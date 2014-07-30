@@ -53,7 +53,10 @@ path.append(SITE_ROOT)
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "TODO: CHANGE ME"#get_env_variable('DJANGO_SECRET_KEY')
+SECRET_KEY = "TODO: CHANGE ME"  # get_env_variable('DJANGO_SECRET_KEY')
+LTI_OAUTH_CREDENTIALS = {
+        'test': 'secret',  #TODO: change me
+    }
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -77,11 +80,20 @@ INSTALLED_APPS = (
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    
+    # Disabling these removes the need for @xframe_options_exempt, @csrf_exempt on views
+    # TODO: determine if this is a better way to go about this
+    #'django.middleware.csrf.CsrfViewMiddleware',
+    #'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_auth_lti.middleware.LTIAuthMiddleware',
 )
+
+AUTHENTICATION_BACKENDS = (
+    'django_auth_lti.backends.LTIAuthBackend',
+)
+
 
 #X_FRAME_OPTIONS = 'EXEMPT'
 #SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
