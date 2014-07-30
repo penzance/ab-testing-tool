@@ -4,3 +4,5 @@ build
 dist
 .vagrant
 *.sqlite3
+.project
+.pydevproject
