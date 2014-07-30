@@ -139,3 +139,12 @@ STATICFILES_DIRS = (
     # Don't forget to use absolute paths, not relative paths.
     normpath(join(SITE_ROOT, 'static')),
 )
+
+TEMPLATE_LOADERS = (
+    'django.template.loaders.filesystem.Loader',
+    'django.template.loaders.app_directories.Loader',
+)
+TEMPLATE_DIRS = (
+    'templates',
+)
+
