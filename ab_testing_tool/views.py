@@ -8,6 +8,10 @@ from django_auth_lti.const import (ADMINISTRATOR, CONTENT_DEVELOPER,
 from ims_lti_py.tool_config import ToolConfig
 from django.views.decorators.http import require_http_methods
 from django.utils.http import urlencode
+from django.template.base import Template
+from random import randint
+from django.template.context import Context
+from django.template import loader
 
 ADMINS = [ADMINISTRATOR, CONTENT_DEVELOPER, TEACHING_ASSISTANT, INSTRUCTOR]
 
@@ -22,21 +26,35 @@ def not_authorized(request):
     return HttpResponse("Student")
 
 def lti_launch(request):
-    #return redirect("/")
-    params = {"return_type": "lti_launch_url",
-               "url": "http://localhost:8000/test/test/asdf",
-               "title": "A/B Page Title",
-               "text": "A/B Page Text"}
+    return resource_selection(request)
+
+def resource_selection(request):
+    """ docs: https://canvas.instructure.com/doc/api/file.link_selection_tools.html """
     ext_content_return_types = request.REQUEST.get('ext_content_return_types')
     if ext_content_return_types == [u'lti_launch_url']:
         return HttpResponse("Error: invalid ext_content_return_types: %s" %
                             ext_content_return_types)
-    url = request.REQUEST.get('ext_content_return_url')
-    if not url:
+    content_return_url = request.REQUEST.get('ext_content_return_url')
+    if not content_return_url:
         return HttpResponse("Error: no ext_content_return_url")
-    return redirect("%s?%s" % (url, urlencode(params)))
-    #print request.__dict__
-    return HttpResponse("lti_launch")
+    
+    return HttpResponse(loader.get_template("add_module_item.html").render(Context({"content_return_url": content_return_url})))
+
+def submit_selection(request):
+    page_url = "/%s" % randint(1000000000, 9999999999) #TODO: improve uniqueness
+    page_name = request.REQUEST.get("page_name")#"A/B Page"
+    content_return_url = request.REQUEST.get("content_return_url")
+    
+    if request.is_secure():
+        host = "https://" + request.get_host()
+    else:
+        host = "http://" + request.get_host()
+    lti_launch_url = "%s%s" % (host, page_url)
+    params = {"return_type": "lti_launch_url",
+               "url": lti_launch_url,
+               #"title": "Title",
+               "text": page_name}
+    return redirect("%s?%s" % (content_return_url, urlencode(params)))
 
 @require_http_methods(["GET"])
 def tool_config(request):
