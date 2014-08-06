@@ -6,3 +6,4 @@ dist
 *.sqlite3
 .project
 .pydevproject
+secure.py

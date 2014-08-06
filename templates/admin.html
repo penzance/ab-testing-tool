@@ -10,25 +10,54 @@
 <body>
 <div class="container">
     <div class="jumbotron">
-        <h2>A/B Testing Tool</h2>
-        <p>Welcome administrator. Manage your course variations here.</p>
+        <h2>A/B Testing Control Panel</h2>
+        <p>Welcome administrator. Manage your A/B course treatments here.</p>
     </div>
-    <div class="span12">
+    <div class="span8">
         <div class="row">
-            <h3>Variations</h3>
+            <div class="span8">
+                <h4>Modules</h4>
+            </div>
+            <div class="list-group span4">
+                {% for m in modules %}
+                    <h4><div class="list-group-item"><button id="module_{{m.id}}"> {{m.name}} </button>| <a href="{{canvas_url}}/modules/{{m.id}}" >(Go to module)</a> </div></h4>
+                    <div id="module_items_{{m.id}}" style="display: none">
+                            <ul class="list-group">
+                                {% for i in m.module_items %}
+                                    {% if i.title == "ab-testing-tool" and i.type == "ExternalTool" %}
+                                        <a href="{{i.html_url}}" class="list-group-item">{{i.title}} | <i>treatment</i></a>
+                                    {% else %}
+                                        <a href="{{i.html_url}}" class="list-group-item">{{i.title|default:"[ Item not titled]"}}</a>
+                                    {% endif %}
+                                {% empty %}
+                                    <li>No items in this module.</li>
+                                {% endfor %}
+                            </ul>
+                    </div>
+                {% empty %}
+                    <li>No modules retrieved.</li>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="span8">
+            <h4>Unused Treatments</h4>
+            </div>
         </div>
         <div class="list-group">
-            <h4><a href="/control" class="list-group-item">Control</a></h4>
-            <h4><a href="/variation1" class="list-group-item">Variation 1</a></h4>
-            {% for v in variations %}
-            <h4><a href="/variation/{{v.id}}" class="list-group-item">{{v.id}}</a></h4>
+            {% for t in treatments %}
+            <a href="/edit_treatment/{{t.id}}" class="list-group-item"><strong>{{t.name}}</strong> - <i>created {{t.created_on}}</i></a>
             {% endfor %}
         </div>
-        <form class="form-inline" method="POST" action="/create_variation" name="create_variation" accept-charset="utf-8">
-            <input type="text" class="input-large" name="variation_name" placeholder="Enter new variation name here..."/>
-            <button type="submit" class="btn btn-success">Create Variation</button>
-        </form>
+            <a class="btn btn-success" href="/update_treatment"> Create Treatment</a>
     </div>
 </div>
+<script>
+{% for m in modules %}
+$( "#module_" + {{m.id}}).click(function() {
+$( "#module_items_" + {{m.id}}).toggle();
+});
+{% endfor %}
+</script>
 </body>
 </html>
