@@ -31,8 +31,8 @@ def not_authorized(request):
 @lti_role_required(ADMINS)
 def render_treatment_control_panel(request):
     """
-        Renders control panel.
-        TODO: filter installed treatments by external_url instead of by treatment name
+    Renders control panel.
+    TODO: filter installed treatments by external_url instead of by treatment name
     """
     course_id = _get_lti_param(request, "custom_canvas_course_id")
     request_context =  _establish_canvas_sdk(request)
@@ -42,15 +42,15 @@ def render_treatment_control_panel(request):
         module["module_items"] = parse_response(modules.list_module_items(request_context, course_id, module["id"], "content_details"))
         installed_treatments.extend([t["title"] for t in module["module_items"]])
     treatments = [t for t in Treatment.objects.all() if t.name not in installed_treatments]
-    return render_to_response("admin.html", {"modules": all_modules,
+    return render_to_response("control_panel.html", {"modules": all_modules,
                                              "treatments": treatments,
                                              "canvas_url": _get_lti_param(request, "launch_presentation_return_url")
                                              })
 
 def deploy_treatment(request, t_id):
     """
-        Delivers randomly one of the two urls in treatment. TODO: Extend this by delivering
-        treatment as determined by track student is on"
+    Delivers randomly one of the two urls in treatment. TODO: Extend this by delivering
+    treatment as determined by track student is on"
     """
     t = Treatment.objects.get(pk=t_id)
     if bool(getrandbits(1)):
@@ -59,18 +59,18 @@ def deploy_treatment(request, t_id):
         return redirect(t.treatment_url2)
 
 @lti_role_required(ADMINS)
-def render_treatment_tempalte(request):
+def new_treatment(request):
     """
-        Note: Canvas fetches all pages within iframe with POST request, requiring separate template render function.
-        This also breaks CSRF token validation if CSRF Middleware is turned out.
+    Note: Canvas fetches all pages within iframe with POST request, requiring separate template render function.
+    This also breaks CSRF token validation if CSRF Middleware is turned out.
     """
     return render_to_response("edit_treatment.html")
 
 @lti_role_required(ADMINS)
 def create_treatment(request):
     """
-        Note: request will always be POST because Canvas fetches pages within iframe by POST
-        TODO: use Django forms library to save instead of getting individual POST params
+    Note: request will always be POST because Canvas fetches pages within iframe by POST
+    TODO: use Django forms library to save instead of getting individual POST params
     """
     course_id = _get_lti_param(request, "custom_canvas_course_id")
     name = request.POST["name"]
@@ -83,8 +83,8 @@ def create_treatment(request):
 @lti_role_required(ADMINS)
 def update_treatment(request):
     """
-        Update treatment only allowed if admin has privileges on the particular course.
-        TODO: use Django forms library to save instead of getting individual POST params
+    Update treatment only allowed if admin has privileges on the particular course.
+    TODO: use Django forms library to save instead of getting individual POST params
     """
     course_id = _get_lti_param(request, "custom_canvas_course_id")
     name = request.POST["name"]
@@ -102,12 +102,14 @@ def update_treatment(request):
     return redirect("/")
 
 @lti_role_required(ADMINS)
-def get_treatment(request, t_id):
+def edit_treatment(request, t_id):
     return render_to_response("edit_treatment.html", {"treatment": Treatment.objects.get(pk=t_id)})
 
 @lti_role_required(ADMINS)
 def add_treatment_to_module(request, t_id):
-    """TODO: Finish this to be able to add treatment to a module from A/B/ control panel"""
+    """
+    TODO: Finish this to be able to add treatment to a module from A/B/ control panel
+    """
     course_id = _get_lti_param(request, "custom_canvas_course_id")
     request_context =  _establish_canvas_sdk(request)
     modules = modules.list_modules(request_context, course_id, "content_details")
