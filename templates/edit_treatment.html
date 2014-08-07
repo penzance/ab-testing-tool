@@ -13,7 +13,7 @@
         <h2>Edit Treatment</h2>
         <p>Edit your A/B course treatments here.</p>
     </div>
-        <form method="post" name="treatment_form" action="{% url 'update_treatment' %}">
+        <form method="post" name="treatment_form" {% if treatment.id %} action="{% url 'update_treatment' %}"{% else %} action="{% url 'create_treatment' %}" {% endif %}>
         {% csrf_token %}
         <input type='hidden' name='id' value="{{ treatment.id }}">
         <table class="table table-striped">

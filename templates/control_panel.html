@@ -49,7 +49,7 @@
             <a href="/edit_treatment/{{t.id}}" class="list-group-item"><strong>{{t.name}}</strong> - <i>created {{t.created_on}}</i></a>
             {% endfor %}
         </div>
-            <a class="btn btn-success" href="/update_treatment"> Create Treatment</a>
+            <a class="btn btn-success" href="{% url 'new_treatment' %}"> Create Treatment</a>
     </div>
 </div>
 <script>
