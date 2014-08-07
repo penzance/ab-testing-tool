@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>A/B Testing Tool</title>
+    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <link rel="stylesheet" href="../static/css/bootstrap.min.css"  type="text/css"/>
+</head>
+
+<body>
+<div class="container">
+    <div class="jumbotron">
+        <h2>A/B Testing Control Panel</h2>
+        <p>Welcome administrator. Manage your A/B course treatments here.</p>
+    </div>
+    <div class="span8">
+        <div class="row">
+            <div class="span8">
+                <h4>Modules</h4>
+            </div>
+            <div class="list-group span4">
+                {% for m in modules %}
+                    <h4><div class="list-group-item"><button id="module_{{m.id}}"> {{m.name}} </button>| <a href="{{canvas_url}}/modules/{{m.id}}" >(Go to module)</a> </div></h4>
+                    <div id="module_items_{{m.id}}" style="display: none">
+                            <ul class="list-group">
+                                {% for i in m.module_items %}
+                                    {% if i.title == "ab-testing-tool" and i.type == "ExternalTool" %}
+                                        <a href="{{i.html_url}}" class="list-group-item">{{i.title}} | <i>treatment</i></a>
+                                    {% else %}
+                                        <a href="{{i.html_url}}" class="list-group-item">{{i.title|default:"[ Item not titled]"}}</a>
+                                    {% endif %}
+                                {% empty %}
+                                    <li>No items in this module.</li>
+                                {% endfor %}
+                            </ul>
+                    </div>
+                {% empty %}
+                    <li>No modules retrieved.</li>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="span8">
+            <h4>Unused Treatments</h4>
+            </div>
+        </div>
+        <div class="list-group">
+            {% for t in treatments %}
+            <a href="/edit_treatment/{{t.id}}" class="list-group-item"><strong>{{t.name}}</strong> - <i>created {{t.created_on}}</i></a>
+            {% endfor %}
+        </div>
+            <a class="btn btn-success" href="{% url 'new_treatment' %}"> Create Treatment</a>
+    </div>
+</div>
+<script>
+{% for m in modules %}
+$( "#module_" + {{m.id}}).click(function() {
+$( "#module_items_" + {{m.id}}).toggle();
+});
+{% endfor %}
+</script>
+</body>
+</html>
