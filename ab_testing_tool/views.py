@@ -150,7 +150,6 @@ def submit_selection(request):
                "text": page_name}
     return redirect("%s?%s" % (content_return_url, urlencode(params)))
 
-@require_http_methods(["GET"])
 def tool_config(request):
     if request.is_secure():
         host = "https://" + request.get_host()
@@ -168,7 +167,7 @@ def tool_config(request):
     nav_params = {
         "enabled": "true",
         # optionally, supply a different URL for the link:
-        # "url": "http://library.harvard.edu",
+        "url": host + reverse("index"),
         "text": "A/B Testing Tool",
         "visibility": "admins",
     }
@@ -176,7 +175,7 @@ def tool_config(request):
     config.set_ext_param("canvas.instructure.com", "course_navigation",
                          nav_params)
     config.set_ext_param("canvas.instructure.com", "resource_selection",
-                         {"enabled": "true", "url": host + reverse("index")})
+                         {"enabled": "true", "url": host + reverse("lti_launch")})
     config.set_ext_param("canvas.instructure.com", "selection_height", "400")
     config.set_ext_param("canvas.instructure.com", "selection_width", "600")
     config.set_ext_param("canvas.instructure.com", "tool_id", "ab_testing_tool")

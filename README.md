@@ -30,14 +30,14 @@ django-admin.py startproject _projectname_ --extension=py,pp --template=https://
         http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
     <blti:title>A/B Testing Tool</blti:title>
     <blti:description>Tool to allow students in a course to get different content in a module item.</blti:description>
-    <blti:launch_url>http://localhost:8000/lti_launch</blti:launch_url>
-    <blti:secure_launch_url>http://localhost:8000/lti_launch</blti:secure_launch_url>
+    <blti:launch_url>http://localhost:8000/</blti:launch_url>
+    <blti:secure_launch_url>http://localhost:8000/</blti:secure_launch_url>
     <blti:vendor/>
     <blti:extensions platform="canvas.instructure.com">
         <lticm:property name="tool_id">ab_testing_tool</lticm:property>
         <lticm:property name="privacy_level">public</lticm:property>
         <lticm:options name="resource_selection">
-            <lticm:property name="url">http://localhost:8000/</lticm:property>
+            <lticm:property name="url">http://localhost:8000/lti_launch</lticm:property>
             <lticm:property name="enabled">true</lticm:property>
         </lticm:options>
         <lticm:property name="selection_width">600</lticm:property>
