@@ -1,7 +1,10 @@
 <HTML>
 <body>
 <form method="POST" action="/submit_selection">
-<label>Page Title</label><input type="text" name="page_name">
+    <select name="treatment_id">
+    {% for treatment in treatments %}
+        <option value="{{treatment.id}}">{{treatment.name}}</option>
+    {%endfor %}
 <input type="hidden" value="{{content_return_url}}" name="content_return_url">
 <input type="submit">
 </form>
