@@ -44,7 +44,14 @@ def deploy_treatment(request, t_id):
     """
     Delivers randomly one of the two urls in treatment.
     TODO: Extend this by delivering treatment as determined by track student is on
+    TODO: Have admin able to preview treatments as a student would see them
     """
+    # TODO: replace the following three lines with verification.is_allowed
+    # when that code makes it into django_auth_lti master
+    lti_launch = request.session.get('LTI_LAUNCH', None)
+    user_roles = lti_launch.get('roles', [])
+    if set(ADMINS) & set(user_roles):
+        return redirect(reverse("edit_treatment", args=(t_id,)))
     t = Treatment.objects.get(pk=t_id)
     if bool(getrandbits(1)):
         return redirect(t.treatment_url1)
