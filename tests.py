@@ -6,8 +6,8 @@ from json import dumps
 from mock import patch, MagicMock
 
 from ab_testing_tool.views import ADMINS
-from ab_testing_tool.controllers import get_uninstalled_treatments,\
-    treatment_url, get_full_host, parse_response, InvalidResponseError
+from ab_testing_tool.controllers import (get_uninstalled_treatments,
+    treatment_url, get_full_host, parse_response, InvalidResponseError)
 from ab_testing_tool.models import Treatment
 
 VIEWS_LIST_MODULES = "ab_testing_tool.views.list_modules"
@@ -81,6 +81,11 @@ class test_views(SessionTestCase):
             self.assertEqual(response.status_code, 200)
             self.assertTemplateUsed(response, "control_panel.html")
     
+    def test_unauthenticated_index(self):
+        self.set_roles([])
+        response = self.client.get(reverse("index"), follow=True)
+        self.assertTemplateNotUsed(response, "control_panel.html")
+    
     def test_get_uninstalled_treatments(self):
         treatments = get_uninstalled_treatments(self.request)
         self.assertEqual(len(treatments), 0)
@@ -150,3 +155,9 @@ class test_views(SessionTestCase):
                 "id": treatment.id}
         self.assertRaises(Exception, self.client.post,
                           reverse("update_treatment"), data, follow=True)
+    
+    def test_tool_config(self):
+        response = self.client.get(reverse("tool_config"))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response._headers["content-type"],
+                        ('Content-Type', 'text/xml'))
