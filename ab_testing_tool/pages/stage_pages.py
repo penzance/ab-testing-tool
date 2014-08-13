@@ -3,8 +3,9 @@ from django.core.urlresolvers import reverse
 from ab_testing_tool.pages.main_pages import ADMINS, STAGE_URL_TAG
 from ab_testing_tool.models import Stage, Track, StageUrl
 from django_auth_lti.decorators import lti_role_required
-from ab_testing_tool.canvas import list_module_items, list_modules, create_module_item
-from ab_testing_tool.controllers import get_lti_param, get_canvas_request_context, stage_url
+from ab_testing_tool.canvas import (list_module_items, list_modules, create_module_item,
+                                    get_lti_param)
+from ab_testing_tool.controllers import get_canvas_request_context, stage_url
 from random import choice
 
 def deploy_stage(request, t_id):
@@ -126,15 +127,12 @@ def add_stage_to_module(request, t_id):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     request_context =  get_canvas_request_context(request)
     modules = list_modules(request_context, course_id, "content_details")
-    item_results = list_module_items(request_context, course_id,
-                                     "24", "content_details")
     module_id = modules[0]["id"]
+    item_results = list_module_items(request_context, course_id, module_id)
     # canvas_sdk.methods.modules.create_module_item(
     #        request_ctx, course_id, module_id, module_item_type,
     #        module_item_content_id, module_item_page_url,
     #        module_item_external_url,
     #        module_item_completion_requirement_min_score)
-    create_module_item(request_context, course_id, module_id, "ExternalTool",
-                       "ab_testing_tool", "1", stage_url(request, t_id),
-                       None)
+    create_module_item(request_context, course_id, module_id, stage_url(request, t_id))
     return redirect("/")

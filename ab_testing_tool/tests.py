@@ -7,13 +7,12 @@ from mock import patch, MagicMock
 
 from ab_testing_tool.pages.main_pages import ADMINS
 from ab_testing_tool.controllers import (get_uninstalled_stages,
-    stage_url, get_full_host, parse_response, InvalidResponseError)
+    stage_url, get_full_host)
 from ab_testing_tool.models import Stage
+from ab_testing_tool.canvas import InvalidResponseError, parse_response
 
-VIEWS_LIST_MODULES = "ab_testing_tool.pages.main_pages.list_modules"
-VIEWS_LIST_ITEMS = "ab_testing_tool.pages.main_pages.list_module_items"
-CONTROLLERS_LIST_MODULES = "ab_testing_tool.controllers.list_modules"
-CONTROLLERS_LIST_ITEMS = "ab_testing_tool.controllers.list_module_items"
+LIST_MODULES = "canvas_sdk.methods.modules.list_modules"
+LIST_ITEMS = "canvas_sdk.methods.modules.list_module_items"
 
 TEST_COURSE_ID = "12345"
 
@@ -46,10 +45,8 @@ class SessionTestCase(TestCase):
         # Patches api functions for all tests; can be overridden by re-patching
         # the particular api call for a particular test
         patchers = [
-            patch(VIEWS_LIST_MODULES, return_value=APIReturn([])),
-            patch(VIEWS_LIST_ITEMS, return_value=APIReturn([])),
-            patch(CONTROLLERS_LIST_MODULES, return_value=APIReturn([])),
-            patch(CONTROLLERS_LIST_ITEMS, return_value=APIReturn([])),
+            patch(LIST_MODULES, return_value=APIReturn([])),
+            patch(LIST_ITEMS, return_value=APIReturn([])),
         ]
         for patcher in patchers:
             patcher.start()
@@ -73,14 +70,13 @@ class test_views(SessionTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "control_panel.html")
 
-    @patch(VIEWS_LIST_MODULES, return_value=APIReturn([{"id": 0}]))
-    @patch(CONTROLLERS_LIST_MODULES, return_value=APIReturn([{"id": 0}]))
-    def test_index_with_module_and_item(self, _mock1, _mock2):
+    @patch(LIST_MODULES, return_value=APIReturn([{"id": 0}]))
+    def test_index_with_module_and_item(self, _mock1):
         mock_item = {"type": "ExternalTool",
                      "external_url": stage_url(self.request, 0)}
         api_return = APIReturn([mock_item])
-        with patch(CONTROLLERS_LIST_ITEMS, return_value=api_return):
-            with patch(VIEWS_LIST_ITEMS, return_value=api_return):
+        with patch(LIST_ITEMS, return_value=api_return):
+            with patch(LIST_ITEMS, return_value=api_return):
                 response = self.client.get(reverse("index"), follow=True)
                 self.assertEqual(response.status_code, 200)
                 self.assertTemplateUsed(response, "control_panel.html")
@@ -94,18 +90,18 @@ class test_views(SessionTestCase):
         stages = get_uninstalled_stages(self.request)
         self.assertEqual(len(stages), 0)
 
-    @patch(CONTROLLERS_LIST_MODULES, return_value=APIReturn([{"id": 0}]))
+    @patch(LIST_MODULES, return_value=APIReturn([{"id": 0}]))
     def test_get_uninstalled_stages_with_item(self, _mock1):
         Stage.objects.create(name="stage1")
         stages = get_uninstalled_stages(self.request)
         self.assertEqual(len(stages), 1)
 
-    @patch(CONTROLLERS_LIST_MODULES, return_value=APIReturn([{"id": 0}]))
+    @patch(LIST_MODULES, return_value=APIReturn([{"id": 0}]))
     def test_get_uninstalled_stages_against_api(self, _mock1):
         stage = Stage.objects.create(name="stage1")
         mock_item = {"type": "ExternalTool",
                      "external_url": stage_url(self.request, stage.id)}
-        with patch(CONTROLLERS_LIST_ITEMS, return_value=APIReturn([mock_item])):
+        with patch(LIST_ITEMS, return_value=APIReturn([mock_item])):
             stages = get_uninstalled_stages(self.request)
             self.assertEqual(len(stages), 0)
 

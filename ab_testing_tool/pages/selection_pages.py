@@ -1,10 +1,11 @@
 from django.shortcuts import render_to_response, redirect
 from django.core.urlresolvers import reverse
 from ab_testing_tool.models import Track, StageUrl, Stage
-from ab_testing_tool.controllers import get_lti_param, get_uninstalled_stages, stage_url
+from ab_testing_tool.controllers import get_uninstalled_stages, stage_url
 from django.http.response import HttpResponse
 from django.utils.http import urlencode
 from ab_testing_tool.pages.main_pages import STAGE_URL_TAG
+from ab_testing_tool.canvas import get_lti_param
 
 
 

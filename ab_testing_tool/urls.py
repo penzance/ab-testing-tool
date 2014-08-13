@@ -2,10 +2,14 @@ from django.conf.urls import patterns, include, url
 from django.contrib import admin
 
 from ab_testing_tool.pages.main_pages import (render_stage_control_panel, not_authorized,
-    deploy_stage, submit_edit_stage, tool_config, resource_selection,
-    submit_selection, create_stage, submit_create_stage, edit_stage, create_track,
-    submit_create_track, submit_edit_track, edit_track, delete_track, delete_stage,
-    submit_selection_new_stage)
+     tool_config)
+
+from ab_testing_tool.pages.selection_pages import (resource_selection, submit_selection,
+                    submit_selection_new_stage)
+from ab_testing_tool.pages.stage_pages import (create_stage, submit_create_stage,
+                    edit_stage,  delete_stage, deploy_stage, submit_edit_stage)
+from ab_testing_tool.pages.track_pages import (create_track, submit_create_track,
+                    submit_edit_track, edit_track, delete_track)
 
 admin.autodiscover()
 

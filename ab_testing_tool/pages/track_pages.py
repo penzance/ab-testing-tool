@@ -3,7 +3,7 @@ from django.core.urlresolvers import reverse
 from ab_testing_tool.pages.main_pages import ADMINS
 from ab_testing_tool.models import Track, StageUrl
 from django_auth_lti.decorators import lti_role_required
-from ab_testing_tool.controllers import get_lti_param
+from ab_testing_tool.canvas import get_lti_param
 
 
 @lti_role_required(ADMINS)

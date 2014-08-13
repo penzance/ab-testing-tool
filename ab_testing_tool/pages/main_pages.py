@@ -1,4 +1,5 @@
-from ab_testing_tool.canvas import (list_module_items, list_modules, create_module_item, get_module_items)
+from ab_testing_tool.canvas import (list_module_items, list_modules, create_module_item,
+                                    get_module_items, get_lti_param)
 from django.core.urlresolvers import reverse
 from django.http.response import HttpResponse
 from django.shortcuts import render_to_response, redirect
@@ -10,8 +11,8 @@ from django_auth_lti.const import (ADMINISTRATOR, CONTENT_DEVELOPER,
     TEACHING_ASSISTANT, INSTRUCTOR)
 from ims_lti_py.tool_config import ToolConfig
 
-from ab_testing_tool.controllers import (get_lti_param, get_canvas_request_context,
-    parse_response, get_uninstalled_stages, stage_url, get_full_host)
+from ab_testing_tool.controllers import (get_canvas_request_context,
+    get_uninstalled_stages, stage_url, get_full_host)
 from ab_testing_tool.models import Stage, Track, StageUrl
 
 
@@ -26,8 +27,7 @@ def not_authorized(request):
 def render_stage_control_panel(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     request_context = get_canvas_request_context(request)
-    response = list_modules(request_context, course_id, "content_details")
-    all_modules = parse_response(response)
+    all_modules = list_modules(request_context, course_id)
     modules = get_module_items(all_modules, request_context, course_id)
     # TODO: instead of 'stages = get_uninstalled_stages(request)',render all stages
     stages = Stage.objects.all()
