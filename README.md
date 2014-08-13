@@ -3,21 +3,21 @@ A/B Testing Tool
 
 In order to run locally:
 
-* copy ab_testing_tool/settings/secure.py.example to create new file ab_testing_tool/settings/secure.py
-and fill in values requested there. If needed, create the token in Canvas (click on Settings in top right of screen, look for 'New Access Token' button under 'Approved Integrations' header) to copy over. Token needs to be in quotes.
+* Copy `ab_testing_tool/settings/secure.py.example` to create a new file `ab_testing_tool/settings/secure.py`
+and fill in values requested there. If needed, create the token in Canvas (click on Settings in top right of screen, look for 'New Access Token' button under 'Approved Integrations' header) to copy over (token needs to be a string i.e. in quotes).
 
+* Install the appropriate requiremnts file from `ab_testing_tool/requirements`.
+Ex. `[sudo] pip install -r ab_testing_tool/requirements/local.txt`.
 
-* Install the appropriate requiremnts file from ab_testing_tool/requirements.
-Ex. `[sudo] pip install -r ab_testing_tool/requirements/local.txt`
-Note If encountering this error "clang error: unknown argument: '-mno-fused-madd'" when installing lxml, refer to this: http://stackoverflow.com/a/22322645/2812260
+Note on installing on OSX: If encountering the error "clang error: unknown argument: '-mno-fused-madd'" when installing lxml, refer to this: http://stackoverflow.com/a/22322645/2812260
 
-* clone the django_auth_lti and canvas_python_sdk libraries and install both
+* Clone the django_auth_lti and canvas_python_sdk libraries and install both
 (via `python setup.py install`)
-TODO: add these to requiremnts
+TODO: ensure these run successfully from requirements
 
-* Run `python manage.py syncdb`
+* Run `python manage.py syncdb` from the ab_testing_tool directory
 
-* Run `python manage.py runserver`
+* Run `python manage.py runserver` from the ab_testing_tool directory
 
 * Install app in canvas by adding an external tool by XML; the config is generated
 by localhost:8000/tool_config; here is what it should generate:

@@ -2,4 +2,6 @@ Django>=1.6
 mock
 ims_lti_py
 # canvas_sdk
+git+https://github.com/penzance/canvas_python_sdk.git@master#egg=canvas_sdk
 # django_auth_lti
+git+https://git@github.com:penzance/django-auth-lti.git@master#egg=django-auth-lti
