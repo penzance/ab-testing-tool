@@ -25,7 +25,7 @@
         </table>
 
     </div>
-            <form method="post" name="track_form" {% if track.id %} action="{% url 'update_track' %}"{% else %} action="{% url 'create_track' %}" {% endif %}>
+            <form method="post" name="track_form" {% if track.id %} action="{% url 'submit_edit_track' %}"{% else %} action="{% url 'submit_create_track' %}" {% endif %}>
             {% csrf_token %}
                 <input type='hidden' name='id' value="{{ track.id }}">
                 <table class="table table-striped">

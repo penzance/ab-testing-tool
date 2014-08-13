@@ -15,7 +15,7 @@
 <div class="container">
       <div class="jumbotron">
           <h2>A/B Testing Control Panel</h2>
-        <p>Welcome administrator. Manage your A/B course treatments here.</p>
+        <p>Welcome administrator. Manage your A/B course stages here.</p>
     </div>
       <div id="tabs">
         <ul>
@@ -28,7 +28,7 @@
                  <div class="span8">
                     <p> Create and Edit your A/B Tracks here. You can assign student cohorts to a track <b> only after </b> finalizing your tracks.</p>
                     <br>
-                     <a class="btn btn-lg btn-success"  href="{% url 'new_track' %}"> Create New Track</a>
+                     <a class="btn btn-lg btn-success"  href="{% url 'create_track' %}"> Create New Track</a>
                      <a class="btn btn-lg btn-danger"> Finalize Tracks</a>
                      <br><br>
                     <div class="list-group span4">
@@ -51,12 +51,12 @@
                 <div class="span8">
                     <p> Create and Edit your A/B stages here. </p>
                     <br>
-                    <a class="btn btn-lg btn-success" style="align:left" href="{% url 'new_treatment' %}"> Create New Stage</a>
+                    <a class="btn btn-lg btn-success" style="align:left" href="{% url 'create_stage' %}"> Create New Stage</a>
                     <br><br>
 
                     <div class="list-group span4">
-                        {% for t in treatments %}
-                        <a href="/edit_treatment/{{t.id}}" class="list-group-item"><strong>{{t.name}}</strong> - <i>created {{t.created_on}}</i></a>
+                        {% for t in stages %}
+                        <a href="/edit_stage/{{t.id}}" class="list-group-item"><strong>{{t.name}}</strong> - <i>created {{t.created_on}}</i></a>
                         {% endfor %}
                     </div>
                 </div>

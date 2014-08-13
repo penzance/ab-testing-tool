@@ -11,9 +11,9 @@
     <form method="POST" action="/submit_selection">
         <h4> To install a new A/B Stage, select one from list of uninstalled stages below:</h4>
         <br>
-        <select name="treatment_id">
-        {% for treatment in treatments %}
-            <option value="{{treatment.id}}">{{treatment.name}}</option>
+        <select name="stage_id">
+        {% for stage in stages %}
+            <option value="{{stage.id}}">{{stage.name}}</option>
         {%endfor %}
         </select>
     <input type="hidden" value="{{content_return_url}}" name="content_return_url">
@@ -23,14 +23,14 @@
     <br>
     <h4> Or, create a new stage:</h4>
     <br>
-  <form method="post" name="treatment_form" action="{% url 'submit_selection_new_treatment' %}">
+  <form method="post" name="stage_form" action="{% url 'submit_selection_new_stage' %}">
             {% csrf_token %}
-    <input type="hidden" value="{{content_return_url}}" name="content_return_url">
-                <input type='hidden' name='id' value="{{ treatment.id }}">
+            <input type="hidden" value="{{content_return_url}}" name="content_return_url">
+                <input type='hidden' name='id' value="{{ stage.id }}">
                 <table class="table">
                 <tr align="left">
                     <td><label>Stage Name</label></td>
-                    <td><input class="form-control"  type="text" name="name" value="{{ treatment.name }}"/></td>
+                    <td><input class="form-control"  type="text" name="name" value="{{ stage.name }}"/></td>
                 </tr>
                 {% for t, s in tracks %}
                 <tr align="left">
@@ -40,7 +40,7 @@
                 {% endfor %}
                 <tr align="left">
                     <td><label>Stage Notes</label></td>
-                    <td><textarea name="notes" rows="6" cols="80" >{{ treatment.notes }}</textarea></td>
+                    <td><textarea name="notes" rows="6" cols="80" >{{ stage.notes }}</textarea></td>
                 </tr>
                 <tr>
                 <td></td>

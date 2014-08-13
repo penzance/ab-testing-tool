@@ -15,7 +15,7 @@ class Track(CustomModel):
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
 
-class Treatment(CustomModel):
+class Stage(CustomModel):
     name = models.CharField(max_length=512)
     notes = models.CharField(max_length=1000)
     course_id = models.CharField(max_length=12, db_index=True)
@@ -25,4 +25,4 @@ class Treatment(CustomModel):
 class StageUrl(CustomModel):
     url = models.CharField(max_length=512)
     track = models.ForeignKey(Track)
-    stage = models.ForeignKey(Treatment)
+    stage = models.ForeignKey(Stage)

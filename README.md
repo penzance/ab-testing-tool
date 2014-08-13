@@ -25,7 +25,7 @@ A/B Testing Tool
         <lticm:property name="tool_id">ab_testing_tool</lticm:property>
         <lticm:property name="privacy_level">public</lticm:property>
         <lticm:options name="resource_selection">
-            <lticm:property name="url">http://localhost:8000/lti_launch</lticm:property>
+            <lticm:property name="url">http://localhost:8000/resource_selection</lticm:property>
             <lticm:property name="enabled">true</lticm:property>
         </lticm:options>
         <lticm:property name="selection_width">800</lticm:property>

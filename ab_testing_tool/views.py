@@ -14,8 +14,8 @@ from ims_lti_py.tool_config import ToolConfig
 from random import getrandbits, randint, choice
 
 from ab_testing_tool.controllers import (get_lti_param, get_canvas_request_context,
-    parse_response, get_uninstalled_treatments, treatment_url, get_full_host)
-from ab_testing_tool.models import Treatment, Track, StageUrl
+    parse_response, get_uninstalled_stages, stage_url, get_full_host)
+from ab_testing_tool.models import Stage, Track, StageUrl
 
 
 ADMINS = [ADMINISTRATOR, CONTENT_DEVELOPER, TEACHING_ASSISTANT, INSTRUCTOR]
@@ -31,41 +31,41 @@ def get_module_items(all_modules, request_context, course_id):
     return all_modules
 
 @lti_role_required(ADMINS)
-def render_treatment_control_panel(request):
+def render_stage_control_panel(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     request_context = get_canvas_request_context(request)
     response = list_modules(request_context, course_id, "content_details")
     all_modules = parse_response(response)
     modules = get_module_items(all_modules, request_context, course_id)
-    # TODO: instead of 'treatments = get_uninstalled_treatments(request)',render all treatments
-    treatments = Treatment.objects.all()
+    # TODO: instead of 'stages = get_uninstalled_stages(request)',render all stages
+    stages = Stage.objects.all()
     tracks = Track.objects.all()
     context = {"modules": modules,
-               "treatments": treatments,
+               "stages": stages,
                "tracks": tracks,
                "canvas_url": get_lti_param(request, "launch_presentation_return_url")
               }
     return render_to_response("control_panel.html", context)
 
 
-def deploy_treatment(request, t_id):
+def deploy_stage(request, t_id):
     """
-    Delivers randomly one of the two urls in treatment.
-    TODO: Extend this by delivering treatment as determined by track student is on
-    TODO: Have admin able to preview treatments as a student would see them
+    Delivers randomly one of the two urls in stage.
+    TODO: Extend this by delivering stage as determined by track student is on
+    TODO: Have admin able to preview stages as a student would see them
     """
     # TODO: replace the following three lines with verification.is_allowed
     # when that code makes it into django_auth_lti master
     lti_launch = request.session.get('LTI_LAUNCH', None)
     user_roles = lti_launch.get('roles', [])
     if set(ADMINS) & set(user_roles):
-        return redirect(reverse("edit_treatment", args=(t_id,)))
+        return redirect(reverse("edit_stage", args=(t_id,)))
     stage_urls = StageUrl.objects.filter(stage__pk=t_id).exclude(url__isnull=True).exclude(url__exact='')
     chosen_url = choice(stage_urls)
     return redirect(chosen_url.url)
 
 @lti_role_required(ADMINS)
-def new_track(request):
+def create_track(request):
     return render_to_response("edit_track.html")
 
 @lti_role_required(ADMINS)
@@ -74,7 +74,7 @@ def edit_track(request, track_id):
     return render_to_response("edit_track.html", context)
 
 @lti_role_required(ADMINS)
-def create_track(request):
+def submit_create_track(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     name = request.POST["name"]
     notes = request.POST["notes"]
@@ -82,7 +82,7 @@ def create_track(request):
     return redirect("/")
 
 @lti_role_required(ADMINS)
-def update_track(request):
+def submit_edit_track(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     name = request.POST["name"]
     notes = request.POST["notes"]
@@ -97,18 +97,18 @@ def update_track(request):
     return redirect("/")
 
 @lti_role_required(ADMINS)
-def new_treatment(request):
+def create_stage(request):
     """
     Note: Canvas fetches all pages within iframe with POST request,
     requiring separate template render function.
     This also breaks CSRF token validation if CSRF Middleware is turned off.
     """
     context = {"tracks" : [(t,None) for t in Track.objects.all()]}
-    return render_to_response("edit_treatment.html", context)
+    return render_to_response("edit_stage.html", context)
 
 
 @lti_role_required(ADMINS)
-def create_treatment(request):
+def submit_create_stage(request):
     """
     Note: request will always be POST because Canvas fetches pages within iframe by POST
     TODO: use Django forms library to save instead of getting individual POST params
@@ -116,7 +116,7 @@ def create_treatment(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     name = request.POST["name"]
     notes = request.POST["notes"]
-    t = Treatment.objects.create(name=name, notes=notes, course_id=course_id)
+    t = Stage.objects.create(name=name, notes=notes, course_id=course_id)
     stageurls = [(k,v) for (k,v) in request.POST.iteritems() if STAGE_URL_TAG in k and v]
     for (k,v) in stageurls:
         _,track_id = k.split(STAGE_URL_TAG)
@@ -125,16 +125,16 @@ def create_treatment(request):
 
 
 @lti_role_required(ADMINS)
-def update_treatment(request):
+def submit_edit_stage(request):
     """
-    Update treatment only allowed if admin has privileges on the particular course.
+    Update stage only allowed if admin has privileges on the particular course.
     TODO: use Django forms library to save instead of getting individual POST params
     """
     course_id = get_lti_param(request, "custom_canvas_course_id")
     name = request.POST["name"]
     notes = request.POST["notes"]
     t_id = request.POST["id"]
-    result_list = Treatment.objects.filter(pk=t_id, course_id=course_id)
+    result_list = Stage.objects.filter(pk=t_id, course_id=course_id)
     if len(result_list) == 1:
         result_list[0].update(name=name, notes=notes)
     elif len(result_list) > 1:
@@ -156,7 +156,7 @@ def update_treatment(request):
 
 
 @lti_role_required(ADMINS)
-def edit_treatment(request, t_id):
+def edit_stage(request, t_id):
     all_tracks = Track.objects.all()
     track_urls = []
     for t in all_tracks:
@@ -165,19 +165,19 @@ def edit_treatment(request, t_id):
             track_urls.append((t, stage_url[0]))
         else:
             track_urls.append((t, None))
-    context = {"treatment": Treatment.objects.get(pk=t_id),
+    context = {"stage": Stage.objects.get(pk=t_id),
                "tracks": track_urls,
                }
-    return render_to_response("edit_treatment.html", context)
+    return render_to_response("edit_stage.html", context)
 
 @lti_role_required(ADMINS)
-def delete_treatment(request, t_id):
+def delete_stage(request, t_id):
     """
-    TODO: !!! Make call to canvas API to remove treatment as module item from
+    TODO: !!! Make call to canvas API to remove stage as module item from
     any modules it is installed. May need to add module_item_id as DB attribute.
     """
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    t = Treatment.objects.filter(pk=t_id, course_id=course_id)
+    t = Stage.objects.filter(pk=t_id, course_id=course_id)
     if len(t) == 1:
         t[0].delete()
         stage_urls = StageUrl.objects.filter(stage__pk=t_id)
@@ -192,7 +192,7 @@ def delete_treatment(request, t_id):
 @lti_role_required(ADMINS)
 def delete_track(request, track_id):
     """
-    NOTE: When a track gets deleted, treatments on the track do not get deleted.
+    NOTE: When a track gets deleted, stages on the track do not get deleted.
     Decide whether or not this should be the case.
     """
     course_id = get_lti_param(request, "custom_canvas_course_id")
@@ -210,9 +210,9 @@ def delete_track(request, track_id):
     return redirect("/")
 
 @lti_role_required(ADMINS)
-def add_treatment_to_module(request, t_id):
+def add_stage_to_module(request, t_id):
     """
-    TODO: Finish this to be able to add treatment to a module from control panel
+    TODO: Finish this to be able to add stage to a module from control panel
     """
     course_id = get_lti_param(request, "custom_canvas_course_id")
     request_context =  get_canvas_request_context(request)
@@ -226,16 +226,12 @@ def add_treatment_to_module(request, t_id):
     #        module_item_external_url,
     #        module_item_completion_requirement_min_score)
     create_module_item(request_context, course_id, module_id, "ExternalTool",
-                       "ab_testing_tool", "1", treatment_url(request, t_id),
+                       "ab_testing_tool", "1", stage_url(request, t_id),
                        None)
     return redirect("/")
 
 
-def lti_launch(request):
-    return treatment_selection(request)
-
-
-def treatment_selection(request):
+def resource_selection(request):
     """ docs: https://canvas.instructure.com/doc/api/file.link_selection_tools.html """
     ext_content_return_types = request.REQUEST.get('ext_content_return_types')
     if ext_content_return_types == [u'lti_launch_url']:
@@ -246,17 +242,17 @@ def treatment_selection(request):
         return HttpResponse("Error: no ext_content_return_url")
 
     context = {"content_return_url": content_return_url,
-               "treatments": get_uninstalled_treatments(request),
+               "stages": get_uninstalled_stages(request),
                "tracks": [(t,None) for t in Track.objects.all()],
                }
     return render_to_response("add_module_item.html", context)
 
 
 def submit_selection(request):
-    treatment_id = request.REQUEST.get("treatment_id")
-    t = Treatment.objects.get(pk=treatment_id)
-    page_url = treatment_url(request, treatment_id)
-    print treatment_id, page_url
+    stage_id = request.REQUEST.get("stage_id")
+    t = Stage.objects.get(pk=stage_id)
+    page_url = stage_url(request, stage_id)
+    print stage_id, page_url
     page_name = t.name # TODO: replace with value from DB
     content_return_url = request.REQUEST.get("content_return_url")
     params = {"return_type": "lti_launch_url",
@@ -266,16 +262,16 @@ def submit_selection(request):
     return redirect("%s?%s" % (content_return_url, urlencode(params)))
 
 
-def submit_selection_new_treatment(request):
+def submit_selection_new_stage(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     name = request.POST["name"]
     notes = request.POST["notes"]
-    t = Treatment.objects.create(name=name, notes=notes, course_id=course_id)
+    t = Stage.objects.create(name=name, notes=notes, course_id=course_id)
     stageurls = [(k,v) for (k,v) in request.POST.iteritems() if STAGE_URL_TAG in k and v]
     for (k,v) in stageurls:
         _,track_id = k.split(STAGE_URL_TAG)
         StageUrl.objects.create(url=v, stage_id=t.id, track_id=track_id)
-    page_url = treatment_url(request, t.id)
+    page_url = stage_url(request, t.id)
     page_name = t.name # TODO: replace with value from DB
     content_return_url = request.REQUEST.get("content_return_url")
     params = {"return_type": "lti_launch_url",
@@ -286,7 +282,7 @@ def submit_selection_new_treatment(request):
 
 def tool_config(request):
     host = get_full_host(request)
-    url = host + reverse("lti_launch")
+    url = host + reverse("index")
 
     config = ToolConfig(
         title="A/B Testing Tool",
@@ -305,7 +301,7 @@ def tool_config(request):
     config.set_ext_param("canvas.instructure.com", "course_navigation",
                          nav_params)
     config.set_ext_param("canvas.instructure.com", "resource_selection",
-                         {"enabled": "true", "url": host + reverse("lti_launch")})
+                         {"enabled": "true", "url": host + reverse("resource_selection")})
     config.set_ext_param("canvas.instructure.com", "selection_height", "800")
     config.set_ext_param("canvas.instructure.com", "selection_width", "800")
     config.set_ext_param("canvas.instructure.com", "tool_id", "ab_testing_tool")

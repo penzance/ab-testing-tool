@@ -2,7 +2,7 @@ import json
 from canvas_sdk import RequestContext
 from canvas_sdk.methods.modules import list_module_items, list_modules
 
-from ab_testing_tool.models import Treatment
+from ab_testing_tool.models import Stage
 #TODO: change from secure.py setting to oauth handoff
 from ab_testing_tool.settings.secure import COURSE_OAUTH_TOKEN
 
@@ -39,22 +39,22 @@ def get_full_host(request):
         return "http://" + request.get_host()
 
 
-def treatment_url(request, t_id):
-    return "%s/treatment/%s" % (get_full_host(request), t_id)
+def stage_url(request, t_id):
+    return "%s/stage/%s" % (get_full_host(request), t_id)
 
 
-def get_uninstalled_treatments(request):
+def get_uninstalled_stages(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     request_context =  get_canvas_request_context(request)
     response = list_modules(request_context, course_id, "content_details")
     all_modules = parse_response(response)
-    installed_treatment_urls = []
+    installed_stage_urls = []
     for module in all_modules:
         response = list_module_items(request_context, course_id,
                                      module["id"], "content_details")
-        treatment_urls = [t["external_url"] for t in parse_response(response)
+        stage_urls = [t["external_url"] for t in parse_response(response)
                           if t["type"] == "ExternalTool"]
-        installed_treatment_urls.extend(treatment_urls)
-    treatments = [t for t in Treatment.objects.all()
-                  if treatment_url(request, t.id) not in installed_treatment_urls]
-    return treatments
+        installed_stage_urls.extend(stage_urls)
+    stages = [t for t in Stage.objects.all()
+                  if stage_url(request, t.id) not in installed_stage_urls]
+    return stages
