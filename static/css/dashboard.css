@@ -1,0 +1,12 @@
+.jumbotron {
+  padding: 0.5em 0.6em;
+}
+
+.jumbotron p .btn {
+  padding: 0.5em;
+}
+
+.ui-widget-content .btn {
+  color: white;
+
+}
