@@ -11,6 +11,7 @@ from ab_testing_tool.controllers import (get_uninstalled_treatments,
 from ab_testing_tool.models import Treatment
 
 VIEWS_LIST_MODULES = "ab_testing_tool.views.list_modules"
+VIEWS_LIST_ITEMS = "ab_testing_tool.views.list_module_items"
 CONTROLLERS_LIST_MODULES = "ab_testing_tool.controllers.list_modules"
 CONTROLLERS_LIST_ITEMS = "ab_testing_tool.controllers.list_module_items"
 
@@ -46,6 +47,7 @@ class SessionTestCase(TestCase):
         # the particular api call for a particular test
         patchers = [
             patch(VIEWS_LIST_MODULES, return_value=APIReturn([])),
+            patch(VIEWS_LIST_ITEMS, return_value=APIReturn([])),
             patch(CONTROLLERS_LIST_MODULES, return_value=APIReturn([])),
             patch(CONTROLLERS_LIST_ITEMS, return_value=APIReturn([])),
         ]
@@ -76,10 +78,12 @@ class test_views(SessionTestCase):
     def test_index_with_module_and_item(self, _mock1, _mock2):
         mock_item = {"type": "ExternalTool",
                      "external_url": treatment_url(self.request, 0)}
-        with patch(CONTROLLERS_LIST_ITEMS, return_value=APIReturn([mock_item])):
-            response = self.client.get(reverse("index"), follow=True)
-            self.assertEqual(response.status_code, 200)
-            self.assertTemplateUsed(response, "control_panel.html")
+        api_return = APIReturn([mock_item])
+        with patch(CONTROLLERS_LIST_ITEMS, return_value=api_return):
+            with patch(VIEWS_LIST_ITEMS, return_value=api_return):
+                response = self.client.get(reverse("index"), follow=True)
+                self.assertEqual(response.status_code, 200)
+                self.assertTemplateUsed(response, "control_panel.html")
     
     def test_unauthenticated_index(self):
         self.set_roles([])
