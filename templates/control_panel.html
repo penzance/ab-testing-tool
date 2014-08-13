@@ -35,7 +35,6 @@
                         {% for m in tracks %}
                             <h4><a href="/edit_track/{{m.id}}" class="list-group-item clearfix" id="track_{{m.id}}">
                                     <span><strong>{{m.name}} </strong></span>
-                                    <span class="pull-right">Delete</span>
                                 </a>
                             </h4>
                             <div id="Track_items_{{m.id}}" style="display: none">
@@ -74,7 +73,7 @@
                                     <ul class="list-group">
                                         {% for i in m.module_items %}
                                             {% if i.type == "ExternalTool" %}
-                                                <a href="{{i.html_url}}" class="list-group-item">{{i.title}} | <i> treatment</i></a>
+                                                <a class="list-group-item active">{{i.title}} | <i> Stage</i></a>
                                             {% else %}
                                                 <p class="list-group-item">{{i.title|default:"[ Item not titled]"}}</p>
                                             {% endif %}

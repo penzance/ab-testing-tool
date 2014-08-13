@@ -40,8 +40,8 @@ django-admin.py startproject _projectname_ --extension=py,pp --template=https://
             <lticm:property name="url">http://localhost:8000/lti_launch</lticm:property>
             <lticm:property name="enabled">true</lticm:property>
         </lticm:options>
-        <lticm:property name="selection_width">600</lticm:property>
-        <lticm:property name="selection_height">400</lticm:property>
+        <lticm:property name="selection_width">800</lticm:property>
+        <lticm:property name="selection_height">800</lticm:property>
         <lticm:options name="course_navigation">
             <lticm:property name="text">A/B Testing Tool</lticm:property>
             <lticm:property name="enabled">true</lticm:property>

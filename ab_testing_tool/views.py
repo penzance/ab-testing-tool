@@ -1,5 +1,5 @@
 from canvas_sdk.methods.modules import (list_module_items, list_modules,
-    create_module_item)
+    create_module_item, delete_module_item)
 from django.core.urlresolvers import reverse
 from django.http.response import HttpResponse
 from django.shortcuts import render_to_response, redirect
@@ -11,7 +11,7 @@ from django_auth_lti.decorators import lti_role_required
 from django_auth_lti.const import (ADMINISTRATOR, CONTENT_DEVELOPER,
     TEACHING_ASSISTANT, INSTRUCTOR)
 from ims_lti_py.tool_config import ToolConfig
-from random import getrandbits, randint
+from random import getrandbits, randint, choice
 
 from ab_testing_tool.controllers import (get_lti_param, get_canvas_request_context,
     parse_response, get_uninstalled_treatments, treatment_url, get_full_host)
@@ -60,11 +60,9 @@ def deploy_treatment(request, t_id):
     user_roles = lti_launch.get('roles', [])
     if set(ADMINS) & set(user_roles):
         return redirect(reverse("edit_treatment", args=(t_id,)))
-    t = Treatment.objects.get(pk=t_id)
-    if bool(getrandbits(1)):
-        return redirect(t.treatment_url1)
-    else:
-        return redirect(t.treatment_url2)
+    stage_urls = StageUrl.objects.filter(stage__pk=t_id).exclude(url__isnull=True).exclude(url__exact='')
+    chosen_url = choice(stage_urls)
+    return redirect(chosen_url.url)
 
 @lti_role_required(ADMINS)
 def new_track(request):
@@ -173,6 +171,45 @@ def edit_treatment(request, t_id):
     return render_to_response("edit_treatment.html", context)
 
 @lti_role_required(ADMINS)
+def delete_treatment(request, t_id):
+    """
+    TODO: !!! Make call to canvas API to remove treatment as module item from
+    any modules it is installed. May need to add module_item_id as DB attribute.
+    """
+    course_id = get_lti_param(request, "custom_canvas_course_id")
+    t = Treatment.objects.filter(pk=t_id, course_id=course_id)
+    if len(t) == 1:
+        t[0].delete()
+        stage_urls = StageUrl.objects.filter(stage__pk=t_id)
+        for url in stage_urls:
+            url.delete()
+    elif len(t) > 1:
+        raise Exception("Multiple objects returned.")
+    else:
+        raise Exception("No stage with ID '{0}' found".format(t_id))
+    return redirect("/#tabs-2")
+
+@lti_role_required(ADMINS)
+def delete_track(request, track_id):
+    """
+    NOTE: When a track gets deleted, treatments on the track do not get deleted.
+    Decide whether or not this should be the case.
+    """
+    course_id = get_lti_param(request, "custom_canvas_course_id")
+    t = Track.objects.filter(pk=track_id, course_id=course_id)
+    if len(t) == 1:
+        t[0].delete()
+        stage_urls = StageUrl.objects.filter(track__pk=track_id)
+        for url in stage_urls:
+            url.delete()
+
+    elif len(t) > 1:
+        raise Exception("Multiple objects returned.")
+    else:
+        raise Exception("No track with ID '{0}' found".format(track_id))
+    return redirect("/")
+
+@lti_role_required(ADMINS)
 def add_treatment_to_module(request, t_id):
     """
     TODO: Finish this to be able to add treatment to a module from control panel
@@ -209,15 +246,37 @@ def treatment_selection(request):
         return HttpResponse("Error: no ext_content_return_url")
 
     context = {"content_return_url": content_return_url,
-               "treatments": get_uninstalled_treatments(request)}
+               "treatments": get_uninstalled_treatments(request),
+               "tracks": [(t,None) for t in Track.objects.all()],
+               }
     return render_to_response("add_module_item.html", context)
 
 
 def submit_selection(request):
     treatment_id = request.REQUEST.get("treatment_id")
+    t = Treatment.objects.get(pk=treatment_id)
     page_url = treatment_url(request, treatment_id)
     print treatment_id, page_url
-    page_name = "A/B Page" # TODO: replace with value from DB
+    page_name = t.name # TODO: replace with value from DB
+    content_return_url = request.REQUEST.get("content_return_url")
+    params = {"return_type": "lti_launch_url",
+               "url": page_url,
+               #"title": "Title",
+               "text": page_name}
+    return redirect("%s?%s" % (content_return_url, urlencode(params)))
+
+
+def submit_selection_new_treatment(request):
+    course_id = get_lti_param(request, "custom_canvas_course_id")
+    name = request.POST["name"]
+    notes = request.POST["notes"]
+    t = Treatment.objects.create(name=name, notes=notes, course_id=course_id)
+    stageurls = [(k,v) for (k,v) in request.POST.iteritems() if STAGE_URL_TAG in k and v]
+    for (k,v) in stageurls:
+        _,track_id = k.split(STAGE_URL_TAG)
+        StageUrl.objects.create(url=v, stage_id=t.id, track_id=track_id)
+    page_url = treatment_url(request, t.id)
+    page_name = t.name # TODO: replace with value from DB
     content_return_url = request.REQUEST.get("content_return_url")
     params = {"return_type": "lti_launch_url",
                "url": page_url,

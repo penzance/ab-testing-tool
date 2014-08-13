@@ -9,17 +9,47 @@
 <body>
 <div class="container">
     <form method="POST" action="/submit_selection">
-        <p> Select from Existing Stages </p>
+        <h4> To install a new A/B Stage, select one from list of uninstalled stages below:</h4>
+        <br>
         <select name="treatment_id">
         {% for treatment in treatments %}
             <option value="{{treatment.id}}">{{treatment.name}}</option>
         {%endfor %}
         </select>
     <input type="hidden" value="{{content_return_url}}" name="content_return_url">
-    <br>
+    <br><br>
     <input type="submit" value="Add From List" class="btn btn-large btn-primary submit">
     </form>
-</div>
+    <br>
+    <h4> Or, create a new stage:</h4>
+    <br>
+  <form method="post" name="treatment_form" action="{% url 'submit_selection_new_treatment' %}">
+            {% csrf_token %}
+    <input type="hidden" value="{{content_return_url}}" name="content_return_url">
+                <input type='hidden' name='id' value="{{ treatment.id }}">
+                <table class="table">
+                <tr align="left">
+                    <td><label>Stage Name</label></td>
+                    <td><input class="form-control"  type="text" name="name" value="{{ treatment.name }}"/></td>
+                </tr>
+                {% for t, s in tracks %}
+                <tr align="left">
+                    <td><label>URL for Track "{{t.name}}" </label></td>
+                    <td><input class="form-control"  type="text" name="_stageurl_{{t.id}}" value="{{ s.url }}"/></td>
+                </tr>
+                {% endfor %}
+                <tr align="left">
+                    <td><label>Stage Notes</label></td>
+                    <td><textarea name="notes" rows="6" cols="80" >{{ treatment.notes }}</textarea></td>
+                </tr>
+                <tr>
+                <td></td>
+                <td><input type="submit" name="submit" value="Submit Changes" class="btn btn-lg btn-success submit"></td>
+                </tr>
+                </table>
 
+           </form>
+
+</div>
 </body>
 </html>
