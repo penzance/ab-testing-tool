@@ -4,7 +4,8 @@ A/B Testing Tool
 In order to run locally:
 
 * copy ab_testing_tool/settings/secure.py.example to create new file ab_testing_tool/settings/secure.py
-and fill in values requested there. If needed, create course oauth token in Canvas from Sidebar Settings >
+and fill in values requested there. If needed, create the token in Canvas (click on Settings in top right of screen, look for 'New Access Token' button under 'Approved Integrations' header) to copy over. Token needs to be in quotes.
+
 
 * Install the appropriate requiremnts file from ab_testing_tool/requirements.
 Ex. `[sudo] pip install -r ab_testing_tool/requirements/local.txt`
