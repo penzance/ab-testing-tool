@@ -1,27 +1,14 @@
 import json
-from canvas_sdk import RequestContext
-from canvas_sdk.methods.modules import list_module_items, list_modules
-
 from ab_testing_tool.models import Stage
-#TODO: change from secure.py setting to oauth handoff
-from ab_testing_tool.settings.secure import COURSE_OAUTH_TOKEN
-
+from canvas import get_canvas_request_context, list_module_items, list_modules
 
 class InvalidResponseError(Exception):
     """ TODO: Move this to canvas_sdk_python """
     pass
 
-
 def get_lti_param(request, key):
     """ TODO: Add this function to Django auth lti library """
     return request.session["LTI_LAUNCH"][key]
-
-
-def get_canvas_request_context(request):
-    oauth_token = COURSE_OAUTH_TOKEN
-    canvas_url = "https://{0}/api".format(get_lti_param(request, "custom_canvas_api_domain"))
-    return RequestContext(oauth_token, canvas_url)
-
 
 def parse_response(sdk_response):
     """ TODO: Move this function to canvas_sdk_python so that all sdk
@@ -31,17 +18,14 @@ def parse_response(sdk_response):
     else:
         raise InvalidResponseError
 
-
 def get_full_host(request):
     if request.is_secure():
         return "https://" + request.get_host()
     else:
         return "http://" + request.get_host()
 
-
 def stage_url(request, t_id):
     return "%s/stage/%s" % (get_full_host(request), t_id)
-
 
 def get_uninstalled_stages(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")

@@ -1,7 +1,7 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 
-from ab_testing_tool.views import (render_stage_control_panel, not_authorized,
+from ab_testing_tool.pages.main_pages import (render_stage_control_panel, not_authorized,
     deploy_stage, submit_edit_stage, tool_config, resource_selection,
     submit_selection, create_stage, submit_create_stage, edit_stage, create_track,
     submit_create_track, submit_edit_track, edit_track, delete_track, delete_stage,

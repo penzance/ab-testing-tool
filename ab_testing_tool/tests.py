@@ -5,13 +5,13 @@ from django.utils.importlib import import_module
 from json import dumps
 from mock import patch, MagicMock
 
-from ab_testing_tool.views import ADMINS
+from ab_testing_tool.pages.main_pages import ADMINS
 from ab_testing_tool.controllers import (get_uninstalled_stages,
     stage_url, get_full_host, parse_response, InvalidResponseError)
 from ab_testing_tool.models import Stage
 
-VIEWS_LIST_MODULES = "ab_testing_tool.views.list_modules"
-VIEWS_LIST_ITEMS = "ab_testing_tool.views.list_module_items"
+VIEWS_LIST_MODULES = "ab_testing_tool.pages.main_pages.list_modules"
+VIEWS_LIST_ITEMS = "ab_testing_tool.pages.main_pages.list_module_items"
 CONTROLLERS_LIST_MODULES = "ab_testing_tool.controllers.list_modules"
 CONTROLLERS_LIST_ITEMS = "ab_testing_tool.controllers.list_module_items"
 
