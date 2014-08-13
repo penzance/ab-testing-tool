@@ -15,15 +15,20 @@ from random import getrandbits, randint
 
 from ab_testing_tool.controllers import (get_lti_param, get_canvas_request_context,
     parse_response, get_uninstalled_treatments, treatment_url, get_full_host)
-from ab_testing_tool.models import Treatment
+from ab_testing_tool.models import Treatment, Track, StageUrl
 
 
 ADMINS = [ADMINISTRATOR, CONTENT_DEVELOPER, TEACHING_ASSISTANT, INSTRUCTOR]
-
+STAGE_URL_TAG = '_stageurl_'
 
 def not_authorized(request):
     return HttpResponse("Student")
 
+
+def get_module_items(all_modules, request_context, course_id):
+    for module in all_modules:
+        module["module_items"] = parse_response(list_module_items(request_context, course_id, module["id"], "content_details"))
+    return all_modules
 
 @lti_role_required(ADMINS)
 def render_treatment_control_panel(request):
@@ -31,10 +36,13 @@ def render_treatment_control_panel(request):
     request_context = get_canvas_request_context(request)
     response = list_modules(request_context, course_id, "content_details")
     all_modules = parse_response(response)
-    treatments = get_uninstalled_treatments(request)
-    
-    context = {"modules": all_modules,
+    modules = get_module_items(all_modules, request_context, course_id)
+    # TODO: instead of 'treatments = get_uninstalled_treatments(request)',render all treatments
+    treatments = Treatment.objects.all()
+    tracks = Track.objects.all()
+    context = {"modules": modules,
                "treatments": treatments,
+               "tracks": tracks,
                "canvas_url": get_lti_param(request, "launch_presentation_return_url")
               }
     return render_to_response("control_panel.html", context)
@@ -58,6 +66,37 @@ def deploy_treatment(request, t_id):
     else:
         return redirect(t.treatment_url2)
 
+@lti_role_required(ADMINS)
+def new_track(request):
+    return render_to_response("edit_track.html")
+
+@lti_role_required(ADMINS)
+def edit_track(request, track_id):
+    context = {"track": Track.objects.get(pk=track_id)}
+    return render_to_response("edit_track.html", context)
+
+@lti_role_required(ADMINS)
+def create_track(request):
+    course_id = get_lti_param(request, "custom_canvas_course_id")
+    name = request.POST["name"]
+    notes = request.POST["notes"]
+    Track.objects.create(name=name, notes=notes, course_id=course_id)
+    return redirect("/")
+
+@lti_role_required(ADMINS)
+def update_track(request):
+    course_id = get_lti_param(request, "custom_canvas_course_id")
+    name = request.POST["name"]
+    notes = request.POST["notes"]
+    track_id = request.POST["id"]
+    result_list = Track.objects.filter(pk=track_id, course_id=course_id)
+    if len(result_list) == 1:
+        result_list[0].update(name=name, notes=notes)
+    elif len(result_list) > 1:
+        raise Exception("Multiple objects returned.")
+    else:
+        raise Exception("No track with ID '{0}' found".format(track_id))
+    return redirect("/")
 
 @lti_role_required(ADMINS)
 def new_treatment(request):
@@ -66,7 +105,8 @@ def new_treatment(request):
     requiring separate template render function.
     This also breaks CSRF token validation if CSRF Middleware is turned off.
     """
-    return render_to_response("edit_treatment.html")
+    context = {"tracks" : [(t,None) for t in Track.objects.all()]}
+    return render_to_response("edit_treatment.html", context)
 
 
 @lti_role_required(ADMINS)
@@ -77,11 +117,13 @@ def create_treatment(request):
     """
     course_id = get_lti_param(request, "custom_canvas_course_id")
     name = request.POST["name"]
-    url1 = request.POST["url1"]
-    url2 = request.POST["url2"]
     notes = request.POST["notes"]
-    Treatment.objects.create(name=name, treatment_url1=url1, treatment_url2=url2, notes=notes, course_id=course_id)
-    return redirect("/")
+    t = Treatment.objects.create(name=name, notes=notes, course_id=course_id)
+    stageurls = [(k,v) for (k,v) in request.POST.iteritems() if STAGE_URL_TAG in k and v]
+    for (k,v) in stageurls:
+        _,track_id = k.split(STAGE_URL_TAG)
+        StageUrl.objects.create(url=v, stage_id=t.id, track_id=track_id)
+    return redirect("/#tabs-2")
 
 
 @lti_role_required(ADMINS)
@@ -92,25 +134,43 @@ def update_treatment(request):
     """
     course_id = get_lti_param(request, "custom_canvas_course_id")
     name = request.POST["name"]
-    url1 = request.POST["url1"]
-    url2 = request.POST["url2"]
     notes = request.POST["notes"]
     t_id = request.POST["id"]
     result_list = Treatment.objects.filter(pk=t_id, course_id=course_id)
     if len(result_list) == 1:
-        result_list[0].update(name=name, treatment_url1=url1, treatment_url2=url2, notes=notes)
+        result_list[0].update(name=name, notes=notes)
     elif len(result_list) > 1:
         raise Exception("Multiple objects returned.")
     else:
-        raise Exception("No treatment found")
-    return redirect("/")
+        raise Exception("No stage with ID '{0}' found".format(t_id))
+    #StageUrl creation
+    stageurls = [(k,v) for (k,v) in request.POST.iteritems() if STAGE_URL_TAG in k and v]
+    for (k,v) in stageurls:
+        _,track_id = k.split(STAGE_URL_TAG)
+        stage_result_list = StageUrl.objects.filter(stage__pk=t_id, track__pk=track_id)
+        if len(stage_result_list) == 1:
+            stage_result_list[0].update(url=v)
+        elif len(result_list) > 1:
+            raise Exception("Multiple objects returned.")
+        else:
+            StageUrl.objects.create(url=v, stage_id=t_id, track_id=track_id)
+    return redirect("/#tabs-2")
 
 
 @lti_role_required(ADMINS)
 def edit_treatment(request, t_id):
-    return render_to_response("edit_treatment.html",
-                              {"treatment": Treatment.objects.get(pk=t_id)})
-
+    all_tracks = Track.objects.all()
+    track_urls = []
+    for t in all_tracks:
+        stage_url = StageUrl.objects.filter(stage__pk=t_id, track=t)
+        if stage_url:
+            track_urls.append((t, stage_url[0]))
+        else:
+            track_urls.append((t, None))
+    context = {"treatment": Treatment.objects.get(pk=t_id),
+               "tracks": track_urls,
+               }
+    return render_to_response("edit_treatment.html", context)
 
 @lti_role_required(ADMINS)
 def add_treatment_to_module(request, t_id):
@@ -147,7 +207,7 @@ def treatment_selection(request):
     content_return_url = request.REQUEST.get('ext_content_return_url')
     if not content_return_url:
         return HttpResponse("Error: no ext_content_return_url")
-    
+
     context = {"content_return_url": content_return_url,
                "treatments": get_uninstalled_treatments(request)}
     return render_to_response("add_module_item.html", context)
@@ -165,11 +225,10 @@ def submit_selection(request):
                "text": page_name}
     return redirect("%s?%s" % (content_return_url, urlencode(params)))
 
-
 def tool_config(request):
     host = get_full_host(request)
     url = host + reverse("lti_launch")
-    
+
     config = ToolConfig(
         title="A/B Testing Tool",
         launch_url=url,
@@ -188,11 +247,11 @@ def tool_config(request):
                          nav_params)
     config.set_ext_param("canvas.instructure.com", "resource_selection",
                          {"enabled": "true", "url": host + reverse("lti_launch")})
-    config.set_ext_param("canvas.instructure.com", "selection_height", "400")
-    config.set_ext_param("canvas.instructure.com", "selection_width", "600")
+    config.set_ext_param("canvas.instructure.com", "selection_height", "800")
+    config.set_ext_param("canvas.instructure.com", "selection_width", "800")
     config.set_ext_param("canvas.instructure.com", "tool_id", "ab_testing_tool")
     config.description = ("Tool to allow students in a course to " +
                           "get different content in a module item.")
-    
+
     resp = HttpResponse(config.to_xml(), content_type="text/xml", status=200)
     return resp
