@@ -1,7 +1,25 @@
 A/B Testing Tool
 =======================
 
-* Canvas XML Config:
+In order to run locally:
+
+* copy ab_testing_tool/settings/secure.py.example to ab_teting_tool/settings/secure.py
+and fill in values requested therin
+
+* Install the appropriate requiremnts file from ab_testing_tool/requirements.
+Ex. `[sudo] pip install -r ab_testing_tool/requirements/local.txt`
+
+* clone the django_auth_lti and canvas_python_sdk libraries and install both
+(via `python setup.py install`)
+TODO: add these to requiremnts
+
+* `python manage.py syncdb`
+
+* `python manage.py runserver`
+
+* Install app in canvas by adding an external tool by XML; the config is generated
+by localhost:8000/tool_config; here is what it should generate:
+
 ```
 <?xml version="1.0" encoding="UTF-8"?>
 <cartridge_basiclti_link xmlns:lticm="http://www.imsglobal.org/xsd/imslticm_v1p0"

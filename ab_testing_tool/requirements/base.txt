@@ -1,1 +1,4 @@
 Django>=1.6
+mock
+# canvas_sdk
+# django_auth_lti
