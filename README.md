@@ -3,19 +3,20 @@ A/B Testing Tool
 
 In order to run locally:
 
-* copy ab_testing_tool/settings/secure.py.example to ab_teting_tool/settings/secure.py
-and fill in values requested therin
+* copy ab_testing_tool/settings/secure.py.example to create new file ab_testing_tool/settings/secure.py
+and fill in values requested there. If needed, create course oauth token in Canvas from Sidebar Settings >
 
 * Install the appropriate requiremnts file from ab_testing_tool/requirements.
 Ex. `[sudo] pip install -r ab_testing_tool/requirements/local.txt`
+Note If encountering this error "clang error: unknown argument: '-mno-fused-madd'" when installing lxml, refer to this: http://stackoverflow.com/a/22322645/2812260
 
 * clone the django_auth_lti and canvas_python_sdk libraries and install both
 (via `python setup.py install`)
 TODO: add these to requiremnts
 
-* `python manage.py syncdb`
+* Run `python manage.py syncdb`
 
-* `python manage.py runserver`
+* Run `python manage.py runserver`
 
 * Install app in canvas by adding an external tool by XML; the config is generated
 by localhost:8000/tool_config; here is what it should generate:
