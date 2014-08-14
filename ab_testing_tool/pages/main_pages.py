@@ -17,7 +17,7 @@ from ab_testing_tool.models import Stage, Track, StageUrl
 
 
 ADMINS = [ADMINISTRATOR, CONTENT_DEVELOPER, TEACHING_ASSISTANT, INSTRUCTOR]
-STAGE_URL_TAG = '_stageurl_'
+STAGE_URL_TAG = 'stageurl_'
 
 def not_authorized(request):
     return HttpResponse("Student")
