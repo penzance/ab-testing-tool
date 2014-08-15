@@ -58,7 +58,7 @@ class test_stage_pages(SessionTestCase):
                                     follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEquals(num_stages + 1, Stage.objects.count())
-        self.assertEquals(num_stageurls + 2, Stage.objects.count())
+        self.assertEquals(num_stageurls + 2, StageUrl.objects.count())
 
     def test_submit_edit_stage(self):
         """ Tests that edit_stage does not change DB count but does change Stage
