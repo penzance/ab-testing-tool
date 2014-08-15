@@ -1,9 +1,6 @@
-from ab_testing_tool.canvas import (list_module_items, list_modules, create_module_item,
-                                    get_module_items, get_lti_param)
 from django.core.urlresolvers import reverse
 from django.http.response import HttpResponse
-from django.shortcuts import render_to_response, redirect
-from django.views.decorators.http import require_http_methods
+from django.shortcuts import render_to_response
 #from django.views.decorators.csrf import csrf_exempt
 #from django.views.decorators.clickjacking import xframe_options_exempt
 from django_auth_lti.decorators import lti_role_required
@@ -11,19 +8,23 @@ from django_auth_lti.const import (ADMINISTRATOR, CONTENT_DEVELOPER,
     TEACHING_ASSISTANT, INSTRUCTOR)
 from ims_lti_py.tool_config import ToolConfig
 
+from ab_testing_tool.canvas import list_modules, get_module_items, get_lti_param
 from ab_testing_tool.controllers import (get_canvas_request_context,
-    get_uninstalled_stages, stage_url, get_full_host)
-from ab_testing_tool.models import Stage, Track, StageUrl
+    get_full_host)
+from ab_testing_tool.models import Stage, Track
+from ab_testing_tool.decorators import page
 
 
 ADMINS = [ADMINISTRATOR, CONTENT_DEVELOPER, TEACHING_ASSISTANT, INSTRUCTOR]
 STAGE_URL_TAG = 'stageurl_'
 
+@page
 def not_authorized(request):
     return HttpResponse("Student")
 
 
 @lti_role_required(ADMINS)
+@page
 def render_stage_control_panel(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     request_context = get_canvas_request_context(request)
@@ -39,10 +40,12 @@ def render_stage_control_panel(request):
               }
     return render_to_response("control_panel.html", context)
 
+
+@page
 def tool_config(request):
     host = get_full_host(request)
     url = host + reverse("index")
-
+    
     config = ToolConfig(
         title="A/B Testing Tool",
         launch_url=url,
@@ -66,6 +69,6 @@ def tool_config(request):
     config.set_ext_param("canvas.instructure.com", "tool_id", "ab_testing_tool")
     config.description = ("Tool to allow students in a course to " +
                           "get different content in a module item.")
-
+    
     resp = HttpResponse(config.to_xml(), content_type="text/xml", status=200)
     return resp

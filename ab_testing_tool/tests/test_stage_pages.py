@@ -12,19 +12,19 @@ from ab_testing_tool.tests.test_main_pages import (SessionTestCase,
 
 class test_stage_pages(SessionTestCase):
     """Tests related to Stages and Stage-related pages and methods"""
-
+    
     def test_create_stage_view(self):
         """Tests edit_stage template renders for url 'create_stage' when authenticated"""
         response = self.client.get(reverse("create_stage"))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "edit_stage.html")
-
+    
     def test_create_stage_view_unauthorized(self):
         """Tests edit_stage template renders for url 'create_stage' when unauthorized"""
         self.set_roles([])
         response = self.client.get(reverse("create_stage"))
         self.assertTemplateNotUsed(response, "edit_stage.html")
-
+    
     def test_edit_stage_view(self):
         """Tests edit_stage template renders when authenticated"""
         stage = Stage.objects.create(name="stage1")
@@ -32,7 +32,7 @@ class test_stage_pages(SessionTestCase):
         response = self.client.get(reverse("edit_stage", args=(t_id,)))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "edit_stage.html")
-
+    
     def test_edit_stage_view_unauthorized(self):
         """Tests edit_stage template renders when unauthorized"""
         self.set_roles([])
@@ -40,7 +40,7 @@ class test_stage_pages(SessionTestCase):
         t_id = stage.id
         response = self.client.get(reverse("edit_stage", args=(t_id,)))
         self.assertTemplateNotUsed(response, "edit_stage.html")
-
+    
     def test_deploy_stage_view(self):
         """Tests deploy stage"""
         stage = Stage.objects.create(name="stage1")
@@ -49,12 +49,12 @@ class test_stage_pages(SessionTestCase):
         t_id = stage.id
         response = self.client.get(reverse("deploy_stage", args=(t_id,)), follow=True)
         self.assertEqual(response.status_code, 200)
-
+    
     def test_get_uninstalled_stages(self):
         """Tests method get_uninstalled_stages runs and returns no stages when database empty"""
         stages = get_uninstalled_stages(self.request)
         self.assertEqual(len(stages), 0)
-
+    
     @patch(LIST_MODULES, return_value=APIReturn([{"id": 0}]))
     def test_get_uninstalled_stages_with_item(self, _mock1):
         """Tests method get_uninstalled_stages returns one when database has one item"""
@@ -62,7 +62,7 @@ class test_stage_pages(SessionTestCase):
         Stage.objects.create(name="stage1")
         stages = get_uninstalled_stages(self.request)
         self.assertEqual(len(stages), 1)
-
+    
     @patch(LIST_MODULES, return_value=APIReturn([{"id": 0}]))
     def test_get_uninstalled_stages_against_api(self, _mock1):
         """ Tests method get_uninstalled_stages returns zero when stage in database
@@ -73,7 +73,7 @@ class test_stage_pages(SessionTestCase):
         with patch(LIST_ITEMS, return_value=APIReturn([mock_item])):
             stages = get_uninstalled_stages(self.request)
             self.assertEqual(len(stages), 0)
-
+    
     def test_submit_create_stage(self):
         #TODO: change this test to several tests that Stage and StageUrls in DB,
         #covering the cases when no stage urls submited, with stage urls are submitted
@@ -84,7 +84,7 @@ class test_stage_pages(SessionTestCase):
                                     follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEquals(num_stages + 1, Stage.objects.count())
-
+    
     def test_submit_create_stage_with_stageurls(self):
         """Tests that create_stage creates a Stage object and StageUrl objects
             verified by DB count"""
@@ -97,7 +97,7 @@ class test_stage_pages(SessionTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEquals(num_stages + 1, Stage.objects.count())
         self.assertEquals(num_stageurls + 2, StageUrl.objects.count())
-
+    
     def test_submit_edit_stage(self):
         """ Tests that edit_stage does not change DB count but does change Stage
             attribute"""
@@ -114,15 +114,16 @@ class test_stage_pages(SessionTestCase):
         self.assertEquals(num_stages, Stage.objects.count())
         stage = Stage.objects.get(id=stage_id)
         self.assertEquals(stage.name, "new_name")
-
+    
     def test_update_nonexistent_stage(self):
         """ Tests that update_stage method raises error for non-existent Stage """
         data = {"name": "new_name", "url1": "http://example.com/page",
                 "url2": "http://example.com/otherpage", "notes": "",
                 "id": 10000987}
-        self.assertRaises(Exception, self.client.post,
-                          reverse("submit_edit_stage"), data, follow=True)
-
+        response = self.client.post(reverse("submit_edit_stage"), data,
+                                    follow=True)
+        self.assertTemplateUsed(response, "error.html")
+    
     def test_submit_edit_stage_wrong_course(self):
         """ Tests that update_stage method raises error for existent Stage but
             for wrong course"""
@@ -133,5 +134,6 @@ class test_stage_pages(SessionTestCase):
         data = {"name": "new_name", "url1": "http://example.com/page",
                 "url2": "http://example.com/otherpage", "notes": "",
                 "id": stage.id}
-        self.assertRaises(Exception, self.client.post,
-                          reverse("submit_edit_stage"), data, follow=True)
+        response = self.client.post(reverse("submit_edit_stage"), data,
+                                    follow=True)
+        self.assertTemplateUsed(response, "error.html") 

@@ -1,13 +1,16 @@
 from django.shortcuts import render_to_response, redirect
 from django.core.urlresolvers import reverse
+from django_auth_lti.decorators import lti_role_required
+from random import choice
+
 from ab_testing_tool.pages.main_pages import ADMINS, STAGE_URL_TAG
 from ab_testing_tool.models import Stage, Track, StageUrl
-from django_auth_lti.decorators import lti_role_required
 from ab_testing_tool.canvas import (list_module_items, list_modules, create_module_item,
                                     get_lti_param)
 from ab_testing_tool.controllers import get_canvas_request_context, stage_url
-from random import choice
+from ab_testing_tool.decorators import page
 
+@page
 def deploy_stage(request, t_id):
     """
     Note: Do not put @lti_role_required(ADMINS) here. @lti_role_required(const.STUDENT)
@@ -28,6 +31,7 @@ def deploy_stage(request, t_id):
 
 
 @lti_role_required(ADMINS)
+@page
 def create_stage(request):
     """
     Note: Canvas fetches all pages within iframe with POST request,
@@ -39,6 +43,7 @@ def create_stage(request):
 
 
 @lti_role_required(ADMINS)
+@page
 def submit_create_stage(request):
     """
     Note: request will always be POST because Canvas fetches pages within iframe by POST
@@ -56,6 +61,7 @@ def submit_create_stage(request):
 
 
 @lti_role_required(ADMINS)
+@page
 def submit_edit_stage(request):
     """
     Update stage only allowed if admin has privileges on the particular course.
@@ -86,6 +92,7 @@ def submit_edit_stage(request):
     return redirect("/#tabs-2")
 
 @lti_role_required(ADMINS)
+@page
 def edit_stage(request, t_id):
     all_tracks = Track.objects.all()
     track_urls = []
@@ -120,6 +127,7 @@ def delete_stage(request, t_id):
     return redirect("/#tabs-2")
 
 @lti_role_required(ADMINS)
+@page
 def add_stage_to_module(request, t_id):
     """
     TODO: Finish this to be able to add stage to a module from control panel

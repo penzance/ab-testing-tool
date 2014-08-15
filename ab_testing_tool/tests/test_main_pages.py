@@ -49,7 +49,7 @@ class SessionTestCase(TestCase):
         for patcher in patchers:
             patcher.start()
             self.addCleanup(patcher.stop)
-
+    
     def set_roles(self, roles):
         session = self.client.session
         session["LTI_LAUNCH"]["roles"] = roles
@@ -61,8 +61,8 @@ class APIReturn(object):
     def __init__(self, obj, ok=True):
         self.text = dumps(obj)
         self.ok = ok
-        
-        
+
+
 class test_main_pages(SessionTestCase):
     """Tests related to control panel and main pages and genearl backend methods"""
     def test_index_and_control_panel_view(self):
@@ -71,7 +71,7 @@ class test_main_pages(SessionTestCase):
         response = self.client.get(reverse("index"), follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "control_panel.html")
-
+    
     @patch(LIST_MODULES, return_value=APIReturn([{"id": 0}]))
     def test_control_panel_with_module_and_item(self, _mock1):
         """Tests control_panel template renders with items returned from Canvas"""
@@ -82,33 +82,33 @@ class test_main_pages(SessionTestCase):
             response = self.client.get(reverse("index"), follow=True)
             self.assertEqual(response.status_code, 200)
             self.assertTemplateUsed(response, "control_panel.html")
-
+    
     def test_unauthenticated_index(self):
         """Tests control_panel template does not render when unauthorized"""
         self.set_roles([])
         response = self.client.get(reverse("index"), follow=True)
         self.assertTemplateNotUsed(response, "control_panel.html")
-
+    
     def test_get_full_host(self):
         """ Tests that appropriate prefix of http/https is used based on whether SSL is used"""
         self.request.is_secure.return_value = False
         self.assertIn("http://", get_full_host(self.request))
         self.request.is_secure.return_value = True
         self.assertIn("https://", get_full_host(self.request))
-
+    
     def test_parse_response_error(self):
         """ Tests that a not OK API response raises an InvalidResponseError"""
         response = APIReturn([])
         response.ok = False
         self.assertRaises(InvalidResponseError, parse_response, response)
-
+    
     def test_parse_response(self):
         """ Tests that an OK API response is correctly returned"""
         json_obj = [{"id": 0}]
         response = APIReturn(json_obj)
         response.ok = True
         self.assertEquals(parse_response(response), json_obj)
-
+    
     def test_tool_config(self):
         """ Tests that that tool_config page returns XML content"""
         response = self.client.get(reverse("tool_config"))
