@@ -5,12 +5,50 @@ from mock import patch
 from ab_testing_tool.pages.main_pages import STAGE_URL_TAG
 from ab_testing_tool.controllers import (get_uninstalled_stages,
     stage_url)
-from ab_testing_tool.models import Stage, StageUrl
+from ab_testing_tool.models import Stage, StageUrl, Track
 from ab_testing_tool.tests.test_main_pages import (SessionTestCase,
     TEST_COURSE_ID, APIReturn, LIST_MODULES, LIST_ITEMS)
 
 
 class test_stage_pages(SessionTestCase):
+    """Tests related to Stages and Stage-related pages and methods"""
+
+    def test_create_stage_view(self):
+        """Tests edit_stage template renders for url 'create_stage' when authenticated"""
+        response = self.client.get(reverse("create_stage"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "edit_stage.html")
+
+    def test_create_stage_view_unauthorized(self):
+        """Tests edit_stage template renders for url 'create_stage' when unauthorized"""
+        self.set_roles([])
+        response = self.client.get(reverse("create_stage"))
+        self.assertTemplateNotUsed(response, "edit_stage.html")
+
+    def test_edit_stage_view(self):
+        """Tests edit_stage template renders when authenticated"""
+        stage = Stage.objects.create(name="stage1")
+        t_id = stage.id
+        response = self.client.get(reverse("edit_stage", args=(t_id,)))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "edit_stage.html")
+
+    def test_edit_stage_view_unauthorized(self):
+        """Tests edit_stage template renders when unauthorized"""
+        self.set_roles([])
+        stage = Stage.objects.create(name="stage1")
+        t_id = stage.id
+        response = self.client.get(reverse("edit_stage", args=(t_id,)))
+        self.assertTemplateNotUsed(response, "edit_stage.html")
+
+    def test_deploy_stage_view(self):
+        """Tests deploy stage"""
+        stage = Stage.objects.create(name="stage1")
+        track = Track.objects.create(name="track1")
+        stage_url = StageUrl.objects.create(stage=stage, url="http://www.example.com", track=track)
+        t_id = stage.id
+        response = self.client.get(reverse("deploy_stage", args=(t_id,)), follow=True)
+        self.assertEqual(response.status_code, 200)
 
     def test_get_uninstalled_stages(self):
         """Tests method get_uninstalled_stages runs and returns no stages when database empty"""

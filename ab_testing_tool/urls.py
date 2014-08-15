@@ -25,7 +25,7 @@ urlpatterns = patterns('',
     url(r'^submit_create_stage$', submit_create_stage, name='submit_create_stage'),
     url(r'^edit_stage/(?P<t_id>\d+)$', edit_stage, name='edit_stage'),
     url(r'^submit_edit_stage$', submit_edit_stage, name='submit_edit_stage'),
-    url(r'^stage/(?P<t_id>\d+)$', deploy_stage, name='render_stage'),
+    url(r'^stage/(?P<t_id>\d+)$', deploy_stage, name='deploy_stage'),
     url(r'^delete_stage/(?P<t_id>\d+)$', delete_stage, name='delete_stage'),
 
     url(r'^create_track', create_track, name='create_track'),

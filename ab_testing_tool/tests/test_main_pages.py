@@ -63,8 +63,9 @@ class APIReturn(object):
         self.ok = ok
         
         
-class test_main_views(SessionTestCase):
-    def test_index(self):
+class test_main_pages(SessionTestCase):
+    """Tests related to control panel and main pages and genearl backend methods"""
+    def test_index_and_control_panel_view(self):
         """Tests control_panel template renders when authenticated and with no
             contents returned from Canvas"""
         response = self.client.get(reverse("index"), follow=True)
@@ -72,7 +73,7 @@ class test_main_views(SessionTestCase):
         self.assertTemplateUsed(response, "control_panel.html")
 
     @patch(LIST_MODULES, return_value=APIReturn([{"id": 0}]))
-    def test_index_with_module_and_item(self, _mock1):
+    def test_control_panel_with_module_and_item(self, _mock1):
         """Tests control_panel template renders with items returned from Canvas"""
         mock_item = {"type": "ExternalTool",
                      "external_url": stage_url(self.request, 0)}
