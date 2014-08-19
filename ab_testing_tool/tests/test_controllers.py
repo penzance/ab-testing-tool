@@ -4,9 +4,23 @@ from ab_testing_tool.controllers import get_uninstalled_stages, stage_url
 from ab_testing_tool.tests.common import (SessionTestCase, APIReturn,
     LIST_MODULES, LIST_ITEMS)
 from ab_testing_tool.models import Stage
+from ab_testing_tool.canvas import parse_response
+from ab_testing_tool.exceptions import InvalidResponseError
 
 
 class test_stage_pages(SessionTestCase):
+    def test_parse_response_error(self):
+        """ Tests that a not OK API response raises an InvalidResponseError"""
+        response = APIReturn([])
+        response.ok = False
+        self.assertRaises(InvalidResponseError, parse_response, response)
+    
+    def test_parse_response(self):
+        """ Tests that an OK API response is correctly returned"""
+        json_obj = [{"id": 0}]
+        response = APIReturn(json_obj)
+        response.ok = True
+        self.assertEquals(parse_response(response), json_obj)
     
     def test_get_uninstalled_stages(self):
         """Tests method get_uninstalled_stages runs and returns no stages when database empty"""

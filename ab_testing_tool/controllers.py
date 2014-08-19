@@ -1,6 +1,6 @@
 from ab_testing_tool.models import Stage
 from canvas import (get_canvas_request_context, list_module_items, list_modules,
-                    get_lti_param)
+    get_lti_param)
 from django.core.urlresolvers import reverse
 
 

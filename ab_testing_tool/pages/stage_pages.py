@@ -5,9 +5,8 @@ from random import choice
 
 from ab_testing_tool.pages.main_pages import ADMINS, STAGE_URL_TAG
 from ab_testing_tool.models import Stage, Track, StageUrl
-from ab_testing_tool.canvas import (list_module_items, list_modules, create_module_item,
-                                    get_lti_param)
-from ab_testing_tool.controllers import get_canvas_request_context, stage_url
+from ab_testing_tool.canvas import get_lti_param
+from ab_testing_tool.controllers import stage_url
 from ab_testing_tool.decorators import page
 from ab_testing_tool.exceptions import MULTIPLE_OBJECTS, MISSING_STAGE
 
