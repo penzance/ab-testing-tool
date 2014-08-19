@@ -54,13 +54,3 @@ def get_canvas_request_context(request):
     canvas_domain = get_lti_param(request, "custom_canvas_api_domain")
     canvas_url = "https://{0}/api".format(canvas_domain)
     return RequestContext(oauth_token, canvas_url)
-
-
-def get_module_items(all_modules, request_context, course_id):
-    """
-    Takes all_modules dict and fetches module items for each module to be added
-    to the returned dict.
-    """
-    for module in all_modules:
-        module["module_items"] = list_module_items(request_context, course_id, module["id"])
-    return all_modules

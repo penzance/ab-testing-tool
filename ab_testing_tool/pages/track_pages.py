@@ -1,7 +1,7 @@
 from django.shortcuts import render_to_response, redirect
 from django_auth_lti.decorators import lti_role_required
 
-from ab_testing_tool.pages.main_pages import ADMINS
+from ab_testing_tool.constants import ADMINS
 from ab_testing_tool.models import Track, StageUrl
 from ab_testing_tool.canvas import get_lti_param
 from ab_testing_tool.decorators import page

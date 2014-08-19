@@ -1,7 +1,7 @@
 from django.db import models
 
 class CustomModel(models.Model):
-
+    
     def update(self, **kwargs):
         """Helper method to update objects"""
         for k, v in kwargs.iteritems():

@@ -1,5 +1,3 @@
-from ab_testing_tool.pages.main_pages import ADMINS, STAGE_URL_TAG
-from ab_testing_tool.models import Track
 from ab_testing_tool.tests.common import SessionTestCase
 
 class test_track_pages(SessionTestCase):

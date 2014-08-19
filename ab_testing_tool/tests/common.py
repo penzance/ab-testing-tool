@@ -4,13 +4,14 @@ from django.utils.importlib import import_module
 from json import dumps
 from mock import patch, MagicMock
 
-from ab_testing_tool.pages.main_pages import ADMINS
+from ab_testing_tool.constants import ADMINS
 
 
 LIST_MODULES = "canvas_sdk.methods.modules.list_modules"
 LIST_ITEMS = "canvas_sdk.methods.modules.list_module_items"
  
 TEST_COURSE_ID = "12345"
+TEST_OTHER_COURSE_ID = "5555555"
 TEST_DOMAIN = "example.com"
 
 

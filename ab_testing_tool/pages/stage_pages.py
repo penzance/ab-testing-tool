@@ -3,7 +3,7 @@ from django.core.urlresolvers import reverse
 from django_auth_lti.decorators import lti_role_required
 from random import choice
 
-from ab_testing_tool.pages.main_pages import ADMINS, STAGE_URL_TAG
+from ab_testing_tool.constants import ADMINS, STAGE_URL_TAG
 from ab_testing_tool.models import Stage, Track, StageUrl
 from ab_testing_tool.canvas import get_lti_param
 from ab_testing_tool.controllers import stage_url

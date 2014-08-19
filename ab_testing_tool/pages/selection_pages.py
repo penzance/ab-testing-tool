@@ -5,7 +5,7 @@ from django_auth_lti.decorators import lti_role_required
 
 from ab_testing_tool.models import Track, StageUrl, Stage
 from ab_testing_tool.controllers import get_uninstalled_stages, stage_url
-from ab_testing_tool.pages.main_pages import STAGE_URL_TAG, ADMINS
+from ab_testing_tool.constants import STAGE_URL_TAG, ADMINS
 from ab_testing_tool.canvas import get_lti_param
 from ab_testing_tool.decorators import page
 
@@ -54,7 +54,7 @@ def submit_selection_new_stage(request):
     t = Stage.objects.create(name=name, notes=notes, course_id=course_id)
     stageurls = [(k,v) for (k,v) in request.POST.iteritems() if STAGE_URL_TAG in k and v]
     for (k,v) in stageurls:
-        _,track_id = k.split(STAGE_URL_TAG)
+        _, track_id = k.split(STAGE_URL_TAG)
         StageUrl.objects.create(url=v, stage_id=t.id, track_id=track_id)
     page_url = stage_url(request, t.id)
     page_name = t.name # TODO: replace with value from DB

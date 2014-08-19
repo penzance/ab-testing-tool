@@ -1,8 +1,9 @@
 from django.core.urlresolvers import reverse
 
-from ab_testing_tool.pages.main_pages import STAGE_URL_TAG
+from ab_testing_tool.constants import STAGE_URL_TAG
 from ab_testing_tool.models import Stage, StageUrl, Track
-from ab_testing_tool.tests.common import SessionTestCase, TEST_COURSE_ID
+from ab_testing_tool.tests.common import SessionTestCase, TEST_COURSE_ID,\
+    TEST_OTHER_COURSE_ID
 
 
 class test_stage_pages(SessionTestCase):
@@ -40,11 +41,10 @@ class test_stage_pages(SessionTestCase):
         """Tests deploy stage"""
         stage = Stage.objects.create(name="stage1")
         track = Track.objects.create(name="track1")
-        stage_url = StageUrl.objects.create(stage=stage, url="http://www.example.com", track=track)
+        StageUrl.objects.create(stage=stage, url="http://www.example.com", track=track)
         t_id = stage.id
         response = self.client.get(reverse("deploy_stage", args=(t_id,)), follow=True)
         self.assertEqual(response.status_code, 200)
-    
     
     def test_submit_create_stage(self):
         #TODO: change this test to several tests that Stage and StageUrls in DB,
@@ -102,7 +102,7 @@ class test_stage_pages(SessionTestCase):
         #TODO: make similar test for update_tracks
         #TODO: render template tests for all the forms
         stage = Stage.objects.create(name="old_name",
-                                             course_id="other_course")
+                                     course_id=TEST_OTHER_COURSE_ID)
         data = {"name": "new_name", "url1": "http://example.com/page",
                 "url2": "http://example.com/otherpage", "notes": "",
                 "id": stage.id}
