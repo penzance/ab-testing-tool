@@ -126,22 +126,3 @@ def delete_stage(request, t_id):
     else:
         raise MISSING_STAGE
     return redirect("/#tabs-2")
-
-@lti_role_required(ADMINS)
-@page
-def add_stage_to_module(request, t_id):
-    """
-    TODO: Finish this to be able to add stage to a module from control panel
-    """
-    course_id = get_lti_param(request, "custom_canvas_course_id")
-    request_context =  get_canvas_request_context(request)
-    modules = list_modules(request_context, course_id, "content_details")
-    module_id = modules[0]["id"]
-    item_results = list_module_items(request_context, course_id, module_id)
-    # canvas_sdk.methods.modules.create_module_item(
-    #        request_ctx, course_id, module_id, module_item_type,
-    #        module_item_content_id, module_item_page_url,
-    #        module_item_external_url,
-    #        module_item_completion_requirement_min_score)
-    create_module_item(request_context, course_id, module_id, stage_url(request, t_id))
-    return redirect("/")
