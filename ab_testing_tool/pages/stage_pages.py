@@ -9,6 +9,7 @@ from ab_testing_tool.canvas import (list_module_items, list_modules, create_modu
                                     get_lti_param)
 from ab_testing_tool.controllers import get_canvas_request_context, stage_url
 from ab_testing_tool.decorators import page
+from ab_testing_tool.exceptions import MULTIPLE_OBJECTS, MISSING_STAGE
 
 @page
 def deploy_stage(request, t_id):
@@ -75,9 +76,9 @@ def submit_edit_stage(request):
     if len(result_list) == 1:
         result_list[0].update(name=name, notes=notes)
     elif len(result_list) > 1:
-        raise Exception("Multiple objects returned.")
+        raise MULTIPLE_OBJECTS
     else:
-        raise Exception("No stage with ID '{0}' found".format(t_id))
+        raise MISSING_STAGE
     #StageUrl creation
     stageurls = [(k,v) for (k,v) in request.POST.iteritems() if STAGE_URL_TAG in k and v]
     for (k,v) in stageurls:
@@ -86,7 +87,7 @@ def submit_edit_stage(request):
         if len(stage_result_list) == 1:
             stage_result_list[0].update(url=v)
         elif len(result_list) > 1:
-            raise Exception("Multiple objects returned.")
+            raise MULTIPLE_OBJECTS
         else:
             StageUrl.objects.create(url=v, stage_id=t_id, track_id=track_id)
     return redirect("/#tabs-2")
@@ -121,9 +122,9 @@ def delete_stage(request, t_id):
         for url in stage_urls:
             url.delete()
     elif len(t) > 1:
-        raise Exception("Multiple objects returned.")
+        raise MULTIPLE_OBJECTS
     else:
-        raise Exception("No stage with ID '{0}' found".format(t_id))
+        raise MISSING_STAGE
     return redirect("/#tabs-2")
 
 @lti_role_required(ADMINS)

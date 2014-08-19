@@ -5,6 +5,7 @@ from ab_testing_tool.pages.main_pages import ADMINS
 from ab_testing_tool.models import Track, StageUrl
 from ab_testing_tool.canvas import get_lti_param
 from ab_testing_tool.decorators import page
+from ab_testing_tool.exceptions import MULTIPLE_OBJECTS, MISSING_TRACK
 
 
 @lti_role_required(ADMINS)
@@ -41,9 +42,9 @@ def submit_edit_track(request):
     if len(result_list) == 1:
         result_list[0].update(name=name, notes=notes)
     elif len(result_list) > 1:
-        raise Exception("Multiple objects returned.")
+        raise MULTIPLE_OBJECTS
     else:
-        raise Exception("No track with ID '{0}' found".format(track_id))
+        raise MISSING_TRACK
     return redirect("/")
 
 
@@ -63,7 +64,7 @@ def delete_track(request, track_id):
             url.delete()
     
     elif len(t) > 1:
-        raise Exception("Multiple objects returned.")
+        raise MULTIPLE_OBJECTS
     else:
-        raise Exception("No track with ID '{0}' found".format(track_id))
+        raise MISSING_TRACK
     return redirect("/")
