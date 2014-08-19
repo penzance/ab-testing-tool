@@ -14,6 +14,7 @@ from ab_testing_tool.decorators import page
 @page
 def resource_selection(request):
     """ docs: https://canvas.instructure.com/doc/api/file.link_selection_tools.html """
+    course_id = get_lti_param(request, "custom_canvas_course_id")
     ext_content_return_types = request.REQUEST.get('ext_content_return_types')
     if ext_content_return_types == [u'lti_launch_url']:
         return HttpResponse("Error: invalid ext_content_return_types: %s" %
@@ -24,7 +25,8 @@ def resource_selection(request):
     
     context = {"content_return_url": content_return_url,
                "stages": get_uninstalled_stages(request),
-               "tracks": [(t,None) for t in Track.objects.all()],
+               "tracks": [(t, None) for t in
+                          Track.objects.filter(course_id=course_id)],
                }
     return render_to_response("add_module_item.html", context)
 

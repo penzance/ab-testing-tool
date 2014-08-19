@@ -10,11 +10,14 @@ from ab_testing_tool.controllers import stage_url
 from ab_testing_tool.decorators import page
 from ab_testing_tool.exceptions import MULTIPLE_OBJECTS, MISSING_STAGE
 
+
 @page
 def deploy_stage(request, t_id):
     """
-    Note: Do not put @lti_role_required(ADMINS) here. @lti_role_required(const.STUDENT)
-    Description: Delivers randomly one of the two urls in stage.
+    Delivers randomly one of the urls in stage if user is not an admin, or
+    edit stage panel if user is an admin.
+    Note: Do not put @lti_role_required(ADMINS) here, as students can reach
+    this page.
     TODO: Extend this by delivering stage as determined by track student is on
     TODO: Have admin able to preview stages as a student would see them
     """
@@ -38,7 +41,9 @@ def create_stage(request):
     requiring separate template render function.
     This also breaks CSRF token validation if CSRF Middleware is turned off.
     """
-    context = {"tracks" : [(t,None) for t in Track.objects.all()]}
+    course_id = get_lti_param(request, "custom_canvas_course_id")
+    context = {"tracks" : [(t, None) for t in
+                           Track.objects.filter(course_id=course_id)]}
     return render_to_response("edit_stage.html", context)
 
 
@@ -58,6 +63,24 @@ def submit_create_stage(request):
         _,track_id = k.split(STAGE_URL_TAG)
         StageUrl.objects.create(url=v, stage_id=t.id, track_id=track_id)
     return redirect("/#tabs-2")
+
+
+@lti_role_required(ADMINS)
+@page
+def edit_stage(request, t_id):
+    course_id = get_lti_param(request, "custom_canvas_course_id")
+    all_tracks = Track.objects.filter(course_id=course_id)
+    track_urls = []
+    for t in all_tracks:
+        stage_url = StageUrl.objects.filter(stage__pk=t_id, track=t)
+        if stage_url:
+            track_urls.append((t, stage_url[0]))
+        else:
+            track_urls.append((t, None))
+    context = {"stage": Stage.objects.get(pk=t_id),
+               "tracks": track_urls,
+               }
+    return render_to_response("edit_stage.html", context)
 
 
 @lti_role_required(ADMINS)
@@ -91,28 +114,10 @@ def submit_edit_stage(request):
             StageUrl.objects.create(url=v, stage_id=t_id, track_id=track_id)
     return redirect("/#tabs-2")
 
-@lti_role_required(ADMINS)
-@page
-def edit_stage(request, t_id):
-    all_tracks = Track.objects.all()
-    track_urls = []
-    for t in all_tracks:
-        stage_url = StageUrl.objects.filter(stage__pk=t_id, track=t)
-        if stage_url:
-            track_urls.append((t, stage_url[0]))
-        else:
-            track_urls.append((t, None))
-    context = {"stage": Stage.objects.get(pk=t_id),
-               "tracks": track_urls,
-               }
-    return render_to_response("edit_stage.html", context)
 
 @lti_role_required(ADMINS)
 def delete_stage(request, t_id):
-    """
-    TODO: !!! Make call to canvas API to remove stage as module item from
-    any modules it is installed. May need to add module_item_id as DB attribute.
-    """
+    """ TODO: !!! Don't allow deletion of stages if installed in canvas. """
     course_id = get_lti_param(request, "custom_canvas_course_id")
     t = Stage.objects.filter(pk=t_id, course_id=course_id)
     if len(t) == 1:

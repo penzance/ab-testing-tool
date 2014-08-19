@@ -72,7 +72,7 @@
                             <div id="module_items_{{m.id}}" style="display: none">
                                     <ul class="list-group">
                                         {% for i in m.module_items %}
-                                            {% if i.type == "ExternalTool" %}
+                                            {% if i.is_stage %}
                                                 <a class="list-group-item active">{{i.title}} | <i> Stage</i></a>
                                             {% else %}
                                                 <p class="list-group-item">{{i.title|default:"[ Item not titled]"}}</p>
