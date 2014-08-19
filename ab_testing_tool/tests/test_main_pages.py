@@ -2,9 +2,10 @@ from django.core.urlresolvers import reverse
 from mock import patch
 
 from ab_testing_tool.controllers import stage_url
-from ab_testing_tool.canvas import InvalidResponseError, parse_response
+from ab_testing_tool.canvas import parse_response
 from ab_testing_tool.tests.common import (SessionTestCase, LIST_MODULES,
     LIST_ITEMS, APIReturn)
+from ab_testing_tool.exceptions import InvalidResponseError
 
 
 class test_main_pages(SessionTestCase):
