@@ -1,17 +1,12 @@
-import json
 from ab_testing_tool.models import Stage
 from canvas import (get_canvas_request_context, list_module_items, list_modules,
                     get_lti_param)
+from django.core.urlresolvers import reverse
 
-
-def get_full_host(request):
-    if request.is_secure():
-        return "https://" + request.get_host()
-    else:
-        return "http://" + request.get_host()
 
 def stage_url(request, t_id):
-    return "%s/stage/%s" % (get_full_host(request), t_id)
+    return request.build_absolute_uri(reverse("deploy_stage", args=(t_id,)))
+
 
 def get_uninstalled_stages(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")

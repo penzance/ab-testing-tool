@@ -1,6 +1,6 @@
 from django.http.response import HttpResponse
 
-from ab_testing_tool.tests.test_main_pages import SessionTestCase
+from ab_testing_tool.tests.common import SessionTestCase
 from ab_testing_tool.decorators import page
 
 

@@ -1,7 +1,6 @@
+import json
 import canvas_sdk
 from canvas_sdk import RequestContext
-
-import json
 
 #TODO: change from secure.py setting to oauth handoff
 from ab_testing_tool.settings.secure import COURSE_OAUTH_TOKEN
@@ -44,6 +43,10 @@ def get_lti_param(request, key):
     Note: Not Canvas related, but located here to avoid cyclic imports
     TODO: Add this function to Django auth lti library
     """
+    if "LTI_LAUNCH" not in request.session:
+        raise Exception("LTI_LAUNCH not in session")
+    if key not in request.session["LTI_LAUNCH"]:
+        raise Exception("Missing LTI parameter in session")
     return request.session["LTI_LAUNCH"][key]
 
 def get_canvas_request_context(request):

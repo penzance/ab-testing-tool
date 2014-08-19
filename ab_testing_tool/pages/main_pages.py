@@ -9,8 +9,7 @@ from django_auth_lti.const import (ADMINISTRATOR, CONTENT_DEVELOPER,
 from ims_lti_py.tool_config import ToolConfig
 
 from ab_testing_tool.canvas import list_modules, get_module_items, get_lti_param
-from ab_testing_tool.controllers import (get_canvas_request_context,
-    get_full_host)
+from ab_testing_tool.controllers import get_canvas_request_context
 from ab_testing_tool.models import Stage, Track
 from ab_testing_tool.decorators import page
 
@@ -43,19 +42,19 @@ def render_stage_control_panel(request):
 
 @page
 def tool_config(request):
-    host = get_full_host(request)
-    url = host + reverse("index")
+    index_url = request.build_absolute_uri(reverse("index"))
+    resource_selection_url = request.build_absolute_uri(reverse("resource_selection"))
     
     config = ToolConfig(
         title="A/B Testing Tool",
-        launch_url=url,
-        secure_launch_url=url,
+        launch_url=index_url,
+        secure_launch_url=index_url,
     )
     # Tell Canvas that this tool provides a course navigation link:
     nav_params = {
         "enabled": "true",
         # optionally, supply a different URL for the link:
-        "url": host + reverse("index"),
+        "url": index_url,
         "text": "A/B Testing Tool",
         "visibility": "admins",
     }
@@ -63,7 +62,7 @@ def tool_config(request):
     config.set_ext_param("canvas.instructure.com", "course_navigation",
                          nav_params)
     config.set_ext_param("canvas.instructure.com", "resource_selection",
-                         {"enabled": "true", "url": host + reverse("resource_selection")})
+                         {"enabled": "true", "url": resource_selection_url})
     config.set_ext_param("canvas.instructure.com", "selection_height", "800")
     config.set_ext_param("canvas.instructure.com", "selection_width", "800")
     config.set_ext_param("canvas.instructure.com", "tool_id", "ab_testing_tool")
