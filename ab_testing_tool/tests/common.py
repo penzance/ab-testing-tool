@@ -62,6 +62,17 @@ class SessionTestCase(TestCase):
         session = self.client.session
         session["LTI_LAUNCH"]["roles"] = roles
         session.save()
+    
+    def assertSameIds(self, iterable_1, iterable_2, duplicates_allowed=False):
+        """ Checks that the two iterables have the same set of .id attributes
+            among their items; if duplicates_allowed is False, the test 
+            will pass if either iterable contains duplicate_ids within itself """
+        ids_1 = [i.id for i in iterable_1]
+        ids_2 = [i.id for i in iterable_2]
+        if not duplicates_allowed:
+            self.assertEqual(len(set(ids_1)), len(ids_1))
+            self.assertEqual(len(set(ids_2)), len(ids_2))
+        self.assertEqual(set(ids_1), set(ids_2))
 
 
 class APIReturn(object):

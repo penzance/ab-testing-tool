@@ -40,10 +40,11 @@ class test_stage_pages(SessionTestCase):
     def test_get_uninstalled_stages_against_courses(self, _mock1):
         """ Tests method get_uninstalled_stages returns one when database has
             two items but only one matches the course and api returns nothing """
-        Stage.objects.create(name="stage1", course_id=TEST_COURSE_ID)
+        stage = Stage.objects.create(name="stage1", course_id=TEST_COURSE_ID)
         Stage.objects.create(name="stage2", course_id=TEST_OTHER_COURSE_ID)
         stages = get_uninstalled_stages(self.request)
         self.assertEqual(len(stages), 1)
+        self.assertSameIds([stage], stages)
     
     @patch(LIST_MODULES, return_value=APIReturn([{"id": 0}]))
     def test_get_uninstalled_stages_with_all_installed(self, _mock1):

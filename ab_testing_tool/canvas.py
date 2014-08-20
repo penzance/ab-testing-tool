@@ -27,6 +27,7 @@ def create_module_item(request_context, course_id, module_id, stage_url):
                     request_context, course_id, module_id, "ExternalTool",
                     "ab_testing_tool", "1", stage_url, None ))
 
+
 def parse_response(sdk_response):
     """ TODO: Move this function to canvas_sdk_python so that all sdk
         functions return python objects instead of response objects """
@@ -48,6 +49,7 @@ def get_lti_param(request, key):
     if key not in request.session["LTI_LAUNCH"]:
         raise MISSING_LTI_PARAM
     return request.session["LTI_LAUNCH"][key]
+
 
 def get_canvas_request_context(request):
     oauth_token = COURSE_OAUTH_TOKEN

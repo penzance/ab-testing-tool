@@ -1,9 +1,10 @@
 from django.core.urlresolvers import reverse
 from mock import patch
 
-from ab_testing_tool.controllers import stage_url
+from ab_testing_tool.controllers import stage_url, get_uninstalled_stages
 from ab_testing_tool.tests.common import (SessionTestCase, LIST_MODULES,
-    LIST_ITEMS, APIReturn)
+    LIST_ITEMS, APIReturn, TEST_COURSE_ID, TEST_OTHER_COURSE_ID)
+from ab_testing_tool.models import Stage, Track
 
 
 class test_main_pages(SessionTestCase):
@@ -39,6 +40,53 @@ class test_main_pages(SessionTestCase):
         response = self.client.get(reverse("index"), follow=True)
         self.assertTemplateNotUsed(response, "control_panel.html")
         self.assertTemplateUsed(response, "not_authorized.html")
+    
+    def test_index_context(self):
+        """ Checks that the context of the index contains the relevant fields """
+        response = self.client.get(reverse("index"), follow=True)
+        self.assertIn("stages", response.context)
+        self.assertIn("modules", response.context)
+        self.assertIn("uninstalled_stages", response.context)
+        self.assertIn("tracks", response.context)
+        self.assertIn("canvas_url", response.context)
+    
+    def test_index_context_stages_and_tracks(self):
+        """ Checks that the stages and tracks passed to the index template
+            contain values from the database """
+        response = self.client.get(reverse("index"), follow=True)
+        self.assertEqual(len(response.context["stages"]), 0)
+        self.assertEqual(len(response.context["tracks"]), 0)
+        stage = Stage.objects.create(name="stage1", course_id=TEST_COURSE_ID)
+        track = Track.objects.create(name="track1", course_id=TEST_COURSE_ID)
+        response = self.client.get(reverse("index"), follow=True)
+        self.assertEqual(len(response.context["stages"]), 1)
+        self.assertEqual(len(response.context["tracks"]), 1)
+        self.assertSameIds([stage], response.context["stages"])
+        self.assertSameIds([track], response.context["tracks"])
+    
+    def test_index_context_course_specific_stages_and_tracks(self):
+        """ Checks that the stages and tracks passed to the index template
+            only contain database values matching the course_id """
+        stage = Stage.objects.create(name="stage1", course_id=TEST_COURSE_ID)
+        Stage.objects.create(name="stage1", course_id=TEST_OTHER_COURSE_ID)
+        track = Track.objects.create(name="track1", course_id=TEST_COURSE_ID)
+        Track.objects.create(name="track2", course_id=TEST_OTHER_COURSE_ID)
+        response = self.client.get(reverse("index"), follow=True)
+        self.assertEqual(len(response.context["stages"]), 1)
+        self.assertEqual(len(response.context["tracks"]), 1)
+        self.assertSameIds([stage], response.context["stages"])
+        self.assertSameIds([track], response.context["tracks"])
+    
+    def test_index_context_uninstalled_stages(self):
+        """ Tests that the context for the index correctly contains
+            the uninstalled stages for the course """
+        stage1 =Stage.objects.create(name="stage1", course_id=TEST_COURSE_ID)
+        stage2 = Stage.objects.create(name="stage2", course_id=TEST_COURSE_ID)
+        with patch("ab_testing_tool.pages.main_pages.get_uninstalled_stages",
+                   return_value=[stage1]):
+            response = self.client.get(reverse("index"), follow=True)
+            self.assertSameIds(response.context["uninstalled_stages"], [stage1])
+            self.assertSameIds(response.context["stages"], [stage1, stage2])
     
     def test_tool_config(self):
         """ Tests that that tool_config page returns XML content"""
