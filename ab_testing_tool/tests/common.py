@@ -73,7 +73,14 @@ class SessionTestCase(TestCase):
             self.assertEqual(len(set(ids_1)), len(ids_1))
             self.assertEqual(len(set(ids_2)), len(ids_2))
         self.assertEqual(set(ids_1), set(ids_2))
-
+    
+    def assertRaisesSpecific(self, exception_instance, func, *args, **kwargs):
+        self.assertRaises(exception_instance.__class__, func, *args, **kwargs)
+        try:
+            func(*args, **kwargs)
+            raise Exception("Calling function did not raise error")
+        except Exception as e:
+            self.assertEquals(str(e), str(exception_instance))
 
 class APIReturn(object):
     """Spoofs returned response from Canvas SDK. Has response.ok property and JSON contents"""

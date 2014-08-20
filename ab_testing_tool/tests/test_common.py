@@ -43,3 +43,39 @@ class TestCommon(SessionTestCase):
         iter_1 = [ItemWithId(1), ItemWithId(2)]
         iter_2 = [ItemWithId(1), ItemWithId(1), ItemWithId(2)]
         self.assertSameIds(iter_1, iter_2, duplicates_allowed=True)
+    
+    def test_assert_raises_specific(self):
+        """ Tests that the raisesSpecific test passes """
+        message = "test exception message"
+        def f():
+            raise Exception(message)
+        self.assertRaisesSpecific(Exception(message), f)
+    
+    def test_assert_raises_specific_fails_on_different_exception_message(self):
+        """ Tests that raisesSpecific test fails on different exception messages """
+        message1 = "test exception message 1"
+        message2 = "test exception message 2"
+        def f():
+            raise Exception(message1)
+        self.assertRaises(Exception, self.assertRaisesSpecific,
+                          Exception(message2), f)
+    
+    def test_assert_raises_specific_fails_on_different_exception_type(self):
+        """ Tests that raisesSpecific test fails on different exception classes """
+        class OtherException(Exception):
+            pass
+        message = "test exception message"
+        def f():
+            raise Exception(message)
+        self.assertRaises(Exception, self.assertRaisesSpecific,
+                          OtherException(message), f)
+    
+    def test_assert_raises_specific_passes_on_child_with_same_message(self):
+        """ Tests that raisesSpecific test passes if excpetion tested for is
+            parent of the one raised and has the same message """
+        class OtherException(Exception):
+            pass
+        message = "test exception message"
+        def f():
+            raise OtherException(message)
+        self.assertRaisesSpecific(Exception(message), f)

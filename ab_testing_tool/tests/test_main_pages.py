@@ -5,10 +5,11 @@ from ab_testing_tool.controllers import stage_url, get_uninstalled_stages
 from ab_testing_tool.tests.common import (SessionTestCase, LIST_MODULES,
     LIST_ITEMS, APIReturn, TEST_COURSE_ID, TEST_OTHER_COURSE_ID)
 from ab_testing_tool.models import Stage, Track
+from ab_testing_tool.pages.main_pages import tool_config
 
 
 class test_main_pages(SessionTestCase):
-    """Tests related to control panel and main pages and general backend methods"""
+    """ Tests related to control panel and main pages """
     
     def test_not_authorized_renders(self):
         """ Tests that the not_authorized page renders """
@@ -88,10 +89,28 @@ class test_main_pages(SessionTestCase):
             self.assertSameIds(response.context["uninstalled_stages"], [stage1])
             self.assertSameIds(response.context["stages"], [stage1, stage2])
     
+    def test_index_context_modules(self):
+        ret_val = [{"name": "module1"}]
+        with patch("ab_testing_tool.pages.main_pages.get_modules_with_items",
+                   return_value=ret_val):
+            response = self.client.get(reverse("index"), follow=True)
+            self.assertEqual(response.context["modules"], ret_val)
+    
     def test_tool_config(self):
         """ Tests that that tool_config page returns XML content"""
         response = self.client.get(reverse("tool_config"))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response._headers["content-type"],
                         ('Content-Type', 'text/xml'))
-
+    
+    def test_too_config_urls(self):
+        """ Tests that urls for index and resource_selection appear in
+            the return of tool config; this test doesn't use self.client
+            in order to use the same request for building the comparison uris
+            as it does for calling the view """
+        index_url = self.request.build_absolute_uri(reverse("index"))
+        resource_selection_url = self.request.build_absolute_uri(
+                reverse("resource_selection"))
+        response = tool_config(self.request)
+        self.assertContains(response, index_url)
+        self.assertContains(response, resource_selection_url)
