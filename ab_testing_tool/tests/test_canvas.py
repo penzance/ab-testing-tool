@@ -1,7 +1,8 @@
 from ab_testing_tool.tests.common import SessionTestCase, APIReturn
 from ab_testing_tool.canvas import get_lti_param, parse_response
-from ab_testing_tool.exceptions import MISSING_LTI_LAUNCH, MISSING_LTI_PARAM,\
-    NO_SDK_RESPONSE, INVALID_SDK_RESPONSE
+from ab_testing_tool.exceptions import (MISSING_LTI_LAUNCH, MISSING_LTI_PARAM,
+    NO_SDK_RESPONSE, INVALID_SDK_RESPONSE)
+from ab_testing_tool.exceptions import InvalidResponseError
 
 class test_stage_pages(SessionTestCase):
     def test_get_lti_param_success(self):
@@ -42,3 +43,16 @@ class test_stage_pages(SessionTestCase):
         self.assertRaisesSpecific(INVALID_SDK_RESPONSE, parse_response, response)
         response.text = "This is not json {}"
         self.assertRaisesSpecific(INVALID_SDK_RESPONSE, parse_response, response)
+    
+    def test_parse_response_error_type(self):
+        """ Tests that a not OK API response raises an InvalidResponseError """
+        response = APIReturn([])
+        response.ok = False
+        self.assertRaises(InvalidResponseError, parse_response, response)
+    
+    def test_parse_response_with_dict(self):
+        """ Tests that an OK API response is correctly returned with a dict """
+        json_obj = [{"id": 0}]
+        response = APIReturn(json_obj)
+        response.ok = True
+        self.assertEquals(parse_response(response), json_obj)

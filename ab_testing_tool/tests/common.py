@@ -75,6 +75,10 @@ class SessionTestCase(TestCase):
         self.assertEqual(set(ids_1), set(ids_2))
     
     def assertRaisesSpecific(self, exception_instance, func, *args, **kwargs):
+        """ Asserts that the function with the passed args and kwargs,
+            raises an exception that matches the exception_instance.
+            Match means has the same message, and is either the same class as
+            exception_instance or a child of exception_instance's class. """
         error = False
         self.assertRaises(exception_instance.__class__, func, *args, **kwargs)
         try:

@@ -8,6 +8,8 @@ INVALID_SDK_RESPONSE = InvalidResponseError("Response from canvas SDK was invali
 MISSING_LTI_LAUNCH = Exception("LTI_LAUNCH not in session")
 MISSING_LTI_PARAM = Exception("Missing LTI parameter in session")
 
+BAD_STAGE_ID = Exception("Invalid stage id")
+
 MISSING_STAGE = Exception("No stage found matching database query")
 MISSING_TRACK = Exception("No track found matching database query")
 

@@ -2,10 +2,15 @@ from ab_testing_tool.models import Stage
 from canvas import (get_canvas_request_context, list_module_items, list_modules,
     get_lti_param)
 from django.core.urlresolvers import reverse
+from ab_testing_tool.exceptions import BAD_STAGE_ID
 
 
 def stage_url(request, stage_id):
     """ Builds a URL to deploy the stage with the database id stage_id """
+    try:
+        stage_id = int(stage_id)
+    except (TypeError, ValueError):
+        raise BAD_STAGE_ID
     return request.build_absolute_uri(reverse("deploy_stage", args=(stage_id,)))
 
 
