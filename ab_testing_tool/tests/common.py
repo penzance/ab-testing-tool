@@ -75,15 +75,21 @@ class SessionTestCase(TestCase):
         self.assertEqual(set(ids_1), set(ids_2))
     
     def assertRaisesSpecific(self, exception_instance, func, *args, **kwargs):
+        error = False
         self.assertRaises(exception_instance.__class__, func, *args, **kwargs)
         try:
             func(*args, **kwargs)
-            assert False, "Function either raises no exception or is non-deterministic"
+            error = True
+            
         except Exception as e:
             self.assertEquals(str(e), str(exception_instance))
+        if error:
+            raise Exception("Function either raises no exception or is "
+                            "non-deterministic")
 
 class APIReturn(object):
-    """Spoofs returned response from Canvas SDK. Has response.ok property and JSON contents"""
+    """ Spoofs returned response from Canvas SDK. Has response.ok property and
+        JSON contents """
     def __init__(self, obj, ok=True):
         self.text = dumps(obj)
         self.ok = ok

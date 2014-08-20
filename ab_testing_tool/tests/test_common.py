@@ -79,3 +79,18 @@ class TestCommon(SessionTestCase):
         def f():
             raise OtherException(message)
         self.assertRaisesSpecific(Exception(message), f)
+    
+    def test_assert_raises_specific_errors_on_non_deterministic(self):
+        """ A non-deterministic function has odd behavior on assertRaisesSpecific
+            if it raises an exception on its first run but not on its second.
+            This tests that assertRaisesSpecific does error on this case.
+            This test is fragile to changes in the implementation of
+            UnitTest.assertRaises """
+        self.do_raise = False
+        message = "test exception message"
+        def f(self):
+            self.do_raise = not self.do_raise
+            if self.do_raise:
+                raise Exception(message)
+        self.assertRaises(Exception, self.assertRaisesSpecific,
+                          Exception(message), f, self)
