@@ -35,7 +35,7 @@ def parse_response(sdk_response):
         raise NO_SDK_RESPONSE
     try:
         return json.loads(sdk_response.text)
-    except ValueError:
+    except (ValueError, TypeError):
         raise INVALID_SDK_RESPONSE
 
 

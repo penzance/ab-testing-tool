@@ -78,7 +78,7 @@ class SessionTestCase(TestCase):
         self.assertRaises(exception_instance.__class__, func, *args, **kwargs)
         try:
             func(*args, **kwargs)
-            raise Exception("Calling function did not raise error")
+            assert False, "Function either raises no exception or is non-deterministic"
         except Exception as e:
             self.assertEquals(str(e), str(exception_instance))
 
