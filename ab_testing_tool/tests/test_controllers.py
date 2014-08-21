@@ -8,7 +8,7 @@ from ab_testing_tool.models import Stage
 from ab_testing_tool.exceptions import BAD_STAGE_ID
 
 
-class test_stage_pages(SessionTestCase):
+class test_controllers(SessionTestCase):
     def test_get_uninstalled_stages(self):
         """ Tests method get_uninstalled_stages runs and returns no stages when
             database empty """
@@ -63,7 +63,7 @@ class test_stage_pages(SessionTestCase):
         self.assertEqual(len(urls), 0)
     
     def test_all_stage_urls_one_element(self):
-        """ Tests that all_stage_urls returns the url for one stage when 
+        """ Tests that all_stage_urls returns the url for one stage when
             that is in the database """
         stage = Stage.objects.create(name="stage1", course_id=TEST_COURSE_ID)
         urls = all_stage_urls(self.request, TEST_COURSE_ID)

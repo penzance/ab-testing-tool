@@ -16,7 +16,7 @@ class test_stage_pages(SessionTestCase):
         self.assertTemplateUsed(response, "edit_stage.html")
     
     def test_create_stage_view_unauthorized(self):
-        """Tests edit_stage template renders for url 'create_stage' when unauthorized"""
+        """Tests edit_stage template does not render for url 'create_stage' when unauthorized"""
         self.set_roles([])
         response = self.client.get(reverse("create_stage"))
         self.assertTemplateNotUsed(response, "edit_stage.html")
@@ -108,4 +108,4 @@ class test_stage_pages(SessionTestCase):
                 "id": stage.id}
         response = self.client.post(reverse("submit_edit_stage"), data,
                                     follow=True)
-        self.assertTemplateUsed(response, "error.html") 
+        self.assertTemplateUsed(response, "error.html")

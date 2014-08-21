@@ -4,7 +4,7 @@ from ab_testing_tool.tests.common import SessionTestCase
 from ab_testing_tool.decorators import page
 
 
-class test_stage_pages(SessionTestCase):
+class test_decorators(SessionTestCase):
     def test_page_decorator_catches_error(self):
         """ Tests that a page raising an exception renders the error template
             with the correct message """
@@ -18,7 +18,7 @@ class test_stage_pages(SessionTestCase):
         self.assertContains(response, error_message)
     
     def test_page_decorator_passthrough(self):
-        """ Tests that the page decorator doesn't modify the response of a 
+        """ Tests that the page decorator doesn't modify the response of a
             page not raising an exception """
         expected_response = HttpResponse("test")
         @page

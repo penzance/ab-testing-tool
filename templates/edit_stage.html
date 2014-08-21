@@ -17,14 +17,18 @@
         <!-- <td class="text-right nowrap"><a href="/" class="btn btn-lg btn-primary" id="delete">Go To Dashboard</a></td>-->
         <tr>
         <td ><p>Created: {{stage.created_on}} | Last updated: {{stage.updated_on}} </p></td>
-        {% if stage.id %}
+        {% if stage.id and not is_installed %}
         <td class="text-right nowrap"><a href="/delete_stage/{{ stage.id }}" class="btn btn-lg btn-danger" id="delete">Delete Stage</a></td>
+        {% else %}
+        <td class="text-right nowrap"><a  class="btn btn-lg btn-danger disabled">Delete Stage</a></td>
         {% endif %}
         </tr>
-
         </tbody>
         </table>
     </div>
+            {% if stage.id and not is_installed and installed_module %}
+            <h4 class="text-center nowrap">Stage Currently Installed in Module "{{installed_module}}"</h4>
+            {% endif %}
             <form method="post" name="stage_form" {% if stage.id %} action="{% url 'submit_edit_stage' %}"{% else %} action="{% url 'submit_create_stage' %}" {% endif %}>
             {% csrf_token %}
                 <input type='hidden' name='id' value="{{ stage.id }}">

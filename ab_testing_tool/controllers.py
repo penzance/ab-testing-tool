@@ -18,6 +18,15 @@ def get_uninstalled_stages(request):
     """ Returns the list of Stage objects that have been created for the
         current course but not installed in any of that course's modules """
     course_id = get_lti_param(request, "custom_canvas_course_id")
+    installed_stage_urls = get_installed_stages(request)
+    stages = [stage for stage in Stage.objects.filter(course_id=course_id)
+              if stage_url(request, stage.id) not in installed_stage_urls]
+    return stages
+
+def get_installed_stages(request):
+    """ Returns the list of stage urls (as strings) for Stages that have been
+        installed in at least one of the courses modules. """
+    course_id = get_lti_param(request, "custom_canvas_course_id")
     request_context =  get_canvas_request_context(request)
     all_modules = list_modules(request_context, course_id)
     installed_stage_urls = []
@@ -26,10 +35,10 @@ def get_uninstalled_stages(request):
         stage_urls = [item["external_url"] for item in module_items
                       if item["type"] == "ExternalTool"]
         installed_stage_urls.extend(stage_urls)
-    stages = [stage for stage in Stage.objects.filter(course_id=course_id)
-              if stage_url(request, stage.id) not in installed_stage_urls]
-    return stages
+    return installed_stage_urls
 
+def stage_is_installed(request, stage):
+    return stage_url(request, stage.id) in get_installed_stages(request)
 
 def all_stage_urls(request, course_id):
     """ Returns the deploy urls of all stages in the database for that course"""

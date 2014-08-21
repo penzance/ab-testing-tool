@@ -17,9 +17,10 @@ def list_module_items(request_context, course_id, module_id):
                     request_context, course_id, module_id, "content_details"))
 
 def list_modules(request_context, course_id):
-    return parse_response(canvas_sdk.methods.modules.list_modules(
+    from canvas_sdk.methods.modules import list_modules
+    return parse_response(list_modules(
                     request_context, course_id, "content_details"))
-
+ 
 
 def create_module_item(request_context, course_id, module_id, stage_url):
     #TODO: unused, untested

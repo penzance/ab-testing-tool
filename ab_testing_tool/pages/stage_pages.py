@@ -6,9 +6,10 @@ from random import choice
 from ab_testing_tool.constants import ADMINS, STAGE_URL_TAG
 from ab_testing_tool.models import Stage, Track, StageUrl
 from ab_testing_tool.canvas import get_lti_param
-from ab_testing_tool.controllers import stage_url
+from ab_testing_tool.controllers import stage_is_installed
 from ab_testing_tool.decorators import page
-from ab_testing_tool.exceptions import MULTIPLE_OBJECTS, MISSING_STAGE
+from ab_testing_tool.exceptions import (MULTIPLE_OBJECTS, MISSING_STAGE,
+    DELETING_INSTALLED_STAGE)
 
 
 @page
@@ -72,13 +73,16 @@ def edit_stage(request, t_id):
     all_tracks = Track.objects.filter(course_id=course_id)
     track_urls = []
     for t in all_tracks:
-        stage_url = StageUrl.objects.filter(stage__pk=t_id, track=t)
-        if stage_url:
-            track_urls.append((t, stage_url[0]))
+        url = StageUrl.objects.filter(stage__pk=t_id, track=t)
+        if url:
+            track_urls.append((t, url[0]))
         else:
             track_urls.append((t, None))
-    context = {"stage": Stage.objects.get(pk=t_id),
+    stage = Stage.objects.get(pk=t_id)
+    context = {"stage": stage,
                "tracks": track_urls,
+               "is_installed": stage_is_installed(request, stage),
+               #TODO: "installed_module": installed_module,
                }
     return render_to_response("edit_stage.html", context)
 
@@ -118,10 +122,14 @@ def submit_edit_stage(request):
 @lti_role_required(ADMINS)
 def delete_stage(request, t_id):
     """ TODO: !!! Don't allow deletion of stages if installed in canvas. """
+    
     course_id = get_lti_param(request, "custom_canvas_course_id")
     t = Stage.objects.filter(pk=t_id, course_id=course_id)
     if len(t) == 1:
-        t[0].delete()
+        stage = t[0]
+        if stage_is_installed(request, stage):
+            raise DELETING_INSTALLED_STAGE
+        stage.delete()
         stage_urls = StageUrl.objects.filter(stage__pk=t_id)
         for url in stage_urls:
             url.delete()

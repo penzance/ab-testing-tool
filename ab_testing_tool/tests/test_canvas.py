@@ -4,7 +4,7 @@ from ab_testing_tool.exceptions import (MISSING_LTI_LAUNCH, MISSING_LTI_PARAM,
     NO_SDK_RESPONSE, INVALID_SDK_RESPONSE)
 from ab_testing_tool.exceptions import InvalidResponseError
 
-class test_stage_pages(SessionTestCase):
+class test_canvas_pages(SessionTestCase):
     def test_get_lti_param_success(self):
         """ Tests that get_lti_param returns the correct value when it is present """
         param_val = "test_param_val"
