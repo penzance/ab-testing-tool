@@ -1,7 +1,9 @@
 from ab_testing_tool.tests.common import SessionTestCase, TEST_COURSE_ID,\
-    TEST_OTHER_COURSE_ID
+    TEST_OTHER_COURSE_ID, NONEXISTANT_STAGE_ID
 from django.core.urlresolvers import reverse
 from ab_testing_tool.models import Track
+from ab_testing_tool.pages.track_pages import delete_track
+from ab_testing_tool.exceptions import MISSING_TRACK
 
 class test_track_pages(SessionTestCase):
     """Tests related to Track and Track pages and methods"""
@@ -64,7 +66,7 @@ class test_track_pages(SessionTestCase):
         """ Tests that update_track method raises error for non-existent Track """
         data = {"name": "new_name", "url1": "http://example.com/page",
                 "url2": "http://example.com/otherpage", "notes": "",
-                "id": 10000987}
+                "id": NONEXISTANT_STAGE_ID}
         response = self.client.post(reverse("submit_edit_track"), data,
                                     follow=True)
         self.assertTemplateUsed(response, "error.html")
@@ -80,3 +82,46 @@ class test_track_pages(SessionTestCase):
         response = self.client.post(reverse("submit_edit_track"), data,
                                     follow=True)
         self.assertTemplateUsed(response, "error.html")
+    
+    def test_delete_track(self):
+        """ Tests that delete_track method properly deletes a track when authorized"""
+        first_num_tracks = Track.objects.count()
+        track = Track.objects.create(name="testname", course_id=TEST_COURSE_ID)
+        self.assertEqual(first_num_tracks + 1, Track.objects.count())
+        t_id = track.id
+        response = self.client.get(reverse("delete_track", args=(t_id,)))
+        second_num_tracks = Track.objects.count()
+        #TODO: self.assertEqual(response.status_code, 200)
+        self.assertEqual(first_num_tracks, second_num_tracks)
+
+    def test_delete_track_unauthorized(self):
+        """ Tests that delete_track method raises error when unauthorized"""
+        self.set_roles([])
+        first_num_tracks = Track.objects.count()
+        track = Track.objects.create(name="testname", course_id=TEST_COURSE_ID)
+        t_id = track.id
+        self.client.get(reverse("delete_track", args=(t_id,)))
+        second_num_tracks = Track.objects.count()
+        self.assertNotEqual(first_num_tracks, second_num_tracks)
+
+    def test_delete_track_nonexistent(self):
+        """ Tests that delete_track method raises error for non-existent Track"""
+        first_num_tracks = Track.objects.count()
+        track = Track.objects.create(name="testname", course_id=TEST_COURSE_ID)
+        t_id = NONEXISTANT_STAGE_ID
+        self.client.get(reverse("delete_track", args=(t_id,)))
+        second_num_tracks = Track.objects.count()
+        #self.assertRaisesSpecific(MISSING_TRACK, delete_track, self.request, (t_id,))
+        self.assertNotEqual(first_num_tracks, second_num_tracks)
+
+    def test_delete_track_wrong_course(self):
+        """ Tests that delete_track method raises error for existent Track but for
+            wrong course"""
+        first_num_tracks = Track.objects.count()
+        track = Track.objects.create(name="testname", course_id=TEST_OTHER_COURSE_ID)
+        t_id = track.id
+        self.client.get(reverse("delete_track", args=(t_id,)))
+        second_num_tracks = Track.objects.count()
+        #self.assertRaisesSpecific(MISSING_TRACK, delete_track, self.request, (t_id,))
+        self.assertNotEqual(first_num_tracks, second_num_tracks)
+        

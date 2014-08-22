@@ -26,8 +26,8 @@
         </tbody>
         </table>
     </div>
-            {% if stage.id and not is_installed and installed_module %}
-            <h4 class="text-center nowrap">Stage Currently Installed in Module "{{installed_module}}"</h4>
+            {% if stage.id and not is_installed %}
+            <h4 class="text-center nowrap">Stage Currently Installed! Stage must be uninstalled before it can be deleted.)</h4>
             {% endif %}
             <form method="post" name="stage_form" {% if stage.id %} action="{% url 'submit_edit_stage' %}"{% else %} action="{% url 'submit_create_stage' %}" {% endif %}>
             {% csrf_token %}

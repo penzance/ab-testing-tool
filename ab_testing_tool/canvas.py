@@ -1,5 +1,5 @@
 import json
-import canvas_sdk
+import canvas_sdk.methods.modules
 from canvas_sdk import RequestContext
 
 #TODO: change from secure.py setting to oauth handoff
@@ -17,17 +17,8 @@ def list_module_items(request_context, course_id, module_id):
                     request_context, course_id, module_id, "content_details"))
 
 def list_modules(request_context, course_id):
-    from canvas_sdk.methods.modules import list_modules
-    return parse_response(list_modules(
+    return parse_response(canvas_sdk.methods.modules.list_modules(
                     request_context, course_id, "content_details"))
- 
-
-def create_module_item(request_context, course_id, module_id, stage_url):
-    #TODO: unused, untested
-    return parse_response(canvas_sdk.methods.modules.create_module_item(
-                    request_context, course_id, module_id, "ExternalTool",
-                    "ab_testing_tool", "1", stage_url, None ))
-
 
 def parse_response(sdk_response):
     """ TODO: Move this function to canvas_sdk_python so that all sdk

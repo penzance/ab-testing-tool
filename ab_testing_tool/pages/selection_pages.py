@@ -38,7 +38,7 @@ def submit_selection(request):
     t = Stage.objects.get(pk=stage_id)
     page_url = stage_url(request, stage_id)
     print stage_id, page_url
-    page_name = t.name # TODO: replace with value from DB
+    page_name = t.name
     content_return_url = request.REQUEST.get("content_return_url")
     params = {"return_type": "lti_launch_url",
                "url": page_url,
@@ -59,7 +59,7 @@ def submit_selection_new_stage(request):
         _, track_id = k.split(STAGE_URL_TAG)
         StageUrl.objects.create(url=v, stage_id=t.id, track_id=track_id)
     page_url = stage_url(request, t.id)
-    page_name = t.name # TODO: replace with value from DB
+    page_name = t.name
     content_return_url = request.REQUEST.get("content_return_url")
     params = {"return_type": "lti_launch_url",
                "url": page_url,

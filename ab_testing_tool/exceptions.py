@@ -15,5 +15,4 @@ MISSING_TRACK = Exception("No track found matching database query")
 
 MULTIPLE_OBJECTS = Exception("Multiple objects returned by database query.")
 
-
 DELETING_INSTALLED_STAGE = Exception("Deleting an installed Stage is not allowed")

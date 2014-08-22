@@ -14,6 +14,7 @@ TEST_COURSE_ID = "12345"
 TEST_OTHER_COURSE_ID = "5555555"
 TEST_DOMAIN = "example.com"
 
+NONEXISTANT_STAGE_ID = 12345678987654321 #111111111^2
 
 class RequestMock(MagicMock):
     get_host = MagicMock(return_value=TEST_DOMAIN)
@@ -65,7 +66,7 @@ class SessionTestCase(TestCase):
     
     def assertSameIds(self, iterable_1, iterable_2, duplicates_allowed=False):
         """ Checks that the two iterables have the same set of .id attributes
-            among their items; if duplicates_allowed is False, the test 
+            among their items; if duplicates_allowed is False, the test
             will pass if either iterable contains duplicate_ids within itself """
         ids_1 = [i.id for i in iterable_1]
         ids_2 = [i.id for i in iterable_2]
