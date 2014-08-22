@@ -8,6 +8,8 @@ from ab_testing_tool.controllers import get_uninstalled_stages, stage_url
 from ab_testing_tool.constants import STAGE_URL_TAG, ADMINS
 from ab_testing_tool.canvas import get_lti_param
 from ab_testing_tool.decorators import page
+from ab_testing_tool.exceptions import (MISSING_RETURN_TYPES_PARAM,
+    MISSING_RETURN_URL)
 
 
 @lti_role_required(ADMINS)
@@ -16,13 +18,11 @@ def resource_selection(request):
     """ docs: https://canvas.instructure.com/doc/api/file.link_selection_tools.html """
     course_id = get_lti_param(request, "custom_canvas_course_id")
     ext_content_return_types = request.REQUEST.get('ext_content_return_types')
-    if ext_content_return_types == [u'lti_launch_url']:
-        return HttpResponse("Error: invalid ext_content_return_types: %s" %
-                            ext_content_return_types)
+    if ext_content_return_types == ['lti_launch_url']:
+        raise MISSING_RETURN_TYPES_PARAM
     content_return_url = request.REQUEST.get('ext_content_return_url')
     if not content_return_url:
-        return HttpResponse("Error: no ext_content_return_url")
-    
+        raise MISSING_RETURN_URL
     context = {"content_return_url": content_return_url,
                "stages": get_uninstalled_stages(request),
                "tracks": [(t, None) for t in

@@ -9,19 +9,19 @@ from ab_testing_tool.canvas import get_lti_param
 from ab_testing_tool.controllers import stage_is_installed
 from ab_testing_tool.decorators import page
 from ab_testing_tool.exceptions import (MULTIPLE_OBJECTS, MISSING_STAGE,
-    DELETING_INSTALLED_STAGE)
+    DELETING_INSTALLED_STAGE, UNAUTHORIZED_ACCESS)
 
 
 @page
 def deploy_stage(request, t_id):
-    """
-    Delivers randomly one of the urls in stage if user is not an admin, or
-    edit stage panel if user is an admin.
-    Note: Do not put @lti_role_required(ADMINS) here, as students can reach
-    this page.
-    TODO: Extend this by delivering stage as determined by track student is on
-    TODO: Have admin able to preview stages as a student would see them
-    """
+    """Delivers randomly one of the urls in stage if user is not an admin, or
+       edit_stage panel if admin.
+       Note: Do not put @lti_role_required(ADMINS) here, as students can reach
+       this page.
+       TODO: Extend this by delivering stage as determined by track student is on
+       TODO: Have admin able to preview stages as a student would see them
+       
+       """
     # TODO: replace the following three lines with verification.is_allowed
     # when that code makes it into django_auth_lti master
     lti_launch = request.session.get('LTI_LAUNCH', None)
@@ -37,11 +37,8 @@ def deploy_stage(request, t_id):
 @lti_role_required(ADMINS)
 @page
 def create_stage(request):
-    """
-    Note: Canvas fetches all pages within iframe with POST request,
-    requiring separate template render function.
-    This also breaks CSRF token validation if CSRF Middleware is turned off.
-    """
+    """ Note: Canvas fetches all pages within iframe with POST request, requiring separate
+        template render function. This also breaks CSRF token validation if CSRF Middleware is turned off. """
     course_id = get_lti_param(request, "custom_canvas_course_id")
     context = {"tracks" : [(t, None) for t in
                            Track.objects.filter(course_id=course_id)]}
@@ -51,10 +48,8 @@ def create_stage(request):
 @lti_role_required(ADMINS)
 @page
 def submit_create_stage(request):
-    """
-    Note: request will always be POST because Canvas fetches pages within iframe by POST
-    TODO: use Django forms library to save instead of getting individual POST params
-    """
+    """ Note: request will always be POST because Canvas fetches pages within iframe by POST
+        TODO: use Django forms library to save instead of getting individual POST params """
     course_id = get_lti_param(request, "custom_canvas_course_id")
     name = request.POST["name"]
     notes = request.POST["notes"]
@@ -70,15 +65,19 @@ def submit_create_stage(request):
 @page
 def edit_stage(request, t_id):
     course_id = get_lti_param(request, "custom_canvas_course_id")
+    stage = Stage.objects.get(pk=t_id)
+    if course_id != stage.course_id:
+        raise UNAUTHORIZED_ACCESS
     all_tracks = Track.objects.filter(course_id=course_id)
     track_urls = []
     for t in all_tracks:
         url = StageUrl.objects.filter(stage__pk=t_id, track=t)
-        if url:
+        if url and len(url) == 1:
             track_urls.append((t, url[0]))
+        elif len(url) > 1:
+            raise MULTIPLE_OBJECTS
         else:
             track_urls.append((t, None))
-    stage = Stage.objects.get(pk=t_id)
     context = {"stage": stage,
                "tracks": track_urls,
                "is_installed": stage_is_installed(request, stage),
@@ -90,10 +89,8 @@ def edit_stage(request, t_id):
 @lti_role_required(ADMINS)
 @page
 def submit_edit_stage(request):
-    """
-    Update stage only allowed if admin has privileges on the particular course.
-    TODO: use Django forms library to save instead of getting individual POST params
-    """
+    """Note:Only allowed if admin has privileges on the particular course.
+       TODO: consider using Django forms to save rather of getting individual POST params"""
     course_id = get_lti_param(request, "custom_canvas_course_id")
     name = request.POST["name"]
     notes = request.POST["notes"]
@@ -120,9 +117,9 @@ def submit_edit_stage(request):
 
 
 @lti_role_required(ADMINS)
+@page
 def delete_stage(request, t_id):
-    """ TODO: !!! Don't allow deletion of stages if installed in canvas. """
-    
+    """Note: Installed stages are not allowed to be deleted"""
     course_id = get_lti_param(request, "custom_canvas_course_id")
     t = Stage.objects.filter(pk=t_id, course_id=course_id)
     if len(t) == 1:

@@ -5,7 +5,8 @@ from ab_testing_tool.constants import ADMINS
 from ab_testing_tool.models import Track, StageUrl
 from ab_testing_tool.canvas import get_lti_param
 from ab_testing_tool.decorators import page
-from ab_testing_tool.exceptions import MULTIPLE_OBJECTS, MISSING_TRACK
+from ab_testing_tool.exceptions import (MULTIPLE_OBJECTS, MISSING_TRACK,
+    UNAUTHORIZED_ACCESS)
 
 
 @lti_role_required(ADMINS)
@@ -17,7 +18,11 @@ def create_track(request):
 @lti_role_required(ADMINS)
 @page
 def edit_track(request, track_id):
-    context = {"track": Track.objects.get(pk=track_id)}
+    course_id = get_lti_param(request, "custom_canvas_course_id")
+    t = Track.objects.get(pk=track_id)
+    if course_id != t.course_id:
+        raise UNAUTHORIZED_ACCESS
+    context = {"track": t}
     return render_to_response("edit_track.html", context)
 
 
@@ -62,7 +67,6 @@ def delete_track(request, track_id):
         stage_urls = StageUrl.objects.filter(track__pk=track_id)
         for url in stage_urls:
             url.delete()
-    
     elif len(t) > 1:
         raise MULTIPLE_OBJECTS
     else:
