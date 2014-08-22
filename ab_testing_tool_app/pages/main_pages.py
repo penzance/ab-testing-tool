@@ -5,12 +5,12 @@ from django.shortcuts import render_to_response
 from django_auth_lti.decorators import lti_role_required
 from ims_lti_py.tool_config import ToolConfig
 
-from ab_testing_tool.canvas import get_lti_param
-from ab_testing_tool.controllers import (get_uninstalled_stages,
+from ab_testing_tool_app.canvas import get_lti_param
+from ab_testing_tool_app.controllers import (get_uninstalled_stages,
     get_modules_with_items)
-from ab_testing_tool.models import Stage, Track
-from ab_testing_tool.decorators import page
-from ab_testing_tool.constants import ADMINS
+from ab_testing_tool_app.models import Stage, Track
+from ab_testing_tool_app.decorators import page
+from ab_testing_tool_app.constants import ADMINS
 
 
 @page

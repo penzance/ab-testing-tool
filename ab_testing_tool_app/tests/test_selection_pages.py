@@ -1,8 +1,8 @@
 from django.core.urlresolvers import reverse
-from ab_testing_tool.tests.common import SessionTestCase, TEST_COURSE_ID
-from ab_testing_tool.models import Stage
+from ab_testing_tool_app.tests.common import SessionTestCase, TEST_COURSE_ID
+from ab_testing_tool_app.models import Stage
 from django.template.defaultfilters import urlencode
-from ab_testing_tool.controllers import stage_url
+from ab_testing_tool_app.controllers import stage_url
 
 class test_selection_pages(SessionTestCase):
     """Tests related to selection pages and methods"""

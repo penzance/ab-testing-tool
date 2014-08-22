@@ -1,8 +1,8 @@
-from ab_testing_tool.models import Stage
-from canvas import (get_canvas_request_context, list_module_items, list_modules,
+from ab_testing_tool_app.models import Stage
+from ab_testing_tool_app.canvas import (get_canvas_request_context, list_module_items, list_modules,
     get_lti_param)
 from django.core.urlresolvers import reverse
-from ab_testing_tool.exceptions import BAD_STAGE_ID
+from ab_testing_tool_app.exceptions import BAD_STAGE_ID
 
 
 def stage_url(request, stage_id):

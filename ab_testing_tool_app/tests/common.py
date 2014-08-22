@@ -4,7 +4,7 @@ from django.utils.importlib import import_module
 from json import dumps
 from mock import patch, MagicMock
 
-from ab_testing_tool.constants import ADMINS
+from ab_testing_tool_app.constants import ADMINS
 
 
 LIST_MODULES = "canvas_sdk.methods.modules.list_modules"

@@ -1,11 +1,11 @@
 from mock import patch
 
-from ab_testing_tool.controllers import get_uninstalled_stages, stage_url,\
+from ab_testing_tool_app.controllers import get_uninstalled_stages, stage_url,\
     all_stage_urls
-from ab_testing_tool.tests.common import (SessionTestCase, APIReturn,
+from ab_testing_tool_app.tests.common import (SessionTestCase, APIReturn,
     LIST_MODULES, LIST_ITEMS, TEST_COURSE_ID, TEST_OTHER_COURSE_ID)
-from ab_testing_tool.models import Stage
-from ab_testing_tool.exceptions import BAD_STAGE_ID
+from ab_testing_tool_app.models import Stage
+from ab_testing_tool_app.exceptions import BAD_STAGE_ID
 
 
 class test_controllers(SessionTestCase):

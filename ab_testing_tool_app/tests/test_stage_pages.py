@@ -1,12 +1,12 @@
 from django.core.urlresolvers import reverse
 from mock import patch
 
-from ab_testing_tool.constants import STAGE_URL_TAG
-from ab_testing_tool.models import Stage, StageUrl, Track
-from ab_testing_tool.tests.common import (SessionTestCase, TEST_COURSE_ID,
+from ab_testing_tool_app.constants import STAGE_URL_TAG
+from ab_testing_tool_app.models import Stage, StageUrl, Track
+from ab_testing_tool_app.tests.common import (SessionTestCase, TEST_COURSE_ID,
     TEST_OTHER_COURSE_ID, NONEXISTENT_STAGE_ID, APIReturn, LIST_MODULES,
     LIST_ITEMS)
-from ab_testing_tool.controllers import stage_url
+from ab_testing_tool_app.controllers import stage_url
 
 
 class test_stage_pages(SessionTestCase):
@@ -205,11 +205,10 @@ class test_stage_pages(SessionTestCase):
         stage = Stage.objects.create(name="testname", course_id=TEST_COURSE_ID)
         self.assertEqual(first_num_stages + 1, Stage.objects.count())
         t_id = stage.id
-        mock_item = {"type": "ExternalTool",
-                     "external_url": stage_url(self.request, t_id)}
-        with patch(LIST_ITEMS, return_value=APIReturn([mock_item])):
-            #TODO:
-            #response = self.client.get(reverse("delete_stage", args=(t_id,)), follow=True)
+        ret_val = [True]
+        with patch("ab_testing_tool_app.pages.stage_pages.stage_is_installed",
+                   return_value=ret_val):
+            response = self.client.get(reverse("delete_stage", args=(t_id,)), follow=True)
             second_num_stages = Stage.objects.count()
             self.assertNotEqual(first_num_stages, second_num_stages)
-            #self.assertTemplateUsed(response, "error.html")
+            self.assertTemplateUsed(response, "error.html")

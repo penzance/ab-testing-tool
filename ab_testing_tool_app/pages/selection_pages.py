@@ -3,12 +3,12 @@ from django.http.response import HttpResponse
 from django.utils.http import urlencode
 from django_auth_lti.decorators import lti_role_required
 
-from ab_testing_tool.models import Track, StageUrl, Stage
-from ab_testing_tool.controllers import get_uninstalled_stages, stage_url
-from ab_testing_tool.constants import STAGE_URL_TAG, ADMINS
-from ab_testing_tool.canvas import get_lti_param
-from ab_testing_tool.decorators import page
-from ab_testing_tool.exceptions import (MISSING_RETURN_TYPES_PARAM,
+from ab_testing_tool_app.models import Track, StageUrl, Stage
+from ab_testing_tool_app.controllers import get_uninstalled_stages, stage_url
+from ab_testing_tool_app.constants import STAGE_URL_TAG, ADMINS
+from ab_testing_tool_app.canvas import get_lti_param
+from ab_testing_tool_app.decorators import page
+from ab_testing_tool_app.exceptions import (MISSING_RETURN_TYPES_PARAM,
     MISSING_RETURN_URL)
 
 

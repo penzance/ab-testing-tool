@@ -3,12 +3,12 @@ from django.core.urlresolvers import reverse
 from django_auth_lti.decorators import lti_role_required
 from random import choice
 
-from ab_testing_tool.constants import ADMINS, STAGE_URL_TAG
-from ab_testing_tool.models import Stage, Track, StageUrl
-from ab_testing_tool.canvas import get_lti_param
-from ab_testing_tool.controllers import stage_is_installed
-from ab_testing_tool.decorators import page
-from ab_testing_tool.exceptions import (MULTIPLE_OBJECTS, MISSING_STAGE,
+from ab_testing_tool_app.constants import ADMINS, STAGE_URL_TAG
+from ab_testing_tool_app.models import Stage, Track, StageUrl
+from ab_testing_tool_app.canvas import get_lti_param
+from ab_testing_tool_app.controllers import stage_is_installed
+from ab_testing_tool_app.decorators import page
+from ab_testing_tool_app.exceptions import (MULTIPLE_OBJECTS, MISSING_STAGE,
     DELETING_INSTALLED_STAGE, UNAUTHORIZED_ACCESS)
 
 

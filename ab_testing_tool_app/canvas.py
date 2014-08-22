@@ -4,7 +4,7 @@ from canvas_sdk import RequestContext
 
 #TODO: change from secure.py setting to oauth handoff
 from ab_testing_tool.settings.secure import COURSE_OAUTH_TOKEN
-from ab_testing_tool.exceptions import MISSING_LTI_PARAM, MISSING_LTI_LAUNCH,\
+from ab_testing_tool_app.exceptions import MISSING_LTI_PARAM, MISSING_LTI_LAUNCH,\
     INVALID_SDK_RESPONSE, NO_SDK_RESPONSE
 
 

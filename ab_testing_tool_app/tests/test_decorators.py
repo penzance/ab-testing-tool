@@ -1,7 +1,7 @@
 from django.http.response import HttpResponse
 
-from ab_testing_tool.tests.common import SessionTestCase
-from ab_testing_tool.decorators import page
+from ab_testing_tool_app.tests.common import SessionTestCase
+from ab_testing_tool_app.decorators import page
 
 
 class test_decorators(SessionTestCase):

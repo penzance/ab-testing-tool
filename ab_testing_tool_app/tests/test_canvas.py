@@ -1,8 +1,8 @@
-from ab_testing_tool.tests.common import SessionTestCase, APIReturn
-from ab_testing_tool.canvas import get_lti_param, parse_response
-from ab_testing_tool.exceptions import (MISSING_LTI_LAUNCH, MISSING_LTI_PARAM,
+from ab_testing_tool_app.tests.common import SessionTestCase, APIReturn
+from ab_testing_tool_app.canvas import get_lti_param, parse_response
+from ab_testing_tool_app.exceptions import (MISSING_LTI_LAUNCH, MISSING_LTI_PARAM,
     NO_SDK_RESPONSE, INVALID_SDK_RESPONSE)
-from ab_testing_tool.exceptions import InvalidResponseError
+from ab_testing_tool_app.exceptions import InvalidResponseError
 
 class test_canvas_pages(SessionTestCase):
     def test_get_lti_param_success(self):

@@ -1,11 +1,11 @@
 from django.shortcuts import render_to_response, redirect
 from django_auth_lti.decorators import lti_role_required
 
-from ab_testing_tool.constants import ADMINS
-from ab_testing_tool.models import Track, StageUrl
-from ab_testing_tool.canvas import get_lti_param
-from ab_testing_tool.decorators import page
-from ab_testing_tool.exceptions import (MULTIPLE_OBJECTS, MISSING_TRACK,
+from ab_testing_tool_app.constants import ADMINS
+from ab_testing_tool_app.models import Track, StageUrl
+from ab_testing_tool_app.canvas import get_lti_param
+from ab_testing_tool_app.decorators import page
+from ab_testing_tool_app.exceptions import (MULTIPLE_OBJECTS, MISSING_TRACK,
     UNAUTHORIZED_ACCESS)
 
 
