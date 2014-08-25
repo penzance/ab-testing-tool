@@ -19,15 +19,16 @@
         <td ><p>Created: {{stage.created_on}} | Last updated: {{stage.updated_on}} </p></td>
         {% if stage.id and not is_installed %}
         <td class="text-right nowrap"><a href="/delete_stage/{{ stage.id }}" class="btn btn-lg btn-danger" id="delete">Delete Stage</a></td>
-        {% elif stage.id %}
+        {% elif stage.id and is_installed%}
         <td class="text-right nowrap"><a  class="btn btn-lg btn-danger disabled">Delete Stage</a></td>
         {% endif %}
         </tr>
         </tbody>
         </table>
     </div>
-            {% if stage.id and not is_installed %}
-            <h4 class="text-center nowrap">Stage Currently Installed! Stage must be uninstalled before it can be deleted.)</h4>
+            {% if stage.id and is_installed %}
+            <h4 class="text-center nowrap">Stage Is Installed.</h4>
+            <h5 class="text-center nowrap">Note: Stage must first be uninstalled before it can be deleted</h5>
             {% endif %}
             <form method="post" name="stage_form" {% if stage.id %} action="{% url 'submit_edit_stage' %}"{% else %} action="{% url 'submit_create_stage' %}" {% endif %}>
             {% csrf_token %}

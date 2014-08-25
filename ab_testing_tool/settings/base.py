@@ -99,7 +99,7 @@ AUTHENTICATION_BACKENDS = (
 #X_FRAME_OPTIONS = 'EXEMPT'
 #SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-ROOT_URLCONF = 'ab_testing_tool.urls'
+ROOT_URLCONF = 'ab_testing_tool_app.urls'
 
 WSGI_APPLICATION = 'ab_testing_tool.wsgi.application'
 

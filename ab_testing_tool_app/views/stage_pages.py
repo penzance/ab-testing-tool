@@ -4,12 +4,12 @@ from django_auth_lti.decorators import lti_role_required
 from random import choice
 
 from ab_testing_tool_app.constants import ADMINS, STAGE_URL_TAG
-from ab_testing_tool_app.models import Stage, Track, StageUrl
+from ab_testing_tool_app.models import Stage, Track, StageUrl, CourseSetting
 from ab_testing_tool_app.canvas import get_lti_param
 from ab_testing_tool_app.controllers import stage_is_installed
 from ab_testing_tool_app.decorators import page
 from ab_testing_tool_app.exceptions import (MULTIPLE_OBJECTS, MISSING_STAGE,
-    DELETING_INSTALLED_STAGE, UNAUTHORIZED_ACCESS)
+    DELETING_INSTALLED_STAGE, UNAUTHORIZED_ACCESS, COURSE_TRACKS_NOT_FINALIZED)
 
 
 @page
@@ -24,10 +24,14 @@ def deploy_stage(request, t_id):
        """
     # TODO: replace the following three lines with verification.is_allowed
     # when that code makes it into django_auth_lti master
+    course_id = get_lti_param(request, "custom_canvas_course_id")
+    course_setting = CourseSetting.objects.get_or_create(course_id = course_id)
     lti_launch = request.session.get('LTI_LAUNCH', None)
     user_roles = lti_launch.get('roles', [])
     if set(ADMINS) & set(user_roles):
         return redirect(reverse("edit_stage", args=(t_id,)))
+    if not course_setting.tracks_finalized:
+        raise COURSE_TRACKS_NOT_FINALIZED
     stage_urls = StageUrl.objects.filter(stage__pk=t_id)
     stage_urls = stage_urls.exclude(url__isnull=True).exclude(url__exact='')
     chosen_url = choice(stage_urls)
