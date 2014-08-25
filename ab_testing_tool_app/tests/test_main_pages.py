@@ -5,7 +5,7 @@ from ab_testing_tool_app.controllers import stage_url, get_uninstalled_stages
 from ab_testing_tool_app.tests.common import (SessionTestCase, LIST_MODULES,
     LIST_ITEMS, APIReturn, TEST_COURSE_ID, TEST_OTHER_COURSE_ID)
 from ab_testing_tool_app.models import Stage, Track
-from ab_testing_tool_app.pages.main_pages import tool_config
+from ab_testing_tool_app.views.main_pages import tool_config
 
 
 class test_main_pages(SessionTestCase):
@@ -83,7 +83,7 @@ class test_main_pages(SessionTestCase):
             the uninstalled stages for the course """
         stage1 =Stage.objects.create(name="stage1", course_id=TEST_COURSE_ID)
         stage2 = Stage.objects.create(name="stage2", course_id=TEST_COURSE_ID)
-        with patch("ab_testing_tool_app.pages.main_pages.get_uninstalled_stages",
+        with patch("ab_testing_tool_app.views.main_pages.get_uninstalled_stages",
                    return_value=[stage1]):
             response = self.client.get(reverse("index"), follow=True)
             self.assertSameIds(response.context["uninstalled_stages"], [stage1])
@@ -91,7 +91,7 @@ class test_main_pages(SessionTestCase):
     
     def test_index_context_modules(self):
         ret_val = [{"name": "module1"}]
-        with patch("ab_testing_tool_app.pages.main_pages.get_modules_with_items",
+        with patch("ab_testing_tool_app.views.main_pages.get_modules_with_items",
                    return_value=ret_val):
             response = self.client.get(reverse("index"), follow=True)
             self.assertEqual(response.context["modules"], ret_val)

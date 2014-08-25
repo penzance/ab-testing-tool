@@ -18,7 +18,7 @@ LOGGING = {
         },
     },
     'loggers': {
-        'ab_testing_tool': {
+        'ab_testing_tool_app': {
             'handlers':['null'],
             'propagate': True,
             'level':'DEBUG',

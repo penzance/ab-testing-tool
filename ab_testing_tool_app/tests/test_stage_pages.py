@@ -206,7 +206,7 @@ class test_stage_pages(SessionTestCase):
         self.assertEqual(first_num_stages + 1, Stage.objects.count())
         t_id = stage.id
         ret_val = [True]
-        with patch("ab_testing_tool_app.pages.stage_pages.stage_is_installed",
+        with patch("ab_testing_tool_app.views.stage_pages.stage_is_installed",
                    return_value=ret_val):
             response = self.client.get(reverse("delete_stage", args=(t_id,)), follow=True)
             second_num_stages = Stage.objects.count()
