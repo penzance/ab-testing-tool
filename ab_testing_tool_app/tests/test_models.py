@@ -40,7 +40,7 @@ class TestModels(SessionTestCase):
         stage = Stage.objects.create(course_id=TEST_COURSE_ID, name="stage")
         track1 = Track.objects.create(course_id=TEST_COURSE_ID, name="track1")
         Track.objects.create(course_id=TEST_COURSE_ID, name="track2")
-        StageUrl.objects.create(stage=stage, track=track1, url="")
+        StageUrl.objects.create(stage=stage, track=track1, url="example.com")
         self.assertTrue(stage.is_missing_urls())
     
     def test_is_missing_urls_true_no_url(self):

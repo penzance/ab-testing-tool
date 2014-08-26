@@ -10,6 +10,12 @@ class CustomModel(models.Model):
             setattr(self, k, v)
         self.save()
 
+    @classmethod
+    def get_or_none(cls, **kwargs):
+        try:
+            return cls.objects.get(**kwargs)
+        except cls.DoesNotExist:
+            return None
 
 class Track(CustomModel):
     name = models.CharField(max_length=512)
@@ -29,7 +35,7 @@ class Stage(CustomModel):
     
     def is_missing_urls(self):
         for track in Track.objects.filter(course_id=self.course_id):
-            stageurl= StageUrl.objects.get(stage=self, track=track)
+            stageurl = StageUrl.get_or_none(stage=self, track=track)
             if not stageurl or not stageurl.url:
                 return True
         return False

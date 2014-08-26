@@ -50,7 +50,7 @@ def deploy_stage(request, t_id):
     
     # Retrieve the url for the student's track at the current intervention point
     # Return an error page if there is no url configured.
-    chosen_stageurl = StageUrl.objects.get(stage__pk=t_id, track=chosen_track)
+    chosen_stageurl = StageUrl.get_or_none(stage__pk=t_id, track=chosen_track)
     if chosen_stageurl and chosen_stageurl.url:
         return redirect(chosen_stageurl.url)
     raise NO_URL_FOR_TRACK
@@ -87,7 +87,9 @@ def submit_create_stage(request):
 @page
 def edit_stage(request, t_id):
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    stage = Stage.objects.get(pk=t_id)
+    stage = Stage.get_or_none(pk=t_id)
+    if not stage:
+        raise MISSING_STAGE
     if course_id != stage.course_id:
         raise UNAUTHORIZED_ACCESS
     all_tracks = Track.objects.filter(course_id=course_id)

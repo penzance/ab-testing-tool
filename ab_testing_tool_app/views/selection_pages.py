@@ -9,7 +9,7 @@ from ab_testing_tool_app.constants import STAGE_URL_TAG, ADMINS
 from ab_testing_tool_app.canvas import get_lti_param
 from ab_testing_tool_app.decorators import page
 from ab_testing_tool_app.exceptions import (MISSING_RETURN_TYPES_PARAM,
-    MISSING_RETURN_URL)
+    MISSING_RETURN_URL, MISSING_STAGE)
 
 
 @lti_role_required(ADMINS)
@@ -35,7 +35,9 @@ def resource_selection(request):
 @page
 def submit_selection(request):
     stage_id = request.REQUEST.get("stage_id")
-    t = Stage.objects.get(pk=stage_id)
+    t = Stage.get_or_none(pk=stage_id)
+    if not t:
+        raise MISSING_STAGE
     page_url = stage_url(request, stage_id)
     page_name = t.name
     content_return_url = request.REQUEST.get("content_return_url")

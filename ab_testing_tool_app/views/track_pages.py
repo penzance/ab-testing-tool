@@ -23,7 +23,9 @@ def create_track(request):
 @page
 def edit_track(request, track_id):
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    t = Track.objects.get(pk=track_id)
+    t = Track.get_or_none(pk=track_id)
+    if not t:
+        raise MISSING_TRACK
     if course_id != t.course_id:
         raise UNAUTHORIZED_ACCESS
     is_finalized = CourseSetting.get_is_finalized(course_id)
