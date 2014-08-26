@@ -1,7 +1,7 @@
 from mock import patch
 
 from ab_testing_tool_app.controllers import get_uninstalled_stages, stage_url,\
-    all_stage_urls
+    all_stage_urls, format_url
 from ab_testing_tool_app.tests.common import (SessionTestCase, APIReturn,
     LIST_MODULES, LIST_ITEMS, TEST_COURSE_ID, TEST_OTHER_COURSE_ID)
 from ab_testing_tool_app.models import Stage
@@ -101,3 +101,18 @@ class test_controllers(SessionTestCase):
         """ Tests that stage_url errors when passed a non-numeral stage_id """
         self.assertRaisesSpecific(BAD_STAGE_ID, stage_url, self.request, None)
         self.assertRaisesSpecific(BAD_STAGE_ID, stage_url, self.request, "str")
+    
+    def test_format_url_passthrough(self):
+        """ Tests that format_url doesn't change a proper http:// url """
+        url = "http://example.com/http_stuff?thing=other_thing"
+        self.assertEqual(url, format_url(url))
+    
+    def test_format_url_https_passthrough(self):
+        """ Tests that format_url doesn't change a proper https:// url """
+        url = "https://example.com/http_stuff?thing=other_thing"
+        self.assertEqual(url, format_url(url))
+    
+    def test_format_url_adds_http(self):
+        """ Tests that format_url adds http:// to a url missing it """
+        url = "www.example.com/http_stuff?thing=other_thing"
+        self.assertEqual("http://" + url, format_url(url))

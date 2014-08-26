@@ -17,8 +17,8 @@ from ab_testing_tool_app.exceptions import (MISSING_RETURN_TYPES_PARAM,
 def resource_selection(request):
     """ docs: https://canvas.instructure.com/doc/api/file.link_selection_tools.html """
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    ext_content_return_types = request.REQUEST.get('ext_content_return_types')
-    if ext_content_return_types == ['lti_launch_url']:
+    ext_content_return_types = request.REQUEST.getlist('ext_content_return_types')
+    if ext_content_return_types != ['lti_launch_url']:
         raise MISSING_RETURN_TYPES_PARAM
     content_return_url = request.REQUEST.get('ext_content_return_url')
     if not content_return_url:

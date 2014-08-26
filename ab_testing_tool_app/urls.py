@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, include, url
+from django.conf.urls import patterns, url
 from django.contrib import admin
 
 from ab_testing_tool_app.views.main_pages import (render_stage_control_panel, not_authorized,
