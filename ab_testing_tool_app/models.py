@@ -26,13 +26,22 @@ class Stage(CustomModel):
     course_id = models.CharField(max_length=12, db_index=True)
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
-
+    
+    def is_missing_urls(self):
+        for track in Track.objects.filter(course_id=self.course_id):
+            stageurl= StageUrl.objects.get(stage=self, track=track)
+            if not stageurl or not stageurl.url:
+                return True
+        return False
 
 class StageUrl(CustomModel):
     """ This model stores the URL of a single intervention """
     url = models.CharField(max_length=512)
     track = models.ForeignKey(Track)
     stage = models.ForeignKey(Stage)
+    
+    class Meta:
+        unique_together = (('track', 'stage'),)
 
 
 class Student(CustomModel):

@@ -87,13 +87,11 @@ def delete_track(request, track_id):
 @page
 def finalize_tracks(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    missing_urls = []
-    for stage in Stage.objects.filter(course_id=course_id):
-        for track in Track.objects.filter(course_id=course_id):
-            stageurl= StageUrl.objects.get(stage=stage, track=track)
-            if not stageurl or not stageurl.url:
-                missing_urls.append((stage,track))
+    missing_urls = [stage.name for stage
+                    in Stage.objects.filter(course_id=course_id)
+                    if stage.is_missing_urls()]
     if missing_urls:
-        return HttpResponse("URLs missing for these tracks in these Stages" + missing_urls)
+        #TODO: replace with better error display
+        return HttpResponse("URLs missing for these tracks in these Stages: %s" % missing_urls)
     CourseSetting.set_finalized(course_id)
     return redirect("/")

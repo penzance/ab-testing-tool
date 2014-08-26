@@ -8,7 +8,7 @@ from ab_testing_tool_app.models import Stage, Track
 from ab_testing_tool_app.views.main_pages import tool_config
 
 
-class test_main_pages(SessionTestCase):
+class TestMainPages(SessionTestCase):
     """ Tests related to control panel and main pages """
     
     def test_not_authorized_renders(self):

@@ -8,7 +8,7 @@ from ab_testing_tool_app.models import Stage
 from ab_testing_tool_app.exceptions import BAD_STAGE_ID
 
 
-class test_controllers(SessionTestCase):
+class TestControllers(SessionTestCase):
     def test_get_uninstalled_stages(self):
         """ Tests method get_uninstalled_stages runs and returns no stages when
             database empty """

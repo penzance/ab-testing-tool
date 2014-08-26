@@ -4,7 +4,7 @@ from ab_testing_tool_app.tests.common import SessionTestCase
 from ab_testing_tool_app.decorators import page
 
 
-class test_decorators(SessionTestCase):
+class TestDecorators(SessionTestCase):
     def test_page_decorator_catches_error(self):
         """ Tests that a page raising an exception renders the error template
             with the correct message """

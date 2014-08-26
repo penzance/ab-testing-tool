@@ -1,10 +1,8 @@
-from mock import patch
-
 from ab_testing_tool_app.tests.common import SessionTestCase, TEST_COURSE_ID
-from ab_testing_tool_app.models import CourseSetting
+from ab_testing_tool_app.models import CourseSetting, Track, Stage, StageUrl
 
 
-class test_controllers(SessionTestCase):
+class TestModels(SessionTestCase):
     def test_get_finalized_course_does_not_exist(self):
         """ Tests that get_finalized works when the course settings don't exist
             yet for the course """
@@ -36,3 +34,34 @@ class test_controllers(SessionTestCase):
         CourseSetting.set_finalized(TEST_COURSE_ID)
         self.assertTrue(CourseSetting.get_is_finalized(TEST_COURSE_ID))
         self.assertTrue(CourseSetting.get_is_finalized(TEST_COURSE_ID))
+    
+    def test_is_missing_urls_true(self):
+        """ Tests that is_missing_urls returns false when a url is missing """
+        stage = Stage.objects.create(course_id=TEST_COURSE_ID, name="stage")
+        track1 = Track.objects.create(course_id=TEST_COURSE_ID, name="track1")
+        Track.objects.create(course_id=TEST_COURSE_ID, name="track2")
+        StageUrl.objects.create(stage=stage, track=track1, url="")
+        self.assertTrue(stage.is_missing_urls())
+    
+    def test_is_missing_urls_true_no_url(self):
+        """ Tests that is_missing_urls returns true when not all urls have urls """
+        stage = Stage.objects.create(course_id=TEST_COURSE_ID, name="stage")
+        track1 = Track.objects.create(course_id=TEST_COURSE_ID, name="track1")
+        StageUrl.objects.create(stage=stage, track=track1)
+        self.assertTrue(stage.is_missing_urls())
+    
+    def test_is_missing_urls_true_blank_url(self):
+        """ Tests that is_missing_urls returns true when not all urls are filled in """
+        stage = Stage.objects.create(course_id=TEST_COURSE_ID, name="stage")
+        track1 = Track.objects.create(course_id=TEST_COURSE_ID, name="track1")
+        StageUrl.objects.create(stage=stage, track=track1, url="")
+        self.assertTrue(stage.is_missing_urls())
+    
+    def test_is_missing_urls_false(self):
+        """ Tests that is_missing_urls returns false when all urls are filled """
+        stage = Stage.objects.create(course_id=TEST_COURSE_ID, name="stage")
+        track1 = Track.objects.create(course_id=TEST_COURSE_ID, name="track1")
+        track2 = Track.objects.create(course_id=TEST_COURSE_ID, name="track2")
+        StageUrl.objects.create(stage=stage, track=track1, url="http://example.com")
+        StageUrl.objects.create(stage=stage, track=track2, url="http://example.com")
+        self.assertFalse(stage.is_missing_urls())

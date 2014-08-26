@@ -4,12 +4,10 @@ from mock import patch
 from ab_testing_tool_app.constants import STAGE_URL_TAG
 from ab_testing_tool_app.models import Stage, StageUrl, Track
 from ab_testing_tool_app.tests.common import (SessionTestCase, TEST_COURSE_ID,
-    TEST_OTHER_COURSE_ID, NONEXISTENT_STAGE_ID, APIReturn, LIST_MODULES,
-    LIST_ITEMS)
-from ab_testing_tool_app.controllers import stage_url
+    TEST_OTHER_COURSE_ID, NONEXISTENT_STAGE_ID, APIReturn, LIST_MODULES)
 
 
-class test_stage_pages(SessionTestCase):
+class TestStagePages(SessionTestCase):
     """Tests related to Stages and Stage-related pages and methods"""
     
     def test_create_stage_view(self):

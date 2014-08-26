@@ -8,7 +8,7 @@ from mock import patch
 from ab_testing_tool_app.exceptions import MISSING_RETURN_TYPES_PARAM,\
     MISSING_RETURN_URL
 
-class test_selection_pages(SessionTestCase):
+class TestSelectionPages(SessionTestCase):
     """ Tests related to selection pages and methods """
     
     def test_resource_selection_view(self):

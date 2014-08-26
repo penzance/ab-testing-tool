@@ -1,11 +1,9 @@
-from ab_testing_tool_app.tests.common import SessionTestCase, TEST_COURSE_ID,\
-    TEST_OTHER_COURSE_ID, NONEXISTENT_STAGE_ID, NONEXISTENT_TRACK_ID
+from ab_testing_tool_app.tests.common import (SessionTestCase, TEST_COURSE_ID,
+    TEST_OTHER_COURSE_ID, NONEXISTENT_STAGE_ID, NONEXISTENT_TRACK_ID)
 from django.core.urlresolvers import reverse
 from ab_testing_tool_app.models import Track
-from ab_testing_tool_app.views.track_pages import delete_track
-from ab_testing_tool_app.exceptions import MISSING_TRACK
 
-class test_track_pages(SessionTestCase):
+class TestTrackPages(SessionTestCase):
     """Tests related to Track and Track pages and methods"""
 
     def test_create_track_view(self):
