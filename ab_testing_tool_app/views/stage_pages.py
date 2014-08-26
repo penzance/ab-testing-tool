@@ -7,7 +7,7 @@ from ab_testing_tool_app.constants import ADMINS, STAGE_URL_TAG
 from ab_testing_tool_app.models import Stage, Track, StageUrl, CourseSetting,\
     Student
 from ab_testing_tool_app.canvas import get_lti_param
-from ab_testing_tool_app.controllers import stage_is_installed
+from ab_testing_tool_app.controllers import stage_is_installed, format_url
 from ab_testing_tool_app.decorators import page
 from ab_testing_tool_app.exceptions import (MULTIPLE_OBJECTS, MISSING_STAGE,
     DELETING_INSTALLED_STAGE, UNAUTHORIZED_ACCESS, COURSE_TRACKS_NOT_FINALIZED,
@@ -79,7 +79,7 @@ def submit_create_stage(request):
     stageurls = [(k,v) for (k,v) in request.POST.iteritems() if STAGE_URL_TAG in k and v]
     for (k,v) in stageurls:
         _,track_id = k.split(STAGE_URL_TAG)
-        StageUrl.objects.create(url=v, stage_id=t.id, track_id=track_id)
+        StageUrl.objects.create(url=format_url(v), stage_id=t.id, track_id=track_id)
     return redirect("/#tabs-2")
 
 
@@ -130,7 +130,7 @@ def submit_edit_stage(request):
         _,track_id = k.split(STAGE_URL_TAG)
         stage_result_list = StageUrl.objects.filter(stage__pk=t_id, track__pk=track_id)
         if len(stage_result_list) == 1:
-            stage_result_list[0].update(url=v)
+            stage_result_list[0].update(url=format_url(v))
         elif len(result_list) > 1:
             raise MULTIPLE_OBJECTS
         else:

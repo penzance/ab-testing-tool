@@ -1,3 +1,4 @@
+import csv
 from django.core.urlresolvers import reverse
 from django.http.response import HttpResponse
 from django.shortcuts import render_to_response, redirect
@@ -11,8 +12,6 @@ from ab_testing_tool_app.controllers import (get_uninstalled_stages,
 from ab_testing_tool_app.models import Stage, Track, Student, StageUrl
 from ab_testing_tool_app.decorators import page
 from ab_testing_tool_app.constants import ADMINS
-from django.template.defaultfilters import slugify
-import csv
 
 
 @page
@@ -69,6 +68,8 @@ def tool_config(request):
     resp = HttpResponse(config.to_xml(), content_type="text/xml", status=200)
     return resp
 
+
+@lti_role_required(ADMINS)
 @page
 def download_data(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
@@ -84,22 +85,19 @@ def download_data(request):
         writer.writerow(row)
     return response
 
+
+@lti_role_required(ADMINS)
 @page
 def finalize_tracks(request):
     #TODO: should we allow stages to exist that are not installed? If so, replace with:
     #for i in get_installed_stages(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     missing_urls = []
-    invalid_urls = []
     for stage in Stage.objects.filter(course_id=course_id):
         for track in Track.objects.filter(course_id=course_id):
             stageurl= StageUrl.objects.get(stage=stage, track=track)
             if not stageurl or not stageurl.url:
                 missing_urls.append((stage,track))
-            if "http" not in stageurl.url:
-                invalid_urls.append((stage,track))
     if missing_urls:
         return HttpResponse("URLs missing for these tracks in these Stages" + missing_urls)
-    if invalid_urls:
-        return HttpResponse("URLs are invalid missing for these tracks in these Stages" + invalid_urls)
     return redirect("/")
