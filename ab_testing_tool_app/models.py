@@ -62,12 +62,12 @@ class CourseSetting(CustomModel):
     
     @classmethod
     def get_is_finalized(cls, course_id):
-        course_setting = CourseSetting.objects.get_or_create(course_id=course_id)
+        course_setting, _ = CourseSetting.objects.get_or_create(course_id=course_id)
         return course_setting.tracks_finalized
     
     @classmethod
     def set_finalized(cls, course_id):
-        course_setting = CourseSetting.objects.get_or_create(
+        course_setting, _ = CourseSetting.objects.get_or_create(
                 course_id=course_id, defaults={"tracks_finalized": True})
         if not course_setting.tracks_finalized:
             course_setting.tracks_finalized = True

@@ -24,3 +24,4 @@ MISSING_RETURN_TYPES_PARAM = Exception("Error: invalid ext_content_return_types"
 MISSING_RETURN_URL = Exception("Error: no ext_content_return_url")
 
 COURSE_TRACKS_NOT_FINALIZED = Exception("Error: Course tracks are not finalized")
+NO_URL_FOR_TRACK = Exception("Error: No course content. Ask your course instructors to put something here.")

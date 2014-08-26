@@ -1,8 +1,9 @@
-from ab_testing_tool_app.models import Stage
+from ab_testing_tool_app.models import Stage, Track, StageUrl
 from ab_testing_tool_app.canvas import (get_canvas_request_context, list_module_items, list_modules,
     get_lti_param)
 from django.core.urlresolvers import reverse
 from ab_testing_tool_app.exceptions import BAD_STAGE_ID
+from django.http.response import HttpResponse
 
 
 def stage_url(request, stage_id):
@@ -12,7 +13,6 @@ def stage_url(request, stage_id):
     except (TypeError, ValueError):
         raise BAD_STAGE_ID
     return request.build_absolute_uri(reverse("deploy_stage", args=(stage_id,)))
-
 
 def get_uninstalled_stages(request):
     """ Returns the list of Stage objects that have been created for the
