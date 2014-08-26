@@ -3,8 +3,8 @@ import traceback
 from functools import wraps
 from django.shortcuts import render_to_response
 from django.http.response import HttpResponse
-
-UNKNOWN_ERROR = "An unknown error occurred in the A/B testing tool"
+from ab_testing_tool_app.constants import UNKNOWN_ERROR_STRING,\
+    DOUBLE_ERROR_STRING
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +18,7 @@ def page(f):
         try:
             return wrapped_page(f, args, kwargs)
         except Exception:
-            return HttpResponse(UNKNOWN_ERROR)
+            return HttpResponse(DOUBLE_ERROR_STRING)
     return wrapped
 
 
@@ -32,9 +32,5 @@ def wrapped_page(f, args, kwargs):
         logger.error(traceback.format_exc())
         message = str(e)
         if not message:
-            message = UNKNOWN_ERROR
+            message = UNKNOWN_ERROR_STRING
         return render_to_response("error.html", {"message": message})
-
-
-
-
