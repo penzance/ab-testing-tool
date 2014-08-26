@@ -8,7 +8,7 @@
 </head>
 <body>
 <div class="container">
-    <form method="POST" action="/submit_selection">
+    <form method="POST" action="{% url 'submit_selection' %}">
         <h4> To install a new A/B Stage, select one from list of uninstalled stages below:</h4>
         <br>
         <select name="stage_id">

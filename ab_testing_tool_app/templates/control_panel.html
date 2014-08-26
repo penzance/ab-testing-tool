@@ -62,12 +62,10 @@
                 <br>
                 <div class="list-group span4">
                     {% for m in tracks %}
-                        <h4><a href="/edit_track/{{m.id}}" class="list-group-item clearfix" id="track_{{m.id}}">
+                        <h4><a href="{% url 'edit_track' m.id %}" class="list-group-item clearfix" id="track_{{m.id}}">
                                 <span><strong>{{m.name}} </strong></span>
                             </a>
                         </h4>
-                        <div id="Track_items_{{m.id}}" style="display: none">
-                        </div>
                     {% empty %}
                         <br>
                         <p>No Tracks found.</p>
@@ -86,7 +84,7 @@
         
                 <div class="list-group span4">
                     {% for t in stages %}
-                    <a href="/edit_stage/{{t.id}}" class="list-group-item"><strong>{{t.name}}</strong> <i>{{t.is_missing_urls|yesno:"- URLs missing,complete"}}</i></a>
+                    <a href="{% url 'edit_stage' t.id %}" class="list-group-item"><strong>{{t.name}}</strong> <i>{{t.is_missing_urls|yesno:"- URLs missing,complete"}}</i></a>
                     {% endfor %}
                 </div>
             </div>
@@ -125,7 +123,7 @@
             <div class="span8">
                 <p> Download a CSV file of your A/B testing data here. </p>
                 <br>
-                <a href="/download_data" class="btn btn-lg btn-primary"> Download Data</a>
+                <a href="{% url 'download_data' %}" class="btn btn-lg btn-primary"> Download Data</a>
             </div>
         </div>
     </div>
@@ -136,14 +134,8 @@
 <script src="../static/js/jquery-ui.js"></script>
 <script src="../static/js/bootstrap.min.js"></script>
 
-<!-- JS for Modules expanding tabs-->
+<!-- JS for expanding modules-->
 <script>
-{% for m in tracks %}
-$( "#track_" + {{m.id}}).click(function() {
-$( "#track_items_" + {{m.id}}).toggle('fast');
-});
-{% endfor %}
-
 {% for m in modules %}
 $( "#module_" + {{m.id}}).click(function() {
 $( "#module_items_" + {{m.id}}).toggle('fast');

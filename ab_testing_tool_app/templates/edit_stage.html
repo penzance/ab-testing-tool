@@ -18,7 +18,7 @@
         <tr>
         <td ><p>Created: {{stage.created_on}} | Last updated: {{stage.updated_on}} </p></td>
         {% if stage.id and not is_installed %}
-        <td class="text-right nowrap"><a href="/delete_stage/{{ stage.id }}" class="btn btn-lg btn-danger" id="delete">Delete Stage</a></td>
+        <td class="text-right nowrap"><a href="{% url 'delete_stage' stage.id %}" class="btn btn-lg btn-danger" id="delete">Delete Stage</a></td>
         {% elif stage.id and is_installed%}
         <td class="text-right nowrap"><a  class="btn btn-lg btn-danger disabled">Delete Stage</a></td>
         {% endif %}

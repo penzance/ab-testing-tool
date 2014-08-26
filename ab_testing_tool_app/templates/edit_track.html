@@ -18,7 +18,7 @@
 
         <td><p>Created: {{track.created_on}} | Last updated: {{track.updated_on}} </p></td>
         {% if track.id and not is_finalized%}
-        <td class="text-right nowrap"><a href="/delete_track/{{ track.id }}" class="btn btn-lg btn-danger" id="delete">Delete Track</a></td>
+        <td class="text-right nowrap"><a href="{% url 'delete_track' track.id %}" class="btn btn-lg btn-danger" id="delete">Delete Track</a></td>
         {% elif track.id and is_finalized %}
         <td class="text-right nowrap"><a class="btn btn-lg btn-danger disabled" id="delete">Delete Track</a></td>
         {% endif %}
