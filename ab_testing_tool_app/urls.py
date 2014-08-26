@@ -2,7 +2,7 @@ from django.conf.urls import patterns, include, url
 from django.contrib import admin
 
 from ab_testing_tool_app.views.main_pages import (render_stage_control_panel, not_authorized,
-     tool_config)
+     tool_config, download_data)
 
 from ab_testing_tool_app.views.selection_pages import (resource_selection, submit_selection,
                     submit_selection_new_stage)
@@ -16,6 +16,7 @@ admin.autodiscover()
 urlpatterns = patterns('',
     url(r'^$', render_stage_control_panel, name='index'),
     url(r'^not_authorized$', not_authorized, name='not_authorized'),
+    url(r'^download_data$', download_data, name='download_data'),
     url(r'^tool_config$', tool_config, name='tool_config'),
     url(r'^resource_selection$', resource_selection, name="resource_selection"),
     url(r'^submit_selection$', submit_selection, name="submit_selection"),

@@ -8,9 +8,11 @@ from ims_lti_py.tool_config import ToolConfig
 from ab_testing_tool_app.canvas import get_lti_param
 from ab_testing_tool_app.controllers import (get_uninstalled_stages,
     get_modules_with_items)
-from ab_testing_tool_app.models import Stage, Track
+from ab_testing_tool_app.models import Stage, Track, Student
 from ab_testing_tool_app.decorators import page
 from ab_testing_tool_app.constants import ADMINS
+from django.template.defaultfilters import slugify
+import csv
 
 
 @page
@@ -66,3 +68,18 @@ def tool_config(request):
     
     resp = HttpResponse(config.to_xml(), content_type="text/xml", status=200)
     return resp
+
+@page
+def download_data(request):
+    course_id = get_lti_param(request, "custom_canvas_course_id")
+    response = HttpResponse(mimetype='text/csv')
+    response['Content-Disposition'] = 'attachment; filename=%students.csv'
+    writer = csv.writer(response)
+    # Write headers to CSV file
+    headers = ["Student_ID", "Assigned_Track"]
+    writer.writerow(headers)
+    # Write data to CSV file
+    for s in Student.objects.filter(course_id=course_id):
+        row = [s.student_id, s.track]
+        writer.writerow(row)
+    return response
