@@ -20,30 +20,40 @@ def deploy_stage(request, t_id):
        edit_stage panel if admin.
        Note: Do not put @lti_role_required(ADMINS) here, as students can reach
        this page.
-       TODO: Extend this by delivering stage as determined by track student is on
        TODO: Have admin able to preview stages as a student would see them
-       
        """
-    # TODO: replace the following three lines with verification.is_allowed
-    # when that code makes it into django_auth_lti master
     course_id = get_lti_param(request, "custom_canvas_course_id")
+    # TODO: replace the following code with verification.is_allowed
+    # when that code makes it into django_auth_lti master
     user_roles = get_lti_param(request, "roles")
+    
+    # If user is an admin, let them edit the stage
     if set(ADMINS) & set(user_roles):
         return redirect(reverse("edit_stage", args=(t_id,)))
+    
+    # Otherwise, user is a student.  Tracks for the course must be finalized
+    # for a student to be able to access content from the ab_testing_tool
     if not CourseSetting.get_is_finalized(course_id):
         raise COURSE_TRACKS_NOT_FINALIZED
+    
     student_id = get_lti_param(request, "custom_canvas_user_login_id")
-    student, is_new_obj = Student.objects.get_or_create(student_id=student_id, course_id=course_id)
-    if not is_new_obj and student.track:
-        chosen_stageurl = StageUrl.objects.get(stage__pk=t_id, track=student.track)
-    else:
+    
+    # Create an object to track the student for this course if we haven't yet
+    student, is_new_obj = Student.objects.get_or_create(student_id=student_id,
+                                                        course_id=course_id)
+    # If this is a new student or the student doesn't yet have a track,
+    # assign the student to a track
+    # TODO: expand this code to allow multiple randomization procedures
+    if is_new_obj or not student.track:
         chosen_track = choice(Track.objects.filter(course_id=course_id))
         student.update(track=chosen_track)
-        chosen_stageurl = StageUrl.objects.get(stage__pk=t_id, track=chosen_track)
+    
+    # Retrieve the url for the student's track at the current intervention point
+    # Return an error page if there is no url configured.
+    chosen_stageurl = StageUrl.objects.get(stage__pk=t_id, track=chosen_track)
     if chosen_stageurl and chosen_stageurl.url:
         return redirect(chosen_stageurl.url)
-    else:
-        raise NO_URL_FOR_TRACK
+    raise NO_URL_FOR_TRACK
 
 
 @lti_role_required(ADMINS)

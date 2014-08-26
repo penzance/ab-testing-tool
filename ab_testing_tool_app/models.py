@@ -36,7 +36,9 @@ class StageUrl(CustomModel):
 
 
 class Student(CustomModel):
-    """ This model stores which track a student is in for each course. """
+    """ This model stores which track a student is in for each course.
+        A real-world can be represented by multiple Student objects,
+        and will have a seperate object for each course they are in. """
     course_id = models.CharField(max_length=12, db_index=True)
     student_id = models.CharField(max_length=12)
     track = models.ForeignKey(Track)
