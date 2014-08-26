@@ -28,9 +28,18 @@
                  <div class="span8">
                     <p> Create and Edit your A/B Tracks here. You can assign student cohorts to a track <b> only after </b> finalizing your tracks.</p>
                     <br>
-                     <a class="btn btn-lg btn-success"  href="{% url 'create_track' %}"> Create New Track</a>
-                     <a class="btn btn-lg btn-danger"> Finalize Tracks</a>
-                     <br><br>
+                    {% if not is_finalized %}
+                    <a class="btn btn-lg btn-success"  href="{% url 'create_track' %}"> Create New Track</a>
+                    <a class="btn btn-lg btn-danger" href="{% url 'finalize_tracks' %}"> Finalize Tracks</a>
+                    <br>
+                    {% else %}
+                    <a class="btn btn-lg btn-success disabled"> Create New Track</a>
+                    <a class="btn btn-lg btn-danger disabled"> Finalize Tracks</a>
+                    <br><br>
+                    <h4 class="text-center nowrap">Tracks Are Finalized.</h4>
+                    <h5 class="text-center nowrap">Note: Tracks can no longer be deleted or created. Existing tracks can still be edited.</h5>
+                    {% endif %}
+                    <br>
                     <div class="list-group span4">
                         {% for m in tracks %}
                             <h4><a href="/edit_track/{{m.id}}" class="list-group-item clearfix" id="track_{{m.id}}">

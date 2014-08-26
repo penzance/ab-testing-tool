@@ -9,7 +9,7 @@ from ab_testing_tool_app.views.selection_pages import (resource_selection, submi
 from ab_testing_tool_app.views.stage_pages import (create_stage, submit_create_stage,
                     edit_stage,  delete_stage, deploy_stage, submit_edit_stage)
 from ab_testing_tool_app.views.track_pages import (create_track, submit_create_track,
-                    submit_edit_track, edit_track, delete_track)
+                    submit_edit_track, edit_track, delete_track, finalize_tracks)
 
 admin.autodiscover()
 
@@ -34,6 +34,7 @@ urlpatterns = patterns('',
     url(r'^edit_track/(?P<track_id>\d+)$', edit_track, name='edit_track'),
     url(r'^submit_edit_track$', submit_edit_track, name='submit_edit_track'),
     url(r'^delete_track/(?P<track_id>\d+)$', delete_track, name='delete_track'),
+    url(r'^finalize_tracks$', finalize_tracks, name='finalize_tracks'),
     
     # Examples:
     # url(r'^$', 'project_name.views.home', name='home'),

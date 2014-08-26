@@ -2,11 +2,12 @@ from django.shortcuts import render_to_response, redirect
 from django_auth_lti.decorators import lti_role_required
 
 from ab_testing_tool_app.constants import ADMINS
-from ab_testing_tool_app.models import Track, StageUrl, CourseSetting
+from ab_testing_tool_app.models import Track, StageUrl, CourseSetting, Stage
 from ab_testing_tool_app.canvas import get_lti_param
 from ab_testing_tool_app.decorators import page
 from ab_testing_tool_app.exceptions import (MULTIPLE_OBJECTS, MISSING_TRACK,
     UNAUTHORIZED_ACCESS, COURSE_TRACKS_ALREADY_FINALIZED)
+from django.http.response import HttpResponse
 
 
 @lti_role_required(ADMINS)
@@ -25,7 +26,9 @@ def edit_track(request, track_id):
     t = Track.objects.get(pk=track_id)
     if course_id != t.course_id:
         raise UNAUTHORIZED_ACCESS
-    context = {"track": t}
+    is_finalized = CourseSetting.get_is_finalized(course_id)
+    context = {"track": t,
+               "is_finalized": is_finalized}
     return render_to_response("edit_track.html", context)
 
 
@@ -62,8 +65,7 @@ def submit_edit_track(request):
 @page
 def delete_track(request, track_id):
     """
-    NOTE: When a track gets deleted, stages on the track do not get deleted.
-    Decide whether or not this should be the case.
+    NOTE: When a track gets deleted, stages installed on the track do not get deleted.
     """
     course_id = get_lti_param(request, "custom_canvas_course_id")
     if CourseSetting.get_is_finalized(course_id):
@@ -78,4 +80,20 @@ def delete_track(request, track_id):
         raise MULTIPLE_OBJECTS
     else:
         raise MISSING_TRACK
+    return redirect("/")
+
+
+@lti_role_required(ADMINS)
+@page
+def finalize_tracks(request):
+    course_id = get_lti_param(request, "custom_canvas_course_id")
+    missing_urls = []
+    for stage in Stage.objects.filter(course_id=course_id):
+        for track in Track.objects.filter(course_id=course_id):
+            stageurl= StageUrl.objects.get(stage=stage, track=track)
+            if not stageurl or not stageurl.url:
+                missing_urls.append((stage,track))
+    if missing_urls:
+        return HttpResponse("URLs missing for these tracks in these Stages" + missing_urls)
+    CourseSetting.set_finalized(course_id)
     return redirect("/")

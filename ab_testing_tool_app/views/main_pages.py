@@ -1,7 +1,7 @@
 import csv
 from django.core.urlresolvers import reverse
 from django.http.response import HttpResponse
-from django.shortcuts import render_to_response, redirect
+from django.shortcuts import render_to_response
 #from django.views.decorators.csrf import csrf_exempt
 from django_auth_lti.decorators import lti_role_required
 from ims_lti_py.tool_config import ToolConfig
@@ -9,8 +9,8 @@ from ims_lti_py.tool_config import ToolConfig
 from ab_testing_tool_app.canvas import get_lti_param
 from ab_testing_tool_app.controllers import (get_uninstalled_stages,
     get_modules_with_items)
-from ab_testing_tool_app.models import Stage, Track, Student, StageUrl,\
-    CourseSetting
+from ab_testing_tool_app.models import (Stage, Track, Student,
+    CourseSetting)
 from ab_testing_tool_app.decorators import page
 from ab_testing_tool_app.constants import ADMINS
 
@@ -28,12 +28,14 @@ def render_stage_control_panel(request):
     uninstalled_stages = get_uninstalled_stages(request)
     stages = Stage.objects.filter(course_id=course_id)
     tracks = Track.objects.filter(course_id=course_id)
+    is_finalized = CourseSetting.get_is_finalized(course_id=course_id)
     context = {
         "modules": modules,
         "stages": stages,
         "uninstalled_stages": uninstalled_stages,
         "tracks": tracks,
-        "canvas_url": get_lti_param(request, "launch_presentation_return_url")
+        "canvas_url": get_lti_param(request, "launch_presentation_return_url"),
+        "is_finalized": is_finalized,
     }
     return render_to_response("control_panel.html", context)
 
@@ -75,7 +77,7 @@ def tool_config(request):
 def download_data(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     response = HttpResponse(mimetype='text/csv')
-    response['Content-Disposition'] = 'attachment; filename=%students.csv'
+    response['Content-Disposition'] = 'attachment; filename=students.csv'
     writer = csv.writer(response)
     # Write headers to CSV file
     headers = ["Student_ID", "Assigned_Track"]
@@ -85,21 +87,3 @@ def download_data(request):
         row = [s.student_id, s.track]
         writer.writerow(row)
     return response
-
-
-@lti_role_required(ADMINS)
-@page
-def finalize_tracks(request):
-    #TODO: should we allow stages to exist that are not installed? If so, replace with:
-    #for i in get_installed_stages(request):
-    course_id = get_lti_param(request, "custom_canvas_course_id")
-    missing_urls = []
-    for stage in Stage.objects.filter(course_id=course_id):
-        for track in Track.objects.filter(course_id=course_id):
-            stageurl= StageUrl.objects.get(stage=stage, track=track)
-            if not stageurl or not stageurl.url:
-                missing_urls.append((stage,track))
-    if missing_urls:
-        return HttpResponse("URLs missing for these tracks in these Stages" + missing_urls)
-    CourseSetting.set_finalized(course_id)
-    return redirect("/")
