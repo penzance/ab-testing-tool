@@ -27,8 +27,7 @@ def deploy_stage(request, t_id):
     # TODO: replace the following three lines with verification.is_allowed
     # when that code makes it into django_auth_lti master
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    lti_launch = request.session.get('LTI_LAUNCH', None)
-    user_roles = lti_launch.get('roles', [])
+    user_roles = get_lti_param(request, "roles")
     if set(ADMINS) & set(user_roles):
         return redirect(reverse("edit_stage", args=(t_id,)))
     if not CourseSetting.get_is_finalized(course_id):
