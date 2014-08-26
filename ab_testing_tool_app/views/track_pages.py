@@ -2,16 +2,19 @@ from django.shortcuts import render_to_response, redirect
 from django_auth_lti.decorators import lti_role_required
 
 from ab_testing_tool_app.constants import ADMINS
-from ab_testing_tool_app.models import Track, StageUrl
+from ab_testing_tool_app.models import Track, StageUrl, CourseSetting
 from ab_testing_tool_app.canvas import get_lti_param
 from ab_testing_tool_app.decorators import page
 from ab_testing_tool_app.exceptions import (MULTIPLE_OBJECTS, MISSING_TRACK,
-    UNAUTHORIZED_ACCESS)
+    UNAUTHORIZED_ACCESS, COURSE_TRACKS_ALREADY_FINALIZED)
 
 
 @lti_role_required(ADMINS)
 @page
 def create_track(request):
+    course_id = get_lti_param(request, "custom_canvas_course_id")
+    if CourseSetting.get_is_finalized(course_id):
+        raise COURSE_TRACKS_ALREADY_FINALIZED
     return render_to_response("edit_track.html")
 
 
@@ -30,6 +33,8 @@ def edit_track(request, track_id):
 @page
 def submit_create_track(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
+    if CourseSetting.get_is_finalized(course_id):
+        raise COURSE_TRACKS_ALREADY_FINALIZED
     name = request.POST["name"]
     notes = request.POST["notes"]
     Track.objects.create(name=name, notes=notes, course_id=course_id)
@@ -61,6 +66,8 @@ def delete_track(request, track_id):
     Decide whether or not this should be the case.
     """
     course_id = get_lti_param(request, "custom_canvas_course_id")
+    if CourseSetting.get_is_finalized(course_id):
+        raise COURSE_TRACKS_ALREADY_FINALIZED
     t = Track.objects.filter(pk=track_id, course_id=course_id)
     if len(t) == 1:
         t[0].delete()

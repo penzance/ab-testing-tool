@@ -19,9 +19,10 @@ DELETING_INSTALLED_STAGE = Exception("Deleting an installed Stage is not allowed
 
 UNAUTHORIZED_ACCESS = Exception("You do not have access to this course.")
 
-MISSING_RETURN_TYPES_PARAM = Exception("Error: invalid ext_content_return_types")
+MISSING_RETURN_TYPES_PARAM = Exception("Invalid ext_content_return_types")
 
-MISSING_RETURN_URL = Exception("Error: no ext_content_return_url")
+MISSING_RETURN_URL = Exception("No ext_content_return_url")
 
-COURSE_TRACKS_NOT_FINALIZED = Exception("Error: Course tracks are not finalized")
-NO_URL_FOR_TRACK = Exception("Error: No course content. Ask your course instructors to put something here.")
+COURSE_TRACKS_ALREADY_FINALIZED = Exception("You can't change tracks after their finalized")
+COURSE_TRACKS_NOT_FINALIZED = Exception("Course tracks are not finalized")
+NO_URL_FOR_TRACK = Exception("No course content. Ask your course instructors to put something here.")
