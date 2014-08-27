@@ -65,7 +65,7 @@ def submit_edit_track(request):
 def delete_track(request, track_id):
     """
     NOTE: When a track gets deleted, urls for that track get deleted from all
-          stages in that course.
+          stages in that course as a result of cascading delete.
     """
     course_id = get_lti_param(request, "custom_canvas_course_id")
     if CourseSetting.get_is_finalized(course_id):
@@ -74,9 +74,6 @@ def delete_track(request, track_id):
     if not track:
         raise MISSING_TRACK
     track.delete()
-    stage_urls = StageUrl.objects.filter(track__pk=track_id)
-    for url in stage_urls:
-        url.delete()
     return redirect("/")
 
 
