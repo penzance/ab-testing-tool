@@ -84,6 +84,7 @@ def download_data(request):
     writer.writerow(headers)
     # Write data to CSV file
     for s in Student.objects.filter(course_id=course_id):
-        row = [s.student_id, s.track]
+        row = [s.student_id, s.track.name]
         writer.writerow(row)
     return response
+

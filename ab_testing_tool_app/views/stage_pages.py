@@ -39,18 +39,18 @@ def deploy_stage(request, stage_id):
     student_id = get_lti_param(request, "custom_canvas_user_login_id")
     
     # Create an object to track the student for this course if we haven't yet
-    student, is_new_obj = Student.objects.get_or_create(student_id=student_id,
-                                                        course_id=course_id)
+    student = Student.get_or_none(student_id=student_id, course_id=course_id)
     # If this is a new student or the student doesn't yet have a track,
     # assign the student to a track
     # TODO: expand this code to allow multiple randomization procedures
-    if is_new_obj or not student.track:
+    if not student:
         chosen_track = choice(Track.objects.filter(course_id=course_id))
-        student.update(track=chosen_track)
+        student = Student.objects.create(student_id=student_id,
+                                         course_id=course_id, track=chosen_track)
     
     # Retrieve the url for the student's track at the current intervention point
     # Return an error page if there is no url configured.
-    chosen_stageurl = StageUrl.get_or_none(stage__pk=stage_id, track=chosen_track)
+    chosen_stageurl = StageUrl.get_or_none(stage__pk=stage_id, track=student.track)
     if chosen_stageurl and chosen_stageurl.url:
         return redirect(chosen_stageurl.url)
     raise NO_URL_FOR_TRACK
