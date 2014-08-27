@@ -4,6 +4,7 @@ from django.http.response import HttpResponse
 from django.shortcuts import render_to_response
 #from django.views.decorators.csrf import csrf_exempt
 from django_auth_lti.decorators import lti_role_required
+from django.template.defaultfilters import slugify
 from ims_lti_py.tool_config import ToolConfig
 
 from ab_testing_tool_app.canvas import get_lti_param
@@ -76,8 +77,10 @@ def tool_config(request):
 @page
 def download_data(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
+    course_title = get_lti_param(request, "context_title")
     response = HttpResponse(mimetype='text/csv')
-    response['Content-Disposition'] = 'attachment; filename=students.csv'
+    response['Content-Disposition'] = ('attachment; filename=%s_students.csv' %
+                                       slugify(course_title))
     writer = csv.writer(response)
     # Write headers to CSV file
     headers = ["Student_ID", "Assigned_Track"]
