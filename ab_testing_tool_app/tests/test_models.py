@@ -35,6 +35,12 @@ class TestModels(SessionTestCase):
         self.assertTrue(CourseSetting.get_is_finalized(TEST_COURSE_ID))
         self.assertTrue(CourseSetting.get_is_finalized(TEST_COURSE_ID))
     
+    def test_get_returns_none(self):
+        """ Tests that get_or_none returns None when object does not exist"""
+        stage = Stage.objects.create(course_id=TEST_COURSE_ID, name="stage")
+        track1 = Track.objects.create(course_id=TEST_COURSE_ID, name="track1")
+        self.assertIsNone(StageUrl.get_or_none(stage=stage, track=track1))
+
     def test_is_missing_urls_true(self):
         """ Tests that is_missing_urls returns false when a url is missing """
         stage = Stage.objects.create(course_id=TEST_COURSE_ID, name="stage")

@@ -67,16 +67,25 @@ class TestStagePages(SessionTestCase):
     def test_submit_create_stage_with_stageurls(self):
         """Tests that create_stage creates a Stage object and StageUrl objects
             verified by DB count"""
+        stage_name = "stage"
         num_stages = Stage.objects.count()
         num_stageurls = StageUrl.objects.count()
-        data = {"name": "stage", STAGE_URL_TAG + "1": "http://example.com/page",
-                STAGE_URL_TAG + "2": "http://example.com/otherpage", "notes": "hi"}
+        track1 = Track.objects.create(name="t1", course_id=TEST_COURSE_ID)
+        track2 = Track.objects.create(name="t2", course_id=TEST_COURSE_ID)
+        data = {"name": stage_name,
+                STAGE_URL_TAG + str(track1.id): "http://example.com/page",
+                STAGE_URL_TAG + str(track2.id): "http://example.com/otherpage",
+                "notes": "hi"}
         response = self.client.post(reverse("submit_create_stage"), data,
                                     follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(num_stages + 1, Stage.objects.count())
         self.assertEqual(num_stageurls + 2, StageUrl.objects.count())
-    
+        self.assertIsNotNone(Stage.objects.get(name=stage_name))
+        stage = Stage.objects.get(name=stage_name)
+        self.assertIsNotNone(StageUrl.objects.get(stage=stage.id, track=track1.id))
+        self.assertIsNotNone(StageUrl.objects.get(stage=stage.id, track=track2.id))
+
     def test_submit_create_stage_unauthorized(self):
         """Tests that create_stage unauthorized"""
         self.set_roles([])

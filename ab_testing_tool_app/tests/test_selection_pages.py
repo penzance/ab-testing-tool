@@ -1,12 +1,13 @@
 from django.core.urlresolvers import reverse
 from ab_testing_tool_app.tests.common import (SessionTestCase, TEST_COURSE_ID,
     TEST_DOMAIN)
-from ab_testing_tool_app.models import Stage
+from ab_testing_tool_app.models import Stage, StageUrl, Track
 from django.utils.http import urlencode
 from ab_testing_tool_app.controllers import stage_url
 from mock import patch
 from ab_testing_tool_app.exceptions import MISSING_RETURN_TYPES_PARAM,\
     MISSING_RETURN_URL
+from ab_testing_tool_app.constants import STAGE_URL_TAG
 
 class TestSelectionPages(SessionTestCase):
     """ Tests related to selection pages and methods """
@@ -91,3 +92,23 @@ class TestSelectionPages(SessionTestCase):
                   }
         for k, v in params.items():
             self.assertTrue(urlencode({k: v}) in response.url, urlencode({k: v}))
+
+    @patch("django.http.request.HttpRequest.get_host", return_value=TEST_DOMAIN)
+    def test_submit_selection_new_stage_with_stageurls(self, _mock):
+        """ Tests that submit_selection_new_stage creates a stage object and
+        stage url objects"""
+        stage_name = "this_is_a_stage"
+        num_stages = Stage.objects.count()
+        num_stageurls = StageUrl.objects.count()
+        track1 = Track.objects.create(name="t1", course_id=TEST_COURSE_ID)
+        track2 = Track.objects.create(name="t2", course_id=TEST_COURSE_ID)
+        content_return_url = "http://test_content_return_url.com"
+        data = {"name": stage_name, STAGE_URL_TAG + "1": "http://example.com/page",
+                STAGE_URL_TAG + "2": "http://example.com/otherpage", "notes": "hi",
+                "content_return_url": content_return_url}
+        self.client.post(reverse("submit_selection_new_stage"), data)
+        self.assertEqual(num_stages + 1, Stage.objects.count())
+        self.assertEqual(num_stageurls + 2, StageUrl.objects.count())
+        stage = Stage.objects.get(name=stage_name)
+        self.assertIsNotNone(StageUrl.objects.get(stage=stage.id, track=track1.id))
+        self.assertIsNotNone(StageUrl.objects.get(stage=stage.id, track=track2.id))
