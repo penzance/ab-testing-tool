@@ -142,7 +142,8 @@ def submit_edit_stage(request):
 @lti_role_required(ADMINS)
 @page
 def delete_stage(request, stage_id):
-    """ Note: Installed stages are not allowed to be deleted """
+    """ Note: Installed stages are not allowed to be deleted 
+        Note: attached StageUrls are deleted via cascading delete """
     course_id = get_lti_param(request, "custom_canvas_course_id")
     stage = Stage.get_or_none(pk=stage_id, course_id=course_id)
     if not stage:
@@ -150,7 +151,4 @@ def delete_stage(request, stage_id):
     if stage_is_installed(request, stage):
         raise DELETING_INSTALLED_STAGE
     stage.delete()
-    stage_urls = StageUrl.objects.filter(stage__pk=stage_id)
-    for url in stage_urls:
-        url.delete()
     return redirect("/#tabs-2")
