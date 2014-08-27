@@ -55,7 +55,7 @@ class Student(CustomModel):
         A real-world can be represented by multiple Student objects,
         and will have a seperate object for each course they are in. """
     course_id = models.CharField(max_length=12, db_index=True)
-    student_id = models.CharField(max_length=12)
+    student_id = models.CharField(max_length=12, db_index=True)
     track = models.ForeignKey(Track)
     
     class Meta:
