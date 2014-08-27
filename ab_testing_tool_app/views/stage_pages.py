@@ -11,7 +11,7 @@ from ab_testing_tool_app.controllers import stage_is_installed, format_url
 from ab_testing_tool_app.decorators import page
 from ab_testing_tool_app.exceptions import (MISSING_STAGE, UNAUTHORIZED_ACCESS,
     DELETING_INSTALLED_STAGE, COURSE_TRACKS_NOT_FINALIZED,
-    NO_URL_FOR_TRACK)
+    NO_URL_FOR_TRACK, NO_TRACKS_FOR_COURSE)
 
 
 @page
@@ -44,7 +44,10 @@ def deploy_stage(request, stage_id):
     # assign the student to a track
     # TODO: expand this code to allow multiple randomization procedures
     if not student:
-        chosen_track = choice(Track.objects.filter(course_id=course_id))
+        tracks = Track.objects.filter(course_id=course_id)
+        if not tracks:
+            raise NO_TRACKS_FOR_COURSE
+        chosen_track = choice(tracks)
         student = Student.objects.create(student_id=student_id,
                                          course_id=course_id, track=chosen_track)
     
@@ -120,9 +123,11 @@ def submit_edit_stage(request):
     name = request.POST["name"]
     notes = request.POST["notes"]
     stage_id = request.POST["id"]
-    stage = Stage.objects.filter(pk=stage_id, course_id=course_id)
+    stage = Stage.get_or_none(pk=stage_id)
     if not stage:
         raise MISSING_STAGE
+    if course_id != stage.course_id:
+        raise UNAUTHORIZED_ACCESS
     stage.update(name=name, notes=notes)
     # StageUrl creation
     stageurls = [(k,v) for (k,v) in request.POST.iteritems() if STAGE_URL_TAG in k and v]
@@ -130,8 +135,7 @@ def submit_edit_stage(request):
         _,track_id = k.split(STAGE_URL_TAG)
         # This is a search for the joint unique index of StageUrl, so it
         # should not ever return multiple objects
-        stage_url = StageUrl.objects.filter(stage__pk=stage_id,
-                                            track__pk=track_id)
+        stage_url = StageUrl.get_or_none(stage__pk=stage_id, track__pk=track_id)
         if stage_url:
             stage_url.update(url=format_url(v))
         else:
@@ -145,9 +149,11 @@ def delete_stage(request, stage_id):
     """ Note: Installed stages are not allowed to be deleted
         Note: attached StageUrls are deleted via cascading delete """
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    stage = Stage.get_or_none(pk=stage_id, course_id=course_id)
+    stage = Stage.get_or_none(pk=stage_id)
     if not stage:
         raise MISSING_STAGE
+    if course_id != stage.course_id:
+        raise UNAUTHORIZED_ACCESS
     if stage_is_installed(request, stage):
         raise DELETING_INSTALLED_STAGE
     stage.delete()

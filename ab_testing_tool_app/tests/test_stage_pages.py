@@ -8,7 +8,8 @@ from ab_testing_tool_app.tests.common import (SessionTestCase, TEST_COURSE_ID,
     TEST_OTHER_COURSE_ID, NONEXISTENT_STAGE_ID, APIReturn, LIST_MODULES,
     TEST_STUDENT_ID)
 from ab_testing_tool_app.exceptions import (NO_URL_FOR_TRACK,
-    COURSE_TRACKS_NOT_FINALIZED, MISSING_STAGE, UNAUTHORIZED_ACCESS)
+    COURSE_TRACKS_NOT_FINALIZED, MISSING_STAGE, UNAUTHORIZED_ACCESS,
+    DELETING_INSTALLED_STAGE, NO_TRACKS_FOR_COURSE)
 
 
 class TestStagePages(SessionTestCase):
@@ -26,6 +27,14 @@ class TestStagePages(SessionTestCase):
         stage = Stage.objects.create(name="stage1")
         response = self.client.get(reverse("deploy_stage", args=(stage.id,)))
         self.assertError(response, COURSE_TRACKS_NOT_FINALIZED)
+    
+    def test_deploy_stage_no_tracks_error(self):
+        """ Tests deploy stage for student creates errors with no tracks """
+        self.set_roles([])
+        CourseSetting.set_finalized(TEST_COURSE_ID)
+        stage = Stage.objects.create(name="stage1")
+        response = self.client.get(reverse("deploy_stage", args=(stage.id,)))
+        self.assertError(response, NO_TRACKS_FOR_COURSE)
     
     def test_deploy_stage_student_created(self):
         """ Tests deploy stage for student creates student object and assigns
@@ -243,7 +252,7 @@ class TestStagePages(SessionTestCase):
                 "id": NONEXISTENT_STAGE_ID}
         response = self.client.post(reverse("submit_edit_stage"), data,
                                     follow=True)
-        self.assertTemplateUsed(response, "error.html")
+        self.assertError(response, MISSING_STAGE)
     
     def test_submit_edit_stage_wrong_course(self):
         """ Tests that submit_edit_stage method raises error for existent Stage but
@@ -255,7 +264,7 @@ class TestStagePages(SessionTestCase):
                 "id": stage.id}
         response = self.client.post(reverse("submit_edit_stage"), data,
                                     follow=True)
-        self.assertTemplateUsed(response, "error.html")
+        self.assertError(response, UNAUTHORIZED_ACCESS)
     
     def test_deploy_stage_view(self):
         """ Tests deploy stage  """
@@ -296,7 +305,7 @@ class TestStagePages(SessionTestCase):
         response = self.client.get(reverse("delete_stage", args=(stage_id,)),
                                    follow=True)
         second_num_stages = Stage.objects.count()
-        self.assertTemplateUsed(response, "error.html")
+        self.assertError(response, MISSING_STAGE)
         self.assertNotEqual(first_num_stages, second_num_stages)
     
     def test_delete_stage_wrong_course(self):
@@ -307,7 +316,7 @@ class TestStagePages(SessionTestCase):
         response = self.client.get(reverse("delete_stage", args=(stage.id,)),
                                    follow=True)
         second_num_stages = Stage.objects.count()
-        self.assertTemplateUsed(response, "error.html")
+        self.assertError(response, UNAUTHORIZED_ACCESS)
         self.assertNotEqual(first_num_stages, second_num_stages)
     
     @patch(LIST_MODULES, return_value=APIReturn([{"id": 0}]))
@@ -323,4 +332,4 @@ class TestStagePages(SessionTestCase):
                                        follow=True)
             second_num_stages = Stage.objects.count()
             self.assertNotEqual(first_num_stages, second_num_stages)
-            self.assertTemplateUsed(response, "error.html")
+            self.assertError(response, DELETING_INSTALLED_STAGE)

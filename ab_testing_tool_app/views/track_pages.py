@@ -6,7 +6,7 @@ from ab_testing_tool_app.models import Track, StageUrl, CourseSetting, Stage
 from ab_testing_tool_app.canvas import get_lti_param
 from ab_testing_tool_app.decorators import page
 from ab_testing_tool_app.exceptions import (MISSING_TRACK, UNAUTHORIZED_ACCESS,
-    COURSE_TRACKS_ALREADY_FINALIZED)
+    COURSE_TRACKS_ALREADY_FINALIZED, NO_TRACKS_FOR_COURSE)
 from django.http.response import HttpResponse
 
 
@@ -81,6 +81,8 @@ def delete_track(request, track_id):
 @page
 def finalize_tracks(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
+    if Track.objects.filter(course_id=course_id).count() == 0:
+        raise NO_TRACKS_FOR_COURSE
     missing_urls = [stage.name for stage
                     in Stage.objects.filter(course_id=course_id)
                     if stage.is_missing_urls()]

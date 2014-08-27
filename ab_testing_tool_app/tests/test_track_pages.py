@@ -2,7 +2,8 @@ from ab_testing_tool_app.tests.common import (SessionTestCase, TEST_COURSE_ID,
     TEST_OTHER_COURSE_ID, NONEXISTENT_STAGE_ID, NONEXISTENT_TRACK_ID)
 from django.core.urlresolvers import reverse
 from ab_testing_tool_app.models import Track, CourseSetting, Stage, StageUrl
-from ab_testing_tool_app.exceptions import COURSE_TRACKS_ALREADY_FINALIZED
+from ab_testing_tool_app.exceptions import COURSE_TRACKS_ALREADY_FINALIZED,\
+    NO_TRACKS_FOR_COURSE
 
 class TestTrackPages(SessionTestCase):
     """Tests related to Track and Track pages and methods"""
@@ -207,12 +208,11 @@ class TestTrackPages(SessionTestCase):
         self.assertEqual(first_num_stage_urls - 1, second_num_stage_urls)
     
     def test_finalize_tracks(self):
-        """ Tests that the finalize tracks page sets the appropriate course
-            setting and returns a 200 """
+        """ Tests that the finalize tracks page sets the appropriate course """
         self.assertFalse(CourseSetting.get_is_finalized(TEST_COURSE_ID))
+        Track.objects.create(name="track1", course_id=TEST_COURSE_ID)
         response = self.client.get(reverse("finalize_tracks"), follow=True)
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(CourseSetting.get_is_finalized(TEST_COURSE_ID))
+        self.assertTrue(CourseSetting.get_is_finalized(TEST_COURSE_ID), response)
     
     def test_finalize_tracks_missing_urls(self):
         """ Tests that finalize fails if there are missing urls """
@@ -223,3 +223,8 @@ class TestTrackPages(SessionTestCase):
         StageUrl.objects.create(stage=stage, track=track1, url="example.com")
         self.client.get(reverse("finalize_tracks"), follow=True)
         self.assertFalse(CourseSetting.get_is_finalized(TEST_COURSE_ID))
+    
+    def test_finalize_tracks_no_tracks(self):
+        """ Tests that finalize fails if there are no tracks """
+        response = self.client.get(reverse("finalize_tracks"), follow=True)
+        self.assertError(response, NO_TRACKS_FOR_COURSE)
