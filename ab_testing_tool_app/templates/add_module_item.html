@@ -32,10 +32,10 @@
                     <td><label>Stage Name</label></td>
                     <td><input class="form-control"  type="text" name="name" value="{{ stage.name }}"/></td>
                 </tr>
-                {% for t, s in tracks %}
+                {% for t in tracks %}
                 <tr align="left">
                     <td><label>URL for Track "{{t.name}}" </label></td>
-                    <td><input class="form-control"  type="text" name="_stageurl_{{t.id}}" value="{{ s.url }}"/></td>
+                    <td><input class="form-control"  type="text" name="_stageurl_{{t.id}}" /></td>
                 </tr>
                 {% endfor %}
                 <tr align="left">

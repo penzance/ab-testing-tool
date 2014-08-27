@@ -161,3 +161,21 @@ class TestTrackPages(SessionTestCase):
         second_num_tracks = Track.objects.count()
         self.assertTemplateUsed(response, "error.html")
         self.assertNotEqual(first_num_tracks, second_num_tracks)
+
+    def test_finalize_tracks_with_delete_track(self):
+        """ Tests should not be able to delete tracks after finalizing tracks"""
+        pass
+
+    def test_finalize_tracks_with_create_track(self):
+        """ Tests should not be able to create tracks after finalizing tracks"""
+        pass
+
+    def test_finalize_tracks_with_edit_track(self):
+        """ Tests should be able to edit tracks after finalizing tracks"""
+        pass
+
+    def test_finalize_tracks_with_urls_missing(self):
+        """ Tests that missing urls are checked and appropriate response returned when
+             finalizing tracks"""
+        pass
+

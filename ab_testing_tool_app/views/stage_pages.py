@@ -62,10 +62,10 @@ def create_stage(request):
     """ Note: Canvas fetches all pages within iframe with POST request, requiring separate
         template render function. This also breaks CSRF token validation if CSRF Middleware is turned off. """
     course_id = get_lti_param(request, "custom_canvas_course_id")
+    #Note: Refer to template. (t,None) is passed as there are no existing StageUrls for a new stage
     context = {"tracks" : [(t, None) for t in
                            Track.objects.filter(course_id=course_id)]}
     return render_to_response("edit_stage.html", context)
-
 
 @lti_role_required(ADMINS)
 @page

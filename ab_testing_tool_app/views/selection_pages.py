@@ -25,8 +25,7 @@ def resource_selection(request):
         raise MISSING_RETURN_URL
     context = {"content_return_url": content_return_url,
                "stages": get_uninstalled_stages(request),
-               "tracks": [(t, None) for t in
-                          Track.objects.filter(course_id=course_id)],
+               "tracks": Track.objects.filter(course_id=course_id),
                }
     return render_to_response("add_module_item.html", context)
 
@@ -35,11 +34,11 @@ def resource_selection(request):
 @page
 def submit_selection(request):
     stage_id = request.REQUEST.get("stage_id")
-    t = Stage.get_or_none(pk=stage_id)
-    if not t:
+    stage = Stage.get_or_none(pk=stage_id)
+    if not stage:
         raise MISSING_STAGE
     page_url = stage_url(request, stage_id)
-    page_name = t.name
+    page_name = stage.name
     content_return_url = request.REQUEST.get("content_return_url")
     params = {"return_type": "lti_launch_url",
                "url": page_url,
@@ -54,13 +53,13 @@ def submit_selection_new_stage(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     name = request.POST["name"]
     notes = request.POST["notes"]
-    t = Stage.objects.create(name=name, notes=notes, course_id=course_id)
+    stage = Stage.objects.create(name=name, notes=notes, course_id=course_id)
     stageurls = [(k,v) for (k,v) in request.POST.iteritems() if STAGE_URL_TAG in k and v]
     for (k,v) in stageurls:
         _, track_id = k.split(STAGE_URL_TAG)
-        StageUrl.objects.create(url=v, stage_id=t.id, track_id=track_id)
-    page_url = stage_url(request, t.id)
-    page_name = t.name
+        StageUrl.objects.create(url=v, stage_id=stage.id, track_id=track_id)
+    page_url = stage_url(request, stage.id)
+    page_name = stage.name
     content_return_url = request.REQUEST.get("content_return_url")
     params = {"return_type": "lti_launch_url",
                "url": page_url,
