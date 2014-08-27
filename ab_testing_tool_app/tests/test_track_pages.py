@@ -1,16 +1,25 @@
 from ab_testing_tool_app.tests.common import (SessionTestCase, TEST_COURSE_ID,
     TEST_OTHER_COURSE_ID, NONEXISTENT_STAGE_ID, NONEXISTENT_TRACK_ID)
 from django.core.urlresolvers import reverse
-from ab_testing_tool_app.models import Track
+from ab_testing_tool_app.models import Track, CourseSetting
+from ab_testing_tool_app.exceptions import COURSE_TRACKS_ALREADY_FINALIZED
 
 class TestTrackPages(SessionTestCase):
     """Tests related to Track and Track pages and methods"""
-
+    
     def test_create_track_view(self):
         """Tests edit_track template renders for url 'create_track' when authenticated"""
         response = self.client.get(reverse("create_track"))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "edit_track.html")
+    
+    def test_create_track_view_already_finalized(self):
+        """ Tests that create track doesn't render when tracks are finalized """
+        CourseSetting.set_finalized(TEST_COURSE_ID)
+        response = self.client.get(reverse("create_track"))
+        self.assertTemplateUsed(response, "error.html")
+        self.assertIn(response.context["message"],
+                      str(COURSE_TRACKS_ALREADY_FINALIZED))
     
     def test_create_track_view_unauthorized(self):
         """Tests edit_track template does not render for url 'create_track' when unauthorized"""
@@ -59,7 +68,16 @@ class TestTrackPages(SessionTestCase):
                                     follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEquals(num_tracks + 1, Track.objects.count())
-
+    
+    def test_submit_create_track_already_finalized(self):
+        """ Tests that submit create track doesn't work when tracks are finalized """
+        CourseSetting.set_finalized(TEST_COURSE_ID)
+        response = self.client.get(reverse("submit_create_track"))
+        self.assertTemplateUsed(response, "error.html")
+        self.assertIn(response.context["message"],
+                      str(COURSE_TRACKS_ALREADY_FINALIZED))
+        
+    
     def test_submit_create_track_unauthorized(self):
         """Tests that create_track creates a Track object verified by DB count"""
         self.set_roles([])
@@ -124,58 +142,53 @@ class TestTrackPages(SessionTestCase):
         first_num_tracks = Track.objects.count()
         track = Track.objects.create(name="testname", course_id=TEST_COURSE_ID)
         self.assertEqual(first_num_tracks + 1, Track.objects.count())
-        t_id = track.id
-        response = self.client.get(reverse("delete_track", args=(t_id,)), follow=True)
+        response = self.client.get(reverse("delete_track", args=(track.id,)),
+                                   follow=True)
         second_num_tracks = Track.objects.count()
         self.assertEqual(response.status_code, 200)
         self.assertEqual(first_num_tracks, second_num_tracks)
     
-    def test_delete_track_unauthorized(self):
-        """ Tests that delete_track method raises error when unauthorized"""
-        self.set_roles([])
-        first_num_tracks = Track.objects.count()
+    def test_delete_track_already_finalized(self):
+        """ Tests that delete track doesn't work when tracks are finalized """
+        CourseSetting.set_finalized(TEST_COURSE_ID)
         track = Track.objects.create(name="testname", course_id=TEST_COURSE_ID)
-        t_id = track.id
-        response = self.client.get(reverse("delete_track", args=(t_id,)), follow=True)
+        first_num_tracks = Track.objects.count()
+        response = self.client.get(reverse("delete_track", args=(track.id,)),
+                                   follow=True)
+        second_num_tracks = Track.objects.count()
+        self.assertTemplateUsed(response, "error.html")
+        self.assertIn(response.context["message"],
+                      str(COURSE_TRACKS_ALREADY_FINALIZED))
+        self.assertEqual(first_num_tracks, second_num_tracks)
+    
+    def test_delete_track_unauthorized(self):
+        """ Tests that delete_track method raises error when unauthorized """
+        self.set_roles([])
+        track = Track.objects.create(name="testname", course_id=TEST_COURSE_ID)
+        first_num_tracks = Track.objects.count()
+        response = self.client.get(reverse("delete_track", args=(track.id,)),
+                                   follow=True)
         second_num_tracks = Track.objects.count()
         self.assertTemplateUsed(response, "not_authorized.html")
-        self.assertNotEqual(first_num_tracks, second_num_tracks)
+        self.assertEqual(first_num_tracks, second_num_tracks)
     
     def test_delete_track_nonexistent(self):
-        """ Tests that delete_track method raises error for non-existent Track"""
-        first_num_tracks = Track.objects.count()
+        """ Tests that delete_track method raises error for non-existent Track """
         Track.objects.create(name="testname", course_id=TEST_COURSE_ID)
         t_id = NONEXISTENT_STAGE_ID
+        first_num_tracks = Track.objects.count()
         response = self.client.get(reverse("delete_track", args=(t_id,)), follow=True)
         second_num_tracks = Track.objects.count()
         self.assertTemplateUsed(response, "error.html")
-        self.assertNotEqual(first_num_tracks, second_num_tracks)
+        self.assertEqual(first_num_tracks, second_num_tracks)
     
     def test_delete_track_wrong_course(self):
         """ Tests that delete_track method raises error for existent Track but for
             wrong course"""
-        first_num_tracks = Track.objects.count()
         track = Track.objects.create(name="testname", course_id=TEST_OTHER_COURSE_ID)
         t_id = track.id
+        first_num_tracks = Track.objects.count()
         response = self.client.get(reverse("delete_track", args=(t_id,)), follow=True)
         second_num_tracks = Track.objects.count()
         self.assertTemplateUsed(response, "error.html")
-        self.assertNotEqual(first_num_tracks, second_num_tracks)
-
-    def test_finalize_tracks_with_delete_track(self):
-        """ Tests should not be able to delete tracks after finalizing tracks"""
-        pass
-
-    def test_finalize_tracks_with_create_track(self):
-        """ Tests should not be able to create tracks after finalizing tracks"""
-        pass
-
-    def test_finalize_tracks_with_edit_track(self):
-        """ Tests should be able to edit tracks after finalizing tracks"""
-        pass
-
-    def test_finalize_tracks_with_urls_missing(self):
-        """ Tests that missing urls are checked and appropriate response returned when
-             finalizing tracks"""
-        pass
-
+        self.assertEqual(first_num_tracks, second_num_tracks)
