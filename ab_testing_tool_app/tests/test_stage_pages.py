@@ -26,8 +26,7 @@ class TestStagePages(SessionTestCase):
     def test_edit_stage_view(self):
         """Tests edit_stage template renders when authenticated"""
         stage = Stage.objects.create(name="stage1", course_id=TEST_COURSE_ID)
-        t_id = stage.id
-        response = self.client.get(reverse("edit_stage", args=(t_id,)))
+        response = self.client.get(reverse("edit_stage", args=(stage.id,)))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "edit_stage.html")
     
@@ -167,8 +166,8 @@ class TestStagePages(SessionTestCase):
         first_num_stages = Stage.objects.count()
         stage = Stage.objects.create(name="testname", course_id=TEST_COURSE_ID)
         self.assertEqual(first_num_stages + 1, Stage.objects.count())
-        t_id = stage.id
-        response = self.client.get(reverse("delete_stage", args=(t_id,)), follow=True)
+        response = self.client.get(reverse("delete_stage", args=(stage.id,)),
+                                   follow=True)
         second_num_stages = Stage.objects.count()
         self.assertEqual(response.status_code, 200)
         self.assertEqual(first_num_stages, second_num_stages)
@@ -178,29 +177,30 @@ class TestStagePages(SessionTestCase):
         self.set_roles([])
         first_num_stages = Stage.objects.count()
         stage = Stage.objects.create(name="testname", course_id=TEST_COURSE_ID)
-        t_id = stage.id
-        response = self.client.get(reverse("delete_stage", args=(t_id,)), follow=True)
+        response = self.client.get(reverse("delete_stage", args=(stage.id,)),
+                                   follow=True)
         second_num_stages = Stage.objects.count()
         self.assertTemplateUsed(response, "not_authorized.html")
         self.assertNotEqual(first_num_stages, second_num_stages)
     
     def test_delete_stage_nonexistent(self):
-        """ Tests that delete_stage method raises error for non-existent Stage"""
+        """ Tests that delete_stage method raises error for non-existent Stage """
         first_num_stages = Stage.objects.count()
         Stage.objects.create(name="testname", course_id=TEST_COURSE_ID)
-        t_id = NONEXISTENT_STAGE_ID
-        response = self.client.get(reverse("delete_stage", args=(t_id,)), follow=True)
+        stage_id = NONEXISTENT_STAGE_ID
+        response = self.client.get(reverse("delete_stage", args=(stage_id,)),
+                                   follow=True)
         second_num_stages = Stage.objects.count()
         self.assertTemplateUsed(response, "error.html")
         self.assertNotEqual(first_num_stages, second_num_stages)
     
     def test_delete_stage_wrong_course(self):
         """ Tests that delete_stage method raises error for existent Stage but for
-            wrong course"""
+            wrong course """
         first_num_stages = Stage.objects.count()
         stage = Stage.objects.create(name="testname", course_id=TEST_OTHER_COURSE_ID)
-        t_id = stage.id
-        response = self.client.get(reverse("delete_stage", args=(t_id,)), follow=True)
+        response = self.client.get(reverse("delete_stage", args=(stage.id,)),
+                                   follow=True)
         second_num_stages = Stage.objects.count()
         self.assertTemplateUsed(response, "error.html")
         self.assertNotEqual(first_num_stages, second_num_stages)
@@ -211,11 +211,11 @@ class TestStagePages(SessionTestCase):
         first_num_stages = Stage.objects.count()
         stage = Stage.objects.create(name="testname", course_id=TEST_COURSE_ID)
         self.assertEqual(first_num_stages + 1, Stage.objects.count())
-        t_id = stage.id
         ret_val = [True]
         with patch("ab_testing_tool_app.views.stage_pages.stage_is_installed",
                    return_value=ret_val):
-            response = self.client.get(reverse("delete_stage", args=(t_id,)), follow=True)
+            response = self.client.get(reverse("delete_stage", args=(stage.id,)),
+                                       follow=True)
             second_num_stages = Stage.objects.count()
             self.assertNotEqual(first_num_stages, second_num_stages)
             self.assertTemplateUsed(response, "error.html")

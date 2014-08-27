@@ -5,8 +5,8 @@ from ab_testing_tool_app.constants import ADMINS
 from ab_testing_tool_app.models import Track, StageUrl, CourseSetting, Stage
 from ab_testing_tool_app.canvas import get_lti_param
 from ab_testing_tool_app.decorators import page
-from ab_testing_tool_app.exceptions import (MULTIPLE_OBJECTS, MISSING_TRACK,
-    UNAUTHORIZED_ACCESS, COURSE_TRACKS_ALREADY_FINALIZED)
+from ab_testing_tool_app.exceptions import (MISSING_TRACK, UNAUTHORIZED_ACCESS,
+    COURSE_TRACKS_ALREADY_FINALIZED)
 from django.http.response import HttpResponse
 
 
@@ -53,13 +53,10 @@ def submit_edit_track(request):
     name = request.POST["name"]
     notes = request.POST["notes"]
     track_id = request.POST["id"]
-    result_list = Track.objects.filter(pk=track_id, course_id=course_id)
-    if len(result_list) == 1:
-        result_list[0].update(name=name, notes=notes)
-    elif len(result_list) > 1:
-        raise MULTIPLE_OBJECTS
-    else:
+    track = Track.get_or_none(pk=track_id, course_id=course_id)
+    if not track:
         raise MISSING_TRACK
+    track.update(name=name, notes=notes)
     return redirect("/")
 
 
@@ -67,21 +64,19 @@ def submit_edit_track(request):
 @page
 def delete_track(request, track_id):
     """
-    NOTE: When a track gets deleted, stages installed on the track do not get deleted.
+    NOTE: When a track gets deleted, urls for that track get deleted from all
+          stages in that course.
     """
     course_id = get_lti_param(request, "custom_canvas_course_id")
     if CourseSetting.get_is_finalized(course_id):
         raise COURSE_TRACKS_ALREADY_FINALIZED
-    t = Track.objects.filter(pk=track_id, course_id=course_id)
-    if len(t) == 1:
-        t[0].delete()
-        stage_urls = StageUrl.objects.filter(track__pk=track_id)
-        for url in stage_urls:
-            url.delete()
-    elif len(t) > 1:
-        raise MULTIPLE_OBJECTS
-    else:
+    track = Track.get_or_none(pk=track_id, course_id=course_id)
+    if not track:
         raise MISSING_TRACK
+    track.delete()
+    stage_urls = StageUrl.objects.filter(track__pk=track_id)
+    for url in stage_urls:
+        url.delete()
     return redirect("/")
 
 
