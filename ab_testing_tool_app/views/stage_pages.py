@@ -142,7 +142,7 @@ def submit_edit_stage(request):
 @lti_role_required(ADMINS)
 @page
 def delete_stage(request, stage_id):
-    """ Note: Installed stages are not allowed to be deleted 
+    """ Note: Installed stages are not allowed to be deleted
         Note: attached StageUrls are deleted via cascading delete """
     course_id = get_lti_param(request, "custom_canvas_course_id")
     stage = Stage.get_or_none(pk=stage_id, course_id=course_id)
