@@ -83,11 +83,11 @@ def download_data(request):
                                        slugify(course_title))
     writer = csv.writer(response)
     # Write headers to CSV file
-    headers = ["Student_ID", "Assigned_Track"]
+    headers = ["Student_ID", "Assigned_Track", "Timestamp_Last_Updated"]
     writer.writerow(headers)
     # Write data to CSV file
     for s in Student.objects.filter(course_id=course_id):
-        row = [s.student_id, s.track.name]
+        row = [s.student_id, s.track.name, s.updated_on]
         writer.writerow(row)
     return response
 

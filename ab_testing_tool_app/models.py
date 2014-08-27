@@ -45,6 +45,8 @@ class StageUrl(CustomModel):
     url = models.CharField(max_length=512)
     track = models.ForeignKey(Track)
     stage = models.ForeignKey(Stage)
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
     
     class Meta:
         unique_together = (('track', 'stage'),)
@@ -57,6 +59,8 @@ class Student(CustomModel):
     course_id = models.CharField(max_length=12, db_index=True)
     student_id = models.CharField(max_length=12, db_index=True)
     track = models.ForeignKey(Track)
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
     
     class Meta:
         unique_together = (('course_id', 'student_id'),)
@@ -76,6 +80,8 @@ class CourseSetting(CustomModel):
     """
     course_id = models.CharField(max_length=12, db_index=True, unique=True)
     tracks_finalized = models.BooleanField(default=False)
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
     
     @classmethod
     def get_is_finalized(cls, course_id):
