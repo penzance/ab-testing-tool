@@ -1,7 +1,7 @@
 from ab_testing_tool_app.tests.common import (SessionTestCase, TEST_COURSE_ID,
     TEST_OTHER_COURSE_ID, NONEXISTENT_STAGE_ID, NONEXISTENT_TRACK_ID)
 from django.core.urlresolvers import reverse
-from ab_testing_tool_app.models import Track, CourseSetting
+from ab_testing_tool_app.models import Track, CourseSetting, Stage, StageUrl
 from ab_testing_tool_app.exceptions import COURSE_TRACKS_ALREADY_FINALIZED
 
 class TestTrackPages(SessionTestCase):
@@ -76,7 +76,6 @@ class TestTrackPages(SessionTestCase):
         self.assertTemplateUsed(response, "error.html")
         self.assertIn(response.context["message"],
                       str(COURSE_TRACKS_ALREADY_FINALIZED))
-        
     
     def test_submit_create_track_unauthorized(self):
         """Tests that create_track creates a Track object verified by DB count"""
@@ -87,7 +86,7 @@ class TestTrackPages(SessionTestCase):
                                     follow=True)
         self.assertEquals(num_tracks, Track.objects.count())
         self.assertTemplateUsed(response, "not_authorized.html")
-
+    
     def test_submit_edit_track(self):
         """ Tests that submit_edit_track does not change DB count but does change Track
             attribute"""
@@ -186,9 +185,24 @@ class TestTrackPages(SessionTestCase):
         """ Tests that delete_track method raises error for existent Track but for
             wrong course"""
         track = Track.objects.create(name="testname", course_id=TEST_OTHER_COURSE_ID)
-        t_id = track.id
         first_num_tracks = Track.objects.count()
-        response = self.client.get(reverse("delete_track", args=(t_id,)), follow=True)
+        response = self.client.get(reverse("delete_track", args=(track.id,)),
+                                   follow=True)
         second_num_tracks = Track.objects.count()
         self.assertTemplateUsed(response, "error.html")
         self.assertEqual(first_num_tracks, second_num_tracks)
+    
+    def test_delete_track_deletes_stage_urls(self):
+        """ Tests that stage_urls of a track are deleted when the track is """
+        track1 = Track.objects.create(name="track1", course_id=TEST_COURSE_ID)
+        track2 = Track.objects.create(name="track2", course_id=TEST_COURSE_ID)
+        stage = Stage.objects.create(name="stage1", course_id=TEST_COURSE_ID)
+        StageUrl.objects.create(stage=stage, track=track1, url="example.com")
+        StageUrl.objects.create(stage=stage, track=track2, url="example.com")
+        first_num_stage_urls = StageUrl.objects.count()
+        response = self.client.get(reverse("delete_track", args=(track1.id,)),
+                                   follow=True)
+        second_num_stage_urls = StageUrl.objects.count()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(first_num_stage_urls - 1, second_num_stage_urls)
+        
