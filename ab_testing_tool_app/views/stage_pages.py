@@ -9,13 +9,13 @@ from ab_testing_tool_app.models import Stage, Track, StageUrl, CourseSetting,\
 from ab_testing_tool_app.canvas import get_lti_param
 from ab_testing_tool_app.controllers import stage_is_installed, format_url
 from ab_testing_tool_app.decorators import page
-from ab_testing_tool_app.exceptions import (MULTIPLE_OBJECTS, MISSING_STAGE,
-    DELETING_INSTALLED_STAGE, UNAUTHORIZED_ACCESS, COURSE_TRACKS_NOT_FINALIZED,
+from ab_testing_tool_app.exceptions import (MISSING_STAGE, UNAUTHORIZED_ACCESS,
+    DELETING_INSTALLED_STAGE, COURSE_TRACKS_NOT_FINALIZED,
     NO_URL_FOR_TRACK)
 
 
 @page
-def deploy_stage(request, t_id):
+def deploy_stage(request, stage_id):
     """Delivers randomly one of the urls in stage if user is not an admin, or
        edit_stage panel if admin.
        Note: Do not put @lti_role_required(ADMINS) here, as students can reach
@@ -29,7 +29,7 @@ def deploy_stage(request, t_id):
     
     # If user is an admin, let them edit the stage
     if set(ADMINS) & set(user_roles):
-        return redirect(reverse("edit_stage", args=(t_id,)))
+        return redirect(reverse("edit_stage", args=(stage_id,)))
     
     # Otherwise, user is a student.  Tracks for the course must be finalized
     # for a student to be able to access content from the ab_testing_tool
@@ -50,7 +50,7 @@ def deploy_stage(request, t_id):
     
     # Retrieve the url for the student's track at the current intervention point
     # Return an error page if there is no url configured.
-    chosen_stageurl = StageUrl.get_or_none(stage__pk=t_id, track=chosen_track)
+    chosen_stageurl = StageUrl.get_or_none(stage__pk=stage_id, track=chosen_track)
     if chosen_stageurl and chosen_stageurl.url:
         return redirect(chosen_stageurl.url)
     raise NO_URL_FOR_TRACK
@@ -59,8 +59,9 @@ def deploy_stage(request, t_id):
 @lti_role_required(ADMINS)
 @page
 def create_stage(request):
-    """ Note: Canvas fetches all pages within iframe with POST request, requiring separate
-        template render function. This also breaks CSRF token validation if CSRF Middleware is turned off. """
+    """ Note: Canvas fetches all pages within iframe with POST request,
+        requiring separate template render function. This also breaks CSRF
+        token validation if CSRF Middleware is turned off. """
     course_id = get_lti_param(request, "custom_canvas_course_id")
     context = {"tracks" : [(t, None) for t in
                            Track.objects.filter(course_id=course_id)]}
@@ -85,23 +86,23 @@ def submit_create_stage(request):
 
 @lti_role_required(ADMINS)
 @page
-def edit_stage(request, t_id):
+def edit_stage(request, stage_id):
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    stage = Stage.get_or_none(pk=t_id)
+    stage = Stage.get_or_none(pk=stage_id)
     if not stage:
         raise MISSING_STAGE
     if course_id != stage.course_id:
         raise UNAUTHORIZED_ACCESS
     all_tracks = Track.objects.filter(course_id=course_id)
     track_urls = []
-    for t in all_tracks:
-        url = StageUrl.objects.filter(stage__pk=t_id, track=t)
-        if url and len(url) == 1:
-            track_urls.append((t, url[0]))
-        elif len(url) > 1:
-            raise MULTIPLE_OBJECTS
+    for track in all_tracks:
+        # This is a search for the joint unique index of StageUrl, so it
+        # should not ever return multiple objects
+        stage_url = StageUrl.get_or_none(stage__pk=stage_id, track=track)
+        if stage_url:
+            track_urls.append((track, stage_url))
         else:
-            track_urls.append((t, None))
+            track_urls.append((track, None))
     context = {"stage": stage,
                "tracks": track_urls,
                "is_installed": stage_is_installed(request, stage),
@@ -113,49 +114,43 @@ def edit_stage(request, t_id):
 @lti_role_required(ADMINS)
 @page
 def submit_edit_stage(request):
-    """Note:Only allowed if admin has privileges on the particular course.
-       TODO: consider using Django forms to save rather of getting individual POST params"""
+    """ Note: Only allowed if admin has privileges on the particular course.
+        TODO: consider using Django forms to save rather of getting individual POST params """
     course_id = get_lti_param(request, "custom_canvas_course_id")
     name = request.POST["name"]
     notes = request.POST["notes"]
-    t_id = request.POST["id"]
-    result_list = Stage.objects.filter(pk=t_id, course_id=course_id)
-    if len(result_list) == 1:
-        result_list[0].update(name=name, notes=notes)
-    elif len(result_list) > 1:
-        raise MULTIPLE_OBJECTS
-    else:
+    stage_id = request.POST["id"]
+    stage = Stage.objects.filter(pk=stage_id, course_id=course_id)
+    if not stage:
         raise MISSING_STAGE
-    #StageUrl creation
+    stage.update(name=name, notes=notes)
+    # StageUrl creation
     stageurls = [(k,v) for (k,v) in request.POST.iteritems() if STAGE_URL_TAG in k and v]
     for (k,v) in stageurls:
         _,track_id = k.split(STAGE_URL_TAG)
-        stage_result_list = StageUrl.objects.filter(stage__pk=t_id, track__pk=track_id)
-        if len(stage_result_list) == 1:
-            stage_result_list[0].update(url=format_url(v))
-        elif len(result_list) > 1:
-            raise MULTIPLE_OBJECTS
+        # This is a search for the joint unique index of StageUrl, so it
+        # should not ever return multiple objects
+        stage_url = StageUrl.objects.filter(stage__pk=stage_id,
+                                            track__pk=track_id)
+        if stage_url:
+            stage_url.update(url=format_url(v))
         else:
-            StageUrl.objects.create(url=v, stage_id=t_id, track_id=track_id)
+            StageUrl.objects.create(url=v, stage_id=stage_id, track_id=track_id)
     return redirect("/#tabs-2")
 
 
 @lti_role_required(ADMINS)
 @page
-def delete_stage(request, t_id):
-    """Note: Installed stages are not allowed to be deleted"""
+def delete_stage(request, stage_id):
+    """ Note: Installed stages are not allowed to be deleted """
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    t = Stage.objects.filter(pk=t_id, course_id=course_id)
-    if len(t) == 1:
-        stage = t[0]
-        if stage_is_installed(request, stage):
-            raise DELETING_INSTALLED_STAGE
-        stage.delete()
-        stage_urls = StageUrl.objects.filter(stage__pk=t_id)
-        for url in stage_urls:
-            url.delete()
-    elif len(t) > 1:
-        raise MULTIPLE_OBJECTS
-    else:
+    stage = Stage.get_or_none(pk=stage_id, course_id=course_id)
+    if not stage:
         raise MISSING_STAGE
+    if stage_is_installed(request, stage):
+        raise DELETING_INSTALLED_STAGE
+    stage.delete()
+    stage_urls = StageUrl.objects.filter(stage__pk=stage_id)
+    for url in stage_urls:
+        url.delete()
     return redirect("/#tabs-2")
