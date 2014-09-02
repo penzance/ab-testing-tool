@@ -29,7 +29,11 @@ LOGGING = {
             'handlers':['console'],
             'propagate': True,
             'level':'DEBUG',
+        },
+        'ab_testing_tool': {
+            'handlers':['console'],
+            'propagate': True,
+            'level':'DEBUG',
         }
     },
 }
-
