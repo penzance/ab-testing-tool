@@ -30,7 +30,7 @@ BASE_DIR = dirname(dirname(__file__))
 ### Path stuff as recommended by Two Scoops / with local mods
 
 # Absolute filesystem path to the Django project config directory:
-# (this is the parent of the directory where this file resides, 
+# (this is the parent of the directory where this file resides,
 # since this file is now inside a 'settings' pacakge directory)
 DJANGO_PROJECT_CONFIG = dirname(dirname(abspath(__file__)))
 
@@ -75,6 +75,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'ab_testing_tool_app',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -82,7 +83,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    
+
     # Disabling these removes the need for @xframe_options_exempt, @csrf_exempt on views
     # TODO: determine if this is a better way to go about this
     #'django.middleware.csrf.CsrfViewMiddleware',

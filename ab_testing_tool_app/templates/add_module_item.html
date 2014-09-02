@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>A/B Testing Tool</title>
+    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <link rel="stylesheet" href="../static/css/bootstrap.min.css"  type="text/css"/>
+</head>
+<body>
+<div class="container">
+    <form method="POST" action="/submit_selection">
+        <h4> To install a new A/B Stage, select one from list of uninstalled stages below:</h4>
+        <br>
+        <select name="stage_id">
+        {% for stage in stages %}
+            <option value="{{stage.id}}">{{stage.name}}</option>
+        {%endfor %}
+        </select>
+    <input type="hidden" value="{{content_return_url}}" name="content_return_url">
+    <br><br>
+    <input type="submit" value="Add From List" class="btn btn-large btn-primary submit">
+    </form>
+    <br>
+    <h4> Or, create a new stage:</h4>
+    <br>
+  <form method="post" name="stage_form" action="{% url 'submit_selection_new_stage' %}">
+            {% csrf_token %}
+            <input type="hidden" value="{{content_return_url}}" name="content_return_url">
+                <input type='hidden' name='id' value="{{ stage.id }}">
+                <table class="table">
+                <tr align="left">
+                    <td><label>Stage Name</label></td>
+                    <td><input class="form-control"  type="text" name="name" value="{{ stage.name }}"/></td>
+                </tr>
+                {% for t, s in tracks %}
+                <tr align="left">
+                    <td><label>URL for Track "{{t.name}}" </label></td>
+                    <td><input class="form-control"  type="text" name="_stageurl_{{t.id}}" value="{{ s.url }}"/></td>
+                </tr>
+                {% endfor %}
+                <tr align="left">
+                    <td><label>Stage Notes</label></td>
+                    <td><textarea name="notes" rows="6" cols="80" >{{ stage.notes }}</textarea></td>
+                </tr>
+                <tr>
+                <td></td>
+                <td><input type="submit" name="submit" value="Submit Changes" class="btn btn-lg btn-success submit"></td>
+                </tr>
+                </table>
+
+           </form>
+
+</div>
+</body>
+</html>
