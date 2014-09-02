@@ -4,7 +4,8 @@ from django.utils.http import urlencode
 from django_auth_lti.decorators import lti_role_required
 
 from ab_testing_tool_app.models import Track, StageUrl, Stage
-from ab_testing_tool_app.controllers import get_uninstalled_stages, stage_url
+from ab_testing_tool_app.controllers import get_uninstalled_stages, stage_url,\
+    post_param
 from ab_testing_tool_app.constants import STAGE_URL_TAG, ADMINS
 from ab_testing_tool_app.canvas import get_lti_param
 from ab_testing_tool_app.decorators import page
@@ -34,12 +35,12 @@ def resource_selection(request):
 @lti_role_required(ADMINS)
 @page
 def submit_selection(request):
-    stage_id = request.POST.get("stage_id")
+    stage_id = post_param(request, "stage_id")
     t = Stage.objects.get(pk=stage_id)
     page_url = stage_url(request, stage_id)
     print stage_id, page_url
     page_name = t.name
-    content_return_url = request.POST.get("content_return_url")
+    content_return_url = post_param(request, "content_return_url")
     params = {"return_type": "lti_launch_url",
                "url": page_url,
                #"title": "Title",
@@ -51,8 +52,8 @@ def submit_selection(request):
 @page
 def submit_selection_new_stage(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    name = request.POST["name"]
-    notes = request.POST["notes"]
+    name = post_param(request, "name")
+    notes = post_param(request, "notes")
     t = Stage.objects.create(name=name, notes=notes, course_id=course_id)
     stageurls = [(k,v) for (k,v) in request.POST.iteritems() if STAGE_URL_TAG in k and v]
     for (k,v) in stageurls:
@@ -60,7 +61,7 @@ def submit_selection_new_stage(request):
         StageUrl.objects.create(url=v, stage_id=t.id, track_id=track_id)
     page_url = stage_url(request, t.id)
     page_name = t.name
-    content_return_url = request.POST.get("content_return_url")
+    content_return_url = post_param(request, "content_return_url")
     params = {"return_type": "lti_launch_url",
                "url": page_url,
                #"title": "Title",
