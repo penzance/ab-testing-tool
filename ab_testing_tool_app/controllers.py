@@ -65,3 +65,8 @@ def get_modules_with_items(request):
                         and item["external_url"] in stage_urls)
             item["is_stage"] = is_stage
     return modules
+
+def post_param(request, param_name):
+    if param_name in request.POST:
+        return request.POST[param_name]
+    raise Exception("Missing POST parameter %s" % param_name)

@@ -7,6 +7,7 @@ from ab_testing_tool_app.canvas import get_lti_param
 from ab_testing_tool_app.decorators import page
 from ab_testing_tool_app.exceptions import (MULTIPLE_OBJECTS, MISSING_TRACK,
     UNAUTHORIZED_ACCESS)
+from ab_testing_tool_app.controllers import post_param
 
 
 @lti_role_required(ADMINS)
@@ -30,8 +31,8 @@ def edit_track(request, track_id):
 @page
 def submit_create_track(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    name = request.POST["name"]
-    notes = request.POST["notes"]
+    name = post_param(request, "name")
+    notes = post_param(request, "notes")
     Track.objects.create(name=name, notes=notes, course_id=course_id)
     return redirect("/")
 
@@ -40,9 +41,9 @@ def submit_create_track(request):
 @page
 def submit_edit_track(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    name = request.POST["name"]
-    notes = request.POST["notes"]
-    track_id = request.POST["id"]
+    name = post_param(request, "name")
+    notes = post_param(request, "notes")
+    track_id = post_param(request, "id")
     result_list = Track.objects.filter(pk=track_id, course_id=course_id)
     if len(result_list) == 1:
         result_list[0].update(name=name, notes=notes)

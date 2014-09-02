@@ -6,7 +6,7 @@ from random import choice
 from ab_testing_tool_app.constants import ADMINS, STAGE_URL_TAG
 from ab_testing_tool_app.models import Stage, Track, StageUrl
 from ab_testing_tool_app.canvas import get_lti_param
-from ab_testing_tool_app.controllers import stage_is_installed
+from ab_testing_tool_app.controllers import stage_is_installed, post_param
 from ab_testing_tool_app.decorators import page
 from ab_testing_tool_app.exceptions import (MULTIPLE_OBJECTS, MISSING_STAGE,
     DELETING_INSTALLED_STAGE, UNAUTHORIZED_ACCESS)
@@ -51,8 +51,8 @@ def submit_create_stage(request):
     """ Note: request will always be POST because Canvas fetches pages within iframe by POST
         TODO: use Django forms library to save instead of getting individual POST params """
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    name = request.POST["name"]
-    notes = request.POST["notes"]
+    name = post_param(request, "name")
+    notes = post_param(request, "notes")
     t = Stage.objects.create(name=name, notes=notes, course_id=course_id)
     stageurls = [(k,v) for (k,v) in request.POST.iteritems() if STAGE_URL_TAG in k and v]
     for (k,v) in stageurls:
@@ -92,9 +92,9 @@ def submit_edit_stage(request):
     """Note:Only allowed if admin has privileges on the particular course.
        TODO: consider using Django forms to save rather of getting individual POST params"""
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    name = request.POST["name"]
-    notes = request.POST["notes"]
-    t_id = request.POST["id"]
+    name = post_param(request, "name")
+    notes = post_param(request, "notes")
+    t_id = post_param(request, "id")
     result_list = Stage.objects.filter(pk=t_id, course_id=course_id)
     if len(result_list) == 1:
         result_list[0].update(name=name, notes=notes)
