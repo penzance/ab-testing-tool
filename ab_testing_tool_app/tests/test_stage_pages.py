@@ -23,6 +23,7 @@ class test_stage_pages(SessionTestCase):
         self.set_roles([])
         response = self.client.get(reverse("create_stage"), follow=True)
         self.assertTemplateNotUsed(response, "edit_stage.html")
+        self.assertEqual(response.status_code, 401)
         self.assertTemplateUsed(response, "not_authorized.html")
     
     def test_edit_stage_view(self):
@@ -40,6 +41,7 @@ class test_stage_pages(SessionTestCase):
         t_id = stage.id
         response = self.client.get(reverse("edit_stage", args=(t_id,)), follow=True)
         self.assertTemplateNotUsed(response, "edit_stage.html")
+        self.assertEqual(response.status_code, 401)
         self.assertTemplateUsed(response, "not_authorized.html")
     
     def test_edit_stage_view_nonexistent(self):
@@ -88,7 +90,7 @@ class test_stage_pages(SessionTestCase):
                 STAGE_URL_TAG + "2": "http://example.com/otherpage", "notes": "hi"}
         response = self.client.post(reverse("submit_create_stage"), data,
                                     follow=True)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 401)
         self.assertEqual(num_stages, Stage.objects.count())
         self.assertEqual(num_stageurls, StageUrl.objects.count())
         self.assertTemplateUsed(response, "not_authorized.html")
