@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>A/B Testing Tool</title>
+    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <link rel="stylesheet" href="../static/css/bootstrap.min.css"  type="text/css"/>
+    <link rel="stylesheet" href="../static/css/dashboard.css"  type="text/css"/>
+</head>
+
+<body>
+<div class="container">
+    <div class="jumbotron">
+        <h2>Track "{{track.name|default:"Unnamed"}}"</h2>
+        <table class="table">
+        <tbody>
+        <tr>
+
+        <td><p>Created: {{track.created_on}} | Last updated: {{track.updated_on}} </p></td>
+        {% if track.id %}
+        <td class="text-right nowrap"><a href="/delete_track/{{ track.id }}" class="btn btn-lg btn-danger" id="delete">Delete Track</a></td>
+        {% endif %}
+        </tr>
+        </tbody>
+        </table>
+
+    </div>
+            <form method="post" name="track_form" {% if track.id %} action="{% url 'submit_edit_track' %}"{% else %} action="{% url 'submit_create_track' %}" {% endif %}>
+            {% csrf_token %}
+                <input type='hidden' name='id' value="{{ track.id }}">
+                <table class="table table-striped">
+                <tr align="left">
+                    <td><label>Track Name</label></td>
+                    <td><input class="form-control"  type="text" name="name" value="{{ track.name }}"/></td>
+                </tr>
+                <tr align="left">
+                    <td><label>Track Notes</label></td>
+                    <td><textarea name="notes" rows="6" cols="80" >{{ track.notes }}</textarea></td>
+                </tr>
+                <tr>
+                <td></td>
+                <td><input type="submit" name="submit" value="Submit Changes" class="btn btn-large btn-success submit"></td>
+                </tr>
+                </table>
+
+           </form>
+
+</body>
+</html>
+
