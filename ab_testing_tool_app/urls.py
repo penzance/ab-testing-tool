@@ -13,7 +13,7 @@ from ab_testing_tool_app.views.track_pages import (create_track, submit_create_t
 
 admin.autodiscover()
 
-urlpatterns = patterns('',
+urlpatterns = patterns('ab_testing',
     url(r'^$', render_stage_control_panel, name='index'),
     url(r'^not_authorized$', not_authorized, name='not_authorized'),
     url(r'^tool_config$', tool_config, name='tool_config'),
@@ -33,9 +33,4 @@ urlpatterns = patterns('',
     url(r'^edit_track/(?P<track_id>\d+)$', edit_track, name='edit_track'),
     url(r'^submit_edit_track$', submit_edit_track, name='submit_edit_track'),
     url(r'^delete_track/(?P<track_id>\d+)$', delete_track, name='delete_track'),
-    
-    # Examples:
-    # url(r'^$', 'project_name.views.home', name='home'),
-    # url(r'^blog/', include('blog.urls')),
-    # url(r'^admin/', include(admin.site.urls)),
 )
