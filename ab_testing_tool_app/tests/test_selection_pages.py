@@ -9,9 +9,9 @@ class test_selection_pages(SessionTestCase):
 
     def test_resource_selection_view(self):
         """Tests add_module_item template renders for url 'resource_selection' when authenticated"""
-        data = {"ext_content_return_types": ["not_lti_launch_url"],
+        data = {"ext_content_return_types": ["lti_launch_url"],
                 "ext_content_return_url": "http://test_content_return_url.com"}
-        response = self.client.post(reverse("resource_selection"), data, follow=True)
+        response = self.client.get(reverse("resource_selection"), data, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertIn("content_return_url", response.context)
         self.assertEqual(response.context["content_return_url"], "http://test_content_return_url.com")
@@ -35,7 +35,7 @@ class test_selection_pages(SessionTestCase):
         data = {"ext_content_return_types": [u"lti_launch_url"],
                 "ext_content_return_url": "http://test_content_return_url.com"}
         response = self.client.post(reverse("resource_selection"), data, follow=True)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 401)
         #TODO: self.assertContains(response, "Error: invalid ext_content_return_types")
 
     def test_submit_selection(self):
