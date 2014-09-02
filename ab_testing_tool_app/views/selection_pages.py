@@ -17,10 +17,10 @@ from ab_testing_tool_app.exceptions import (MISSING_RETURN_TYPES_PARAM,
 def resource_selection(request):
     """ docs: https://canvas.instructure.com/doc/api/file.link_selection_tools.html """
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    ext_content_return_types = request.REQUEST.get('ext_content_return_types')
+    ext_content_return_types = request.GET.get('ext_content_return_types')
     if ext_content_return_types == ['lti_launch_url']:
         raise MISSING_RETURN_TYPES_PARAM
-    content_return_url = request.REQUEST.get('ext_content_return_url')
+    content_return_url = request.GET.get('ext_content_return_url')
     if not content_return_url:
         raise MISSING_RETURN_URL
     context = {"content_return_url": content_return_url,
@@ -34,12 +34,12 @@ def resource_selection(request):
 @lti_role_required(ADMINS)
 @page
 def submit_selection(request):
-    stage_id = request.REQUEST.get("stage_id")
+    stage_id = request.POST.get("stage_id")
     t = Stage.objects.get(pk=stage_id)
     page_url = stage_url(request, stage_id)
     print stage_id, page_url
     page_name = t.name
-    content_return_url = request.REQUEST.get("content_return_url")
+    content_return_url = request.POST.get("content_return_url")
     params = {"return_type": "lti_launch_url",
                "url": page_url,
                #"title": "Title",
@@ -60,7 +60,7 @@ def submit_selection_new_stage(request):
         StageUrl.objects.create(url=v, stage_id=t.id, track_id=track_id)
     page_url = stage_url(request, t.id)
     page_name = t.name
-    content_return_url = request.REQUEST.get("content_return_url")
+    content_return_url = request.POST.get("content_return_url")
     params = {"return_type": "lti_launch_url",
                "url": page_url,
                #"title": "Title",
