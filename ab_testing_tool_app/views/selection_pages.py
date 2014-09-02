@@ -38,7 +38,6 @@ def submit_selection(request):
     stage_id = post_param(request, "stage_id")
     t = Stage.objects.get(pk=stage_id)
     page_url = stage_url(request, stage_id)
-    print stage_id, page_url
     page_name = t.name
     content_return_url = post_param(request, "content_return_url")
     params = {"return_type": "lti_launch_url",
