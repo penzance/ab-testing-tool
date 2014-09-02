@@ -3,6 +3,7 @@ from django.http.response import HttpResponse
 from django.shortcuts import render_to_response
 #from django.views.decorators.csrf import csrf_exempt
 from django_auth_lti.decorators import lti_role_required
+from django.template import loader
 from ims_lti_py.tool_config import ToolConfig
 
 from ab_testing_tool_app.canvas import get_lti_param
@@ -15,7 +16,7 @@ from ab_testing_tool_app.constants import ADMINS
 
 @page
 def not_authorized(request):
-    return render_to_response("not_authorized.html")
+    return HttpResponse(loader.render_to_string("not_authorized.html"), status=401)
 
 
 @lti_role_required(ADMINS)
