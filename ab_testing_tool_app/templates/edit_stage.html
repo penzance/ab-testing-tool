@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>A/B Testing Tool</title>
+    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <link rel="stylesheet" href="../static/css/bootstrap.min.css"  type="text/css"/>
+    <link rel="stylesheet" href="../static/css/dashboard.css"  type="text/css"/>
+</head>
+
+<body>
+<div class="container">
+    <div class="jumbotron">
+        <table class="table">
+        <tbody>
+        <h2>A/B Stage "{{stage.name|default:"Unnamed"}}"</h2>
+        <!-- <td class="text-right nowrap"><a href="/" class="btn btn-lg btn-primary" id="delete">Go To Dashboard</a></td>-->
+        <tr>
+        <td ><p>Created: {{stage.created_on}} | Last updated: {{stage.updated_on}} </p></td>
+        {% if stage.id and not is_installed %}
+        <td class="text-right nowrap"><a href="/delete_stage/{{ stage.id }}" class="btn btn-lg btn-danger" id="delete">Delete Stage</a></td>
+        {% elif stage.id %}
+        <td class="text-right nowrap"><a  class="btn btn-lg btn-danger disabled">Delete Stage</a></td>
+        {% endif %}
+        </tr>
+        </tbody>
+        </table>
+    </div>
+            {% if stage.id and not is_installed %}
+            <h4 class="text-center nowrap">Stage Currently Installed! Stage must be uninstalled before it can be deleted.)</h4>
+            {% endif %}
+            <form method="post" name="stage_form" {% if stage.id %} action="{% url 'submit_edit_stage' %}"{% else %} action="{% url 'submit_create_stage' %}" {% endif %}>
+            {% csrf_token %}
+                <input type='hidden' name='id' value="{{ stage.id }}">
+                <table class="table">
+                <tr align="left">
+                    <td><label>Stage Name</label></td>
+                    <td><input class="form-control"  type="text" name="name" value="{{ stage.name }}"/></td>
+                </tr>
+                {% for t, s in tracks %}
+                <tr align="left">
+                    <td><label>URL for Track "{{t.name}}" </label></td>
+                    <td><input class="form-control"  type="text" name="stageurl_{{t.id}}" value="{{ s.url }}"/></td>
+                </tr>
+                {% endfor %}
+                <tr align="left">
+                    <td><label>Stage Notes</label></td>
+                    <td><textarea name="notes" rows="6" cols="80" >{{ stage.notes }}</textarea></td>
+                </tr>
+                <tr>
+                <td></td>
+                <td><input type="submit" name="submit" value="Submit Changes" class="btn btn-lg btn-success submit"></td>
+                </tr>
+                </table>
+
+           </form>
+</div>
+</body>
+</html>
+
