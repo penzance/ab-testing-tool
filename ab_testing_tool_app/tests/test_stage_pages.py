@@ -148,7 +148,7 @@ class test_stage_pages(SessionTestCase):
     
     def test_deploy_stage_view(self):
         """Tests deploy stage"""
-        stage = Stage.objects.create(name="stage1")
+        stage = Stage.objects.create(name="stage1", course_id=TEST_COURSE_ID)
         track = Track.objects.create(name="track1")
         StageUrl.objects.create(stage=stage, url="http://www.example.com", track=track)
         t_id = stage.id

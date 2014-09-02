@@ -28,8 +28,7 @@ class test_selection_pages(SessionTestCase):
         """Tests add_module_item template renders for url 'resource_selection' when authenticated"""
         data = {"ext_content_return_types": ["not_lti_launch_url"]}
         response = self.client.post(reverse("resource_selection"), data, follow=True)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Error: no ext_content_return_url")
+        self.assertContains(response, "Error: no ext_content_return_url", status_code=401)
 
     def test_resource_selection_view_without_ext_content_return_types(self):
         """Tests add_module_item template renders for url 'resource_selection' when authenticated"""

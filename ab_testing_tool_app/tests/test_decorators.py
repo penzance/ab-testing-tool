@@ -15,7 +15,7 @@ class test_decorators(SessionTestCase):
         
         response = test(self.request)
         self.assertTemplateUsed(response, "error.html")
-        self.assertContains(response, error_message)
+        self.assertContains(response, error_message, status_code=401)
     
     def test_page_decorator_passthrough(self):
         """ Tests that the page decorator doesn't modify the response of a
