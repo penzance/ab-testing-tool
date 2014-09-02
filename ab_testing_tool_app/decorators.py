@@ -3,8 +3,9 @@ import traceback
 from functools import wraps
 from django.shortcuts import render_to_response
 from django.http.response import HttpResponse
-from ab_testing_tool_app.constants import UNKNOWN_ERROR_STRING,\
-    DOUBLE_ERROR_STRING
+from django.template import loader
+from ab_testing_tool_app.constants import (UNKNOWN_ERROR_STRING,
+    DOUBLE_ERROR_STRING)
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +19,7 @@ def page(f):
         try:
             return wrapped_page(f, args, kwargs)
         except Exception:
-            return HttpResponse(DOUBLE_ERROR_STRING)
+            return HttpResponse(DOUBLE_ERROR_STRING, status=500)
     return wrapped
 
 
@@ -33,4 +34,5 @@ def wrapped_page(f, args, kwargs):
         message = str(e)
         if not message:
             message = UNKNOWN_ERROR_STRING
-        return render_to_response("error.html", {"message": message})
+        template = loader.render_to_string("error.html", {"message": message})
+        return HttpResponse(template, status=401)

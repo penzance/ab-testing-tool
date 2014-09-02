@@ -14,7 +14,7 @@ class TestMainPages(SessionTestCase):
     def test_not_authorized_renders(self):
         """ Tests that the not_authorized page renders """
         response = self.client.get(reverse("not_authorized"), follow=True)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 401)
         self.assertTemplateUsed(response, "not_authorized.html")
     
     def test_index_and_control_panel_view(self):
@@ -40,6 +40,7 @@ class TestMainPages(SessionTestCase):
         self.set_roles([])
         response = self.client.get(reverse("index"), follow=True)
         self.assertTemplateNotUsed(response, "control_panel.html")
+        self.assertEqual(response.status_code, 401)
         self.assertTemplateUsed(response, "not_authorized.html")
     
     def test_index_context(self):

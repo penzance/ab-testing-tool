@@ -1,7 +1,7 @@
 from mock import patch
 
-from ab_testing_tool_app.controllers import get_uninstalled_stages, stage_url,\
-    all_stage_urls, format_url
+from ab_testing_tool_app.controllers import (get_uninstalled_stages, stage_url,
+    all_stage_urls, format_url)
 from ab_testing_tool_app.tests.common import (SessionTestCase, APIReturn,
     LIST_MODULES, LIST_ITEMS, TEST_COURSE_ID, TEST_OTHER_COURSE_ID)
 from ab_testing_tool_app.models import Stage

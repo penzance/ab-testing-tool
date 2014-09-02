@@ -102,7 +102,7 @@ class TestSelectionPages(SessionTestCase):
                   }
         for k, v in params.items():
             self.assertTrue(urlencode({k: v}) in response.url, urlencode({k: v}))
-
+    
     @patch("django.http.request.HttpRequest.get_host", return_value=TEST_DOMAIN)
     def test_submit_selection_new_stage_with_stageurls(self, _mock):
         """ Tests that submit_selection_new_stage creates a stage object and

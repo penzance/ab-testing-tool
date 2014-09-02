@@ -8,6 +8,7 @@ from ab_testing_tool_app.decorators import page
 from ab_testing_tool_app.exceptions import (MISSING_TRACK, UNAUTHORIZED_ACCESS,
     COURSE_TRACKS_ALREADY_FINALIZED, NO_TRACKS_FOR_COURSE)
 from django.http.response import HttpResponse
+from ab_testing_tool_app.controllers import post_param
 
 
 @lti_role_required(ADMINS)
@@ -40,8 +41,8 @@ def submit_create_track(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     if CourseSetting.get_is_finalized(course_id):
         raise COURSE_TRACKS_ALREADY_FINALIZED
-    name = request.POST["name"]
-    notes = request.POST["notes"]
+    name = post_param(request, "name")
+    notes = post_param(request, "notes")
     Track.objects.create(name=name, notes=notes, course_id=course_id)
     return redirect("/")
 
@@ -50,9 +51,9 @@ def submit_create_track(request):
 @page
 def submit_edit_track(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    name = request.POST["name"]
-    notes = request.POST["notes"]
-    track_id = request.POST["id"]
+    name = post_param(request, "name")
+    notes = post_param(request, "notes")
+    track_id = post_param(request, "id")
     track = Track.get_or_none(pk=track_id, course_id=course_id)
     if not track:
         raise MISSING_TRACK

@@ -4,10 +4,11 @@ from django_auth_lti.decorators import lti_role_required
 from random import choice
 
 from ab_testing_tool_app.constants import ADMINS, STAGE_URL_TAG
-from ab_testing_tool_app.models import Stage, Track, StageUrl, CourseSetting,\
-    Student
+from ab_testing_tool_app.models import (Stage, Track, StageUrl, CourseSetting,
+    Student)
 from ab_testing_tool_app.canvas import get_lti_param
-from ab_testing_tool_app.controllers import stage_is_installed, format_url
+from ab_testing_tool_app.controllers import (stage_is_installed, format_url,
+    post_param)
 from ab_testing_tool_app.decorators import page
 from ab_testing_tool_app.exceptions import (MISSING_STAGE, UNAUTHORIZED_ACCESS,
     DELETING_INSTALLED_STAGE, COURSE_TRACKS_NOT_FINALIZED,
@@ -71,14 +72,15 @@ def create_stage(request):
                            Track.objects.filter(course_id=course_id)]}
     return render_to_response("edit_stage.html", context)
 
+
 @lti_role_required(ADMINS)
 @page
 def submit_create_stage(request):
     """ Note: request will always be POST because Canvas fetches pages within iframe by POST
         TODO: use Django forms library to save instead of getting individual POST params """
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    name = request.POST["name"]
-    notes = request.POST["notes"]
+    name = post_param(request, "name")
+    notes = post_param(request, "notes")
     t = Stage.objects.create(name=name, notes=notes, course_id=course_id)
     stageurls = [(k,v) for (k,v) in request.POST.iteritems() if STAGE_URL_TAG in k and v]
     for (k,v) in stageurls:
@@ -120,9 +122,9 @@ def submit_edit_stage(request):
     """ Note: Only allowed if admin has privileges on the particular course.
         TODO: consider using Django forms to save rather of getting individual POST params """
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    name = request.POST["name"]
-    notes = request.POST["notes"]
-    stage_id = request.POST["id"]
+    name = post_param(request, "name")
+    notes = post_param(request, "notes")
+    stage_id = post_param(reqeust, "id")
     stage = Stage.get_or_none(pk=stage_id)
     if not stage:
         raise MISSING_STAGE

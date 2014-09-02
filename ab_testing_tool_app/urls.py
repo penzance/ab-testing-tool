@@ -35,9 +35,4 @@ urlpatterns = patterns('',
     url(r'^submit_edit_track$', submit_edit_track, name='submit_edit_track'),
     url(r'^delete_track/(?P<track_id>\d+)$', delete_track, name='delete_track'),
     url(r'^finalize_tracks$', finalize_tracks, name='finalize_tracks'),
-    
-    # Examples:
-    # url(r'^$', 'project_name.views.home', name='home'),
-    # url(r'^blog/', include('blog.urls')),
-    # url(r'^admin/', include(admin.site.urls)),
 )
