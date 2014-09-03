@@ -23,7 +23,7 @@ class TestDecorators(SessionTestCase):
             with the correct message """
         error_message = "This is a test error message"
         response = self.page_with_exception(Exception(error_message))
-        self.assertContains(response, error_message)
+        self.assertContains(response, error_message, status_code=401)
     
     def test_page_decorator_passthrough(self):
         """ Tests that the page decorator doesn't modify the response of a
@@ -36,7 +36,7 @@ class TestDecorators(SessionTestCase):
         """ Tests that the page decorator displays an unknown error when
             the Exception raised has no message """
         response = self.page_with_exception(Exception())
-        self.assertContains(response, UNKNOWN_ERROR_STRING)
+        self.assertContains(response, UNKNOWN_ERROR_STRING, status_code=401)
     
     @patch("ab_testing_tool_app.decorators.wrapped_page", side_effect=Exception())
     def test_page_decorator_no_failure(self, _mock):
@@ -45,4 +45,4 @@ class TestDecorators(SessionTestCase):
         not_expected_response = HttpResponse("test")
         response = self.page_with_return(not_expected_response)
         self.assertNotEqual(response, not_expected_response)
-        self.assertContains(response, DOUBLE_ERROR_STRING)
+        self.assertContains(response, DOUBLE_ERROR_STRING, status_code=500)
