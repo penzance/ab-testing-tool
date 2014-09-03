@@ -54,9 +54,11 @@ def submit_edit_track(request):
     name = post_param(request, "name")
     notes = post_param(request, "notes")
     track_id = post_param(request, "id")
-    track = Track.get_or_none(pk=track_id, course_id=course_id)
+    track = Track.get_or_none(pk=track_id)
     if not track:
         raise MISSING_TRACK
+    if course_id != track.course_id:
+        raise UNAUTHORIZED_ACCESS
     track.update(name=name, notes=notes)
     return redirect("/")
 
@@ -71,9 +73,11 @@ def delete_track(request, track_id):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     if CourseSetting.get_is_finalized(course_id):
         raise COURSE_TRACKS_ALREADY_FINALIZED
-    track = Track.get_or_none(pk=track_id, course_id=course_id)
+    track = Track.get_or_none(pk=track_id)
     if not track:
         raise MISSING_TRACK
+    if course_id != track.course_id:
+        raise UNAUTHORIZED_ACCESS
     track.delete()
     return redirect("/")
 
