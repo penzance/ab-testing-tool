@@ -109,7 +109,7 @@ class TestTrackPages(SessionTestCase):
         self.assertTemplateUsed(response, "not_authorized.html")
     
     def test_submit_edit_track_nonexistent(self):
-        """ Tests that update_track method raises error for non-existent Track """
+        """ Tests that submit_edit_track method raises error for non-existent Track """
         data = {"name": "new_name", "url1": "http://example.com/page",
                 "url2": "http://example.com/otherpage", "notes": "",
                 "id": NONEXISTENT_STAGE_ID}
@@ -118,7 +118,7 @@ class TestTrackPages(SessionTestCase):
         self.assertError(response, MISSING_TRACK)
     
     def test_submit_edit_track_wrong_course(self):
-        """ Tests that update_track method raises error for existent Track but
+        """ Tests that submit_edit_track method raises error for existent Track but
             for wrong course"""
         track = Track.objects.create(name="old_name",
                                      course_id=TEST_OTHER_COURSE_ID)
