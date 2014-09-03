@@ -1,7 +1,7 @@
-from mock import patch
+from mock import patch, MagicMock
 
 from ab_testing_tool_app.controllers import (get_uninstalled_stages, stage_url,
-    all_stage_urls, format_url)
+    all_stage_urls, format_url, post_param)
 from ab_testing_tool_app.tests.common import (SessionTestCase, APIReturn,
     LIST_MODULES, LIST_ITEMS, TEST_COURSE_ID, TEST_OTHER_COURSE_ID)
 from ab_testing_tool_app.models import Stage
@@ -116,3 +116,15 @@ class TestControllers(SessionTestCase):
         """ Tests that format_url adds http:// to a url missing it """
         url = "www.example.com/http_stuff?thing=other_thing"
         self.assertEqual("http://" + url, format_url(url))
+    
+    def test_post_param_success(self):
+        """ Test that post_param returns correct value when param is present """
+        request = MagicMock()
+        request.POST = {"param_name": "param_value"}
+        self.assertEqual(post_param(request, "param_name"), "param_value")
+    
+    def test_post_param_error(self):
+        """ Test that post_param errors when requested param is missing """
+        request = MagicMock()
+        request.POST = {}
+        self.assertRaises(Exception, post_param, request, "param_name")
