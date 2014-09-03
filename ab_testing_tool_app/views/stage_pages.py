@@ -124,7 +124,7 @@ def submit_edit_stage(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     name = post_param(request, "name")
     notes = post_param(request, "notes")
-    stage_id = post_param(reqeust, "id")
+    stage_id = post_param(request, "id")
     stage = Stage.get_or_none(pk=stage_id)
     if not stage:
         raise MISSING_STAGE
