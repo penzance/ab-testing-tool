@@ -35,14 +35,8 @@ class TestSelectionPages(SessionTestCase):
     def test_resource_selection_view_without_ext_content_return_url(self):
         """ Test that an error is raised when there is no ext_content_return_url """
         data = {"ext_content_return_types": ["lti_launch_url"]}
-<<<<<<< HEAD
-        response = self.client.post(reverse("resource_selection"), data, follow=True)
-        self.assertError(response, MISSING_RETURN_URL)
-=======
         response = self.client.get(reverse("resource_selection"), data, follow=True)
-        self.assertTemplateUsed(response, "error.html")
-        self.assertEqual(response.context["message"], str(MISSING_RETURN_URL))
->>>>>>> 438a44748cd6dc2b270683c30e4418ffcb6d3fbf
+        self.assertError(response, MISSING_RETURN_URL)
     
     def test_resource_selection_view_missing_ext_content_return_types(self):
         """ Tests that an error is returned when there are no
