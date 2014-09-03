@@ -36,8 +36,7 @@ class TestSelectionPages(SessionTestCase):
         """ Test that an error is raised when there is no ext_content_return_url """
         data = {"ext_content_return_types": ["lti_launch_url"]}
         response = self.client.post(reverse("resource_selection"), data, follow=True)
-        self.assertTemplateUsed(response, "error.html")
-        self.assertEqual(response.context["message"], str(MISSING_RETURN_URL))
+        self.assertError(response, MISSING_RETURN_URL)
     
     def test_resource_selection_view_missing_ext_content_return_types(self):
         """ Tests that an error is returned when there are no
@@ -45,8 +44,7 @@ class TestSelectionPages(SessionTestCase):
         data = {}
         response = self.client.post(reverse("resource_selection"), data, follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "error.html")
-        self.assertEqual(response.context["message"], str(MISSING_RETURN_TYPES_PARAM))
+        self.assertError(response, MISSING_RETURN_TYPES_PARAM)
     
     def test_resource_selection_view_bad_ext_content_return_types(self):
         """ Tests that an error is returned when there are unexpected
@@ -54,8 +52,7 @@ class TestSelectionPages(SessionTestCase):
         data = {"ext_content_return_types": ["not_lti_launch_url"]}
         response = self.client.post(reverse("resource_selection"), data, follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "error.html")
-        self.assertContains(response, str(MISSING_RETURN_TYPES_PARAM))
+        self.assertError(response, MISSING_RETURN_TYPES_PARAM)
     
     @patch("django.http.request.HttpRequest.get_host", return_value=TEST_DOMAIN)
     def test_submit_selection_with_invalid_stage(self, _mock):
@@ -64,8 +61,7 @@ class TestSelectionPages(SessionTestCase):
         content_return_url = "http://test_content_return_url.com"
         data = {"stage_id": NONEXISTENT_STAGE_ID, "content_return_url": content_return_url}
         response = self.client.post(reverse("submit_selection"), data)
-        self.assertTemplateUsed(response, "error.html")
-        self.assertContains(response, str(MISSING_STAGE))
+        self.assertError(response, MISSING_STAGE)
    
     @patch("django.http.request.HttpRequest.get_host", return_value=TEST_DOMAIN)
     def test_submit_selection(self, _mock):

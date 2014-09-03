@@ -3,7 +3,7 @@ from ab_testing_tool_app.tests.common import (SessionTestCase, TEST_COURSE_ID,
 from django.core.urlresolvers import reverse
 from ab_testing_tool_app.models import Track, CourseSetting, Stage, StageUrl
 from ab_testing_tool_app.exceptions import COURSE_TRACKS_ALREADY_FINALIZED,\
-    NO_TRACKS_FOR_COURSE, UNAUTHORIZED_ACCESS
+    NO_TRACKS_FOR_COURSE, UNAUTHORIZED_ACCESS, MISSING_TRACK
 
 class TestTrackPages(SessionTestCase):
     """ Tests related to Track and Track pages and methods """
@@ -48,7 +48,7 @@ class TestTrackPages(SessionTestCase):
         t_id = NONEXISTENT_TRACK_ID
         response = self.client.get(reverse("edit_track", args=(t_id,)))
         self.assertTemplateNotUsed(response, "edit_track.html")
-        self.assertTemplateUsed(response, "error.html")
+        self.assertError(response, MISSING_TRACK)
     
     def test_edit_track_view_wrong_course(self):
         """ Tests edit_track when attempting to access a track from a different course """
@@ -115,7 +115,7 @@ class TestTrackPages(SessionTestCase):
                 "id": NONEXISTENT_STAGE_ID}
         response = self.client.post(reverse("submit_edit_track"), data,
                                     follow=True)
-        self.assertTemplateUsed(response, "error.html")
+        self.assertError(response, MISSING_TRACK)
     
     def test_submit_edit_track_wrong_course(self):
         """ Tests that update_track method raises error for existent Track but
@@ -127,7 +127,7 @@ class TestTrackPages(SessionTestCase):
                 "id": track.id}
         response = self.client.post(reverse("submit_edit_track"), data,
                                     follow=True)
-        self.assertTemplateUsed(response, "error.html")
+        self.assertError(response, UNAUTHORIZED_ACCESS)
     
     def test_delete_track(self):
         """ Tests that delete_track method properly deletes a track when authorized"""
@@ -148,9 +148,7 @@ class TestTrackPages(SessionTestCase):
         response = self.client.get(reverse("delete_track", args=(track.id,)),
                                    follow=True)
         second_num_tracks = Track.objects.count()
-        self.assertTemplateUsed(response, "error.html")
-        self.assertIn(response.context["message"],
-                      str(COURSE_TRACKS_ALREADY_FINALIZED))
+        self.assertError(response, COURSE_TRACKS_ALREADY_FINALIZED)
         self.assertEqual(first_num_tracks, second_num_tracks)
     
     def test_delete_track_unauthorized(self):
@@ -167,12 +165,12 @@ class TestTrackPages(SessionTestCase):
     def test_delete_track_nonexistent(self):
         """ Tests that delete_track method raises error for non-existent Track """
         Track.objects.create(name="testname", course_id=TEST_COURSE_ID)
-        t_id = NONEXISTENT_STAGE_ID
+        t_id = NONEXISTENT_TRACK_ID
         first_num_tracks = Track.objects.count()
         response = self.client.get(reverse("delete_track", args=(t_id,)), follow=True)
         second_num_tracks = Track.objects.count()
-        self.assertTemplateUsed(response, "error.html")
         self.assertEqual(first_num_tracks, second_num_tracks)
+        self.assertError(response, MISSING_TRACK)
     
     def test_delete_track_wrong_course(self):
         """ Tests that delete_track method raises error for existent Track but for
@@ -182,8 +180,8 @@ class TestTrackPages(SessionTestCase):
         response = self.client.get(reverse("delete_track", args=(track.id,)),
                                    follow=True)
         second_num_tracks = Track.objects.count()
-        self.assertTemplateUsed(response, "error.html")
         self.assertEqual(first_num_tracks, second_num_tracks)
+        self.assertError(response, UNAUTHORIZED_ACCESS)
     
     def test_delete_track_deletes_stage_urls(self):
         """ Tests that stage_urls of a track are deleted when the track is """
