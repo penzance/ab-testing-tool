@@ -79,7 +79,7 @@ def tool_config(request):
 def download_data(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     course_title = get_lti_param(request, "context_title")
-    response = HttpResponse(mimetype='text/csv')
+    response = HttpResponse(content_type="text/csv")
     response['Content-Disposition'] = ('attachment; filename=%s_students.csv' %
                                        slugify(course_title))
     writer = csv.writer(response)
