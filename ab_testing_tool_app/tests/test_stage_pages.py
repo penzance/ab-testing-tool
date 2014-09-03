@@ -16,7 +16,7 @@ class TestStagePages(SessionTestCase):
     """ Tests related to Stages and Stage-related pages and methods """
     def test_deploy_stage_admin(self):
         """ Tests deploy stage for admins redirects to edit stage """
-        stage = Stage.objects.create(name="stage1")
+        stage = Stage.objects.create(name="stage1", course_id=TEST_COURSE_ID)
         response = self.client.get(reverse("deploy_stage", args=(stage.id,)))
         self.assertRedirects(response, reverse("edit_stage", args=(stage.id,)))
     
@@ -169,7 +169,7 @@ class TestStagePages(SessionTestCase):
                 "notes": "hi"}
         response = self.client.post(reverse("submit_create_stage"), data,
                                     follow=True)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 401)
         self.assertEqual(num_stages, Stage.objects.count())
         self.assertEqual(num_stageurls, StageUrl.objects.count())
         self.assertTemplateUsed(response, "not_authorized.html")
@@ -268,11 +268,11 @@ class TestStagePages(SessionTestCase):
     
     def test_deploy_stage_view(self):
         """ Tests deploy stage  """
-        stage = Stage.objects.create(name="stage1")
+        stage = Stage.objects.create(name="stage1", course_id=TEST_COURSE_ID)
         track = Track.objects.create(name="track1")
         StageUrl.objects.create(stage=stage, url="http://www.example.com", track=track)
-        t_id = stage.id
-        response = self.client.get(reverse("deploy_stage", args=(t_id,)), follow=True)
+        response = self.client.get(reverse("deploy_stage", args=(stage.id,)),
+                                   follow=True)
         self.assertEqual(response.status_code, 200)
     
     def test_delete_stage(self):

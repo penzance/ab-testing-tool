@@ -43,7 +43,6 @@ class TestSelectionPages(SessionTestCase):
             ext_content_return_types passed """
         data = {}
         response = self.client.get(reverse("resource_selection"), data, follow=True)
-        self.assertEqual(response.status_code, 200)
         self.assertError(response, MISSING_RETURN_TYPES_PARAM)
     
     def test_resource_selection_view_bad_ext_content_return_types(self):
@@ -51,7 +50,6 @@ class TestSelectionPages(SessionTestCase):
             ext_content_return_types passed """
         data = {"ext_content_return_types": ["not_lti_launch_url"]}
         response = self.client.get(reverse("resource_selection"), data, follow=True)
-        self.assertEqual(response.status_code, 200)
         self.assertError(response, MISSING_RETURN_TYPES_PARAM)
     
     @patch("django.http.request.HttpRequest.get_host", return_value=TEST_DOMAIN)
