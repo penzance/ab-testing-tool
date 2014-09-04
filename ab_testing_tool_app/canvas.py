@@ -4,8 +4,8 @@ from canvas_sdk import RequestContext
 
 #TODO: change from secure.py setting to oauth handoff
 from ab_testing_tool.settings.secure import COURSE_OAUTH_TOKEN
-from ab_testing_tool_app.exceptions import MISSING_LTI_PARAM, MISSING_LTI_LAUNCH,\
-    INVALID_SDK_RESPONSE, NO_SDK_RESPONSE
+from ab_testing_tool_app.exceptions import (MISSING_LTI_PARAM, MISSING_LTI_LAUNCH,
+    INVALID_SDK_RESPONSE, NO_SDK_RESPONSE)
 
 
 """
@@ -13,23 +13,18 @@ Canvas API related methods are located in this module
 """
 
 def list_module_items(request_context, course_id, module_id):
-    return parse_response(canvas_sdk.methods.modules.list_module_items(
-                    request_context, course_id, module_id, "content_details"))
+    try:
+        return canvas_sdk.methods.modules.list_module_items(
+                    request_context, course_id, module_id, "content_details").json()
+    except:
+        raise NO_SDK_RESPONSE
 
 def list_modules(request_context, course_id):
-    return parse_response(canvas_sdk.methods.modules.list_modules(
-                    request_context, course_id, "content_details"))
-
-def parse_response(sdk_response):
-    """ TODO: Move this function to canvas_sdk_python so that all sdk
-        functions return python objects instead of response objects """
-    if not sdk_response.ok:
-        raise NO_SDK_RESPONSE
     try:
-        return json.loads(sdk_response.text)
-    except (ValueError, TypeError):
-        raise INVALID_SDK_RESPONSE
-
+        return canvas_sdk.methods.modules.list_modules(request_context,
+                    course_id, "content_details").json()
+    except:
+        raise NO_SDK_RESPONSE
 
 def get_lti_param(request, key):
     """

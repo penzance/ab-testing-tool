@@ -109,5 +109,9 @@ class APIReturn(object):
     """ Spoofs returned response from Canvas SDK. Has response.ok property and
         JSON contents """
     def __init__(self, obj, ok=True):
+        self.obj = obj
         self.text = dumps(obj)
         self.ok = ok
+        
+    def json(self):
+        return self.obj
