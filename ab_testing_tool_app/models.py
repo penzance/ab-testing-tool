@@ -18,18 +18,18 @@ class CustomModel(models.Model):
             return None
 
 class Track(CustomModel):
-    name = models.CharField(max_length=512)
-    notes = models.CharField(max_length=1000)
-    course_id = models.CharField(max_length=12, db_index=True)
+    name = models.CharField(max_length=128)
+    notes = models.CharField(max_length=1024)
+    course_id = models.CharField(max_length=128, db_index=True)
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
 
 
 class Stage(CustomModel):
     """ This model stores the configuration of an intervention point"""
-    name = models.CharField(max_length=512)
-    notes = models.CharField(max_length=1000)
-    course_id = models.CharField(max_length=12, db_index=True)
+    name = models.CharField(max_length=128)
+    notes = models.CharField(max_length=1024)
+    course_id = models.CharField(max_length=128, db_index=True)
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
     
@@ -42,7 +42,7 @@ class Stage(CustomModel):
 
 class StageUrl(CustomModel):
     """ This model stores the URL of a single intervention """
-    url = models.CharField(max_length=512)
+    url = models.CharField(max_length=2048)
     track = models.ForeignKey(Track)
     stage = models.ForeignKey(Stage)
     created_on = models.DateTimeField(auto_now_add=True)
@@ -56,8 +56,8 @@ class Student(CustomModel):
     """ This model stores which track a student is in for each course.
         A real-world can be represented by multiple Student objects,
         and will have a seperate object for each course they are in. """
-    course_id = models.CharField(max_length=12, db_index=True)
-    student_id = models.CharField(max_length=12, db_index=True)
+    course_id = models.CharField(max_length=128, db_index=True)
+    student_id = models.CharField(max_length=128, db_index=True)
     track = models.ForeignKey(Track)
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
@@ -78,7 +78,7 @@ class CourseSetting(CustomModel):
     WARNING: DO NOT HAVE FOREIGN KEYS TO THIS MODEL.  THERE IS NO GUARANTEE
         IT WILL EXIST FOR A GIVEN COURSE.
     """
-    course_id = models.CharField(max_length=12, db_index=True, unique=True)
+    course_id = models.CharField(max_length=128, db_index=True, unique=True)
     tracks_finalized = models.BooleanField(default=False)
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
