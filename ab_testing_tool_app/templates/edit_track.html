@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <title>A/B Testing Tool</title>
-    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <script src="../static/js/jquery-1.10.1.min.js"></script>
     <link rel="stylesheet" href="../static/css/bootstrap.min.css"  type="text/css"/>
     <link rel="stylesheet" href="../static/css/dashboard.css"  type="text/css"/>
 </head>
@@ -17,14 +17,19 @@
         <tr>
 
         <td><p>Created: {{track.created_on}} | Last updated: {{track.updated_on}} </p></td>
-        {% if track.id %}
-        <td class="text-right nowrap"><a href="/delete_track/{{ track.id }}" class="btn btn-lg btn-danger" id="delete">Delete Track</a></td>
+        {% if track.id and not is_finalized%}
+        <td class="text-right nowrap"><a href="{% url 'delete_track' track.id %}" class="btn btn-lg btn-danger" id="delete">Delete Track</a></td>
+        {% elif track.id and is_finalized %}
+        <td class="text-right nowrap"><a class="btn btn-lg btn-danger disabled" id="delete">Delete Track</a></td>
         {% endif %}
         </tr>
         </tbody>
         </table>
-
     </div>
+            {% if track.id and is_finalized %}
+            <h4 class="text-center nowrap">Tracks Are Finalized.</h4>
+            <h5 class="text-center nowrap">Note: Tracks can no longer be deleted or created. Existing tracks can still be edited.</h5>
+            {% endif %}
             <form method="post" name="track_form" {% if track.id %} action="{% url 'submit_edit_track' %}"{% else %} action="{% url 'submit_create_track' %}" {% endif %}>
             {% csrf_token %}
                 <input type='hidden' name='id' value="{{ track.id }}">
