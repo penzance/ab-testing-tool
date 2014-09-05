@@ -18,7 +18,7 @@ class CustomModel(models.Model):
             return None
 
 class Track(CustomModel):
-    name = models.CharField(max_length=128)
+    name = models.CharField(max_length=256)
     notes = models.CharField(max_length=1024)
     course_id = models.CharField(max_length=128, db_index=True)
     created_on = models.DateTimeField(auto_now_add=True)
@@ -27,7 +27,7 @@ class Track(CustomModel):
 
 class Stage(CustomModel):
     """ This model stores the configuration of an intervention point"""
-    name = models.CharField(max_length=128)
+    name = models.CharField(max_length=256)
     notes = models.CharField(max_length=1024)
     course_id = models.CharField(max_length=128, db_index=True)
     created_on = models.DateTimeField(auto_now_add=True)

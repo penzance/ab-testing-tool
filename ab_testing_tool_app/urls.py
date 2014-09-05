@@ -13,7 +13,7 @@ from ab_testing_tool_app.views.track_pages import (create_track, submit_create_t
 
 admin.autodiscover()
 
-urlpatterns = patterns('',
+urlpatterns = patterns('ab_testing',
     url(r'^$', render_stage_control_panel, name='index'),
     url(r'^not_authorized$', not_authorized, name='not_authorized'),
     url(r'^download_data$', download_data, name='download_data'),

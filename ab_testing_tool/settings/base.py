@@ -146,6 +146,6 @@ TEMPLATE_LOADERS = (
     'django.template.loaders.app_directories.Loader',
 )
 TEMPLATE_DIRS = (
-    'templates',
+    os.path.join(BASE_DIR, 'templates')
 )
 
