@@ -4,5 +4,5 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    url(r'^', include('ab_testing_tool_app.urls')),
+    url(r'^lti_tools/ab_testing/', include('ab_testing_tool_app.urls', namespace="ab")),
 )
