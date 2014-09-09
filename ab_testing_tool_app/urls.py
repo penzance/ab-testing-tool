@@ -2,7 +2,7 @@ from django.conf.urls import patterns, url
 from django.contrib import admin
 
 from ab_testing_tool_app.views.main_pages import (render_stage_control_panel, not_authorized,
-     tool_config, download_data)
+     tool_config, download_data, test_page)
 
 from ab_testing_tool_app.views.selection_pages import (resource_selection, submit_selection,
                     submit_selection_new_stage)

@@ -12,7 +12,6 @@ from ab_testing_tool_app.controllers import post_param
 
 
 @lti_role_required(ADMINS)
-@page
 def create_track(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     if CourseSetting.get_is_finalized(course_id):
@@ -21,7 +20,6 @@ def create_track(request):
 
 
 @lti_role_required(ADMINS)
-@page
 def edit_track(request, track_id):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     t = Track.get_or_none(pk=track_id)
@@ -36,7 +34,6 @@ def edit_track(request, track_id):
 
 
 @lti_role_required(ADMINS)
-@page
 def submit_create_track(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     if CourseSetting.get_is_finalized(course_id):
@@ -48,7 +45,6 @@ def submit_create_track(request):
 
 
 @lti_role_required(ADMINS)
-@page
 def submit_edit_track(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     name = post_param(request, "name")
@@ -64,7 +60,6 @@ def submit_edit_track(request):
 
 
 @lti_role_required(ADMINS)
-@page
 def delete_track(request, track_id):
     """
     NOTE: When a track gets deleted, urls for that track get deleted from all
@@ -83,7 +78,6 @@ def delete_track(request, track_id):
 
 
 @lti_role_required(ADMINS)
-@page
 def finalize_tracks(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     if Track.objects.filter(course_id=course_id).count() == 0:

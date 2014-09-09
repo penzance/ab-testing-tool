@@ -14,7 +14,6 @@ from ab_testing_tool_app.exceptions import (MISSING_RETURN_TYPES_PARAM,
 
 
 @lti_role_required(ADMINS)
-@page
 def resource_selection(request):
     """ docs: https://canvas.instructure.com/doc/api/file.link_selection_tools.html """
     course_id = get_lti_param(request, "custom_canvas_course_id")
@@ -32,7 +31,6 @@ def resource_selection(request):
 
 
 @lti_role_required(ADMINS)
-@page
 def submit_selection(request):
     stage_id = post_param(request, "stage_id")
     stage = Stage.get_or_none(pk=stage_id)
@@ -49,7 +47,6 @@ def submit_selection(request):
 
 
 @lti_role_required(ADMINS)
-@page
 def submit_selection_new_stage(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     name = post_param(request, "name")

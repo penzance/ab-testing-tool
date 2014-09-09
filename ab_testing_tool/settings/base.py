@@ -89,6 +89,7 @@ MIDDLEWARE_CLASSES = (
     #'django.middleware.csrf.CsrfViewMiddleware',
     #'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_auth_lti.middleware.LTIAuthMiddleware',
+    'error_middleware.middleware.ErrorMiddleware',
 )
 
 AUTHENTICATION_BACKENDS = (

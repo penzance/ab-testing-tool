@@ -17,13 +17,11 @@ from ab_testing_tool_app.decorators import page
 from ab_testing_tool_app.constants import ADMINS
 
 
-@page
 def not_authorized(request):
     return HttpResponse(loader.render_to_string("not_authorized.html"), status=401)
 
 
 @lti_role_required(ADMINS)
-@page
 def render_stage_control_panel(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     modules = get_modules_with_items(request)
@@ -42,7 +40,6 @@ def render_stage_control_panel(request):
     return render_to_response("control_panel.html", context)
 
 
-@page
 def tool_config(request):
     index_url = request.build_absolute_uri(reverse("index"))
     resource_selection_url = request.build_absolute_uri(reverse("resource_selection"))
@@ -75,7 +72,6 @@ def tool_config(request):
 
 
 @lti_role_required(ADMINS)
-@page
 def download_data(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     course_title = get_lti_param(request, "context_title")
@@ -91,4 +87,3 @@ def download_data(request):
         row = [s.student_id, s.track.name, s.updated_on]
         writer.writerow(row)
     return response
-

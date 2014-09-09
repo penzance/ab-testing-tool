@@ -15,7 +15,6 @@ from ab_testing_tool_app.exceptions import (MISSING_STAGE, UNAUTHORIZED_ACCESS,
     NO_URL_FOR_TRACK, NO_TRACKS_FOR_COURSE)
 
 
-@page
 def deploy_stage(request, stage_id):
     """Delivers randomly one of the urls in stage if user is not an admin, or
        edit_stage panel if admin.
@@ -61,7 +60,6 @@ def deploy_stage(request, stage_id):
 
 
 @lti_role_required(ADMINS)
-@page
 def create_stage(request):
     """ Note: Canvas fetches all pages within iframe with POST request,
         requiring separate template render function. This also breaks CSRF
@@ -74,7 +72,6 @@ def create_stage(request):
 
 
 @lti_role_required(ADMINS)
-@page
 def submit_create_stage(request):
     """ Note: request will always be POST because Canvas fetches pages within iframe by POST
         TODO: use Django forms library to save instead of getting individual POST params """
@@ -90,7 +87,6 @@ def submit_create_stage(request):
 
 
 @lti_role_required(ADMINS)
-@page
 def edit_stage(request, stage_id):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     stage = Stage.get_or_none(pk=stage_id)
@@ -117,7 +113,6 @@ def edit_stage(request, stage_id):
 
 
 @lti_role_required(ADMINS)
-@page
 def submit_edit_stage(request):
     """ Note: Only allowed if admin has privileges on the particular course.
         TODO: consider using Django forms to save rather of getting individual POST params """
@@ -146,7 +141,6 @@ def submit_edit_stage(request):
 
 
 @lti_role_required(ADMINS)
-@page
 def delete_stage(request, stage_id):
     """ Note: Installed stages are not allowed to be deleted
         Note: attached StageUrls are deleted via cascading delete """
