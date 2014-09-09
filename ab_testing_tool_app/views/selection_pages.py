@@ -1,5 +1,4 @@
 from django.shortcuts import render_to_response, redirect
-from django.http.response import HttpResponse
 from django.utils.http import urlencode
 from django_auth_lti.decorators import lti_role_required
 
@@ -8,7 +7,6 @@ from ab_testing_tool_app.controllers import (get_uninstalled_stages, stage_url,
     post_param)
 from ab_testing_tool_app.constants import STAGE_URL_TAG, ADMINS
 from ab_testing_tool_app.canvas import get_lti_param
-from ab_testing_tool_app.decorators import page
 from ab_testing_tool_app.exceptions import (MISSING_RETURN_TYPES_PARAM,
     MISSING_RETURN_URL, MISSING_STAGE)
 

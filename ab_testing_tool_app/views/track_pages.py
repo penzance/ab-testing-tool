@@ -2,9 +2,8 @@ from django.shortcuts import render_to_response, redirect
 from django_auth_lti.decorators import lti_role_required
 
 from ab_testing_tool_app.constants import ADMINS
-from ab_testing_tool_app.models import Track, StageUrl, CourseSetting, Stage
+from ab_testing_tool_app.models import Track, CourseSetting, Stage
 from ab_testing_tool_app.canvas import get_lti_param
-from ab_testing_tool_app.decorators import page
 from ab_testing_tool_app.exceptions import (MISSING_TRACK, UNAUTHORIZED_ACCESS,
     COURSE_TRACKS_ALREADY_FINALIZED, NO_TRACKS_FOR_COURSE)
 from django.http.response import HttpResponse

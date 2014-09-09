@@ -9,7 +9,6 @@ from ab_testing_tool_app.models import (Stage, Track, StageUrl, CourseSetting,
 from ab_testing_tool_app.canvas import get_lti_param
 from ab_testing_tool_app.controllers import (stage_is_installed, format_url,
     post_param)
-from ab_testing_tool_app.decorators import page
 from ab_testing_tool_app.exceptions import (MISSING_STAGE, UNAUTHORIZED_ACCESS,
     DELETING_INSTALLED_STAGE, COURSE_TRACKS_NOT_FINALIZED,
     NO_URL_FOR_TRACK, NO_TRACKS_FOR_COURSE)

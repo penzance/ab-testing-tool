@@ -13,7 +13,6 @@ from ab_testing_tool_app.controllers import (get_uninstalled_stages,
     get_modules_with_items)
 from ab_testing_tool_app.models import (Stage, Track, Student,
     CourseSetting)
-from ab_testing_tool_app.decorators import page
 from ab_testing_tool_app.constants import ADMINS
 
 
