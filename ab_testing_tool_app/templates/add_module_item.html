@@ -3,12 +3,12 @@
 <head>
     <meta charset="utf-8" />
     <title>A/B Testing Tool</title>
-    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <script src="../static/js/jquery-1.10.1.min.js"></script>
     <link rel="stylesheet" href="../static/css/bootstrap.min.css"  type="text/css"/>
 </head>
 <body>
 <div class="container">
-    <form method="POST" action="/submit_selection">
+    <form method="POST" action="{% url 'submit_selection' %}">
         <h4> To install a new A/B Stage, select one from list of uninstalled stages below:</h4>
         <br>
         <select name="stage_id">
@@ -32,10 +32,10 @@
                     <td><label>Stage Name</label></td>
                     <td><input class="form-control"  type="text" name="name" value="{{ stage.name }}"/></td>
                 </tr>
-                {% for t, s in tracks %}
+                {% for t in tracks %}
                 <tr align="left">
                     <td><label>URL for Track "{{t.name}}" </label></td>
-                    <td><input class="form-control"  type="text" name="_stageurl_{{t.id}}" value="{{ s.url }}"/></td>
+                    <td><input class="form-control"  type="text" name="_stageurl_{{t.id}}" /></td>
                 </tr>
                 {% endfor %}
                 <tr align="left">
