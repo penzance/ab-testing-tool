@@ -3,7 +3,6 @@ class InvalidResponseError(Exception):
     pass
 
 NO_SDK_RESPONSE = InvalidResponseError("Canvas SKD returned an error")
-INVALID_SDK_RESPONSE = InvalidResponseError("Response from canvas SDK was invalid")
 
 MISSING_LTI_LAUNCH = Exception("LTI_LAUNCH not in session")
 MISSING_LTI_PARAM = Exception("Missing LTI parameter in session")

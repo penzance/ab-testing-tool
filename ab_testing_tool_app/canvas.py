@@ -5,7 +5,8 @@ from canvas_sdk import RequestContext
 #TODO: change from secure.py setting to oauth handoff
 from ab_testing_tool.settings.secure import COURSE_OAUTH_TOKEN
 from ab_testing_tool_app.exceptions import (MISSING_LTI_PARAM, MISSING_LTI_LAUNCH,
-    INVALID_SDK_RESPONSE, NO_SDK_RESPONSE)
+    NO_SDK_RESPONSE)
+from requests.exceptions import RequestException
 
 
 """
@@ -16,14 +17,14 @@ def list_module_items(request_context, course_id, module_id):
     try:
         return canvas_sdk.methods.modules.list_module_items(
                     request_context, course_id, module_id, "content_details").json()
-    except:
+    except RequestException:
         raise NO_SDK_RESPONSE
 
 def list_modules(request_context, course_id):
     try:
         return canvas_sdk.methods.modules.list_modules(request_context,
                     course_id, "content_details").json()
-    except:
+    except RequestException:
         raise NO_SDK_RESPONSE
 
 def get_lti_param(request, key):
