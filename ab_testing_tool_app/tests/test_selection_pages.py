@@ -6,7 +6,7 @@ from django.utils.http import urlencode
 from ab_testing_tool_app.controllers import stage_url
 from mock import patch
 from ab_testing_tool_app.exceptions import MISSING_RETURN_TYPES_PARAM,\
-    MISSING_RETURN_URL, MISSING_STAGE
+    MISSING_RETURN_URL, MISSING_STAGE, missing_param_error
 from ab_testing_tool_app.constants import STAGE_URL_TAG
 
 class TestSelectionPages(SessionTestCase):
@@ -51,6 +51,11 @@ class TestSelectionPages(SessionTestCase):
         data = {"ext_content_return_types": ["not_lti_launch_url"]}
         response = self.client.get(reverse("resource_selection"), data, follow=True)
         self.assertError(response, MISSING_RETURN_TYPES_PARAM)
+    
+    def test_submit_selection_with_missig_param(self):
+        """ Tests that submit_selection returns an error when missing a post param """
+        response = self.client.post(reverse("submit_selection"), {})
+        self.assertError(response, missing_param_error("stage_id"))
     
     @patch("django.http.request.HttpRequest.get_host", return_value=TEST_DOMAIN)
     def test_submit_selection_with_invalid_stage(self, _mock):

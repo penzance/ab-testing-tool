@@ -22,3 +22,6 @@ COURSE_TRACKS_ALREADY_FINALIZED = RenderableError("You can't change tracks after
 COURSE_TRACKS_NOT_FINALIZED = RenderableError("Course tracks are not finalized")
 NO_URL_FOR_TRACK = RenderableError("No course content. Ask your course instructors to put something here.")
 NO_TRACKS_FOR_COURSE = RenderableError("No tracks have been configured for this course.")
+
+def missing_param_error(param_name):
+    return RenderableError("Missing POST parameter %s" % param_name)
