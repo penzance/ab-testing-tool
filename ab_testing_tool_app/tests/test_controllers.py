@@ -1,14 +1,14 @@
-from mock import patch
+from mock import patch, MagicMock
 
-from ab_testing_tool_app.controllers import get_uninstalled_stages, stage_url,\
-    all_stage_urls
+from ab_testing_tool_app.controllers import (get_uninstalled_stages, stage_url,
+    all_stage_urls, post_param)
 from ab_testing_tool_app.tests.common import (SessionTestCase, APIReturn,
     LIST_MODULES, LIST_ITEMS, TEST_COURSE_ID, TEST_OTHER_COURSE_ID)
 from ab_testing_tool_app.models import Stage
 from ab_testing_tool_app.exceptions import BAD_STAGE_ID
 
 
-class test_controllers(SessionTestCase):
+class TestControllers(SessionTestCase):
     def test_get_uninstalled_stages(self):
         """ Tests method get_uninstalled_stages runs and returns no stages when
             database empty """
@@ -101,3 +101,15 @@ class test_controllers(SessionTestCase):
         """ Tests that stage_url errors when passed a non-numeral stage_id """
         self.assertRaisesSpecific(BAD_STAGE_ID, stage_url, self.request, None)
         self.assertRaisesSpecific(BAD_STAGE_ID, stage_url, self.request, "str")
+    
+    def test_post_param_success(self):
+        """ Test that post_param returns correct value when param is present """
+        request = MagicMock()
+        request.POST = {"param_name": "param_value"}
+        self.assertEqual(post_param(request, "param_name"), "param_value")
+    
+    def test_post_param_error(self):
+        """ Test that post_param errors when requested param is missing """
+        request = MagicMock()
+        request.POST = {}
+        self.assertRaises(Exception, post_param, request, "param_name")

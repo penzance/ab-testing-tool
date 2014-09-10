@@ -35,4 +35,4 @@ def wrapped_page(f, args, kwargs):
         if not message:
             message = UNKNOWN_ERROR
         template = loader.render_to_string("error.html", {"message": message})
-        return HttpResponse(template, status=401)
+        return HttpResponse(template, status=200) #TODO: Change to non-200
