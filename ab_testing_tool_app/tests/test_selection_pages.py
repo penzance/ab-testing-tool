@@ -38,6 +38,29 @@ class TestSelectionPages(SessionTestCase):
         response = self.client.get(reverse("resource_selection"), data, follow=True)
         self.assertError(response, MISSING_RETURN_URL)
     
+    def test_resource_selection_view_missing_ext_content_return_types(self):
+        """ Tests that an error is returned when there are no
+            ext_content_return_types passed """
+        data = {}
+        response = self.client.get(reverse("resource_selection"), data, follow=True)
+        self.assertError(response, MISSING_RETURN_TYPES_PARAM)
+    
+    def test_resource_selection_view_bad_ext_content_return_types(self):
+        """ Tests that an error is returned when there are unexpected
+            ext_content_return_types passed """
+        data = {"ext_content_return_types": ["not_lti_launch_url"]}
+        response = self.client.get(reverse("resource_selection"), data, follow=True)
+        self.assertError(response, MISSING_RETURN_TYPES_PARAM)
+    
+    @patch("django.http.request.HttpRequest.get_host", return_value=TEST_DOMAIN)
+    def test_submit_selection_with_invalid_stage(self, _mock):
+        """ Tests that submit_selection returns a redirect url with the
+            described parameters """
+        content_return_url = "http://test_content_return_url.com"
+        data = {"stage_id": NONEXISTENT_STAGE_ID, "content_return_url": content_return_url}
+        response = self.client.post(reverse("submit_selection"), data)
+        self.assertError(response, MISSING_STAGE)
+   
     @patch("django.http.request.HttpRequest.get_host", return_value=TEST_DOMAIN)
     def test_submit_selection(self, _mock):
         """ Tests that submit_selection returns a redirect url with the
