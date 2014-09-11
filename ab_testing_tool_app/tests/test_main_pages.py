@@ -4,7 +4,7 @@ from mock import patch
 from ab_testing_tool_app.controllers import stage_url, get_uninstalled_stages
 from ab_testing_tool_app.tests.common import (SessionTestCase, LIST_MODULES,
     LIST_ITEMS, APIReturn, TEST_COURSE_ID, TEST_OTHER_COURSE_ID)
-from ab_testing_tool_app.models import Stage, Track
+from ab_testing_tool_app.models import Stage, Track, Student
 from ab_testing_tool_app.views.main_pages import tool_config
 
 
@@ -115,3 +115,40 @@ class TestMainPages(SessionTestCase):
         response = tool_config(self.request)
         self.assertContains(response, index_url)
         self.assertContains(response, resource_selection_url)
+    
+    def test_download_data(self):
+        """ Tests that download data returns a csv with a row for each student """
+        track = Track.objects.create(name="track1", course_id=TEST_COURSE_ID)
+        Student.objects.create(course_id=TEST_COURSE_ID, student_id=1,
+                               track=track)
+        Student.objects.create(course_id=TEST_COURSE_ID, student_id=2,
+                               track=track)
+        response = self.client.get(reverse("download_data"))
+        self.assertEqual(response._headers["content-type"],
+                         ('Content-Type', 'text/csv'))
+        num_students = Student.objects.filter(course_id=TEST_COURSE_ID).count()
+        # Add 2 to length for header and trailing newline
+        self.assertEqual(len(response.content.split("\n")), num_students + 2)
+    
+    def test_download_data_course_specific(self):
+        """ Tests that download data only uses student in the correct course """
+        track = Track.objects.create(name="track1", course_id=TEST_COURSE_ID)
+        Student.objects.create(course_id=TEST_COURSE_ID, student_id=1,
+                               track=track)
+        Student.objects.create(course_id=TEST_OTHER_COURSE_ID, student_id=2,
+                               track=track)
+        response = self.client.get(reverse("download_data"))
+        self.assertEqual(response._headers["content-type"],
+                         ('Content-Type', 'text/csv'))
+        num_students = Student.objects.filter(course_id=TEST_COURSE_ID).count()
+        # Add 2 to length for header and trailing newline
+        self.assertEqual(len(response.content.split("\n")), num_students + 2)
+    
+    def test_download_data_no_students(self):
+        response = self.client.get(reverse("download_data"))
+        self.assertEqual(response._headers["content-type"],
+                         ('Content-Type', 'text/csv'))
+        num_students = Student.objects.filter(course_id=TEST_COURSE_ID).count()
+        self.assertEqual(num_students, 0)
+        # Length is 2 for header and trailing newline
+        self.assertEqual(len(response.content.split("\n")), 2)
