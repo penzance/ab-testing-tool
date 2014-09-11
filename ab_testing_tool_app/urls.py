@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, include, url
+from django.conf.urls import patterns, url
 from django.contrib import admin
 
 from ab_testing_tool_app.views.main_pages import (render_stage_control_panel, not_authorized,
@@ -13,7 +13,7 @@ from ab_testing_tool_app.views.track_pages import (create_track, submit_create_t
 
 admin.autodiscover()
 
-urlpatterns = patterns('ab_testing',
+urlpatterns = patterns('',
     url(r'^$', render_stage_control_panel, name='index'),
     url(r'^not_authorized$', not_authorized, name='not_authorized'),
     url(r'^download_data$', download_data, name='download_data'),
@@ -24,10 +24,10 @@ urlpatterns = patterns('ab_testing',
     
     url(r'^create_stage$', create_stage, name='create_stage'),
     url(r'^submit_create_stage$', submit_create_stage, name='submit_create_stage'),
-    url(r'^edit_stage/(?P<t_id>\d+)$', edit_stage, name='edit_stage'),
+    url(r'^edit_stage/(?P<stage_id>\d+)$', edit_stage, name='edit_stage'),
     url(r'^submit_edit_stage$', submit_edit_stage, name='submit_edit_stage'),
-    url(r'^stage/(?P<t_id>\d+)$', deploy_stage, name='deploy_stage'),
-    url(r'^delete_stage/(?P<t_id>\d+)$', delete_stage, name='delete_stage'),
+    url(r'^stage/(?P<stage_id>\d+)$', deploy_stage, name='deploy_stage'),
+    url(r'^delete_stage/(?P<stage_id>\d+)$', delete_stage, name='delete_stage'),
     
     url(r'^create_track', create_track, name='create_track'),
     url(r'^submit_create_track$', submit_create_track, name='submit_create_track'),
