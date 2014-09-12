@@ -63,13 +63,14 @@ class SessionTestCase(TestCase):
             patcher.start()
             self.addCleanup(patcher.stop)
     
-    def set_lit_param(self, param_name, param_value):
+    def set_lti_param(self, param_name, param_value):
+        """ Convenience method to set an LIT_LAUNCH parameter in the mock session """
         session = self.client.session
         session["LTI_LAUNCH"][param_name] = param_value
         session.save()
     
     def set_roles(self, roles):
-        self.set_lit_param("roles", roles)
+        self.set_lti_param("roles", roles)
     
     def assertError(self, response, exception_instance):
         self.assertTemplateUsed(response, "error.html")
