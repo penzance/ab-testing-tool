@@ -73,7 +73,7 @@ class SessionTestCase(TestCase):
     
     def assertError(self, response, exception_instance):
         self.assertTemplateUsed(response, "error.html")
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 400)
         self.assertIn("message", response.context)
         self.assertEqual(response.context["message"], str(exception_instance))
     

@@ -17,24 +17,6 @@ class TestMainPages(SessionTestCase):
         self.assertEqual(response.status_code, 401)
         self.assertTemplateUsed(response, "not_authorized.html")
     
-    def test_index_and_control_panel_view(self):
-        """ Tests control_panel template renders when authenticated and with no
-            contents returned from Canvas"""
-        response = self.client.get(reverse("index"), follow=True)
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "control_panel.html")
-    
-    @patch(LIST_MODULES, return_value=APIReturn([{"id": 0}]))
-    def test_control_panel_with_module_and_item(self, _mock1):
-        """ Tests control_panel template renders with items returned from Canvas"""
-        mock_item = {"type": "ExternalTool",
-                     "external_url": stage_url(self.request, 0)}
-        api_return = APIReturn([mock_item])
-        with patch(LIST_ITEMS, return_value=api_return):
-            response = self.client.get(reverse("index"), follow=True)
-            self.assertEqual(response.status_code, 200)
-            self.assertTemplateUsed(response, "control_panel.html")
-    
     def test_unauthenticated_index(self):
         """ Tests control_panel template does not render when unauthorized"""
         self.set_roles([])
