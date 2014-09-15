@@ -13,6 +13,7 @@ LIST_ITEMS = "canvas_sdk.methods.modules.list_module_items"
 TEST_COURSE_ID = "12345"
 TEST_OTHER_COURSE_ID = "5555555"
 TEST_DOMAIN = "example.com"
+TEST_STUDENT_ID = "70707707"
 
 NONEXISTENT_STAGE_ID = 12345678987654321 #111111111^2
 NONEXISTENT_TRACK_ID = 31415926535897932 #pi
@@ -43,6 +44,8 @@ class SessionTestCase(TestCase):
         lti_launch["lis_course_offering_sourcedid"] = "92345"
         lti_launch["custom_canvas_api_domain"] = TEST_DOMAIN
         lti_launch["launch_presentation_return_url"] = TEST_DOMAIN
+        lti_launch["custom_canvas_user_login_id"] = TEST_STUDENT_ID
+        lti_launch["context_title"] = "Course title"
         session = self.client.session
         session["LTI_LAUNCH"] = lti_launch
         session.save()
@@ -60,10 +63,20 @@ class SessionTestCase(TestCase):
             patcher.start()
             self.addCleanup(patcher.stop)
     
-    def set_roles(self, roles):
+    def set_lti_param(self, param_name, param_value):
+        """ Convenience method to set an LIT_LAUNCH parameter in the mock session """
         session = self.client.session
-        session["LTI_LAUNCH"]["roles"] = roles
+        session["LTI_LAUNCH"][param_name] = param_value
         session.save()
+    
+    def set_roles(self, roles):
+        self.set_lti_param("roles", roles)
+    
+    def assertError(self, response, exception_instance):
+        self.assertTemplateUsed(response, "error.html")
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("message", response.context)
+        self.assertEqual(response.context["message"], str(exception_instance))
     
     def assertSameIds(self, iterable_1, iterable_2, duplicates_allowed=False):
         """ Checks that the two iterables have the same set of .id attributes
@@ -97,5 +110,9 @@ class APIReturn(object):
     """ Spoofs returned response from Canvas SDK. Has response.ok property and
         JSON contents """
     def __init__(self, obj, ok=True):
+        self.obj = obj
         self.text = dumps(obj)
         self.ok = ok
+        
+    def json(self):
+        return self.obj

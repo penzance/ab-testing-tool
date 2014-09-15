@@ -4,6 +4,7 @@ class ItemWithId(object):
     def __init__(self, _id):
         self.id = _id
 
+
 class TestCommon(SessionTestCase):
     def test_same_ids_fails(self):
         """ Tests that two iterables with different ids fail the sameIds test """
