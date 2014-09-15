@@ -1,7 +1,9 @@
 from ab_testing_tool_app.tests.common import SessionTestCase
 from mock import patch
-from error_middleware.middleware import RenderableError, DEFAULT_ERROR_STATUS,\
-    ErrorMiddleware, UNKNOWN_ERROR_STRING
+from error_middleware.middleware import (RenderableError, ErrorMiddleware,
+    UNKNOWN_ERROR_STRING)
+from error_middleware.exceptions import DEFAULT_ERROR_STATUS, Renderable400,\
+    Renderable403, Renderable404, Renderable500
 from django.template.base import TemplateDoesNotExist
 
 
@@ -30,6 +32,38 @@ class TestMiddleware(SessionTestCase):
         resp = middleware.process_exception(self.request, RenderableError("xxx"))
         self.assertNotEqual(resp, None)
         self.assertEqual(resp.status_code, DEFAULT_ERROR_STATUS)
+    
+    def test_error_middleware_catches_400(self):
+        """ Tests that the ErrorMiddleware returns the correct status code for
+            a Renderable400 """
+        middleware = ErrorMiddleware()
+        resp = middleware.process_exception(self.request, Renderable400("xxx"))
+        self.assertNotEqual(resp, None)
+        self.assertEqual(resp.status_code, 400)
+    
+    def test_error_middleware_catches_403(self):
+        """ Tests that the ErrorMiddleware returns the correct status code for
+            a Renderable403 """
+        middleware = ErrorMiddleware()
+        resp = middleware.process_exception(self.request, Renderable403("xxx"))
+        self.assertNotEqual(resp, None)
+        self.assertEqual(resp.status_code, 403)
+
+    def test_error_middleware_catches_404(self):
+        """ Tests that the ErrorMiddleware returns the correct status code for
+            a Renderable404 """
+        middleware = ErrorMiddleware()
+        resp = middleware.process_exception(self.request, Renderable404("xxx"))
+        self.assertNotEqual(resp, None)
+        self.assertEqual(resp.status_code, 404)
+
+    def test_error_middleware_catches_500(self):
+        """ Tests that the ErrorMiddleware returns the correct status code for
+            a Renderable500 """
+        middleware = ErrorMiddleware()
+        resp = middleware.process_exception(self.request, Renderable500("xxx"))
+        self.assertNotEqual(resp, None)
+        self.assertEqual(resp.status_code, 500)
     
     def test_error_middleware_custom_status(self):
         """ Tests that the ErrorMiddleware returns the correct status on a

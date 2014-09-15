@@ -5,6 +5,7 @@ from json import dumps
 from mock import patch, MagicMock
 
 from ab_testing_tool_app.constants import ADMINS
+from error_middleware.exceptions import DEFAULT_ERROR_STATUS, RenderableError
 
 
 LIST_MODULES = "canvas_sdk.methods.modules.list_modules"
@@ -73,7 +74,10 @@ class SessionTestCase(TestCase):
     
     def assertError(self, response, exception_instance):
         self.assertTemplateUsed(response, "error.html")
-        self.assertEqual(response.status_code, 400)
+        if isinstance(exception_instance, RenderableError):
+            self.assertEqual(response.status_code, exception_instance.status_code)
+        else:
+            self.assertEqual(response.status_code, DEFAULT_ERROR_STATUS)
         self.assertIn("message", response.context)
         self.assertEqual(response.context["message"], str(exception_instance))
     

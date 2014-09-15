@@ -3,30 +3,11 @@ import traceback
 from django.http.response import HttpResponse
 from django.template import loader
 from django.template.base import TemplateDoesNotExist
+from error_middleware.exceptions import RenderableError
 
 logger = logging.getLogger(__name__)
 
 UNKNOWN_ERROR_STRING = "An unknown error occurred in the A/B testing tool"
-
-DEFAULT_ERROR_STATUS = 400
-
-
-class RenderableError(Exception):
-    """
-    This is the Exception child class that errors intended to be displayed
-    should instantiate or descend from.
-    
-    Example:
-        def page_view(request):
-            raise RenderableError("This is the message displayed by the app")
-    """
-    
-    status_code = DEFAULT_ERROR_STATUS
-    
-    def __init__(self, message="", status_code=DEFAULT_ERROR_STATUS):
-        self.status_code = status_code
-        super(RenderableError, self).__init__(message)
-
 
 class ErrorMiddleware(object):
     """
