@@ -66,7 +66,8 @@ def create_stage(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     #Note: Refer to template. (t,None) is passed as there are no existing StageUrls for a new stage
     context = {"tracks" : [(t, None) for t in
-                           Track.objects.filter(course_id=course_id)]}
+                           Track.objects.filter(course_id=course_id)],
+               "cancel_url": "/#tabs-2"}
     return render_to_response("edit_stage.html", context)
 
 
@@ -106,6 +107,7 @@ def edit_stage(request, stage_id):
     context = {"stage": stage,
                "tracks": track_urls,
                "is_installed": stage_is_installed(request, stage),
+               "cancel_url": "/#tabs-2",
                #TODO: "installed_module": installed_module,
                }
     return render_to_response("edit_stage.html", context)
