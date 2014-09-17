@@ -8,6 +8,12 @@ from django.template.base import TemplateDoesNotExist
 
 
 class TestMiddleware(SessionTestCase):
+    def renderable_error_test(self, renderable_exception, status_code):
+        middleware = ErrorMiddleware()
+        resp = middleware.process_exception(self.request, renderable_exception)
+        self.assertNotEqual(resp, None)
+        self.assertEqual(resp.status_code, status_code)
+    
     def test_renderable_error_has_status_code(self):
         """ Tests that a RenderableError has a status_code attribute """
         error = RenderableError()
@@ -15,9 +21,9 @@ class TestMiddleware(SessionTestCase):
     
     def test_renderable_error_custom_data(self):
         """ Tests that a RenderableError can have custom message and status code """
-        error = RenderableError("test_message", 418)
+        error = RenderableError("test_message")
         self.assertEqual("test_message", str(error))
-        self.assertEqual(error.status_code, 418)
+        self.assertEqual(error.status_code, DEFAULT_ERROR_STATUS)
     
     def test_error_middleware_passthrough(self):
         """ Tests that the ErrorMiddleware returns None on a normal Exception """
@@ -28,50 +34,34 @@ class TestMiddleware(SessionTestCase):
     def test_error_middleware_catches_renderable_error(self):
         """ Tests that the ErrorMiddleware returns not none on a
             RenderableError """
-        middleware = ErrorMiddleware()
-        resp = middleware.process_exception(self.request, RenderableError("xxx"))
-        self.assertNotEqual(resp, None)
-        self.assertEqual(resp.status_code, DEFAULT_ERROR_STATUS)
+        self.renderable_error_test(RenderableError("xxx"), DEFAULT_ERROR_STATUS)
     
     def test_error_middleware_catches_400(self):
         """ Tests that the ErrorMiddleware returns the correct status code for
             a Renderable400 """
-        middleware = ErrorMiddleware()
-        resp = middleware.process_exception(self.request, Renderable400("xxx"))
-        self.assertNotEqual(resp, None)
-        self.assertEqual(resp.status_code, 400)
+        self.renderable_error_test(Renderable400("xxx"), 400)
     
     def test_error_middleware_catches_403(self):
         """ Tests that the ErrorMiddleware returns the correct status code for
             a Renderable403 """
-        middleware = ErrorMiddleware()
-        resp = middleware.process_exception(self.request, Renderable403("xxx"))
-        self.assertNotEqual(resp, None)
-        self.assertEqual(resp.status_code, 403)
-
+        self.renderable_error_test(Renderable403("xxx"), 403)
+    
     def test_error_middleware_catches_404(self):
         """ Tests that the ErrorMiddleware returns the correct status code for
             a Renderable404 """
-        middleware = ErrorMiddleware()
-        resp = middleware.process_exception(self.request, Renderable404("xxx"))
-        self.assertNotEqual(resp, None)
-        self.assertEqual(resp.status_code, 404)
-
+        self.renderable_error_test(Renderable404("xxx"), 404)
+    
     def test_error_middleware_catches_500(self):
         """ Tests that the ErrorMiddleware returns the correct status code for
             a Renderable500 """
-        middleware = ErrorMiddleware()
-        resp = middleware.process_exception(self.request, Renderable500("xxx"))
-        self.assertNotEqual(resp, None)
-        self.assertEqual(resp.status_code, 500)
+        self.renderable_error_test(Renderable500("xxx"), 500)
     
     def test_error_middleware_custom_status(self):
         """ Tests that the ErrorMiddleware returns the correct status on a
             RenderableError """
-        middleware = ErrorMiddleware()
-        resp = middleware.process_exception(
-                self.request, RenderableError("xxx", status_code=418))
-        self.assertEqual(resp.status_code, 418)
+        class Renderable418(RenderableError):
+            status_code = 418
+        self.renderable_error_test(Renderable418("xxx"), 418)
     
     @patch("error_middleware.middleware.loader.render_to_string")
     def test_error_middleware_message(self, mock_renderer):

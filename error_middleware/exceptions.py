@@ -2,8 +2,7 @@ from django.http.response import Http404
 from django.core.exceptions import SuspiciousOperation, PermissionDenied
 
 
-DEFAULT_ERROR_STATUS = 400
-
+DEFAULT_ERROR_STATUS = 500
 
 class RenderableError(Exception):
     """
@@ -14,14 +13,7 @@ class RenderableError(Exception):
         def page_view(request):
             raise RenderableError("This is the message displayed by the app")
     """
-    
     status_code = DEFAULT_ERROR_STATUS
-    
-    def __init__(self, message="", status_code=None):
-        if status_code is not None:
-            self.status_code = status_code
-        super(RenderableError, self).__init__(message)
-
 
 class Renderable400(RenderableError, SuspiciousOperation):
     status_code = 400
