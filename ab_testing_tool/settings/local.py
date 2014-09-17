@@ -39,6 +39,11 @@ LOGGING = {
             'handlers':['console'],
             'propagate': True,
             'level':'DEBUG',
+        },
+        'error_middleware': {
+            'handlers':['console'],
+            'propagate': True,
+            'level':'DEBUG',
         }
     },
 }

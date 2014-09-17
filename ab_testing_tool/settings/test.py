@@ -22,6 +22,11 @@ LOGGING = {
             'handlers':['null'],
             'propagate': True,
             'level':'DEBUG',
-        }
+        },
+        'error_middleware': {
+            'handlers':['null'],
+            'propagate': True,
+            'level':'DEBUG',
+        },
     }
 }
