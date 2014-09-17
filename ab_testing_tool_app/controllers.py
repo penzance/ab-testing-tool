@@ -3,7 +3,8 @@ from django.core.urlresolvers import reverse
 from ab_testing_tool_app.models import Stage
 from ab_testing_tool_app.canvas import (get_canvas_request_context, list_module_items, list_modules,
     get_lti_param)
-from ab_testing_tool_app.exceptions import BAD_STAGE_ID
+from ab_testing_tool_app.exceptions import BAD_STAGE_ID, missing_param_error
+from error_middleware.middleware import RenderableError
 
 
 def stage_url(request, stage_id):
@@ -81,4 +82,4 @@ def get_modules_with_items(request):
 def post_param(request, param_name):
     if param_name in request.POST:
         return request.POST[param_name]
-    raise Exception("Missing POST parameter %s" % param_name)
+    raise missing_param_error(param_name)
