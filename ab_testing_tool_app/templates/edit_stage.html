@@ -41,7 +41,8 @@
                 {% for t, s in tracks %}
                 <tr align="left">
                     <td><label>URL for Track "{{t.name}}" </label></td>
-                    <td><input class="form-control"  type="text" name="stageurl_{{t.id}}" value="{{ s.url }}"/></td>
+                    <td><input class="form-control"  type="text" id="url_{{t.id}}" name="stageurl_{{t.id}}" value="{{ s.url }}"/></td>
+                    <td><a id="preview_{{t.id}}" onclick="preview({{t.id}}); return False;" target="_blank" href="" class="btn btn-xs btn-success"/>Preview URL</a></td>
                 </tr>
                 {% endfor %}
                 <tr align="left">
@@ -56,6 +57,15 @@
 
            </form>
 </div>
+<script>
+function preview(t_id) {
+    url = document.getElementById('url_' + t_id).value;
+    if (url.substring(0, 7) != "http://" && url.substring(0, 8) != "https://") {
+        url = "http://" + url;
+    }
+    document.getElementById('preview_' + t_id).href = url;
+}
+</script>
 </body>
 </html>
 
