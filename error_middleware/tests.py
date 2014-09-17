@@ -1,7 +1,7 @@
 from ab_testing_tool_app.tests.common import SessionTestCase
 from mock import patch
 from error_middleware.middleware import (RenderableError, ErrorMiddleware,
-    UNKNOWN_ERROR_STRING)
+    UNKNOWN_ERROR_STRING, ERROR_TEMPLATE)
 from error_middleware.exceptions import DEFAULT_ERROR_STATUS, Renderable400,\
     Renderable403, Renderable404, Renderable500
 from django.template.base import TemplateDoesNotExist
@@ -70,7 +70,7 @@ class TestMiddleware(SessionTestCase):
         message = "test_error_message"
         middleware = ErrorMiddleware()
         middleware.process_exception(self.request, RenderableError(message))
-        mock_renderer.assert_called_with("error.html", {"message": message})
+        mock_renderer.assert_called_with(ERROR_TEMPLATE, {"message": message})
     
     @patch("error_middleware.middleware.loader.render_to_string")
     def test_error_middleware_no_message(self, mock_renderer):
@@ -79,13 +79,13 @@ class TestMiddleware(SessionTestCase):
         middleware = ErrorMiddleware()
         middleware.process_exception(self.request, RenderableError())
         mock_renderer.assert_called_with(
-                "error.html",  {"message": UNKNOWN_ERROR_STRING})
+                ERROR_TEMPLATE,  {"message": UNKNOWN_ERROR_STRING})
     
     @patch("error_middleware.middleware.loader.render_to_string",
            side_effect=TemplateDoesNotExist)
     def test_error_middleware_no_error_template(self, mock_renderer):
-        """ Tests that ErrorMiddleware still works when there is no error.html
-            template present """
+        """ Tests that ErrorMiddleware still works when ERROR_TEMPALTE isn't
+            present """
         message = "test_error_message"
         middleware = ErrorMiddleware()
         resp = middleware.process_exception(self.request, RenderableError(message))
