@@ -1,16 +1,17 @@
-from ab_testing_tool_app.tests.common import SessionTestCase
-from mock import patch
+from mock import patch, MagicMock
+from django.template.base import TemplateDoesNotExist
+from django.test.testcases import TestCase
+
 from error_middleware.middleware import (RenderableError, ErrorMiddleware,
     UNKNOWN_ERROR_STRING, ERROR_TEMPLATE)
-from error_middleware.exceptions import DEFAULT_ERROR_STATUS, Renderable400,\
-    Renderable403, Renderable404, Renderable500
-from django.template.base import TemplateDoesNotExist
+from error_middleware.exceptions import (DEFAULT_ERROR_STATUS, Renderable400,
+    Renderable403, Renderable404, Renderable500)
 
 
-class TestMiddleware(SessionTestCase):
+class TestMiddleware(TestCase):
     def renderable_error_test(self, renderable_exception, status_code):
         middleware = ErrorMiddleware()
-        resp = middleware.process_exception(self.request, renderable_exception)
+        resp = middleware.process_exception(MagicMock(), renderable_exception)
         self.assertNotEqual(resp, None)
         self.assertEqual(resp.status_code, status_code)
     
@@ -28,7 +29,7 @@ class TestMiddleware(SessionTestCase):
     def test_error_middleware_passthrough(self):
         """ Tests that the ErrorMiddleware returns None on a normal Exception """
         middleware = ErrorMiddleware()
-        ret = middleware.process_exception(self.request, Exception("xxx"))
+        ret = middleware.process_exception(MagicMock(), Exception("xxx"))
         self.assertEqual(ret, None)
     
     def test_error_middleware_catches_renderable_error(self):
@@ -69,7 +70,7 @@ class TestMiddleware(SessionTestCase):
             the template loader """
         message = "test_error_message"
         middleware = ErrorMiddleware()
-        middleware.process_exception(self.request, RenderableError(message))
+        middleware.process_exception(MagicMock(), RenderableError(message))
         mock_renderer.assert_called_with(ERROR_TEMPLATE, {"message": message})
     
     @patch("error_middleware.middleware.loader.render_to_string")
@@ -77,7 +78,7 @@ class TestMiddleware(SessionTestCase):
         """ Tests that ErrorMiddleware returns the right message when the
             exception doesn't provide one """
         middleware = ErrorMiddleware()
-        middleware.process_exception(self.request, RenderableError())
+        middleware.process_exception(MagicMock(), RenderableError())
         mock_renderer.assert_called_with(
                 ERROR_TEMPLATE,  {"message": UNKNOWN_ERROR_STRING})
     
@@ -88,5 +89,5 @@ class TestMiddleware(SessionTestCase):
             present """
         message = "test_error_message"
         middleware = ErrorMiddleware()
-        resp = middleware.process_exception(self.request, RenderableError(message))
+        resp = middleware.process_exception(MagicMock(), RenderableError(message))
         self.assertEqual(resp.status_code, DEFAULT_ERROR_STATUS)

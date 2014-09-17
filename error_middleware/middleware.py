@@ -4,6 +4,7 @@ from django.conf import settings
 from django.http.response import HttpResponse
 from django.template import loader
 from django.template.base import TemplateDoesNotExist
+
 from error_middleware.exceptions import RenderableError
 
 logger = logging.getLogger(__name__)
