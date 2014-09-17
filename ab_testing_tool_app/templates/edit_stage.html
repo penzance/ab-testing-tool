@@ -4,12 +4,15 @@
     <meta charset="utf-8" />
     <title>A/B Testing Tool</title>
     <script src="../static/js/jquery-1.10.1.min.js"></script>
+    <script src="../static/js/bootstrap.min.js"></script>
+    <script src="../static/js/bootstrap-switch.min.js"></script>
     <link rel="stylesheet" href="../static/css/bootstrap.min.css"  type="text/css"/>
+    <link rel="stylesheet" href="../static/css/bootstrap-switch.min.css"  type="text/css"/>
     <link rel="stylesheet" href="../static/css/dashboard.css"  type="text/css"/>
 </head>
 
 <body>
-<div class="container">
+<div class="container containter-fluid">
     <div class="jumbotron">
         <table class="table">
         <tbody>
@@ -25,24 +28,37 @@
         </tr>
         </tbody>
         </table>
-    </div>
+    </div class="row-fluid">
             {% if stage.id and is_installed %}
             <h4 class="text-center nowrap">Stage Is Installed.</h4>
             <h5 class="text-center nowrap">Note: Stage must first be uninstalled before it can be deleted</h5>
             {% endif %}
-            <form method="post" name="stage_form" {% if stage.id %} action="{% url 'submit_edit_stage' %}"{% else %} action="{% url 'submit_create_stage' %}" {% endif %}>
+            <form method="post" class="form-horizontal" name="stage_form" {% if stage.id %} action="{% url 'submit_edit_stage' %}"{% else %} action="{% url 'submit_create_stage' %}" {% endif %}>
             {% csrf_token %}
                 <input type='hidden' name='id' value="{{ stage.id }}">
                 <table class="table">
                 <tr align="left">
                     <td><label>Stage Name</label></td>
-                    <td><input class="form-control"  type="text" name="name" value="{{ stage.name }}"/></td>
+                    <td><input class="form-control" type="text" name="name" value="{{ stage.name }}"></td>
                 </tr>
                 {% for t, s in tracks %}
                 <tr align="left">
                     <td><label>URL for Track "{{t.name}}" </label></td>
-                    <td><input class="form-control"  type="text" id="url_{{t.id}}" name="stageurl_{{t.id}}" value="{{ s.url }}"/></td>
-                    <td><a id="preview_{{t.id}}" onclick="preview({{t.id}}); return False;" target="_blank" href="" class="btn btn-xs btn-success"/>Preview URL</a></td>
+                    <td><input class="form-control" type="text" id="url_{{t.id}}" name="stageurl_{{t.id}}" value="{{ s.url }}"/></td>
+                    <td><a id="preview_{{t.id}}" onclick="preview({{t.id}}); return False;" target="_blank" href="" class="btn btn-sm btn-success "/>Preview URL</a></td>
+                    <td>
+                        <div class="btn-group btn-toggle " style="white-space:nowrap" data-toggle="buttons">
+                            <label class="btn btn-xs btn-primary active"
+                                <input type="radio" name="deploy_option" value="non_canvas_url"> Non-Canvas Page
+                            </label>
+                            <label class="btn btn-xs btn-primary">
+                                <input type="radio" name="deploy_option" value="canvas_url"> Canvas Page
+                            </label>
+                        </div>
+                    </td>
+                    <td>
+                          <input type="checkbox" class="form-control" name="in_new_tab" >Open In New Tab
+                    </td>
                 </tr>
                 {% endfor %}
                 <tr align="left">
@@ -58,6 +74,7 @@
            </form>
 </div>
 <script>
+
 function preview(t_id) {
     url = document.getElementById('url_' + t_id).value;
     if (url.substring(0, 7) != "http://" && url.substring(0, 8) != "https://") {
@@ -65,6 +82,7 @@ function preview(t_id) {
     }
     document.getElementById('preview_' + t_id).href = url;
 }
+
 </script>
 </body>
 </html>
