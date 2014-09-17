@@ -32,11 +32,14 @@ class Stage(CustomModel):
     course_id = models.CharField(max_length=128, db_index=True)
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
+    tracks = models.ManyToManyField(Track, through='StageUrl')
     
     def is_missing_urls(self):
-        for track in Track.objects.filter(course_id=self.course_id):
-            stageurl = StageUrl.get_or_none(stage=self, track=track)
-            if not stageurl or not stageurl.url:
+        if (Track.objects.filter(course_id=self.course_id).count()
+            != self.tracks.count()):
+            return True
+        for stage_url in StageUrl.objects.filter(stage=self):
+            if not stage_url.url:
                 return True
         return False
 
