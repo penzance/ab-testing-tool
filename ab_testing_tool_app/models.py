@@ -48,6 +48,8 @@ class StageUrl(CustomModel):
     url = models.URLField(max_length=2048)
     track = models.ForeignKey(Track)
     stage = models.ForeignKey(Stage)
+    open_as_tab = models.BooleanField(default=False)
+    is_canvas_page = models.BooleanField(default=False)
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
     

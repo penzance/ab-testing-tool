@@ -3,12 +3,13 @@ from django.core.urlresolvers import reverse
 from django_auth_lti.decorators import lti_role_required
 from random import choice
 
-from ab_testing_tool_app.constants import ADMINS, STAGE_URL_TAG
+from ab_testing_tool_app.constants import ADMINS, STAGE_URL_TAG,\
+    DEPLOY_OPTION_TAG, AS_TAB_TAG
 from ab_testing_tool_app.models import (Stage, Track, StageUrl, CourseSetting,
     Student)
 from ab_testing_tool_app.canvas import get_lti_param
 from ab_testing_tool_app.controllers import (stage_is_installed, format_url,
-    post_param)
+    post_param, opt_post_param)
 from ab_testing_tool_app.exceptions import (MISSING_STAGE, UNAUTHORIZED_ACCESS,
     DELETING_INSTALLED_STAGE, COURSE_TRACKS_NOT_FINALIZED,
     NO_URL_FOR_TRACK, NO_TRACKS_FOR_COURSE)
@@ -54,6 +55,10 @@ def deploy_stage(request, stage_id):
     # Return an error page if there is no url configured.
     chosen_stageurl = StageUrl.get_or_none(stage__pk=stage_id, track=student.track)
     if chosen_stageurl and chosen_stageurl.url:
+        if chosen_stageurl.open_as_tab:
+            return render_to_response("new_tab_redirect.html", {"url": chosen_stageurl.url})
+        if chosen_stageurl.is_canvas_page:
+            return render_to_response("window_redirect.html", {"url": chosen_stageurl.url})
         return redirect(chosen_stageurl.url)
     raise NO_URL_FOR_TRACK
 
@@ -82,7 +87,12 @@ def submit_create_stage(request):
     stageurls = [(k,v) for (k,v) in request.POST.iteritems() if STAGE_URL_TAG in k and v]
     for (k,v) in stageurls:
         _,track_id = k.split(STAGE_URL_TAG)
-        StageUrl.objects.create(url=format_url(v), stage_id=t.id, track_id=track_id)
+        is_canvas = post_param(request, DEPLOY_OPTION_TAG + track_id)
+        as_tab = opt_post_param(request, AS_TAB_TAG + track_id)
+        is_canvas_page = True if (is_canvas == "canvas_url") else False
+        open_as_tab = True if (as_tab and as_tab == "on") else False
+        StageUrl.objects.create(url=format_url(v), stage_id=t.id, track_id=track_id,
+                                is_canvas_page=is_canvas_page, open_as_tab=open_as_tab)
     return redirect("/#tabs-2")
 
 
@@ -134,10 +144,15 @@ def submit_edit_stage(request):
         # This is a search for the joint unique index of StageUrl, so it
         # should not ever return multiple objects
         stage_url = StageUrl.get_or_none(stage__pk=stage_id, track__pk=track_id)
+        is_canvas = post_param(request, DEPLOY_OPTION_TAG + track_id)
+        as_tab = opt_post_param(request, AS_TAB_TAG + track_id)
+        is_canvas_page = True if (is_canvas == "canvas_url") else False
+        open_as_tab = True if (as_tab and as_tab == "on") else False
         if stage_url:
-            stage_url.update(url=format_url(v))
+            stage_url.update(url=format_url(v), is_canvas_page=is_canvas_page, open_as_tab=open_as_tab)
         else:
-            StageUrl.objects.create(url=v, stage_id=stage_id, track_id=track_id)
+            StageUrl.objects.create(url=format_url(v), stage_id=stage_id, track_id=track_id,
+                                    is_canvas_page=is_canvas_page, open_as_tab=open_as_tab)
     return redirect("/#tabs-2")
 
 

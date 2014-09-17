@@ -5,9 +5,7 @@
     <title>A/B Testing Tool</title>
     <script src="../static/js/jquery-1.10.1.min.js"></script>
     <script src="../static/js/bootstrap.min.js"></script>
-    <script src="../static/js/bootstrap-switch.min.js"></script>
     <link rel="stylesheet" href="../static/css/bootstrap.min.css"  type="text/css"/>
-    <link rel="stylesheet" href="../static/css/bootstrap-switch.min.css"  type="text/css"/>
     <link rel="stylesheet" href="../static/css/dashboard.css"  type="text/css"/>
 </head>
 
@@ -43,27 +41,22 @@
                 </tr>
                 {% for t, s in tracks %}
                 <tr align="left">
-                    <td><label>URL for Track "{{t.name}}" </label></td>
-                    <td><input class="form-control" type="text" id="url_{{t.id}}" name="stageurl_{{t.id}}" value="{{ s.url }}"/></td>
-                    <td><a id="preview_{{t.id}}" onclick="preview({{t.id}}); return False;" target="_blank" href="" class="btn btn-sm btn-success "/>Preview URL</a></td>
-                    <td>
-                        <div class="btn-group btn-toggle " style="white-space:nowrap" data-toggle="buttons">
-                            <label class="btn btn-xs btn-primary active"
-                                <input type="radio" name="deploy_option" value="non_canvas_url"> Non-Canvas Page
-                            </label>
-                            <label class="btn btn-xs btn-primary">
-                                <input type="radio" name="deploy_option" value="canvas_url"> Canvas Page
-                            </label>
-                        </div>
+                    <td class="col-xs-3"><label>URL for Track "{{t.name}}" </label></td>
+                    <td class="col-xs-4">
+                        <input class="form-control" type="text" id="url_{{t.id}}" name="stageurl_{{t.id}}" value="{{ s.url }}">
                     </td>
-                    <td>
-                          <input type="checkbox" class="form-control" name="in_new_tab" >Open In New Tab
+                    <td class="col-xs-3">
+                        <input type="radio" name="is_canvas_page_for_track_{{t.id}}" value="non_canvas_url" {% if not s.is_canvas_page %} checked {% endif %}> Non-Canvas Page
+                        <br>
+                        <input type="radio" name="is_canvas_page_for_track_{{t.id}}" value="canvas_url" {% if s.is_canvas_page %} checked {% endif %}> Canvas Page
                     </td>
+                    <td class="col-xs-2"><input type="checkbox"  name="open_as_tab_for_track_{{t.id}}" {% if s.open_as_tab == True %} checked {% endif %} > Open In New Tab</td>
+                    <td><a id="preview_{{t.id}}" onclick="preview({{t.id}}); return False;" target="_blank" href="" class="btn btn-sm btn-success ">Preview URL</a></td>
                 </tr>
                 {% endfor %}
                 <tr align="left">
                     <td><label>Stage Notes</label></td>
-                    <td><textarea name="notes" rows="6" cols="80" >{{ stage.notes }}</textarea></td>
+                    <td><textarea name="notes" rows="3" cols="80" >{{ stage.notes }}</textarea></td>
                 </tr>
                 <tr>
                 <td></td>
