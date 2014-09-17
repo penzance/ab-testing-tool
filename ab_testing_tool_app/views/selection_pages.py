@@ -1,5 +1,4 @@
 from django.shortcuts import render_to_response, redirect
-from django.http.response import HttpResponse
 from django.utils.http import urlencode
 from django_auth_lti.decorators import lti_role_required
 
@@ -8,20 +7,18 @@ from ab_testing_tool_app.controllers import (get_uninstalled_stages, stage_url,
     post_param)
 from ab_testing_tool_app.constants import STAGE_URL_TAG, ADMINS
 from ab_testing_tool_app.canvas import get_lti_param
-from ab_testing_tool_app.decorators import page
 from ab_testing_tool_app.exceptions import (MISSING_RETURN_TYPES_PARAM,
     MISSING_RETURN_URL, MISSING_STAGE)
 
 
 @lti_role_required(ADMINS)
-@page
 def resource_selection(request):
     """ docs: https://canvas.instructure.com/doc/api/file.link_selection_tools.html """
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    ext_content_return_types = request.GET.getlist('ext_content_return_types')
+    ext_content_return_types = request.POST.getlist('ext_content_return_types')
     if ext_content_return_types != ['lti_launch_url']:
         raise MISSING_RETURN_TYPES_PARAM
-    content_return_url = request.GET.get('ext_content_return_url')
+    content_return_url = request.POST.get('ext_content_return_url')
     if not content_return_url:
         raise MISSING_RETURN_URL
     context = {"content_return_url": content_return_url,
@@ -32,7 +29,6 @@ def resource_selection(request):
 
 
 @lti_role_required(ADMINS)
-@page
 def submit_selection(request):
     stage_id = post_param(request, "stage_id")
     stage = Stage.get_or_none(pk=stage_id)
@@ -49,7 +45,6 @@ def submit_selection(request):
 
 
 @lti_role_required(ADMINS)
-@page
 def submit_selection_new_stage(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     name = post_param(request, "name")
