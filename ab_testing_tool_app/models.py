@@ -55,10 +55,10 @@ class StageUrl(CustomModel):
         unique_together = (('track', 'stage'),)
 
 
-class Student(CustomModel):
-    """ This model stores which track a student is in for each course.
-        A real-world can be represented by multiple Student objects,
-        and will have a seperate object for each course they are in. """
+class CourseStudent(CustomModel):
+    """ This model stores which track a student is in for a given course.
+        A real-world can be represented by multiple CourseStudent objects,
+        and will have a separate object for each course they are in. """
     course_id = models.CharField(max_length=128, db_index=True)
     student_id = models.CharField(max_length=128, db_index=True)
     track = models.ForeignKey(Track)
@@ -69,7 +69,7 @@ class Student(CustomModel):
         unique_together = (('course_id', 'student_id'),)
 
 
-class CourseSetting(CustomModel):
+class CourseSettings(CustomModel):
     """
     This model stores various settings about each course.  In order to ensure
     that this model exists whenever it is needed (since courses exist
@@ -88,13 +88,13 @@ class CourseSetting(CustomModel):
     
     @classmethod
     def get_is_finalized(cls, course_id):
-        course_setting, _ = CourseSetting.objects.get_or_create(course_id=course_id)
-        return course_setting.tracks_finalized
+        course_settings, _ = cls.objects.get_or_create(course_id=course_id)
+        return course_settings.tracks_finalized
     
     @classmethod
     def set_finalized(cls, course_id):
-        course_setting, _ = CourseSetting.objects.get_or_create(
+        course_settings, _ = cls.objects.get_or_create(
                 course_id=course_id, defaults={"tracks_finalized": True})
-        if not course_setting.tracks_finalized:
-            course_setting.tracks_finalized = True
-            course_setting.save()
+        if not course_settings.tracks_finalized:
+            course_settings.tracks_finalized = True
+            course_settings.save()

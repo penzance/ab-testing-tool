@@ -2,7 +2,7 @@ from django.shortcuts import render_to_response, redirect
 from django_auth_lti.decorators import lti_role_required
 
 from ab_testing_tool_app.constants import ADMINS
-from ab_testing_tool_app.models import Track, CourseSetting, Stage
+from ab_testing_tool_app.models import Track, CourseSettings, Stage
 from ab_testing_tool_app.canvas import get_lti_param
 from ab_testing_tool_app.exceptions import (MISSING_TRACK, UNAUTHORIZED_ACCESS,
     COURSE_TRACKS_ALREADY_FINALIZED, NO_TRACKS_FOR_COURSE)
@@ -13,7 +13,7 @@ from ab_testing_tool_app.controllers import post_param
 @lti_role_required(ADMINS)
 def create_track(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    if CourseSetting.get_is_finalized(course_id):
+    if CourseSettings.get_is_finalized(course_id):
         raise COURSE_TRACKS_ALREADY_FINALIZED
     return render_to_response("edit_track.html")
 
@@ -26,7 +26,7 @@ def edit_track(request, track_id):
         raise MISSING_TRACK
     if course_id != t.course_id:
         raise UNAUTHORIZED_ACCESS
-    is_finalized = CourseSetting.get_is_finalized(course_id)
+    is_finalized = CourseSettings.get_is_finalized(course_id)
     context = {"track": t,
                "is_finalized": is_finalized}
     return render_to_response("edit_track.html", context)
@@ -35,7 +35,7 @@ def edit_track(request, track_id):
 @lti_role_required(ADMINS)
 def submit_create_track(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    if CourseSetting.get_is_finalized(course_id):
+    if CourseSettings.get_is_finalized(course_id):
         raise COURSE_TRACKS_ALREADY_FINALIZED
     name = post_param(request, "name")
     notes = post_param(request, "notes")
@@ -65,7 +65,7 @@ def delete_track(request, track_id):
           stages in that course as a result of cascading delete.
     """
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    if CourseSetting.get_is_finalized(course_id):
+    if CourseSettings.get_is_finalized(course_id):
         raise COURSE_TRACKS_ALREADY_FINALIZED
     track = Track.get_or_none(pk=track_id)
     if not track:
@@ -87,5 +87,5 @@ def finalize_tracks(request):
     if missing_urls:
         #TODO: replace with better error display
         return HttpResponse("URLs missing for these tracks in these Stages: %s" % missing_urls)
-    CourseSetting.set_finalized(course_id)
+    CourseSettings.set_finalized(course_id)
     return redirect("/")

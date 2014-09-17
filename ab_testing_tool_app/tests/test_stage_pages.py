@@ -2,8 +2,8 @@ from django.core.urlresolvers import reverse
 from mock import patch
 
 from ab_testing_tool_app.constants import STAGE_URL_TAG
-from ab_testing_tool_app.models import (Stage, StageUrl, Track, Student,
-    CourseSetting)
+from ab_testing_tool_app.models import (Stage, StageUrl, Track, CourseStudent,
+    CourseSettings)
 from ab_testing_tool_app.tests.common import (SessionTestCase, TEST_COURSE_ID,
     TEST_OTHER_COURSE_ID, NONEXISTENT_STAGE_ID, APIReturn, LIST_MODULES,
     TEST_STUDENT_ID)
@@ -31,7 +31,7 @@ class TestStagePages(SessionTestCase):
     def test_deploy_stage_no_tracks_error(self):
         """ Tests deploy stage for student creates errors with no tracks """
         self.set_roles([])
-        CourseSetting.set_finalized(TEST_COURSE_ID)
+        CourseSettings.set_finalized(TEST_COURSE_ID)
         stage = Stage.objects.create(name="stage1")
         response = self.client.get(reverse("deploy_stage", args=(stage.id,)))
         self.assertError(response, NO_TRACKS_FOR_COURSE)
@@ -40,16 +40,16 @@ class TestStagePages(SessionTestCase):
         """ Tests deploy stage for student creates student object and assigns
             track to that student object """
         self.set_roles([])
-        CourseSetting.set_finalized(TEST_COURSE_ID)
+        CourseSettings.set_finalized(TEST_COURSE_ID)
         stage = Stage.objects.create(name="stage1")
         track = Track.objects.create(name="track1", course_id=TEST_COURSE_ID)
-        student = Student.get_or_none(course_id=TEST_COURSE_ID,
+        student = CourseStudent.get_or_none(course_id=TEST_COURSE_ID,
                                       student_id=TEST_STUDENT_ID)
         self.assertEqual(student, None)
         StageUrl.objects.create(stage=stage, track=track,
                                 url="http://www.example.com")
         self.client.get(reverse("deploy_stage", args=(stage.id,)))
-        student = Student.get_or_none(course_id=TEST_COURSE_ID,
+        student = CourseStudent.get_or_none(course_id=TEST_COURSE_ID,
                                       student_id=TEST_STUDENT_ID)
         self.assertNotEqual(None, student)
         self.assertEqual(student.track.name, "track1")
@@ -57,12 +57,12 @@ class TestStagePages(SessionTestCase):
     def test_deploy_stage_student_redirect(self):
         """ Tests deploy stage for student redirects to the correct url """
         self.set_roles([])
-        CourseSetting.set_finalized(TEST_COURSE_ID)
+        CourseSettings.set_finalized(TEST_COURSE_ID)
         stage = Stage.objects.create(name="stage1")
         track = Track.objects.create(name="track1", course_id=TEST_COURSE_ID)
         stage2 = Stage.objects.create(name="stage2")
         track2 = Track.objects.create(name="track2", course_id=TEST_COURSE_ID)
-        Student.objects.create(course_id=TEST_COURSE_ID,
+        CourseStudent.objects.create(course_id=TEST_COURSE_ID,
                                student_id=TEST_STUDENT_ID, track=track)
         StageUrl.objects.create(stage=stage, track=track,
                                 url="http://www.example.com")
@@ -77,10 +77,10 @@ class TestStagePages(SessionTestCase):
     def test_deploy_stage_no_url(self):
         """ Tests depoloy stage for student with no url errors """
         self.set_roles([])
-        CourseSetting.set_finalized(TEST_COURSE_ID)
+        CourseSettings.set_finalized(TEST_COURSE_ID)
         stage = Stage.objects.create(name="stage1")
         track = Track.objects.create(name="track1", course_id=TEST_COURSE_ID)
-        Student.objects.create(course_id=TEST_COURSE_ID,
+        CourseStudent.objects.create(course_id=TEST_COURSE_ID,
                                student_id=TEST_STUDENT_ID, track=track)
         StageUrl.objects.create(stage=stage, track=track, url="")
         response = self.client.get(reverse("deploy_stage", args=(stage.id,)))
