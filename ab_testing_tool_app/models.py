@@ -42,7 +42,7 @@ class Stage(CustomModel):
 
 class StageUrl(CustomModel):
     """ This model stores the URL of a single intervention """
-    url = models.CharField(max_length=2048)
+    url = models.URLField(max_length=2048)
     track = models.ForeignKey(Track)
     stage = models.ForeignKey(Stage)
     created_on = models.DateTimeField(auto_now_add=True)
