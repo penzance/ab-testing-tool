@@ -1,6 +1,9 @@
 from django.db import models
 
 class CustomModel(models.Model):
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
+    
     class Meta:
         abstract = True
     
@@ -9,7 +12,7 @@ class CustomModel(models.Model):
         for k, v in kwargs.iteritems():
             setattr(self, k, v)
         self.save()
-
+    
     @classmethod
     def get_or_none(cls, **kwargs):
         try:
@@ -21,8 +24,6 @@ class Track(CustomModel):
     name = models.CharField(max_length=256)
     notes = models.CharField(max_length=1024)
     course_id = models.CharField(max_length=128, db_index=True)
-    created_on = models.DateTimeField(auto_now_add=True)
-    updated_on = models.DateTimeField(auto_now=True)
 
 
 class Stage(CustomModel):
@@ -30,8 +31,6 @@ class Stage(CustomModel):
     name = models.CharField(max_length=256)
     notes = models.CharField(max_length=1024)
     course_id = models.CharField(max_length=128, db_index=True)
-    created_on = models.DateTimeField(auto_now_add=True)
-    updated_on = models.DateTimeField(auto_now=True)
     tracks = models.ManyToManyField(Track, through='StageUrl')
     
     def is_missing_urls(self):
@@ -48,8 +47,6 @@ class StageUrl(CustomModel):
     url = models.URLField(max_length=2048)
     track = models.ForeignKey(Track)
     stage = models.ForeignKey(Stage)
-    created_on = models.DateTimeField(auto_now_add=True)
-    updated_on = models.DateTimeField(auto_now=True)
     
     class Meta:
         unique_together = (('track', 'stage'),)
@@ -62,8 +59,6 @@ class Student(CustomModel):
     course_id = models.CharField(max_length=128, db_index=True)
     student_id = models.CharField(max_length=128, db_index=True)
     track = models.ForeignKey(Track)
-    created_on = models.DateTimeField(auto_now_add=True)
-    updated_on = models.DateTimeField(auto_now=True)
     
     class Meta:
         unique_together = (('course_id', 'student_id'),)
@@ -83,8 +78,6 @@ class CourseSetting(CustomModel):
     """
     course_id = models.CharField(max_length=128, db_index=True, unique=True)
     tracks_finalized = models.BooleanField(default=False)
-    created_on = models.DateTimeField(auto_now_add=True)
-    updated_on = models.DateTimeField(auto_now=True)
     
     @classmethod
     def get_is_finalized(cls, course_id):
