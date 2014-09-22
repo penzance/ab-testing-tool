@@ -1,9 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
+<head>
+<link rel="stylesheet" href="../static/css/bootstrap.min.css"  type="text/css"/>
+</head>
+<body>
 <script>
-if (window.top.location != "{{ url }}") {
-    window.location.replace("{{ url }}");
-};
-
+try {
+    if (window.top.location != "{{ url }}") {
+        window.location.replace("{{ url }}");
+    }
+} catch (err) {
+    console.log(err);
+}
 </script>
+
+<a id="fallback-button" target="_blank" href="{{url}}"
+    class="btn btn-lg btn-success text-center">Open URL in New Tab</a>
+</body>
 </html>
