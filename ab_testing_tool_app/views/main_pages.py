@@ -11,8 +11,8 @@ from ims_lti_py.tool_config import ToolConfig
 from ab_testing_tool_app.canvas import get_lti_param
 from ab_testing_tool_app.controllers import (get_uninstalled_stages,
     get_modules_with_items)
-from ab_testing_tool_app.models import (Stage, Track, Student,
-    CourseSetting)
+from ab_testing_tool_app.models import (Stage, Track, CourseStudent,
+    CourseSettings)
 from ab_testing_tool_app.constants import ADMINS
 
 
@@ -27,7 +27,7 @@ def render_stage_control_panel(request):
     uninstalled_stages = get_uninstalled_stages(request)
     stages = Stage.objects.filter(course_id=course_id)
     tracks = Track.objects.filter(course_id=course_id)
-    is_finalized = CourseSetting.get_is_finalized(course_id=course_id)
+    is_finalized = CourseSettings.get_is_finalized(course_id=course_id)
     context = {
         "modules": modules,
         "stages": stages,
@@ -82,7 +82,7 @@ def download_data(request):
     headers = ["Student_ID", "Assigned_Track", "Timestamp_Last_Updated"]
     writer.writerow(headers)
     # Write data to CSV file
-    for s in Student.objects.filter(course_id=course_id):
+    for s in CourseStudent.objects.filter(course_id=course_id):
         row = [s.student_id, s.track.name, s.updated_on]
         writer.writerow(row)
     return response

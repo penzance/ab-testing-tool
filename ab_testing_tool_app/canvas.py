@@ -1,5 +1,5 @@
 import json
-import canvas_sdk.methods.modules
+from canvas_sdk.methods import modules
 from canvas_sdk import RequestContext
 
 #TODO: change from secure.py setting to oauth handoff
@@ -15,15 +15,15 @@ Canvas API related methods are located in this module
 
 def list_module_items(request_context, course_id, module_id):
     try:
-        return canvas_sdk.methods.modules.list_module_items(
-                    request_context, course_id, module_id, "content_details").json()
+        return modules.list_module_items(request_context, course_id, module_id,
+                                         "content_details").json()
     except RequestException:
         raise NO_SDK_RESPONSE
 
 def list_modules(request_context, course_id):
     try:
-        return canvas_sdk.methods.modules.list_modules(request_context,
-                    course_id, "content_details").json()
+        return modules.list_modules(request_context, course_id,
+                                    "content_details").json()
     except RequestException:
         raise NO_SDK_RESPONSE
 
