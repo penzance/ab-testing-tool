@@ -4,8 +4,8 @@ from django_auth_lti.decorators import lti_role_required
 from random import choice
 
 from ab_testing_tool_app.constants import ADMINS, STAGE_URL_TAG
-from ab_testing_tool_app.models import (Stage, Track, StageUrl, CourseSetting,
-    Student)
+from ab_testing_tool_app.models import (Stage, Track, StageUrl, CourseSettings,
+    CourseStudent)
 from ab_testing_tool_app.canvas import get_lti_param
 from ab_testing_tool_app.controllers import (stage_is_installed, format_url,
     post_param)
@@ -32,13 +32,13 @@ def deploy_stage(request, stage_id):
     
     # Otherwise, user is a student.  Tracks for the course must be finalized
     # for a student to be able to access content from the ab_testing_tool
-    if not CourseSetting.get_is_finalized(course_id):
+    if not CourseSettings.get_is_finalized(course_id):
         raise COURSE_TRACKS_NOT_FINALIZED
     
     student_id = get_lti_param(request, "custom_canvas_user_login_id")
     
     # Create an object to track the student for this course if we haven't yet
-    student = Student.get_or_none(student_id=student_id, course_id=course_id)
+    student = CourseStudent.get_or_none(student_id=student_id, course_id=course_id)
     # If this is a new student or the student doesn't yet have a track,
     # assign the student to a track
     # TODO: expand this code to allow multiple randomization procedures
@@ -47,7 +47,7 @@ def deploy_stage(request, stage_id):
         if not tracks:
             raise NO_TRACKS_FOR_COURSE
         chosen_track = choice(tracks)
-        student = Student.objects.create(student_id=student_id,
+        student = CourseStudent.objects.create(student_id=student_id,
                                          course_id=course_id, track=chosen_track)
     
     # Retrieve the url for the student's track at the current intervention point
