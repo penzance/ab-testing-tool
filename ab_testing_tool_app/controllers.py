@@ -83,8 +83,3 @@ def post_param(request, param_name):
     if param_name in request.POST:
         return request.POST[param_name]
     raise missing_param_error(param_name)
-
-def opt_post_param(request, param_name):
-    if param_name in request.POST:
-        return request.POST[param_name]
-    return None

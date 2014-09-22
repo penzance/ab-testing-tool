@@ -46,11 +46,11 @@
                         <input class="form-control" type="text" id="url_{{t.id}}" name="stageurl_{{t.id}}" value="{{ s.url }}">
                     </td>
                     <td class="col-xs-3">
-                        <input type="radio" name="is_canvas_page_for_track_{{t.id}}" value="non_canvas_url" {% if not s.is_canvas_page %} checked {% endif %}> Non-Canvas Page
+                        <input type="radio" name="is_canvas_page_for_track_{{t.id}}" value="non_canvas_url" {% if not s.is_canvas_page %} checked="checked" {% endif %}> Non-Canvas Page
                         <br>
-                        <input type="radio" name="is_canvas_page_for_track_{{t.id}}" value="canvas_url" {% if s.is_canvas_page %} checked {% endif %}> Canvas Page
+                        <input type="radio" name="is_canvas_page_for_track_{{t.id}}" value="canvas_url" {% if s.is_canvas_page %} checked="checked" {% endif %}> Canvas Page
                     </td>
-                    <td class="col-xs-2"><input type="checkbox"  name="open_as_tab_for_track_{{t.id}}" {% if s.open_as_tab == True %} checked {% endif %} > Open In New Tab</td>
+                    <td class="col-xs-2"><input type="checkbox"  name="open_as_tab_for_track_{{t.id}}" value="true" {% if s.open_as_tab == True %} checked="checked" {% endif %} > Open In New Tab</td>
                     <td><a id="preview_{{t.id}}" onclick="preview({{t.id}}); return False;" target="_blank" href="" class="btn btn-sm btn-success ">Preview URL</a></td>
                 </tr>
                 {% endfor %}

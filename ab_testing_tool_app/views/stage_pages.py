@@ -9,7 +9,7 @@ from ab_testing_tool_app.models import (Stage, Track, StageUrl, CourseSettings,
     CourseStudent)
 from ab_testing_tool_app.canvas import get_lti_param
 from ab_testing_tool_app.controllers import (stage_is_installed, format_url,
-    post_param, opt_post_param)
+    post_param)
 from ab_testing_tool_app.exceptions import (MISSING_STAGE, UNAUTHORIZED_ACCESS,
     DELETING_INSTALLED_STAGE, COURSE_TRACKS_NOT_FINALIZED,
     NO_URL_FOR_TRACK, NO_TRACKS_FOR_COURSE)
@@ -88,9 +88,9 @@ def submit_create_stage(request):
     for (k,v) in stageurls:
         _,track_id = k.split(STAGE_URL_TAG)
         is_canvas = post_param(request, DEPLOY_OPTION_TAG + track_id)
-        as_tab = opt_post_param(request, AS_TAB_TAG + track_id)
-        is_canvas_page = True if (is_canvas == "canvas_url") else False
-        open_as_tab = True if (as_tab and as_tab == "on") else False
+        as_tab = request.POST.get(AS_TAB_TAG + track_id, None)
+        is_canvas_page = bool(is_canvas == "canvas_url")
+        open_as_tab = bool(as_tab == "true")
         StageUrl.objects.create(url=format_url(v), stage_id=t.id, track_id=track_id,
                                 is_canvas_page=is_canvas_page, open_as_tab=open_as_tab)
     return redirect("/#tabs-2")
@@ -145,9 +145,9 @@ def submit_edit_stage(request):
         # should not ever return multiple objects
         stage_url = StageUrl.get_or_none(stage__pk=stage_id, track__pk=track_id)
         is_canvas = post_param(request, DEPLOY_OPTION_TAG + track_id)
-        as_tab = opt_post_param(request, AS_TAB_TAG + track_id)
-        is_canvas_page = True if (is_canvas == "canvas_url") else False
-        open_as_tab = True if (as_tab and as_tab == "on") else False
+        as_tab = request.POST.get(AS_TAB_TAG + track_id, None)
+        is_canvas_page = bool(is_canvas == "canvas_url")
+        open_as_tab = bool(as_tab == "true")
         if stage_url:
             stage_url.update(url=format_url(v), is_canvas_page=is_canvas_page, open_as_tab=open_as_tab)
         else:
