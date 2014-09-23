@@ -1,7 +1,7 @@
 from django.core.urlresolvers import reverse
 from mock import patch
 
-from ab_testing_tool_app.constants import STAGE_URL_TAG
+from ab_testing_tool_app.constants import STAGE_URL_TAG, DEPLOY_OPTION_TAG
 from ab_testing_tool_app.models import (Stage, StageUrl, Track, CourseStudent,
     CourseSettings)
 from ab_testing_tool_app.tests.common import (SessionTestCase, TEST_COURSE_ID,
@@ -147,6 +147,8 @@ class TestStagePages(SessionTestCase):
         data = {"name": stage_name,
                 STAGE_URL_TAG + str(track1.id): "http://example.com/page",
                 STAGE_URL_TAG + str(track2.id): "http://example.com/otherpage",
+                DEPLOY_OPTION_TAG + str(track1.id): "non_canvas_url",
+                DEPLOY_OPTION_TAG + str(track2.id): "non_canvas_url",
                 "notes": "hi"}
         response = self.client.post(reverse("submit_create_stage"), data,
                                     follow=True)
@@ -216,6 +218,8 @@ class TestStagePages(SessionTestCase):
         data = {"name": "new_name",
                 STAGE_URL_TAG + str(track.id): "http://example.com/new_page",
                 STAGE_URL_TAG + str(track2.id): "http://example.com/second_page",
+                DEPLOY_OPTION_TAG + str(track.id): "non_canvas_url",
+                DEPLOY_OPTION_TAG + str(track2.id): "non_canvas_url",
                 "notes": "hi",
                 "id": stage_id}
         response = self.client.post(reverse("submit_edit_stage"), data,
