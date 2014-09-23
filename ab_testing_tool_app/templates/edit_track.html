@@ -18,9 +18,9 @@
 
         <td><p>Created: {{track.created_on}} | Last updated: {{track.updated_on}} </p></td>
         {% if track.id and not is_finalized%}
-        <td class="text-right nowrap"><a href="{% url 'delete_track' track.id %}" class="btn btn-lg btn-danger" id="delete">Delete Track</a></td>
+        <td class="text-right nowrap"><a id="delete_track_button" href="{% url 'delete_track' track.id %}" class="btn btn-lg btn-danger">Delete Track</a></td>
         {% elif track.id and is_finalized %}
-        <td class="text-right nowrap"><a class="btn btn-lg btn-danger disabled" id="delete">Delete Track</a></td>
+        <td class="text-right nowrap"><a id="delete_track_button_disabled" class="btn btn-lg btn-danger disabled">Delete Track</a></td>
         {% endif %}
         </tr>
         </tbody>
@@ -43,8 +43,8 @@
                 </tr>
                 <tr>
                 <td></td>
-                <td><input type="submit" name="submit" value="Submit Changes" class="btn btn-lg btn-success submit">
-                <a href="{% url 'index' %}" class="btn btn-lg btn-primary">Cancel</a></td>
+                <td><input id="submit_edit_track_button" type="submit" name="submit" value="Submit Changes" class="btn btn-lg btn-success submit">
+                <a id="cancel_submit_edit_track_button" href="{% url 'index' %}" class="btn btn-lg btn-primary">Cancel</a></td>
                 </tr>
                 </table>
 

@@ -47,10 +47,14 @@ def get_installed_stages(request):
         installed_stage_urls.extend(stage_urls)
     return installed_stage_urls
 
-
 def stage_is_installed(request, stage):
     return stage_url(request, stage.id) in get_installed_stages(request)
 
+def get_incomplete_stages(stage_list):
+    """ Takes paramter stage_list instead of parameter course_id to avoid
+        second database call to the Stage table in methods that needs to
+        already fetch the Stage table"""
+    return [stage.name for stage in stage_list if stage.is_missing_urls()]
 
 def all_stage_urls(request, course_id):
     """ Returns the deploy urls of all stages in the database for that course"""
