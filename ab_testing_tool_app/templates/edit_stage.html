@@ -39,9 +39,10 @@
                     <td><input class="form-control"  type="text" name="name" value="{{ stage.name }}"/></td>
                 </tr>
                 {% for t, s in tracks %}
-                <tr align="left">
+                <tr align="left" class="url_box">
                     <td><label>URL for Track "{{t.name}}" </label></td>
-                    <td><input class="form-control"  type="text" name="stageurl_{{t.id}}" value="{{ s.url }}"/></td>
+                    <td><input id="url_{{t.id}}" class="form-control url_box_input"  type="url"  name="stageurl_{{t.id}}" value="{{ s.url }}"/></td>
+                    <td><a id="preview_{{t.id}}" target="_blank" href="" class="btn btn-xs btn-success preview-btn"/>Preview URL</a></td>
                 </tr>
                 {% endfor %}
                 <tr align="left">
@@ -57,6 +58,19 @@
 
            </form>
 </div>
+<script>
+
+function set_preview_href() {
+    url = $(this).closest('.url_box').find(".url_box_input")[0].value; // fetches value from input
+    if (url.substring(0, 7) != "http://" && url.substring(0, 8) != "https://") {
+        url = "http://" + url;
+    }
+    this.href = url;
+}
+
+$(".preview-btn").click(set_preview_href);
+
+</script>
 </body>
 </html>
 
