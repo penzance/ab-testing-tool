@@ -3,6 +3,10 @@ from .base import *
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# This is for https forwarding on server
+# SECURITY WARNING: https://docs.djangoproject.com/en/1.7/ref/settings/#secure-proxy-ssl-header
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = []
@@ -30,20 +34,25 @@ LOGGING = {
             'propagate': True,
             'level':'DEBUG',
         },
-        'ab_testing_tool': {
-            'handlers':['console'],
+        'django_auth_lti': {
+            'handlers': ['console'],
             'propagate': True,
-            'level':'DEBUG',
+            'level': 'DEBUG'
+        },
+        'ab_testing_tool': {
+            'handlers': ['console'],
+            'propagate': True,
+            'level': 'DEBUG',
         },
         'ab_testing_tool_app': {
-            'handlers':['console'],
+            'handlers': ['console'],
             'propagate': True,
-            'level':'DEBUG',
+            'level': 'DEBUG',
         },
         'error_middleware': {
-            'handlers':['console'],
+            'handlers': ['console'],
             'propagate': True,
-            'level':'DEBUG',
+            'level': 'DEBUG',
         }
     },
 }
