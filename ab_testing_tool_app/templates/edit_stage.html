@@ -30,9 +30,8 @@
             <h4 class="text-center nowrap">Stage Is Installed.</h4>
             <h5 class="text-center nowrap">Note: Stage must first be uninstalled before it can be deleted</h5>
             {% endif %}
-            <form method="post" name="stage_form" {% if stage.id %} action="{% url 'submit_edit_stage' %}"{% else %} action="{% url 'submit_create_stage' %}" {% endif %}>
+            <form method="post" name="stage_form" {% if stage.id %} action="{% url 'submit_edit_stage' stage.id %}"{% else %} action="{% url 'submit_create_stage' %}" {% endif %}>
             {% csrf_token %}
-                <input type='hidden' name='id' value="{{ stage.id }}">
                 <table class="table">
                 <tr align="left">
                     <td><label>Stage Name</label></td>

@@ -1,9 +1,9 @@
 from ab_testing_tool_app.tests.common import (SessionTestCase, TEST_COURSE_ID,
-    TEST_OTHER_COURSE_ID, NONEXISTENT_STAGE_ID, NONEXISTENT_TRACK_ID)
+    TEST_OTHER_COURSE_ID, NONEXISTENT_TRACK_ID)
 from django.core.urlresolvers import reverse
 from ab_testing_tool_app.models import Track, CourseSettings, Stage, StageUrl
 from ab_testing_tool_app.exceptions import (COURSE_TRACKS_ALREADY_FINALIZED,
-    NO_TRACKS_FOR_COURSE, UNAUTHORIZED_ACCESS, MISSING_TRACK)
+    NO_TRACKS_FOR_COURSE, UNAUTHORIZED_ACCESS)
 
 class TestTrackPages(SessionTestCase):
     """ Tests related to Track and Track pages and methods """
@@ -48,7 +48,7 @@ class TestTrackPages(SessionTestCase):
         t_id = NONEXISTENT_TRACK_ID
         response = self.client.get(reverse("edit_track", args=(t_id,)))
         self.assertTemplateNotUsed(response, "edit_track.html")
-        self.assertError(response, MISSING_TRACK)
+        self.assertEquals(response.status_code, 404)
     
     def test_edit_track_view_wrong_course(self):
         """ Tests edit_track when attempting to access a track from a different course """
@@ -87,10 +87,9 @@ class TestTrackPages(SessionTestCase):
         track_id = track.id
         num_tracks = Track.objects.count()
         data = {"name": "new_name", "url1": "http://example.com/page",
-                "url2": "http://example.com/otherpage", "notes": "",
-                "id": track_id}
-        response = self.client.post(reverse("submit_edit_track"), data,
-                                    follow=True)
+                "url2": "http://example.com/otherpage", "notes": ""}
+        response = self.client.post(
+                reverse("submit_edit_track", args=(track_id,)), data, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEquals(num_tracks, Track.objects.count())
         track = Track.objects.get(id=track_id)
@@ -102,20 +101,19 @@ class TestTrackPages(SessionTestCase):
         track = Track.objects.create(name="old_name", course_id=TEST_COURSE_ID)
         track_id = track.id
         data = {"name": "new_name", "url1": "http://example.com/page",
-                "url2": "http://example.com/otherpage", "notes": "",
-                "id": track_id}
-        response = self.client.post(reverse("submit_edit_track"), data,
-                                    follow=True)
+                "url2": "http://example.com/otherpage", "notes": ""}
+        response = self.client.post(
+                reverse("submit_edit_track", args=(track_id,)), data, follow=True)
         self.assertTemplateUsed(response, "not_authorized.html")
     
     def test_submit_edit_track_nonexistent(self):
         """ Tests that submit_edit_track method raises error for non-existent Track """
+        track_id = NONEXISTENT_TRACK_ID
         data = {"name": "new_name", "url1": "http://example.com/page",
-                "url2": "http://example.com/otherpage", "notes": "",
-                "id": NONEXISTENT_STAGE_ID}
-        response = self.client.post(reverse("submit_edit_track"), data,
-                                    follow=True)
-        self.assertError(response, MISSING_TRACK)
+                "url2": "http://example.com/otherpage", "notes": ""}
+        response = self.client.post(
+                reverse("submit_edit_track", args=(track_id,)), data, follow=True)
+        self.assertEquals(response.status_code, 404)
     
     def test_submit_edit_track_wrong_course(self):
         """ Tests that submit_edit_track method raises error for existent Track but
@@ -123,10 +121,9 @@ class TestTrackPages(SessionTestCase):
         track = Track.objects.create(name="old_name",
                                      course_id=TEST_OTHER_COURSE_ID)
         data = {"name": "new_name", "url1": "http://example.com/page",
-                "url2": "http://example.com/otherpage", "notes": "",
-                "id": track.id}
-        response = self.client.post(reverse("submit_edit_track"), data,
-                                    follow=True)
+                "url2": "http://example.com/otherpage", "notes": ""}
+        response = self.client.post(
+                reverse("submit_edit_track", args=(track.id,)), data, follow=True)
         self.assertError(response, UNAUTHORIZED_ACCESS)
     
     def test_delete_track(self):
@@ -170,7 +167,7 @@ class TestTrackPages(SessionTestCase):
         response = self.client.get(reverse("delete_track", args=(t_id,)), follow=True)
         second_num_tracks = Track.objects.count()
         self.assertEqual(first_num_tracks, second_num_tracks)
-        self.assertError(response, MISSING_TRACK)
+        self.assertEquals(response.status_code, 404)
     
     def test_delete_track_wrong_course(self):
         """ Tests that delete_track method raises error for existent Track but for

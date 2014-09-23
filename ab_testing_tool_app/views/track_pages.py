@@ -1,10 +1,10 @@
-from django.shortcuts import render_to_response, redirect
+from django.shortcuts import render_to_response, redirect, get_object_or_404
 from django_auth_lti.decorators import lti_role_required
 
 from ab_testing_tool_app.constants import ADMINS
 from ab_testing_tool_app.models import Track, CourseSettings, Stage
 from ab_testing_tool_app.canvas import get_lti_param
-from ab_testing_tool_app.exceptions import (MISSING_TRACK, UNAUTHORIZED_ACCESS,
+from ab_testing_tool_app.exceptions import (UNAUTHORIZED_ACCESS,
     COURSE_TRACKS_ALREADY_FINALIZED, NO_TRACKS_FOR_COURSE)
 from django.http.response import HttpResponse
 from ab_testing_tool_app.controllers import post_param
@@ -20,14 +20,12 @@ def create_track(request):
 
 @lti_role_required(ADMINS)
 def edit_track(request, track_id):
+    track = get_object_or_404(Track, pk=track_id)
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    t = Track.get_or_none(pk=track_id)
-    if not t:
-        raise MISSING_TRACK
-    if course_id != t.course_id:
+    if course_id != track.course_id:
         raise UNAUTHORIZED_ACCESS
     is_finalized = CourseSettings.get_is_finalized(course_id)
-    context = {"track": t,
+    context = {"track": track,
                "is_finalized": is_finalized}
     return render_to_response("edit_track.html", context)
 
@@ -44,14 +42,11 @@ def submit_create_track(request):
 
 
 @lti_role_required(ADMINS)
-def submit_edit_track(request):
+def submit_edit_track(request, track_id):
+    track = get_object_or_404(Track, pk=track_id)
     course_id = get_lti_param(request, "custom_canvas_course_id")
     name = post_param(request, "name")
     notes = post_param(request, "notes")
-    track_id = post_param(request, "id")
-    track = Track.get_or_none(pk=track_id)
-    if not track:
-        raise MISSING_TRACK
     if course_id != track.course_id:
         raise UNAUTHORIZED_ACCESS
     track.update(name=name, notes=notes)
@@ -64,12 +59,10 @@ def delete_track(request, track_id):
     NOTE: When a track gets deleted, urls for that track get deleted from all
           stages in that course as a result of cascading delete.
     """
+    track = get_object_or_404(Track, pk=track_id)
     course_id = get_lti_param(request, "custom_canvas_course_id")
     if CourseSettings.get_is_finalized(course_id):
         raise COURSE_TRACKS_ALREADY_FINALIZED
-    track = Track.get_or_none(pk=track_id)
-    if not track:
-        raise MISSING_TRACK
     if course_id != track.course_id:
         raise UNAUTHORIZED_ACCESS
     track.delete()

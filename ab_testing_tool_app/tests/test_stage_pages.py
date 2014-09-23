@@ -8,7 +8,7 @@ from ab_testing_tool_app.tests.common import (SessionTestCase, TEST_COURSE_ID,
     TEST_OTHER_COURSE_ID, NONEXISTENT_STAGE_ID, APIReturn, LIST_MODULES,
     TEST_STUDENT_ID)
 from ab_testing_tool_app.exceptions import (NO_URL_FOR_TRACK,
-    COURSE_TRACKS_NOT_FINALIZED, MISSING_STAGE, UNAUTHORIZED_ACCESS,
+    COURSE_TRACKS_NOT_FINALIZED, UNAUTHORIZED_ACCESS,
     DELETING_INSTALLED_STAGE, NO_TRACKS_FOR_COURSE)
 
 
@@ -43,15 +43,14 @@ class TestStagePages(SessionTestCase):
         CourseSettings.set_finalized(TEST_COURSE_ID)
         stage = Stage.objects.create(name="stage1")
         track = Track.objects.create(name="track1", course_id=TEST_COURSE_ID)
-        student = CourseStudent.get_or_none(course_id=TEST_COURSE_ID,
-                                      student_id=TEST_STUDENT_ID)
-        self.assertEqual(student, None)
+        students = CourseStudent.objects.filter(course_id=TEST_COURSE_ID,
+                                               student_id=TEST_STUDENT_ID)
+        self.assertEqual(students.count(), 0)
         StageUrl.objects.create(stage=stage, track=track,
                                 url="http://www.example.com")
         self.client.get(reverse("deploy_stage", args=(stage.id,)))
-        student = CourseStudent.get_or_none(course_id=TEST_COURSE_ID,
-                                      student_id=TEST_STUDENT_ID)
-        self.assertNotEqual(None, student)
+        student = CourseStudent.objects.get(course_id=TEST_COURSE_ID,
+                                            student_id=TEST_STUDENT_ID)
         self.assertEqual(student.track.name, "track1")
     
     def test_deploy_stage_student_redirect(self):
@@ -119,7 +118,7 @@ class TestStagePages(SessionTestCase):
         """ Tests edit_stage template renders when stage does not exist """
         stage_id = NONEXISTENT_STAGE_ID
         response = self.client.get(reverse("edit_stage", args=(stage_id,)))
-        self.assertError(response, MISSING_STAGE)
+        self.assertEqual(response.status_code, 404)
     
     def test_edit_stage_view_wrong_course(self):
         """ Tests edit_track when attempting to access a track from a different course """
@@ -194,10 +193,9 @@ class TestStagePages(SessionTestCase):
         stage_id = stage.id
         num_stages = Stage.objects.count()
         data = {"name": "new_name",
-                "notes": "",
-                "id": stage_id}
-        response = self.client.post(reverse("submit_edit_stage"), data,
-                                    follow=True)
+                "notes": ""}
+        response = self.client.post(
+                reverse("submit_edit_stage", args=(stage_id,)), data, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(num_stages, Stage.objects.count())
         stage = Stage.objects.get(id=stage_id)
@@ -216,10 +214,9 @@ class TestStagePages(SessionTestCase):
         data = {"name": "new_name",
                 STAGE_URL_TAG + str(track.id): "http://example.com/new_page",
                 STAGE_URL_TAG + str(track2.id): "http://example.com/second_page",
-                "notes": "hi",
-                "id": stage_id}
-        response = self.client.post(reverse("submit_edit_stage"), data,
-                                    follow=True)
+                "notes": "hi"}
+        response = self.client.post(
+                reverse("submit_edit_stage", args=(stage_id,)), data, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(num_stages, Stage.objects.count())
         stage = Stage.objects.get(id=stage_id)
@@ -233,26 +230,23 @@ class TestStagePages(SessionTestCase):
     def test_submit_edit_stage_unauthorized(self):
         """ Tests that submit_edit_stage when unauthorized """
         self.set_roles([])
-        stage = Stage.objects.create(name="old_name",
-                                             course_id=TEST_COURSE_ID)
-        stage_id = stage.id
+        stage = Stage.objects.create(name="old_name", course_id=TEST_COURSE_ID)
         num_stages = Stage.objects.count()
         data = {"name": "new_name",
-                "notes": "new notes",
-                "id": stage_id}
-        response = self.client.post(reverse("submit_edit_stage"), data,
-                                    follow=True)
+                "notes": "new notes"}
+        response = self.client.post(
+                reverse("submit_edit_stage", args=(stage.id,)), data, follow=True)
         self.assertEqual(num_stages, Stage.objects.count())
         self.assertTemplateUsed(response, "not_authorized.html")
     
     def test_submit_edit_stage_nonexistent(self):
         """ Tests that submit_edit_stage method raises error for non-existent Stage """
+        stage_id = NONEXISTENT_STAGE_ID
         data = {"name": "new_name",
-                "notes": "hi",
-                "id": NONEXISTENT_STAGE_ID}
-        response = self.client.post(reverse("submit_edit_stage"), data,
-                                    follow=True)
-        self.assertError(response, MISSING_STAGE)
+                "notes": "hi"}
+        response = self.client.post(
+                reverse("submit_edit_stage", args=(stage_id,)), data, follow=True)
+        self.assertEqual(response.status_code, 404)
     
     def test_submit_edit_stage_wrong_course(self):
         """ Tests that submit_edit_stage method raises error for existent Stage but
@@ -260,10 +254,9 @@ class TestStagePages(SessionTestCase):
         stage = Stage.objects.create(name="old_name",
                                      course_id=TEST_OTHER_COURSE_ID)
         data = {"name": "new_name",
-                "notes": "hi",
-                "id": stage.id}
-        response = self.client.post(reverse("submit_edit_stage"), data,
-                                    follow=True)
+                "notes": "hi"}
+        response = self.client.post(
+                reverse("submit_edit_stage", args=(stage.id,)), data, follow=True)
         self.assertError(response, UNAUTHORIZED_ACCESS)
     
     def test_deploy_stage_view(self):
@@ -305,7 +298,7 @@ class TestStagePages(SessionTestCase):
         response = self.client.get(reverse("delete_stage", args=(stage_id,)),
                                    follow=True)
         second_num_stages = Stage.objects.count()
-        self.assertError(response, MISSING_STAGE)
+        self.assertEqual(response.status_code, 404)
         self.assertNotEqual(first_num_stages, second_num_stages)
     
     def test_delete_stage_wrong_course(self):

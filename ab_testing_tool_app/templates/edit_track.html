@@ -30,9 +30,8 @@
             <h4 class="text-center nowrap">Tracks Are Finalized.</h4>
             <h5 class="text-center nowrap">Note: Tracks can no longer be deleted or created. Existing tracks can still be edited.</h5>
             {% endif %}
-            <form method="post" name="track_form" {% if track.id %} action="{% url 'submit_edit_track' %}"{% else %} action="{% url 'submit_create_track' %}" {% endif %}>
+            <form method="post" name="track_form" {% if track.id %} action="{% url 'submit_edit_track' track.id %}"{% else %} action="{% url 'submit_create_track' %}" {% endif %}>
             {% csrf_token %}
-                <input type='hidden' name='id' value="{{ track.id }}">
                 <table class="table table-striped">
                 <tr align="left">
                     <td><label>Track Name</label></td>

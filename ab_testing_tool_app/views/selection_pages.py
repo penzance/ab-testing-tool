@@ -1,4 +1,4 @@
-from django.shortcuts import render_to_response, redirect
+from django.shortcuts import render_to_response, redirect, get_object_or_404
 from django.utils.http import urlencode
 from django_auth_lti.decorators import lti_role_required
 
@@ -8,7 +8,7 @@ from ab_testing_tool_app.controllers import (get_uninstalled_stages, stage_url,
 from ab_testing_tool_app.constants import STAGE_URL_TAG, ADMINS
 from ab_testing_tool_app.canvas import get_lti_param
 from ab_testing_tool_app.exceptions import (MISSING_RETURN_TYPES_PARAM,
-    MISSING_RETURN_URL, MISSING_STAGE)
+    MISSING_RETURN_URL)
 
 
 @lti_role_required(ADMINS)
@@ -31,9 +31,7 @@ def resource_selection(request):
 @lti_role_required(ADMINS)
 def submit_selection(request):
     stage_id = post_param(request, "stage_id")
-    stage = Stage.get_or_none(pk=stage_id)
-    if not stage:
-        raise MISSING_STAGE
+    stage = get_object_or_404(Stage, pk=stage_id)
     page_url = stage_url(request, stage_id)
     page_name = stage.name
     content_return_url = post_param(request, "content_return_url")

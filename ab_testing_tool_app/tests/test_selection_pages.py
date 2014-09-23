@@ -5,8 +5,8 @@ from ab_testing_tool_app.models import Stage, StageUrl, Track
 from django.utils.http import urlencode
 from ab_testing_tool_app.controllers import stage_url
 from mock import patch
-from ab_testing_tool_app.exceptions import MISSING_RETURN_TYPES_PARAM,\
-    MISSING_RETURN_URL, MISSING_STAGE, missing_param_error
+from ab_testing_tool_app.exceptions import (MISSING_RETURN_TYPES_PARAM,
+    MISSING_RETURN_URL, missing_param_error)
 from ab_testing_tool_app.constants import STAGE_URL_TAG
 
 class TestSelectionPages(SessionTestCase):
@@ -64,7 +64,7 @@ class TestSelectionPages(SessionTestCase):
         content_return_url = "http://test_content_return_url.com"
         data = {"stage_id": NONEXISTENT_STAGE_ID, "content_return_url": content_return_url}
         response = self.client.post(reverse("submit_selection"), data)
-        self.assertError(response, MISSING_STAGE)
+        self.assertEquals(response.status_code, 404)
    
     @patch("django.http.request.HttpRequest.get_host", return_value=TEST_DOMAIN)
     def test_submit_selection(self, _mock):
