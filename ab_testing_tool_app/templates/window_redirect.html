@@ -5,18 +5,8 @@
 </head>
 <body>
 <script>
-
-/* This block is meant to redirect the topmost window to the url instead of only inside the iframe.
-   The try-catch block is meant to catch the JS error related referencing outside iframe
-   "Permission denied to access property 'valueOf'"
-*/
-try {
-    if (window.top.location != "{{ url }}") {
-        window.top.location.href = "{{ url }}";
-    }
-} catch (err) {
-    console.log(err);
-}
+/* Redirect the topmost window to the url instead of only inside the iframe.*/
+ window.top.location.href = "{{ url }}";
 </script>
 
 <!-- The HTML is fall-back to open the URL in a new tab in the event the above block fails -->
