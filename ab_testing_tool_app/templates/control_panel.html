@@ -12,13 +12,13 @@
 <div class="container">
     <div class="jumbotron">
         <h2>A/B Testing Control Panel</h2>
-      <p>Welcome administrator. Manage your A/B course stages here.</p>
+      <p>Welcome administrator. Manage your A/B course intervention points here.</p>
     </div>
 
     <div id="tabs">
     <ul>
     <li><a href="#tabs-1">Tracks</a></li>
-    <li><a href="#tabs-2">A/B Stages</a></li>
+    <li><a href="#tabs-2">A/B Intervention Points</a></li>
     <li><a href="#tabs-3">Course Modules</a></li>
     <li><a href="#tabs-4">Data</a></li>
     </ul>
@@ -74,12 +74,12 @@
             </div>
         </div>
         
-        <!-- Tab for Stages-->
+        <!-- Tab for Intervention Points-->
         <div id="tabs-2">
             <div class="span8">
-                <p> Create and Edit your A/B stages here. </p>
+                <p> Create and Edit your A/B intervention points here. </p>
                 <br>
-                <a class="btn btn-lg btn-success" style="align:left" href="{% url 'create_stage' %}"> Create New Stage</a>
+                <a class="btn btn-lg btn-success" style="align:left" href="{% url 'create_stage' %}"> Create New Intervention Point</a>
                 <br><br>
         
                 <div class="list-group span4">
@@ -93,7 +93,7 @@
         <!-- Tab for Modules-->
         <div id="tabs-3">
             <div class="span8">
-                <p> See where A/B stages are positioned in your modules here. </p>
+                <p> See where A/B intervention points are positioned in your modules here. </p>
                 <br>
                 <div class="list-group span4">
                     {% for m in modules %}
@@ -102,7 +102,7 @@
                                 <ul class="list-group">
                                     {% for i in m.module_items %}
                                         {% if i.is_stage %}
-                                            <a class="list-group-item active">{{i.title}} | <i> Stage</i></a>
+                                            <a class="list-group-item active">{{i.title}} | <i> Intervention Point</i></a>
                                         {% else %}
                                             <p class="list-group-item">{{i.title|default:"[ Item not titled]"}}</p>
                                         {% endif %}

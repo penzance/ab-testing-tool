@@ -9,7 +9,7 @@
 <body>
 <div class="container">
     <form method="POST" action="{% url 'submit_selection' %}">
-        <h4> To install a new A/B Stage, select one from list of uninstalled stages below:</h4>
+        <h4> To install a new A/B Intervention Point, select one from list of uninstalled intervention points below:</h4>
         <br>
         <select name="stage_id">
         {% for stage in stages %}
@@ -21,7 +21,7 @@
     <input type="submit" value="Add From List" class="btn btn-large btn-primary submit">
     </form>
     <br>
-    <h4> Or, create a new stage:</h4>
+    <h4> Or, create a new Intervention Point:</h4>
     <br>
   <form method="post" name="stage_form" action="{% url 'submit_selection_new_stage' %}">
             {% csrf_token %}
@@ -29,7 +29,7 @@
                 <input type='hidden' name='id' value="{{ stage.id }}">
                 <table class="table">
                 <tr align="left">
-                    <td><label>Stage Name</label></td>
+                    <td><label>Intervention Point Name</label></td>
                     <td><input class="form-control"  type="text" name="name" value="{{ stage.name }}"/></td>
                 </tr>
                 {% for t in tracks %}
@@ -39,7 +39,7 @@
                 </tr>
                 {% endfor %}
                 <tr align="left">
-                    <td><label>Stage Notes</label></td>
+                    <td><label>Intervention Point Notes</label></td>
                     <td><textarea name="notes" rows="6" cols="80" >{{ stage.notes }}</textarea></td>
                 </tr>
                 <tr>
