@@ -1,4 +1,4 @@
-from django.shortcuts import render_to_response, redirect
+from django.shortcuts import render_to_response, redirect, get_object_or_404
 from django.core.urlresolvers import reverse
 from django_auth_lti.decorators import lti_role_required
 from random import choice
@@ -9,7 +9,7 @@ from ab_testing_tool_app.models import (Stage, Track, StageUrl, CourseSettings,
 from ab_testing_tool_app.canvas import get_lti_param
 from ab_testing_tool_app.controllers import (stage_is_installed, format_url,
     post_param)
-from ab_testing_tool_app.exceptions import (MISSING_STAGE, UNAUTHORIZED_ACCESS,
+from ab_testing_tool_app.exceptions import (UNAUTHORIZED_ACCESS,
     DELETING_INSTALLED_STAGE, COURSE_TRACKS_NOT_FINALIZED,
     NO_URL_FOR_TRACK, NO_TRACKS_FOR_COURSE)
 
@@ -37,25 +37,29 @@ def deploy_stage(request, stage_id):
     
     student_id = get_lti_param(request, "custom_canvas_user_login_id")
     
-    # Create an object to track the student for this course if we haven't yet
-    student = CourseStudent.get_or_none(student_id=student_id, course_id=course_id)
-    # If this is a new student or the student doesn't yet have a track,
-    # assign the student to a track
-    # TODO: expand this code to allow multiple randomization procedures
-    if not student:
+    # Get or create an object to track the student for this course
+    try:
+        student = CourseStudent.objects.get(student_id=student_id, course_id=course_id)
+    except CourseStudent.DoesNotExist:
+        # If this is a new student or the student doesn't yet have a track,
+        # assign the student to a track
+        # TODO: expand this code to allow multiple randomization procedures
         tracks = Track.objects.filter(course_id=course_id)
         if not tracks:
             raise NO_TRACKS_FOR_COURSE
         chosen_track = choice(tracks)
-        student = CourseStudent.objects.create(student_id=student_id,
-                                         course_id=course_id, track=chosen_track)
+        student = CourseStudent.objects.create(
+                student_id=student_id, course_id=course_id, track=chosen_track)
     
     # Retrieve the url for the student's track at the current intervention point
     # Return an error page if there is no url configured.
-    chosen_stageurl = StageUrl.get_or_none(stage__pk=stage_id, track=student.track)
-    if chosen_stageurl and chosen_stageurl.url:
-        return redirect(chosen_stageurl.url)
-    raise NO_URL_FOR_TRACK
+    try:
+        chosen_stage_url = StageUrl.objects.get(stage__pk=stage_id, track=student.track)
+    except StageUrl.DoesNotExist:
+        raise NO_URL_FOR_TRACK
+    if not chosen_stage_url.url:
+        raise NO_URL_FOR_TRACK
+    return redirect(chosen_stage_url.url)
 
 
 @lti_role_required(ADMINS)
@@ -88,10 +92,8 @@ def submit_create_stage(request):
 
 @lti_role_required(ADMINS)
 def edit_stage(request, stage_id):
+    stage = get_object_or_404(Stage, pk=stage_id)
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    stage = Stage.get_or_none(pk=stage_id)
-    if not stage:
-        raise MISSING_STAGE
     if course_id != stage.course_id:
         raise UNAUTHORIZED_ACCESS
     all_tracks = Track.objects.filter(course_id=course_id)
@@ -99,10 +101,10 @@ def edit_stage(request, stage_id):
     for track in all_tracks:
         # This is a search for the joint unique index of StageUrl, so it
         # should not ever return multiple objects
-        stage_url = StageUrl.get_or_none(stage__pk=stage_id, track=track)
-        if stage_url:
+        try:
+            stage_url = StageUrl.objects.get(stage__pk=stage_id, track=track)
             track_urls.append((track, stage_url))
-        else:
+        except StageUrl.DoesNotExist:
             track_urls.append((track, None))
     context = {"stage": stage,
                "tracks": track_urls,
@@ -114,29 +116,26 @@ def edit_stage(request, stage_id):
 
 
 @lti_role_required(ADMINS)
-def submit_edit_stage(request):
+def submit_edit_stage(request, stage_id):
     """ Note: Only allowed if admin has privileges on the particular course.
         TODO: consider using Django forms to save rather of getting individual POST params """
+    stage = get_object_or_404(Stage, pk=stage_id)
     course_id = get_lti_param(request, "custom_canvas_course_id")
     name = post_param(request, "name")
     notes = post_param(request, "notes")
-    stage_id = post_param(request, "id")
-    stage = Stage.get_or_none(pk=stage_id)
-    if not stage:
-        raise MISSING_STAGE
     if course_id != stage.course_id:
         raise UNAUTHORIZED_ACCESS
     stage.update(name=name, notes=notes)
     # StageUrl creation
     stageurls = [(k,v) for (k,v) in request.POST.iteritems() if STAGE_URL_TAG in k and v]
     for (k,v) in stageurls:
-        _,track_id = k.split(STAGE_URL_TAG)
+        _, track_id = k.split(STAGE_URL_TAG)
         # This is a search for the joint unique index of StageUrl, so it
         # should not ever return multiple objects
-        stage_url = StageUrl.get_or_none(stage__pk=stage_id, track__pk=track_id)
-        if stage_url:
+        try:
+            stage_url = StageUrl.objects.get(stage__pk=stage_id, track__pk=track_id)
             stage_url.update(url=format_url(v))
-        else:
+        except StageUrl.DoesNotExist:
             StageUrl.objects.create(url=v, stage_id=stage_id, track_id=track_id)
     return redirect("/#tabs-2")
 
@@ -145,10 +144,8 @@ def submit_edit_stage(request):
 def delete_stage(request, stage_id):
     """ Note: Installed stages are not allowed to be deleted
         Note: attached StageUrls are deleted via cascading delete """
+    stage = get_object_or_404(Stage, pk=stage_id)
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    stage = Stage.get_or_none(pk=stage_id)
-    if not stage:
-        raise MISSING_STAGE
     if course_id != stage.course_id:
         raise UNAUTHORIZED_ACCESS
     if stage_is_installed(request, stage):

@@ -12,13 +12,7 @@ class CustomModel(models.Model):
         for k, v in kwargs.iteritems():
             setattr(self, k, v)
         self.save()
-    
-    @classmethod
-    def get_or_none(cls, **kwargs):
-        try:
-            return cls.objects.get(**kwargs)
-        except cls.DoesNotExist:
-            return None
+
 
 class Track(CustomModel):
     name = models.CharField(max_length=256)

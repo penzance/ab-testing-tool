@@ -8,9 +8,6 @@ MISSING_LTI_PARAM = Renderable400("Missing LTI parameter in session")
 
 BAD_STAGE_ID = Renderable400("Invalid stage id")
 
-MISSING_STAGE = Renderable404("No stage found matching database query")
-MISSING_TRACK = Renderable404("No track found matching database query")
-
 DELETING_INSTALLED_STAGE = Renderable400("Deleting an installed Stage is not allowed")
 
 UNAUTHORIZED_ACCESS = Renderable403("You do not have access to this course.")
