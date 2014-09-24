@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import patterns, url, include
 from django.contrib import admin
 
 from ab_testing_tool_app.views.main_pages import (render_stage_control_panel, not_authorized,
@@ -35,4 +35,6 @@ urlpatterns = patterns('',
     url(r'^submit_edit_track/(?P<track_id>\d+)$', submit_edit_track, name='submit_edit_track'),
     url(r'^delete_track/(?P<track_id>\d+)$', delete_track, name='delete_track'),
     url(r'^finalize_tracks$', finalize_tracks, name='finalize_tracks'),
+    
+    url(r'^admin/', include(admin.site.urls)),
 )
