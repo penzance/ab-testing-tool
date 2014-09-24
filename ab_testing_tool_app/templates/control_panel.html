@@ -28,9 +28,30 @@
                 <p> Create and Edit your A/B Tracks here. You can assign student cohorts to a track <b> only after </b> finalizing your tracks.</p>
                 <br>
                 {% if not is_finalized %}
-                <a class="btn btn-lg btn-success"  href="{% url 'create_track' %}"> Create New Track</a>
-                <a class="btn btn-lg btn-danger" href="#finalize_modal" data-toggle="modal" > Finalize Tracks</a>
-
+                <a id="create_track_button" class="btn btn-lg btn-success"  href="{% url 'create_track' %}"> Create New Track</a>
+                <a id="finalize_button" class="btn btn-lg btn-danger" {% if incomplete_stages %} href="#incomplete_stages_modal" {% else %} href="#finalize_modal" {% endif %} data-toggle="modal" > Finalize Tracks</a>
+                {% if incomplete_stages %}
+                <!-- START Modal code for incomplete_stages confirmation box-->
+                <div id="incomplete_stages_modal" class="modal fade" role="dialog" aria-labelledby="finalize_modal" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                <h4 class="modal-title">Intervention Points Are Missing URLs</h4>
+                            </div>
+                            <div class="modal-body">
+                                <p>Some Intervention Points are missing URLs</p>
+                                <p class="text-warning">These following Intervention Points are incomplete: {{ incomplete_stages|join:", " }} </p>
+                            </div>
+                            <div class="modal-footer">
+                                <a class="btn btn-lg btn-primary" data-dismiss="modal"> Close </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- END Modal code for incomplete_stages confirmation box-->
+                {% endif %}
+                
                 <!-- START Modal code for Finalize Tracks confirmation box-->
                 <div id="finalize_modal" class="modal fade" role="dialog" aria-labelledby="finalize_modal" aria-hidden="true">
                     <div class="modal-dialog">
