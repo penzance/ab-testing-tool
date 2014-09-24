@@ -93,7 +93,6 @@ def submit_create_stage(request):
 @lti_role_required(ADMINS)
 def modules_page_edit_stage(request, stage_id):
     context = edit_stage_common(request, stage_id)
-    context["cancel_url"] = get_lti_param(request, "launch_presentation_return_url") + "/modules"
     return render_to_response("modules_page_edit_stage.html", context)
 
 @lti_role_required(ADMINS)
