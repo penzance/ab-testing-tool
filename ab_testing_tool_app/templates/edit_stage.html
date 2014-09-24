@@ -13,28 +13,28 @@
     <div class="jumbotron">
         <table class="table">
         <tbody>
-        <h2>A/B Stage "{{stage.name|default:"Unnamed"}}"</h2>
+        <h2>A/B Intervention Point "{{stage.name|default:"Unnamed"}}"</h2>
         <!-- <td class="text-right nowrap"><a href="/" class="btn btn-lg btn-primary" id="delete">Go To Dashboard</a></td>-->
         <tr>
         <td ><p>Created: {{stage.created_on}} | Last updated: {{stage.updated_on}} </p></td>
         {% if stage.id and not is_installed %}
-        <td class="text-right nowrap"><a href="{% url 'delete_stage' stage.id %}" class="btn btn-lg btn-danger" id="delete">Delete Stage</a></td>
+        <td class="text-right nowrap"><a href="{% url 'delete_stage' stage.id %}" class="btn btn-lg btn-danger" id="delete">Delete Intervention Point</a></td>
         {% elif stage.id and is_installed%}
-        <td class="text-right nowrap"><a  class="btn btn-lg btn-danger disabled">Delete Stage</a></td>
+        <td class="text-right nowrap"><a  class="btn btn-lg btn-danger disabled">Delete Intervention Point</a></td>
         {% endif %}
         </tr>
         </tbody>
         </table>
     </div>
             {% if stage.id and is_installed %}
-            <h4 class="text-center nowrap">Stage Is Installed.</h4>
-            <h5 class="text-center nowrap">Note: Stage must first be uninstalled before it can be deleted</h5>
+            <h4 class="text-center nowrap">Intervention Point Is Installed.</h4>
+            <h5 class="text-center nowrap">Note: Intervention Point must first be uninstalled before it can be deleted</h5>
             {% endif %}
             <form method="post" name="stage_form" {% if stage.id %} action="{% url 'submit_edit_stage' stage.id %}"{% else %} action="{% url 'submit_create_stage' %}" {% endif %}>
             {% csrf_token %}
                 <table class="table">
                 <tr align="left">
-                    <td><label>Stage Name</label></td>
+                    <td><label>Intervention Point Name</label></td>
                     <td><input class="form-control"  type="text" name="name" value="{{ stage.name }}"/></td>
                 </tr>
                 {% for t, s in tracks %}
@@ -45,7 +45,7 @@
                 </tr>
                 {% endfor %}
                 <tr align="left">
-                    <td><label>Stage Notes</label></td>
+                    <td><label>Intervention Point Notes</label></td>
                     <td><textarea name="notes" rows="6" cols="80" >{{ stage.notes }}</textarea></td>
                 </tr>
                 <tr>
