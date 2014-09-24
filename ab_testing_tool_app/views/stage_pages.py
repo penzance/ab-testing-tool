@@ -28,7 +28,7 @@ def deploy_stage(request, stage_id):
     
     # If user is an admin, let them edit the stage
     if set(ADMINS) & set(user_roles):
-        return redirect(reverse("edit_stage", args=(stage_id,)))
+        return redirect(reverse("modules_page_edit_stage", args=(stage_id,)))
     
     # Otherwise, user is a student.  Tracks for the course must be finalized
     # for a student to be able to access content from the ab_testing_tool
@@ -91,7 +91,19 @@ def submit_create_stage(request):
 
 
 @lti_role_required(ADMINS)
+def modules_page_edit_stage(request, stage_id):
+    context = edit_stage_common(request, stage_id)
+    return render_to_response("modules_page_edit_stage.html", context)
+
+
+@lti_role_required(ADMINS)
 def edit_stage(request, stage_id):
+    context = edit_stage_common(request, stage_id)
+    return render_to_response("edit_stage.html", context)
+
+
+def edit_stage_common(request, stage_id):
+    """ Common core shared bewteen edit_stage and modules_page_edit_stage """
     stage = get_object_or_404(Stage, pk=stage_id)
     course_id = get_lti_param(request, "custom_canvas_course_id")
     if course_id != stage.course_id:
@@ -112,7 +124,7 @@ def edit_stage(request, stage_id):
                "cancel_url": "/#tabs-2",
                #TODO: "installed_module": installed_module,
                }
-    return render_to_response("edit_stage.html", context)
+    return context
 
 
 @lti_role_required(ADMINS)
