@@ -1,7 +1,19 @@
-A/B Testing Tool
+#A/B Testing Tool
 =======================
 
-In order to run locally:
+## Motivation
+Harvard is a leader in both research and higher education. As Harvard changes academic platforms, there are new opportunities to allow course staff and education researchers access to data about how these platforms are used. Data about learning can inform teaching to improve learning outcomes and other success metrics. This enables a cycle of continuous, iterative improvement.
+
+Faculty asked, and we listened. A/B testing can help identify changes in courses that impact the success of students.
+
+## About the tool
+The A/B Testing Tool complements existing features within Canvas that provide data about how the platform is used. An LTI optimized for Canvas, the A/B Testing Tool:
+* divides course enrollment into sets of users that are part of a **track** unique to the course
+* applies interventions by displaying different content to each track at **intervention points** throughout the course
+
+For more information, take a look at [these slides](https://docs.google.com/a/g.harvard.edu/presentation/d/1Yj5ov_hfg5jryGcwVNKqIRDy12ZYmA6kkSLi24zAZRs)
+
+##In order to run locally:
 
 * Copy `ab_testing_tool/settings/secure.py.example` to create a new file `ab_testing_tool/settings/secure.py`
 and fill in values requested there. If needed, create the token in Canvas (click on Settings in top right of screen, look for 'New Access Token' button under 'Approved Integrations' header) to copy over (token needs to be a string i.e. in quotes).
