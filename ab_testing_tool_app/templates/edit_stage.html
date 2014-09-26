@@ -58,7 +58,9 @@
                 <tr>
                 <td></td>
                 <td><input id="submit_edit_stage_button" type="submit" name="submit" value="Submit Changes" class="btn btn-lg btn-success submit">
+                {% block cancel_url %}
                 <a id="cancel_submit_edit_stage_button" href="{{ cancel_url }}" class="btn btn-lg btn-primary">Cancel</a></td>
+                {% endblock %}
                 </tr>
                 </table>
 

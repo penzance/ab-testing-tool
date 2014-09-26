@@ -7,7 +7,8 @@ from ab_testing_tool_app.views.main_pages import (render_stage_control_panel, no
 from ab_testing_tool_app.views.selection_pages import (resource_selection, submit_selection,
                     submit_selection_new_stage)
 from ab_testing_tool_app.views.stage_pages import (create_stage, submit_create_stage,
-                    edit_stage,  delete_stage, deploy_stage, submit_edit_stage)
+                    edit_stage,  delete_stage, deploy_stage, submit_edit_stage,
+                    modules_page_edit_stage)
 from ab_testing_tool_app.views.track_pages import (create_track, submit_create_track,
                     submit_edit_track, edit_track, delete_track, finalize_tracks)
 
@@ -25,6 +26,7 @@ urlpatterns = patterns('',
     url(r'^create_stage$', create_stage, name='create_stage'),
     url(r'^submit_create_stage$', submit_create_stage, name='submit_create_stage'),
     url(r'^edit_stage/(?P<stage_id>\d+)$', edit_stage, name='edit_stage'),
+    url(r'^modules_page_edit_stage/(?P<stage_id>\d+)$', modules_page_edit_stage, name='modules_page_edit_stage'),
     url(r'^submit_edit_stage/(?P<stage_id>\d+)$', submit_edit_stage, name='submit_edit_stage'),
     url(r'^stage/(?P<stage_id>\d+)$', deploy_stage, name='deploy_stage'),
     url(r'^delete_stage/(?P<stage_id>\d+)$', delete_stage, name='delete_stage'),
