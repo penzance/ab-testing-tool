@@ -19,9 +19,9 @@
         <tr>
         <td ><p>Created: {{stage.created_on}} | Last updated: {{stage.updated_on}} </p></td>
         {% if stage.id and not is_installed %}
-        <td class="text-right nowrap"><a href="{% url 'delete_stage' stage.id %}" class="btn btn-lg btn-danger" id="delete">Delete Intervention Point</a></td>
+        <td class="text-right nowrap"><a id="delete_stage_button" href="{% url 'delete_stage' stage.id %}" class="btn btn-lg btn-danger">Delete Intervention Point</a></td>
         {% elif stage.id and is_installed%}
-        <td class="text-right nowrap"><a  class="btn btn-lg btn-danger disabled">Delete Intervention Point</a></td>
+        <td class="text-right nowrap"><a id="delete_stage_button_disabled" class="btn btn-lg btn-danger disabled">Delete Intervention Point</a></td>
         {% endif %}
         </tr>
         </tbody>
@@ -57,8 +57,8 @@
                 </tr>
                 <tr>
                 <td></td>
-                <td><input type="submit" name="submit" value="Submit Changes" class="btn btn-lg btn-success submit">
-                <a href="{{ cancel_url }}" class="btn btn-lg btn-primary">Cancel</a></td>
+                <td><input id="submit_edit_stage_button" type="submit" name="submit" value="Submit Changes" class="btn btn-lg btn-success submit">
+                <a id="cancel_submit_edit_stage_button" href="{{ cancel_url }}" class="btn btn-lg btn-primary">Cancel</a></td>
                 </tr>
                 </table>
 

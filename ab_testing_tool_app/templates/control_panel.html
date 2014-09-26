@@ -28,8 +28,8 @@
                 <p> Create and Edit your A/B Tracks here. You can assign student cohorts to a track <b> only after </b> finalizing your tracks.</p>
                 <br>
                 {% if not is_finalized %}
-                <a class="btn btn-lg btn-success"  href="{% url 'create_track' %}"> Create New Track</a>
-                <a class="btn btn-lg btn-danger" href="#finalize_modal" data-toggle="modal" > Finalize Tracks</a>
+                <a id="create_track_button" class="btn btn-lg btn-success"  href="{% url 'create_track' %}"> Create New Track</a>
+                <a id="finalize_button" class="btn btn-lg btn-danger" href="#finalize_modal" data-toggle="modal" > Finalize Tracks</a>
 
                 <!-- START Modal code for Finalize Tracks confirmation box-->
                 <div id="finalize_modal" class="modal fade" role="dialog" aria-labelledby="finalize_modal" aria-hidden="true">
@@ -53,8 +53,8 @@
                 <!-- END Modal code for Finalize Tracks confirmation box-->
                 <br>
                 {% else %}
-                <a class="btn btn-lg btn-success disabled"> Create New Track</a>
-                <a class="btn btn-lg btn-danger disabled"> Finalize Tracks</a>
+                <a id="create_track_button_disabled" class="btn btn-lg btn-success disabled"> Create New Track</a>
+                <a id="finalize_button_disabled" class="btn btn-lg btn-danger disabled"> Finalize Tracks</a>
                 <br><br>
                 <h4 class="text-center nowrap">Tracks Are Finalized.</h4>
                 <h5 class="text-center nowrap">Note: Tracks can no longer be deleted or created. Existing tracks can still be edited.</h5>
@@ -79,7 +79,7 @@
             <div class="span8">
                 <p> Create and Edit your A/B intervention points here. </p>
                 <br>
-                <a class="btn btn-lg btn-success" style="align:left" href="{% url 'create_stage' %}"> Create New Intervention Point</a>
+                <a id="create_new_stage_button" class="btn btn-lg btn-success" style="align:left" href="{% url 'create_stage' %}"> Create New Intervention Point</a>
                 <br><br>
         
                 <div class="list-group span4">
@@ -123,7 +123,7 @@
             <div class="span8">
                 <p> Download a CSV file of your A/B testing data here. </p>
                 <br>
-                <a href="{% url 'download_data' %}" class="btn btn-lg btn-primary"> Download Data</a>
+                <a id="download_data_button" href="{% url 'download_data' %}" class="btn btn-lg btn-primary"> Download Data</a>
             </div>
         </div>
     </div>

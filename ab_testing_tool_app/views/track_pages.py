@@ -7,7 +7,7 @@ from ab_testing_tool_app.canvas import get_lti_param
 from ab_testing_tool_app.exceptions import (UNAUTHORIZED_ACCESS,
     COURSE_TRACKS_ALREADY_FINALIZED, NO_TRACKS_FOR_COURSE)
 from django.http.response import HttpResponse
-from ab_testing_tool_app.controllers import post_param
+from ab_testing_tool_app.controllers import (post_param, get_incomplete_stages)
 
 
 @lti_role_required(ADMINS)
@@ -74,11 +74,10 @@ def finalize_tracks(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     if Track.objects.filter(course_id=course_id).count() == 0:
         raise NO_TRACKS_FOR_COURSE
-    missing_urls = [stage.name for stage
-                    in Stage.objects.filter(course_id=course_id)
-                    if stage.is_missing_urls()]
-    if missing_urls:
+    stages = Stage.objects.filter(course_id=course_id)
+    incomplete_stages = get_incomplete_stages(stages)
+    if incomplete_stages:
         #TODO: replace with better error display
-        return HttpResponse("URLs missing for these tracks in these Stages: %s" % missing_urls)
+        return HttpResponse("URLs missing for these tracks in these Stages: %s" % incomplete_stages)
     CourseSettings.set_finalized(course_id)
     return redirect("/")
