@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="stylesheet" href="../static/css/bootstrap.min.css"  type="text/css"/>
+</head>
+<body>
+
+/* This block is meant to detect whether the topmost window has already been opened
+   in a new tab to prevent double tab opening, as Canvas provides its own option to open
+   an external tool in a new tab.
+*/
+<script>
+if (window.top.location == window.location) {
+    window.location.replace("{{ url }}");
+}
+</script>
+
+<span>
+<br>
+<p class="text-center"> To visit the URL, click the button below. </p>
+<br>
+<div class="text-center"><a target="_blank" href="{{url}}" class="btn btn-lg btn-primary">Open in New Tab</a></div>
+</span>
+</body>
+</html>
