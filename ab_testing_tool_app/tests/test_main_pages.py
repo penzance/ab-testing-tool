@@ -4,7 +4,7 @@ from mock import patch
 from ab_testing_tool_app.controllers import stage_url, get_uninstalled_stages
 from ab_testing_tool_app.tests.common import (SessionTestCase, LIST_MODULES,
     LIST_ITEMS, APIReturn, TEST_COURSE_ID, TEST_OTHER_COURSE_ID)
-from ab_testing_tool_app.models import Stage, Track, CourseStudent
+from ab_testing_tool_app.models import InterventionPoint, Track, CourseStudent
 from ab_testing_tool_app.views.main_pages import tool_config
 
 
@@ -58,7 +58,7 @@ class TestMainPages(SessionTestCase):
         response = self.client.get(reverse("index"), follow=True)
         self.assertEqual(len(response.context["stages"]), 0)
         self.assertEqual(len(response.context["tracks"]), 0)
-        stage = Stage.objects.create(name="stage1", course_id=TEST_COURSE_ID)
+        stage = InterventionPoint.objects.create(name="stage1", course_id=TEST_COURSE_ID)
         track = Track.objects.create(name="track1", course_id=TEST_COURSE_ID)
         response = self.client.get(reverse("index"), follow=True)
         self.assertEqual(len(response.context["stages"]), 1)
@@ -69,8 +69,8 @@ class TestMainPages(SessionTestCase):
     def test_index_context_course_specific_stages_and_tracks(self):
         """ Checks that the stages and tracks passed to the index template
             only contain database values matching the course_id """
-        stage = Stage.objects.create(name="stage1", course_id=TEST_COURSE_ID)
-        Stage.objects.create(name="stage1", course_id=TEST_OTHER_COURSE_ID)
+        stage = InterventionPoint.objects.create(name="stage1", course_id=TEST_COURSE_ID)
+        InterventionPoint.objects.create(name="stage1", course_id=TEST_OTHER_COURSE_ID)
         track = Track.objects.create(name="track1", course_id=TEST_COURSE_ID)
         Track.objects.create(name="track2", course_id=TEST_OTHER_COURSE_ID)
         response = self.client.get(reverse("index"), follow=True)
@@ -82,8 +82,8 @@ class TestMainPages(SessionTestCase):
     def test_index_context_uninstalled_stages(self):
         """ Tests that the context for the index correctly contains
             the uninstalled stages for the course """
-        stage1 =Stage.objects.create(name="stage1", course_id=TEST_COURSE_ID)
-        stage2 = Stage.objects.create(name="stage2", course_id=TEST_COURSE_ID)
+        stage1 =InterventionPoint.objects.create(name="stage1", course_id=TEST_COURSE_ID)
+        stage2 = InterventionPoint.objects.create(name="stage2", course_id=TEST_COURSE_ID)
         with patch("ab_testing_tool_app.views.main_pages.get_uninstalled_stages",
                    return_value=[stage1]):
             response = self.client.get(reverse("index"), follow=True)

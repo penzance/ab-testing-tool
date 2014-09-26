@@ -8,7 +8,7 @@ MISSING_LTI_PARAM = Renderable400("Missing LTI parameter in session")
 
 BAD_STAGE_ID = Renderable400("Invalid stage id")
 
-DELETING_INSTALLED_STAGE = Renderable400("Deleting an installed Stage is not allowed")
+DELETING_INSTALLED_STAGE = Renderable400("Deleting an installed Intervention Point is not allowed")
 
 UNAUTHORIZED_ACCESS = Renderable403("You do not have access to this course.")
 

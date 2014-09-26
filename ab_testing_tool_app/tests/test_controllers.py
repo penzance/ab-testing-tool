@@ -4,7 +4,7 @@ from ab_testing_tool_app.controllers import (get_uninstalled_stages, stage_url,
     all_stage_urls, format_url, post_param)
 from ab_testing_tool_app.tests.common import (SessionTestCase, APIReturn,
     LIST_MODULES, LIST_ITEMS, TEST_COURSE_ID, TEST_OTHER_COURSE_ID)
-from ab_testing_tool_app.models import Stage
+from ab_testing_tool_app.models import InterventionPoint
 from ab_testing_tool_app.exceptions import BAD_STAGE_ID
 
 
@@ -19,7 +19,7 @@ class TestControllers(SessionTestCase):
     def test_get_uninstalled_stages_with_item(self, _mock1):
         """ Tests method get_uninstalled_stages returns one when database has
             one item and api returns nothing """
-        Stage.objects.create(name="stage1", course_id=TEST_COURSE_ID)
+        InterventionPoint.objects.create(name="stage1", course_id=TEST_COURSE_ID)
         stages = get_uninstalled_stages(self.request)
         self.assertEqual(len(stages), 1)
     
@@ -27,8 +27,8 @@ class TestControllers(SessionTestCase):
     def test_get_uninstalled_stages_against_courses(self, _mock1):
         """ Tests method get_uninstalled_stages returns one when database has
             two items but only one matches the course and api returns nothing """
-        stage = Stage.objects.create(name="stage1", course_id=TEST_COURSE_ID)
-        Stage.objects.create(name="stage2", course_id=TEST_OTHER_COURSE_ID)
+        stage = InterventionPoint.objects.create(name="stage1", course_id=TEST_COURSE_ID)
+        InterventionPoint.objects.create(name="stage2", course_id=TEST_OTHER_COURSE_ID)
         stages = get_uninstalled_stages(self.request)
         self.assertEqual(len(stages), 1)
         self.assertSameIds([stage], stages)
@@ -37,7 +37,7 @@ class TestControllers(SessionTestCase):
     def test_get_uninstalled_stages_with_all_installed(self, _mock1):
         """ Tests method get_uninstalled_stages returns zero when stage in
             database is also returned by the API, which means it is installed """
-        stage = Stage.objects.create(name="stage1", course_id=TEST_COURSE_ID)
+        stage = InterventionPoint.objects.create(name="stage1", course_id=TEST_COURSE_ID)
         mock_item = {"type": "ExternalTool",
                      "external_url": stage_url(self.request, stage.id)}
         with patch(LIST_ITEMS, return_value=APIReturn([mock_item])):
@@ -49,8 +49,8 @@ class TestControllers(SessionTestCase):
         """ Tests method get_uninstalled_stages returns one when there are two
             stages in the database, one of which is also returned by the API,
             which means it is installed """
-        stage = Stage.objects.create(name="stage1", course_id=TEST_COURSE_ID)
-        Stage.objects.create(name="stage2", course_id=TEST_COURSE_ID)
+        stage = InterventionPoint.objects.create(name="stage1", course_id=TEST_COURSE_ID)
+        InterventionPoint.objects.create(name="stage2", course_id=TEST_COURSE_ID)
         mock_item = {"type": "ExternalTool",
                      "external_url": stage_url(self.request, stage.id)}
         with patch(LIST_ITEMS, return_value=APIReturn([mock_item])):
@@ -65,7 +65,7 @@ class TestControllers(SessionTestCase):
     def test_all_stage_urls_one_element(self):
         """ Tests that all_stage_urls returns the url for one stage when
             that is in the database """
-        stage = Stage.objects.create(name="stage1", course_id=TEST_COURSE_ID)
+        stage = InterventionPoint.objects.create(name="stage1", course_id=TEST_COURSE_ID)
         urls = all_stage_urls(self.request, TEST_COURSE_ID)
         self.assertEqual(len(urls), 1)
         self.assertEqual([stage_url(self.request, stage.id)], urls)
@@ -73,8 +73,8 @@ class TestControllers(SessionTestCase):
     def test_all_stage_urls_multiple_courses(self):
         """ Tests that all_stage_urls only returns the url for the stage
             in the database that matches the course_id """
-        stage = Stage.objects.create(name="stage1", course_id=TEST_COURSE_ID)
-        Stage.objects.create(name="stage2", course_id=TEST_OTHER_COURSE_ID)
+        stage = InterventionPoint.objects.create(name="stage1", course_id=TEST_COURSE_ID)
+        InterventionPoint.objects.create(name="stage2", course_id=TEST_OTHER_COURSE_ID)
         urls = all_stage_urls(self.request, TEST_COURSE_ID)
         self.assertEqual(len(urls), 1)
         self.assertEqual([stage_url(self.request, stage.id)], urls)

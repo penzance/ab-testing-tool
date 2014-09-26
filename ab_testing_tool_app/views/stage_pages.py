@@ -5,7 +5,7 @@ from random import choice
 
 from ab_testing_tool_app.constants import (ADMINS, STAGE_URL_TAG,
     DEPLOY_OPTION_TAG, AS_TAB_TAG)
-from ab_testing_tool_app.models import (Stage, Track, StageUrl, CourseSettings,
+from ab_testing_tool_app.models import (InterventionPoint, Track, InterventionPointUrl, CourseSettings,
     CourseStudent)
 from ab_testing_tool_app.canvas import get_lti_param
 from ab_testing_tool_app.controllers import (stage_is_installed, format_url,
@@ -55,12 +55,12 @@ def deploy_stage(request, stage_id):
     # Retrieve the url for the student's track at the current intervention point
     # Return an error page if there is no url configured.
     try:
-        chosen_stage_url = StageUrl.objects.get(stage__pk=stage_id, track=student.track)
+        chosen_stage_url = InterventionPointUrl.objects.get(stage__pk=stage_id, track=student.track)
         if chosen_stage_url.open_as_tab:
             return render_to_response("new_tab_redirect.html", {"url": chosen_stage_url.url})
         if chosen_stage_url.is_canvas_page:
             return render_to_response("window_redirect.html", {"url": chosen_stage_url.url})
-    except StageUrl.DoesNotExist:
+    except InterventionPointUrl.DoesNotExist:
         raise NO_URL_FOR_TRACK
     if not chosen_stage_url.url:
         raise NO_URL_FOR_TRACK
@@ -73,7 +73,7 @@ def create_stage(request):
         requiring separate template render function. This also breaks CSRF
         token validation if CSRF Middleware is turned off. """
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    #Note: Refer to template. (t,None) is passed as there are no existing StageUrls for a new stage
+    #Note: Refer to template. (t,None) is passed as there are no existing InterventionPointUrls for a new stage
     context = {"tracks" : [(t, None) for t in
                            Track.objects.filter(course_id=course_id)],
                "cancel_url": "/#tabs-2"}
@@ -87,7 +87,7 @@ def submit_create_stage(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     name = post_param(request, "name")
     notes = post_param(request, "notes")
-    t = Stage.objects.create(name=name, notes=notes, course_id=course_id)
+    t = InterventionPoint.objects.create(name=name, notes=notes, course_id=course_id)
     stageurls = [(k,v) for (k,v) in request.POST.iteritems() if STAGE_URL_TAG in k and v]
     for (k,v) in stageurls:
         _,track_id = k.split(STAGE_URL_TAG)
@@ -95,7 +95,7 @@ def submit_create_stage(request):
         as_tab = request.POST.get(AS_TAB_TAG + track_id, None)
         is_canvas_page = bool(is_canvas == "canvas_url")
         open_as_tab = bool(as_tab == "true")
-        StageUrl.objects.create(url=format_url(v), stage_id=t.id, track_id=track_id,
+        InterventionPointUrl.objects.create(url=format_url(v), stage_id=t.id, track_id=track_id,
                                 is_canvas_page=is_canvas_page, open_as_tab=open_as_tab)
     return redirect("/#tabs-2")
 
@@ -113,19 +113,19 @@ def edit_stage(request, stage_id):
 
 def edit_stage_common(request, stage_id):
     """ Common core shared bewteen edit_stage and modules_page_edit_stage """
-    stage = get_object_or_404(Stage, pk=stage_id)
+    stage = get_object_or_404(InterventionPoint, pk=stage_id)
     course_id = get_lti_param(request, "custom_canvas_course_id")
     if course_id != stage.course_id:
         raise UNAUTHORIZED_ACCESS
     all_tracks = Track.objects.filter(course_id=course_id)
     track_urls = []
     for track in all_tracks:
-        # This is a search for the joint unique index of StageUrl, so it
+        # This is a search for the joint unique index of InterventionPointUrl, so it
         # should not ever return multiple objects
         try:
-            stage_url = StageUrl.objects.get(stage__pk=stage_id, track=track)
+            stage_url = InterventionPointUrl.objects.get(stage__pk=stage_id, track=track)
             track_urls.append((track, stage_url))
-        except StageUrl.DoesNotExist:
+        except InterventionPointUrl.DoesNotExist:
             track_urls.append((track, None))
     context = {"stage": stage,
                "tracks": track_urls,
@@ -139,28 +139,28 @@ def edit_stage_common(request, stage_id):
 def submit_edit_stage(request, stage_id):
     """ Note: Only allowed if admin has privileges on the particular course.
         TODO: consider using Django forms to save rather of getting individual POST params """
-    stage = get_object_or_404(Stage, pk=stage_id)
+    stage = get_object_or_404(InterventionPoint, pk=stage_id)
     course_id = get_lti_param(request, "custom_canvas_course_id")
     name = post_param(request, "name")
     notes = post_param(request, "notes")
     if course_id != stage.course_id:
         raise UNAUTHORIZED_ACCESS
     stage.update(name=name, notes=notes)
-    # StageUrl creation
+    # InterventionPointUrl creation
     stageurls = [(k,v) for (k,v) in request.POST.iteritems() if STAGE_URL_TAG in k and v]
     for (k,v) in stageurls:
         _, track_id = k.split(STAGE_URL_TAG)
-        # This is a search for the joint unique index of StageUrl, so it
+        # This is a search for the joint unique index of InterventionPointUrl, so it
         # should not ever return multiple objects
         is_canvas = post_param(request, DEPLOY_OPTION_TAG + track_id)
         as_tab = request.POST.get(AS_TAB_TAG + track_id, None)
         is_canvas_page = bool(is_canvas == "canvas_url")
         open_as_tab = bool(as_tab == "true")
         try:
-            stage_url = StageUrl.objects.get(stage__pk=stage_id, track__pk=track_id)
+            stage_url = InterventionPointUrl.objects.get(stage__pk=stage_id, track__pk=track_id)
             stage_url.update(url=format_url(v), is_canvas_page=is_canvas_page, open_as_tab=open_as_tab)
-        except StageUrl.DoesNotExist:
-            StageUrl.objects.create(url=format_url(v), stage_id=stage_id, track_id=track_id,
+        except InterventionPointUrl.DoesNotExist:
+            InterventionPointUrl.objects.create(url=format_url(v), stage_id=stage_id, track_id=track_id,
                                     is_canvas_page=is_canvas_page, open_as_tab=open_as_tab)
     return redirect("/#tabs-2")
 
@@ -168,8 +168,8 @@ def submit_edit_stage(request, stage_id):
 @lti_role_required(ADMINS)
 def delete_stage(request, stage_id):
     """ Note: Installed stages are not allowed to be deleted
-        Note: attached StageUrls are deleted via cascading delete """
-    stage = get_object_or_404(Stage, pk=stage_id)
+        Note: attached InterventionPointUrls are deleted via cascading delete """
+    stage = get_object_or_404(InterventionPoint, pk=stage_id)
     course_id = get_lti_param(request, "custom_canvas_course_id")
     if course_id != stage.course_id:
         raise UNAUTHORIZED_ACCESS

@@ -1,6 +1,6 @@
 from django.core.urlresolvers import reverse
 
-from ab_testing_tool_app.models import Stage
+from ab_testing_tool_app.models import InterventionPoint
 from ab_testing_tool_app.canvas import (get_canvas_request_context, list_module_items, list_modules,
     get_lti_param)
 from ab_testing_tool_app.exceptions import BAD_STAGE_ID, missing_param_error
@@ -24,17 +24,17 @@ def format_url(url):
 
 
 def get_uninstalled_stages(request):
-    """ Returns the list of Stage objects that have been created for the
+    """ Returns the list of InterventionPoint objects that have been created for the
         current course but not installed in any of that course's modules """
     course_id = get_lti_param(request, "custom_canvas_course_id")
     installed_stage_urls = get_installed_stages(request)
-    stages = [stage for stage in Stage.objects.filter(course_id=course_id)
+    stages = [stage for stage in InterventionPoint.objects.filter(course_id=course_id)
               if stage_url(request, stage.id) not in installed_stage_urls]
     return stages
 
 
 def get_installed_stages(request):
-    """ Returns the list of stage urls (as strings) for Stages that have been
+    """ Returns the list of InterventionPointUrls (as strings) for InterventionPoints that have been
         installed in at least one of the courses modules. """
     course_id = get_lti_param(request, "custom_canvas_course_id")
     request_context =  get_canvas_request_context(request)
@@ -52,14 +52,14 @@ def stage_is_installed(request, stage):
 
 def get_incomplete_stages(stage_list):
     """ Takes paramter stage_list instead of parameter course_id to avoid
-        second database call to the Stage table in methods that needs to
-        already fetch the Stage table"""
+        second database call to the InterventionPoint table in methods that needs to
+        already fetch the InterventionPoint table"""
     return [stage.name for stage in stage_list if stage.is_missing_urls()]
 
 def all_stage_urls(request, course_id):
     """ Returns the deploy urls of all stages in the database for that course"""
     return [stage_url(request, stage.id) for stage in
-            Stage.objects.filter(course_id=course_id)]
+            InterventionPoint.objects.filter(course_id=course_id)]
 
 
 def get_modules_with_items(request):

@@ -2,7 +2,7 @@ from django.shortcuts import render_to_response, redirect, get_object_or_404
 from django_auth_lti.decorators import lti_role_required
 
 from ab_testing_tool_app.constants import ADMINS
-from ab_testing_tool_app.models import Track, CourseSettings, Stage
+from ab_testing_tool_app.models import Track, CourseSettings, InterventionPoint
 from ab_testing_tool_app.canvas import get_lti_param
 from ab_testing_tool_app.exceptions import (UNAUTHORIZED_ACCESS,
     COURSE_TRACKS_ALREADY_FINALIZED, NO_TRACKS_FOR_COURSE)
@@ -74,10 +74,10 @@ def finalize_tracks(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     if Track.objects.filter(course_id=course_id).count() == 0:
         raise NO_TRACKS_FOR_COURSE
-    stages = Stage.objects.filter(course_id=course_id)
+    stages = InterventionPoint.objects.filter(course_id=course_id)
     incomplete_stages = get_incomplete_stages(stages)
     if incomplete_stages:
         #TODO: replace with better error display
-        return HttpResponse("URLs missing for these tracks in these Stages: %s" % incomplete_stages)
+        return HttpResponse("URLs missing for these tracks in these Intervention Points: %s" % incomplete_stages)
     CourseSettings.set_finalized(course_id)
     return redirect("/")

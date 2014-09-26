@@ -1,7 +1,7 @@
 from ab_testing_tool_app.tests.common import (SessionTestCase, TEST_COURSE_ID,
     TEST_OTHER_COURSE_ID, NONEXISTENT_TRACK_ID)
 from django.core.urlresolvers import reverse
-from ab_testing_tool_app.models import Track, CourseSettings, Stage, StageUrl
+from ab_testing_tool_app.models import Track, CourseSettings, InterventionPoint, InterventionPointUrl
 from ab_testing_tool_app.exceptions import (COURSE_TRACKS_ALREADY_FINALIZED,
     NO_TRACKS_FOR_COURSE, UNAUTHORIZED_ACCESS)
 
@@ -184,13 +184,13 @@ class TestTrackPages(SessionTestCase):
         """ Tests that stage_urls of a track are deleted when the track is """
         track1 = Track.objects.create(name="track1", course_id=TEST_COURSE_ID)
         track2 = Track.objects.create(name="track2", course_id=TEST_COURSE_ID)
-        stage = Stage.objects.create(name="stage1", course_id=TEST_COURSE_ID)
-        StageUrl.objects.create(stage=stage, track=track1, url="example.com")
-        StageUrl.objects.create(stage=stage, track=track2, url="example.com")
-        first_num_stage_urls = StageUrl.objects.count()
+        stage = InterventionPoint.objects.create(name="stage1", course_id=TEST_COURSE_ID)
+        InterventionPointUrl.objects.create(stage=stage, track=track1, url="example.com")
+        InterventionPointUrl.objects.create(stage=stage, track=track2, url="example.com")
+        first_num_stage_urls = InterventionPointUrl.objects.count()
         response = self.client.get(reverse("delete_track", args=(track1.id,)),
                                    follow=True)
-        second_num_stage_urls = StageUrl.objects.count()
+        second_num_stage_urls = InterventionPointUrl.objects.count()
         self.assertEqual(response.status_code, 200)
         self.assertEqual(first_num_stage_urls - 1, second_num_stage_urls)
     
@@ -206,8 +206,8 @@ class TestTrackPages(SessionTestCase):
         self.assertFalse(CourseSettings.get_is_finalized(TEST_COURSE_ID))
         track1 = Track.objects.create(name="track1", course_id=TEST_COURSE_ID)
         Track.objects.create(name="track2", course_id=TEST_COURSE_ID)
-        stage = Stage.objects.create(name="stage1", course_id=TEST_COURSE_ID)
-        StageUrl.objects.create(stage=stage, track=track1, url="example.com")
+        stage = InterventionPoint.objects.create(name="stage1", course_id=TEST_COURSE_ID)
+        InterventionPointUrl.objects.create(stage=stage, track=track1, url="example.com")
         self.client.get(reverse("finalize_tracks"), follow=True)
         self.assertFalse(CourseSettings.get_is_finalized(TEST_COURSE_ID))
     
