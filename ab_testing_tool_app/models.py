@@ -31,7 +31,7 @@ class InterventionPoint(CustomModel):
         if (Track.objects.filter(course_id=self.course_id).count()
             != self.tracks.count()):
             return True
-        for intervention_point_url in InterventionPointUrl.objects.filter(stage=self):
+        for intervention_point_url in InterventionPointUrl.objects.filter(intervention_point=self):
             if not intervention_point_url.url:
                 return True
         return False
@@ -40,12 +40,12 @@ class InterventionPointUrl(CustomModel):
     """ This model stores the URL of a single intervention """
     url = models.URLField(max_length=2048)
     track = models.ForeignKey(Track)
-    stage = models.ForeignKey(InterventionPoint)
+    intervention_point = models.ForeignKey(InterventionPoint)
     open_as_tab = models.BooleanField(default=False)
     is_canvas_page = models.BooleanField(default=False)
     
     class Meta:
-        unique_together = (('track', 'stage'),)
+        unique_together = (('track', 'intervention_point'),)
 
 
 class CourseStudent(CustomModel):

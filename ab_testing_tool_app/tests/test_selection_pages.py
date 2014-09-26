@@ -3,7 +3,7 @@ from ab_testing_tool_app.tests.common import (SessionTestCase, TEST_COURSE_ID,
     TEST_DOMAIN, NONEXISTENT_STAGE_ID)
 from ab_testing_tool_app.models import InterventionPoint, InterventionPointUrl, Track
 from django.utils.http import urlencode
-from ab_testing_tool_app.controllers import stage_url
+from ab_testing_tool_app.controllers import intervention_point_url
 from mock import patch
 from ab_testing_tool_app.exceptions import (MISSING_RETURN_TYPES_PARAM,
     MISSING_RETURN_URL, missing_param_error)
@@ -55,14 +55,14 @@ class TestSelectionPages(SessionTestCase):
     def test_submit_selection_with_missig_param(self):
         """ Tests that submit_selection returns an error when missing a post param """
         response = self.client.post(reverse("submit_selection"), {})
-        self.assertError(response, missing_param_error("stage_id"))
+        self.assertError(response, missing_param_error("intervention_point_id"))
     
     @patch("django.http.request.HttpRequest.get_host", return_value=TEST_DOMAIN)
-    def test_submit_selection_with_invalid_stage(self, _mock):
+    def test_submit_selection_with_invalid_intervention_point(self, _mock):
         """ Tests that submit_selection returns a redirect url with the
             described parameters """
         content_return_url = "http://test_content_return_url.com"
-        data = {"stage_id": NONEXISTENT_STAGE_ID, "content_return_url": content_return_url}
+        data = {"intervention_point_id": NONEXISTENT_STAGE_ID, "content_return_url": content_return_url}
         response = self.client.post(reverse("submit_selection"), data)
         self.assertEquals(response.status_code, 404)
    
@@ -70,54 +70,54 @@ class TestSelectionPages(SessionTestCase):
     def test_submit_selection(self, _mock):
         """ Tests that submit_selection returns a redirect url with the
             described parameters """
-        stage = InterventionPoint.objects.create(name="stage1", course_id=TEST_COURSE_ID)
+        intervention_point = InterventionPoint.objects.create(name="intervention_point1", course_id=TEST_COURSE_ID)
         content_return_url = "http://test_content_return_url.com"
-        data = {"stage_id": stage.id, "content_return_url": content_return_url}
+        data = {"intervention_point_id": intervention_point.id, "content_return_url": content_return_url}
         response = self.client.post(reverse("submit_selection"), data)
         self.request.is_secure.return_value = False
         params = {"return_type": "lti_launch_url",
-                   "url": stage_url(self.request, stage.id),
-                   "text": stage.name,
+                   "url": intervention_point_url(self.request, intervention_point.id),
+                   "text": intervention_point.name,
                   }
         for k, v in params.items():
             self.assertTrue(urlencode({k: v}) in response.url, urlencode({k: v}))
     
     @patch("django.http.request.HttpRequest.get_host", return_value=TEST_DOMAIN)
-    def test_submit_selection_new_stage(self, _mock):
-        """ Tests that submit_selection_new_stage creates a stage object and
+    def test_submit_selection_new_intervention_point(self, _mock):
+        """ Tests that submit_selection_new_intervention_point creates a intervention_point object and
             returns a redirect url with the described parameters """
-        stage_name = "this_is_a_stage"
-        num_stages = InterventionPoint.objects.count()
+        intervention_point_name = "this_is_a_intervention_point"
+        num_intervention_points = InterventionPoint.objects.count()
         content_return_url = "http://test_content_return_url.com"
-        data = {"name": stage_name, "notes": "hi",
+        data = {"name": intervention_point_name, "notes": "hi",
                 "content_return_url": content_return_url}
-        response = self.client.post(reverse("submit_selection_new_stage"), data)
-        self.assertEqual(num_stages + 1, InterventionPoint.objects.count())
-        stage = InterventionPoint.objects.get(name=stage_name)
+        response = self.client.post(reverse("submit_selection_new_intervention_point"), data)
+        self.assertEqual(num_intervention_points + 1, InterventionPoint.objects.count())
+        intervention_point = InterventionPoint.objects.get(name=intervention_point_name)
         self.request.is_secure.return_value = False
         params = {"return_type": "lti_launch_url",
-                   "url": stage_url(self.request, stage.id),
-                   "text": stage_name,
+                   "url": intervention_point_url(self.request, intervention_point.id),
+                   "text": intervention_point_name,
                   }
         for k, v in params.items():
             self.assertTrue(urlencode({k: v}) in response.url, urlencode({k: v}))
     
     @patch("django.http.request.HttpRequest.get_host", return_value=TEST_DOMAIN)
-    def test_submit_selection_new_stage_with_stageurls(self, _mock):
-        """ Tests that submit_selection_new_stage creates a stage object and
-        stage url objects"""
-        stage_name = "this_is_a_stage"
-        num_stages = InterventionPoint.objects.count()
-        num_stageurls = InterventionPointUrl.objects.count()
+    def test_submit_selection_new_intervention_point_with_intervention_pointurls(self, _mock):
+        """ Tests that submit_selection_new_intervention_point creates a intervention_point object and
+        intervention_point url objects"""
+        intervention_point_name = "this_is_a_intervention_point"
+        num_intervention_points = InterventionPoint.objects.count()
+        num_intervention_pointurls = InterventionPointUrl.objects.count()
         track1 = Track.objects.create(name="t1", course_id=TEST_COURSE_ID)
         track2 = Track.objects.create(name="t2", course_id=TEST_COURSE_ID)
         content_return_url = "http://test_content_return_url.com"
-        data = {"name": stage_name, STAGE_URL_TAG + "1": "http://example.com/page",
+        data = {"name": intervention_point_name, STAGE_URL_TAG + "1": "http://example.com/page",
                 STAGE_URL_TAG + "2": "http://example.com/otherpage", "notes": "hi",
                 "content_return_url": content_return_url}
-        self.client.post(reverse("submit_selection_new_stage"), data)
-        self.assertEqual(num_stages + 1, InterventionPoint.objects.count())
-        self.assertEqual(num_stageurls + 2, InterventionPointUrl.objects.count())
-        stage = InterventionPoint.objects.get(name=stage_name)
-        self.assertIsNotNone(InterventionPointUrl.objects.get(stage=stage.id, track=track1.id))
-        self.assertIsNotNone(InterventionPointUrl.objects.get(stage=stage.id, track=track2.id))
+        self.client.post(reverse("submit_selection_new_intervention_point"), data)
+        self.assertEqual(num_intervention_points + 1, InterventionPoint.objects.count())
+        self.assertEqual(num_intervention_pointurls + 2, InterventionPointUrl.objects.count())
+        intervention_point = InterventionPoint.objects.get(name=intervention_point_name)
+        self.assertIsNotNone(InterventionPointUrl.objects.get(intervention_point=intervention_point.id, track=track1.id))
+        self.assertIsNotNone(InterventionPointUrl.objects.get(intervention_point=intervention_point.id, track=track2.id))

@@ -1,7 +1,7 @@
 from django.core.urlresolvers import reverse
 from mock import patch
 
-from ab_testing_tool_app.controllers import stage_url, get_uninstalled_stages
+from ab_testing_tool_app.controllers import intervention_point_url, get_uninstalled_intervention_points
 from ab_testing_tool_app.tests.common import (SessionTestCase, LIST_MODULES,
     LIST_ITEMS, APIReturn, TEST_COURSE_ID, TEST_OTHER_COURSE_ID)
 from ab_testing_tool_app.models import InterventionPoint, Track, CourseStudent
@@ -28,7 +28,7 @@ class TestMainPages(SessionTestCase):
     def test_control_panel_with_module_and_item(self, _mock1):
         """ Tests control_panel template renders with items returned from Canvas"""
         mock_item = {"type": "ExternalTool",
-                     "external_url": stage_url(self.request, 0)}
+                     "external_url": intervention_point_url(self.request, 0)}
         api_return = APIReturn([mock_item])
         with patch(LIST_ITEMS, return_value=api_return):
             response = self.client.get(reverse("index"), follow=True)
@@ -46,49 +46,49 @@ class TestMainPages(SessionTestCase):
     def test_index_context(self):
         """ Checks that the context of the index contains the relevant fields """
         response = self.client.get(reverse("index"), follow=True)
-        self.assertIn("stages", response.context)
+        self.assertIn("intervention_points", response.context)
         self.assertIn("modules", response.context)
-        self.assertIn("uninstalled_stages", response.context)
+        self.assertIn("uninstalled_intervention_points", response.context)
         self.assertIn("tracks", response.context)
         self.assertIn("canvas_url", response.context)
     
-    def test_index_context_stages_and_tracks(self):
-        """ Checks that the stages and tracks passed to the index template
+    def test_index_context_intervention_points_and_tracks(self):
+        """ Checks that the intervention_points and tracks passed to the index template
             contain values from the database """
         response = self.client.get(reverse("index"), follow=True)
-        self.assertEqual(len(response.context["stages"]), 0)
+        self.assertEqual(len(response.context["intervention_points"]), 0)
         self.assertEqual(len(response.context["tracks"]), 0)
-        stage = InterventionPoint.objects.create(name="stage1", course_id=TEST_COURSE_ID)
+        intervention_point = InterventionPoint.objects.create(name="intervention_point1", course_id=TEST_COURSE_ID)
         track = Track.objects.create(name="track1", course_id=TEST_COURSE_ID)
         response = self.client.get(reverse("index"), follow=True)
-        self.assertEqual(len(response.context["stages"]), 1)
+        self.assertEqual(len(response.context["intervention_points"]), 1)
         self.assertEqual(len(response.context["tracks"]), 1)
-        self.assertSameIds([stage], response.context["stages"])
+        self.assertSameIds([intervention_point], response.context["intervention_points"])
         self.assertSameIds([track], response.context["tracks"])
     
-    def test_index_context_course_specific_stages_and_tracks(self):
-        """ Checks that the stages and tracks passed to the index template
+    def test_index_context_course_specific_intervention_points_and_tracks(self):
+        """ Checks that the intervention_points and tracks passed to the index template
             only contain database values matching the course_id """
-        stage = InterventionPoint.objects.create(name="stage1", course_id=TEST_COURSE_ID)
-        InterventionPoint.objects.create(name="stage1", course_id=TEST_OTHER_COURSE_ID)
+        intervention_point = InterventionPoint.objects.create(name="intervention_point1", course_id=TEST_COURSE_ID)
+        InterventionPoint.objects.create(name="intervention_point1", course_id=TEST_OTHER_COURSE_ID)
         track = Track.objects.create(name="track1", course_id=TEST_COURSE_ID)
         Track.objects.create(name="track2", course_id=TEST_OTHER_COURSE_ID)
         response = self.client.get(reverse("index"), follow=True)
-        self.assertEqual(len(response.context["stages"]), 1)
+        self.assertEqual(len(response.context["intervention_points"]), 1)
         self.assertEqual(len(response.context["tracks"]), 1)
-        self.assertSameIds([stage], response.context["stages"])
+        self.assertSameIds([intervention_point], response.context["intervention_points"])
         self.assertSameIds([track], response.context["tracks"])
     
-    def test_index_context_uninstalled_stages(self):
+    def test_index_context_uninstalled_intervention_points(self):
         """ Tests that the context for the index correctly contains
-            the uninstalled stages for the course """
-        stage1 =InterventionPoint.objects.create(name="stage1", course_id=TEST_COURSE_ID)
-        stage2 = InterventionPoint.objects.create(name="stage2", course_id=TEST_COURSE_ID)
-        with patch("ab_testing_tool_app.views.main_pages.get_uninstalled_stages",
-                   return_value=[stage1]):
+            the uninstalled intervention_points for the course """
+        intervention_point1 =InterventionPoint.objects.create(name="intervention_point1", course_id=TEST_COURSE_ID)
+        intervention_point2 = InterventionPoint.objects.create(name="intervention_point2", course_id=TEST_COURSE_ID)
+        with patch("ab_testing_tool_app.views.main_pages.get_uninstalled_intervention_points",
+                   return_value=[intervention_point1]):
             response = self.client.get(reverse("index"), follow=True)
-            self.assertSameIds(response.context["uninstalled_stages"], [stage1])
-            self.assertSameIds(response.context["stages"], [stage1, stage2])
+            self.assertSameIds(response.context["uninstalled_intervention_points"], [intervention_point1])
+            self.assertSameIds(response.context["intervention_points"], [intervention_point1, intervention_point2])
     
     def test_index_context_modules(self):
         ret_val = [{"name": "module1"}]
