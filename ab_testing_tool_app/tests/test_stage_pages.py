@@ -18,7 +18,7 @@ class TestStagePages(SessionTestCase):
         """ Tests deploy stage for admins redirects to edit stage """
         stage = Stage.objects.create(name="stage1", course_id=TEST_COURSE_ID)
         response = self.client.get(reverse("deploy_stage", args=(stage.id,)))
-        self.assertRedirects(response, reverse("edit_stage", args=(stage.id,)))
+        self.assertRedirects(response, reverse("modules_page_edit_stage", args=(stage.id,)))
     
     def test_deploy_stage_student_not_finalized(self):
         """ Tests deploy stage for student errors if tracks not finalized
