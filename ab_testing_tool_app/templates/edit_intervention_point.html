@@ -41,7 +41,7 @@
                 {% for t, s in tracks %}
                 <tr align="left" class="url_box">
                     <td class="col-xs-3"><label>URL for Track "{{t.name}}" </label></td>
-                    <td class="col-xs-4"><input id="url_{{t.id}}" class="form-control url_box_input"  type="url"  name="intervention_point_url{{t.id}}" value="{{ s.url }}"/></td>
+                    <td class="col-xs-4"><input id="url_{{t.id}}" class="form-control url_box_input"  type="url"  name="intervention_point_url_{{t.id}}" value="{{ s.url }}"/></td>
                     <td class="col-xs-3">
                         <input type="radio" name="is_canvas_page_for_track_{{t.id}}" value="non_canvas_url" {% if not s.is_canvas_page %} checked="checked" {% endif %}> Non-Canvas Page
                         <br>
