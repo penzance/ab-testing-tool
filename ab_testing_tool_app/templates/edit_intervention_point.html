@@ -14,34 +14,34 @@
     <div class="jumbotron">
         <table class="table">
         <tbody>
-        <h2>A/B Intervention Point "{{stage.name|default:"Unnamed"}}"</h2>
+        <h2>A/B Intervention Point "{{intervention_point.name|default:"Unnamed"}}"</h2>
         <!-- <td class="text-right nowrap"><a href="/" class="btn btn-lg btn-primary" id="delete">Go To Dashboard</a></td>-->
         <tr>
-        <td ><p>Created: {{stage.created_on}} | Last updated: {{stage.updated_on}} </p></td>
-        {% if stage.id and not is_installed %}
-        <td class="text-right nowrap"><a id="delete_stage_button" href="{% url 'delete_stage' stage.id %}" class="btn btn-lg btn-danger">Delete Intervention Point</a></td>
-        {% elif stage.id and is_installed%}
-        <td class="text-right nowrap"><a id="delete_stage_button_disabled" class="btn btn-lg btn-danger disabled">Delete Intervention Point</a></td>
+        <td ><p>Created: {{intervention_point.created_on}} | Last updated: {{intervention_point.updated_on}} </p></td>
+        {% if intervention_point.id and not is_installed %}
+        <td class="text-right nowrap"><a id="delete_intervention_point_button" href="{% url 'delete_intervention_point' intervention_point.id %}" class="btn btn-lg btn-danger">Delete Intervention Point</a></td>
+        {% elif intervention_point.id and is_installed%}
+        <td class="text-right nowrap"><a id="delete_intervention_point_button_disabled" class="btn btn-lg btn-danger disabled">Delete Intervention Point</a></td>
         {% endif %}
         </tr>
         </tbody>
         </table>
     </div class="row-fluid">
-            {% if stage.id and is_installed %}
+            {% if intervention_point.id and is_installed %}
             <h4 class="text-center nowrap">Intervention Point Is Installed.</h4>
             <h5 class="text-center nowrap">Note: Intervention Point must first be uninstalled before it can be deleted</h5>
             {% endif %}
-            <form method="post" class="form-horizontal" name="stage_form" {% if stage.id %} action="{% url 'submit_edit_stage' stage.id %}"{% else %} action="{% url 'submit_create_stage' %}" {% endif %}>
+            <form method="post" class="form-horizontal" name="intervention_point_form" {% if intervention_point.id %} action="{% url 'submit_edit_intervention_point' intervention_point.id %}"{% else %} action="{% url 'submit_create_intervention_point' %}" {% endif %}>
             {% csrf_token %}
                 <table class="table">
                 <tr align="left">
                     <td><label>Intervention Point Name</label></td>
-                    <td><input class="form-control"  type="text" name="name" value="{{ stage.name }}"/></td>
+                    <td><input class="form-control"  type="text" name="name" value="{{ intervention_point.name }}"/></td>
                 </tr>
                 {% for t, s in tracks %}
                 <tr align="left" class="url_box">
                     <td class="col-xs-3"><label>URL for Track "{{t.name}}" </label></td>
-                    <td class="col-xs-4"><input id="url_{{t.id}}" class="form-control url_box_input"  type="url"  name="stageurl_{{t.id}}" value="{{ s.url }}"/></td>
+                    <td class="col-xs-4"><input id="url_{{t.id}}" class="form-control url_box_input"  type="url"  name="intervention_point_url_{{t.id}}" value="{{ s.url }}"/></td>
                     <td class="col-xs-3">
                         <input type="radio" name="is_canvas_page_for_track_{{t.id}}" value="non_canvas_url" {% if not s.is_canvas_page %} checked="checked" {% endif %}> Non-Canvas Page
                         <br>
@@ -53,13 +53,13 @@
                 {% endfor %}
                 <tr align="left">
                     <td><label>Intervention Point Notes</label></td>
-                    <td><textarea name="notes" rows="6" cols="80" >{{ stage.notes }}</textarea></td>
+                    <td><textarea name="notes" rows="6" cols="80" >{{ intervention_point.notes }}</textarea></td>
                 </tr>
                 <tr>
                 <td></td>
-                <td><input id="submit_edit_stage_button" type="submit" name="submit" value="Submit Changes" class="btn btn-lg btn-success submit">
+                <td><input id="submit_edit_intervention_point_button" type="submit" name="submit" value="Submit Changes" class="btn btn-lg btn-success submit">
                 {% block cancel_url %}
-                <a id="cancel_submit_edit_stage_button" href="{{ cancel_url }}" class="btn btn-lg btn-primary">Cancel</a></td>
+                <a id="cancel_submit_edit_intervention_point_button" href="{{ cancel_url }}" class="btn btn-lg btn-primary">Cancel</a></td>
                 {% endblock %}
                 </tr>
                 </table>

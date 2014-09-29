@@ -2,12 +2,12 @@ from django.shortcuts import render_to_response, redirect, get_object_or_404
 from django_auth_lti.decorators import lti_role_required
 
 from ab_testing_tool_app.constants import ADMINS
-from ab_testing_tool_app.models import Track, CourseSettings, Stage
+from ab_testing_tool_app.models import Track, CourseSettings, InterventionPoint
 from ab_testing_tool_app.canvas import get_lti_param
 from ab_testing_tool_app.exceptions import (UNAUTHORIZED_ACCESS,
     COURSE_TRACKS_ALREADY_FINALIZED, NO_TRACKS_FOR_COURSE)
 from django.http.response import HttpResponse
-from ab_testing_tool_app.controllers import (post_param, get_incomplete_stages)
+from ab_testing_tool_app.controllers import (post_param, get_incomplete_intervention_points)
 
 
 @lti_role_required(ADMINS)
@@ -57,7 +57,7 @@ def submit_edit_track(request, track_id):
 def delete_track(request, track_id):
     """
     NOTE: When a track gets deleted, urls for that track get deleted from all
-          stages in that course as a result of cascading delete.
+          intervention_points in that course as a result of cascading delete.
     """
     track = get_object_or_404(Track, pk=track_id)
     course_id = get_lti_param(request, "custom_canvas_course_id")
@@ -74,10 +74,10 @@ def finalize_tracks(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     if Track.objects.filter(course_id=course_id).count() == 0:
         raise NO_TRACKS_FOR_COURSE
-    stages = Stage.objects.filter(course_id=course_id)
-    incomplete_stages = get_incomplete_stages(stages)
-    if incomplete_stages:
+    intervention_points = InterventionPoint.objects.filter(course_id=course_id)
+    incomplete_intervention_points = get_incomplete_intervention_points(intervention_points)
+    if incomplete_intervention_points:
         #TODO: replace with better error display
-        return HttpResponse("URLs missing for these tracks in these Stages: %s" % incomplete_stages)
+        return HttpResponse("URLs missing for these tracks in these Intervention Points: %s" % incomplete_intervention_points)
     CourseSettings.set_finalized(course_id)
     return redirect("/")

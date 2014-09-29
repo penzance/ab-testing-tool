@@ -20,32 +20,32 @@ class Track(CustomModel):
     course_id = models.CharField(max_length=128, db_index=True)
 
 
-class Stage(CustomModel):
+class InterventionPoint(CustomModel):
     """ This model stores the configuration of an intervention point"""
     name = models.CharField(max_length=256)
     notes = models.CharField(max_length=1024)
     course_id = models.CharField(max_length=128, db_index=True)
-    tracks = models.ManyToManyField(Track, through='StageUrl')
+    tracks = models.ManyToManyField(Track, through='InterventionPointUrl')
     
     def is_missing_urls(self):
         if (Track.objects.filter(course_id=self.course_id).count()
             != self.tracks.count()):
             return True
-        for stage_url in StageUrl.objects.filter(stage=self):
-            if not stage_url.url:
+        for intervention_point_url in InterventionPointUrl.objects.filter(intervention_point=self):
+            if not intervention_point_url.url:
                 return True
         return False
 
-class StageUrl(CustomModel):
+class InterventionPointUrl(CustomModel):
     """ This model stores the URL of a single intervention """
     url = models.URLField(max_length=2048)
     track = models.ForeignKey(Track)
-    stage = models.ForeignKey(Stage)
+    intervention_point = models.ForeignKey(InterventionPoint)
     open_as_tab = models.BooleanField(default=False)
     is_canvas_page = models.BooleanField(default=False)
     
     class Meta:
-        unique_together = (('track', 'stage'),)
+        unique_together = (('track', 'intervention_point'),)
 
 
 class CourseStudent(CustomModel):

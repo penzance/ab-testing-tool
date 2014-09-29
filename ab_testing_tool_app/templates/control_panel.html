@@ -29,10 +29,10 @@
                 <br>
                 {% if not is_finalized %}
                 <a id="create_track_button" class="btn btn-lg btn-success"  href="{% url 'create_track' %}"> Create New Track</a>
-                <a id="finalize_button" class="btn btn-lg btn-danger" {% if incomplete_stages %} href="#incomplete_stages_modal" {% else %} href="#finalize_modal" {% endif %} data-toggle="modal" > Finalize Tracks</a>
-                {% if incomplete_stages %}
-                <!-- START Modal code for incomplete_stages confirmation box-->
-                <div id="incomplete_stages_modal" class="modal fade" role="dialog" aria-labelledby="finalize_modal" aria-hidden="true">
+                <a id="finalize_button" class="btn btn-lg btn-danger" {% if incomplete_intervention_points %} href="#incomplete_intervention_points_modal" {% else %} href="#finalize_modal" {% endif %} data-toggle="modal" > Finalize Tracks</a>
+                {% if incomplete_intervention_points %}
+                <!-- START Modal code for incomplete_intervention_points confirmation box-->
+                <div id="incomplete_intervention_points_modal" class="modal fade" role="dialog" aria-labelledby="finalize_modal" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -41,7 +41,7 @@
                             </div>
                             <div class="modal-body">
                                 <p>Complete your intervention points by filling in the URLs fields for all tracks.</p>
-                                <p class="text-warning">These following intervention points are incomplete: {{ incomplete_stages|join:", " }} </p>
+                                <p class="text-warning">These following intervention points are incomplete: {{ incomplete_intervention_points|join:", " }} </p>
                             </div>
                             <div class="modal-footer">
                                 <a class="btn btn-lg btn-primary" data-dismiss="modal"> Close </a>
@@ -49,7 +49,7 @@
                         </div>
                     </div>
                 </div>
-                <!-- END Modal code for incomplete_stages confirmation box-->
+                <!-- END Modal code for incomplete_intervention_points confirmation box-->
                 {% endif %}
                 
                 <!-- START Modal code for Finalize Tracks confirmation box-->
@@ -100,12 +100,12 @@
             <div class="span8">
                 <p> Create and Edit your A/B intervention points here. </p>
                 <br>
-                <a id="create_new_stage_button" class="btn btn-lg btn-success" style="align:left" href="{% url 'create_stage' %}"> Create New Intervention Point</a>
+                <a id="create_new_intervention_point_button" class="btn btn-lg btn-success" style="align:left" href="{% url 'create_intervention_point' %}"> Create New Intervention Point</a>
                 <br><br>
         
                 <div class="list-group span4">
-                    {% for t in stages %}
-                    <a href="{% url 'edit_stage' t.id %}" class="list-group-item"><strong>{{t.name}}</strong> <i>{{t.is_missing_urls|yesno:"- URLs missing,complete"}}</i></a>
+                    {% for t in intervention_points %}
+                    <a href="{% url 'edit_intervention_point' t.id %}" class="list-group-item"><strong>{{t.name}}</strong> <i>{{t.is_missing_urls|yesno:"- URLs missing,complete"}}</i></a>
                     {% endfor %}
                 </div>
             </div>
@@ -122,7 +122,7 @@
                         <div id="module_items_{{m.id}}" style="display: none">
                                 <ul class="list-group">
                                     {% for i in m.module_items %}
-                                        {% if i.is_stage %}
+                                        {% if i.is_intervention_point %}
                                             <a class="list-group-item active">{{i.title}} | <i> Intervention Point</i></a>
                                         {% else %}
                                             <p class="list-group-item">{{i.title|default:"[ Item not titled]"}}</p>

@@ -1,106 +1,106 @@
 from mock import patch, MagicMock
 
-from ab_testing_tool_app.controllers import (get_uninstalled_stages, stage_url,
-    all_stage_urls, format_url, post_param)
+from ab_testing_tool_app.controllers import (get_uninstalled_intervention_points, intervention_point_url,
+    all_intervention_point_urls, format_url, post_param)
 from ab_testing_tool_app.tests.common import (SessionTestCase, APIReturn,
     LIST_MODULES, LIST_ITEMS, TEST_COURSE_ID, TEST_OTHER_COURSE_ID)
-from ab_testing_tool_app.models import Stage
+from ab_testing_tool_app.models import InterventionPoint
 from ab_testing_tool_app.exceptions import BAD_STAGE_ID
 
 
 class TestControllers(SessionTestCase):
-    def test_get_uninstalled_stages(self):
-        """ Tests method get_uninstalled_stages runs and returns no stages when
+    def test_get_uninstalled_intervention_points(self):
+        """ Tests method get_uninstalled_intervention_points runs and returns no intervention_points when
             database empty """
-        stages = get_uninstalled_stages(self.request)
-        self.assertEqual(len(stages), 0)
+        intervention_points = get_uninstalled_intervention_points(self.request)
+        self.assertEqual(len(intervention_points), 0)
     
     @patch(LIST_MODULES, return_value=APIReturn([{"id": 0}]))
-    def test_get_uninstalled_stages_with_item(self, _mock1):
-        """ Tests method get_uninstalled_stages returns one when database has
+    def test_get_uninstalled_intervention_points_with_item(self, _mock1):
+        """ Tests method get_uninstalled_intervention_points returns one when database has
             one item and api returns nothing """
-        Stage.objects.create(name="stage1", course_id=TEST_COURSE_ID)
-        stages = get_uninstalled_stages(self.request)
-        self.assertEqual(len(stages), 1)
+        InterventionPoint.objects.create(name="intervention_point1", course_id=TEST_COURSE_ID)
+        intervention_points = get_uninstalled_intervention_points(self.request)
+        self.assertEqual(len(intervention_points), 1)
     
     @patch(LIST_MODULES, return_value=APIReturn([{"id": 0}]))
-    def test_get_uninstalled_stages_against_courses(self, _mock1):
-        """ Tests method get_uninstalled_stages returns one when database has
+    def test_get_uninstalled_intervention_points_against_courses(self, _mock1):
+        """ Tests method get_uninstalled_intervention_points returns one when database has
             two items but only one matches the course and api returns nothing """
-        stage = Stage.objects.create(name="stage1", course_id=TEST_COURSE_ID)
-        Stage.objects.create(name="stage2", course_id=TEST_OTHER_COURSE_ID)
-        stages = get_uninstalled_stages(self.request)
-        self.assertEqual(len(stages), 1)
-        self.assertSameIds([stage], stages)
+        intervention_point = InterventionPoint.objects.create(name="intervention_point1", course_id=TEST_COURSE_ID)
+        InterventionPoint.objects.create(name="intervention_point2", course_id=TEST_OTHER_COURSE_ID)
+        intervention_points = get_uninstalled_intervention_points(self.request)
+        self.assertEqual(len(intervention_points), 1)
+        self.assertSameIds([intervention_point], intervention_points)
     
     @patch(LIST_MODULES, return_value=APIReturn([{"id": 0}]))
-    def test_get_uninstalled_stages_with_all_installed(self, _mock1):
-        """ Tests method get_uninstalled_stages returns zero when stage in
+    def test_get_uninstalled_intervention_points_with_all_installed(self, _mock1):
+        """ Tests method get_uninstalled_intervention_points returns zero when intervention_point in
             database is also returned by the API, which means it is installed """
-        stage = Stage.objects.create(name="stage1", course_id=TEST_COURSE_ID)
+        intervention_point = InterventionPoint.objects.create(name="intervention_point1", course_id=TEST_COURSE_ID)
         mock_item = {"type": "ExternalTool",
-                     "external_url": stage_url(self.request, stage.id)}
+                     "external_url": intervention_point_url(self.request, intervention_point.id)}
         with patch(LIST_ITEMS, return_value=APIReturn([mock_item])):
-            stages = get_uninstalled_stages(self.request)
-            self.assertEqual(len(stages), 0)
+            intervention_points = get_uninstalled_intervention_points(self.request)
+            self.assertEqual(len(intervention_points), 0)
     
     @patch(LIST_MODULES, return_value=APIReturn([{"id": 0}]))
-    def test_get_uninstalled_stages_with_some_installed(self, _mock1):
-        """ Tests method get_uninstalled_stages returns one when there are two
-            stages in the database, one of which is also returned by the API,
+    def test_get_uninstalled_intervention_points_with_some_installed(self, _mock1):
+        """ Tests method get_uninstalled_intervention_points returns one when there are two
+            intervention_points in the database, one of which is also returned by the API,
             which means it is installed """
-        stage = Stage.objects.create(name="stage1", course_id=TEST_COURSE_ID)
-        Stage.objects.create(name="stage2", course_id=TEST_COURSE_ID)
+        intervention_point = InterventionPoint.objects.create(name="intervention_point1", course_id=TEST_COURSE_ID)
+        InterventionPoint.objects.create(name="intervention_point2", course_id=TEST_COURSE_ID)
         mock_item = {"type": "ExternalTool",
-                     "external_url": stage_url(self.request, stage.id)}
+                     "external_url": intervention_point_url(self.request, intervention_point.id)}
         with patch(LIST_ITEMS, return_value=APIReturn([mock_item])):
-            stages = get_uninstalled_stages(self.request)
-            self.assertEqual(len(stages), 1)
+            intervention_points = get_uninstalled_intervention_points(self.request)
+            self.assertEqual(len(intervention_points), 1)
     
-    def test_all_stage_urls_empty(self):
-        """ Tests that all_stage_urls returns empty when there are no stages """
-        urls = all_stage_urls(self.request, TEST_COURSE_ID)
+    def test_all_intervention_point_urls_empty(self):
+        """ Tests that all_intervention_point_urls returns empty when there are no intervention_points """
+        urls = all_intervention_point_urls(self.request, TEST_COURSE_ID)
         self.assertEqual(len(urls), 0)
     
-    def test_all_stage_urls_one_element(self):
-        """ Tests that all_stage_urls returns the url for one stage when
+    def test_all_intervention_point_urls_one_element(self):
+        """ Tests that all_intervention_point_urls returns the url for one intervention_point when
             that is in the database """
-        stage = Stage.objects.create(name="stage1", course_id=TEST_COURSE_ID)
-        urls = all_stage_urls(self.request, TEST_COURSE_ID)
+        intervention_point = InterventionPoint.objects.create(name="intervention_point1", course_id=TEST_COURSE_ID)
+        urls = all_intervention_point_urls(self.request, TEST_COURSE_ID)
         self.assertEqual(len(urls), 1)
-        self.assertEqual([stage_url(self.request, stage.id)], urls)
+        self.assertEqual([intervention_point_url(self.request, intervention_point.id)], urls)
     
-    def test_all_stage_urls_multiple_courses(self):
-        """ Tests that all_stage_urls only returns the url for the stage
+    def test_all_intervention_point_urls_multiple_courses(self):
+        """ Tests that all_intervention_point_urls only returns the url for the intervention_point
             in the database that matches the course_id """
-        stage = Stage.objects.create(name="stage1", course_id=TEST_COURSE_ID)
-        Stage.objects.create(name="stage2", course_id=TEST_OTHER_COURSE_ID)
-        urls = all_stage_urls(self.request, TEST_COURSE_ID)
+        intervention_point = InterventionPoint.objects.create(name="intervention_point1", course_id=TEST_COURSE_ID)
+        InterventionPoint.objects.create(name="intervention_point2", course_id=TEST_OTHER_COURSE_ID)
+        urls = all_intervention_point_urls(self.request, TEST_COURSE_ID)
         self.assertEqual(len(urls), 1)
-        self.assertEqual([stage_url(self.request, stage.id)], urls)
+        self.assertEqual([intervention_point_url(self.request, intervention_point.id)], urls)
     
-    def test_stage_url_contains_stage_id(self):
-        """ Tests that stage_url contains the string of the stage_id """
-        stage_id = 999888777
-        url = stage_url(self.request, stage_id)
-        self.assertIn(str(stage_id), url)
+    def test_intervention_point_url_contains_intervention_point_id(self):
+        """ Tests that intervention_point_url contains the string of the intervention_point_id """
+        intervention_point_id = 999888777
+        url = intervention_point_url(self.request, intervention_point_id)
+        self.assertIn(str(intervention_point_id), url)
     
-    def test_stage_url_works_with_string_id(self):
-        """ Tests that stage_url succeeds when stage_id is a number string """
-        stage_id = "999888777"
-        url = stage_url(self.request, stage_id)
-        self.assertIn(stage_id, url)
+    def test_intervention_point_url_works_with_string_id(self):
+        """ Tests that intervention_point_url succeeds when intervention_point_id is a number string """
+        intervention_point_id = "999888777"
+        url = intervention_point_url(self.request, intervention_point_id)
+        self.assertIn(intervention_point_id, url)
     
-    def test_stage_url_contains_host(self):
-        """ Tests that stage_url's output contains the host of the request """
-        stage_id = "1"
-        url = stage_url(self.request, stage_id)
+    def test_intervention_point_url_contains_host(self):
+        """ Tests that intervention_point_url's output contains the host of the request """
+        intervention_point_id = "1"
+        url = intervention_point_url(self.request, intervention_point_id)
         self.assertIn(self.request.get_host(), url)
     
-    def test_stage_url_errors(self):
-        """ Tests that stage_url errors when passed a non-numeral stage_id """
-        self.assertRaisesSpecific(BAD_STAGE_ID, stage_url, self.request, None)
-        self.assertRaisesSpecific(BAD_STAGE_ID, stage_url, self.request, "str")
+    def test_intervention_point_url_errors(self):
+        """ Tests that intervention_point_url errors when passed a non-numeral intervention_point_id """
+        self.assertRaisesSpecific(BAD_STAGE_ID, intervention_point_url, self.request, None)
+        self.assertRaisesSpecific(BAD_STAGE_ID, intervention_point_url, self.request, "str")
     
     def test_format_url_passthrough(self):
         """ Tests that format_url doesn't change a proper http:// url """
