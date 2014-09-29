@@ -9,9 +9,9 @@ from django.template import loader
 from ims_lti_py.tool_config import ToolConfig
 
 from ab_testing_tool_app.canvas import get_lti_param
-from ab_testing_tool_app.controllers import (get_uninstalled_stages,
-    get_modules_with_items)
-from ab_testing_tool_app.models import (Stage, Track, CourseStudent,
+from ab_testing_tool_app.controllers import (get_uninstalled_intervention_points,
+    get_modules_with_items, get_incomplete_intervention_points)
+from ab_testing_tool_app.models import (InterventionPoint, Track, CourseStudent,
     CourseSettings)
 from ab_testing_tool_app.constants import ADMINS
 
@@ -21,20 +21,22 @@ def not_authorized(request):
 
 
 @lti_role_required(ADMINS)
-def render_stage_control_panel(request):
+def render_intervention_point_control_panel(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     modules = get_modules_with_items(request)
-    uninstalled_stages = get_uninstalled_stages(request)
-    stages = Stage.objects.filter(course_id=course_id)
+    uninstalled_intervention_points = get_uninstalled_intervention_points(request)
+    intervention_points = InterventionPoint.objects.filter(course_id=course_id)
     tracks = Track.objects.filter(course_id=course_id)
     is_finalized = CourseSettings.get_is_finalized(course_id=course_id)
+    incomplete_intervention_points = get_incomplete_intervention_points(intervention_points)
     context = {
         "modules": modules,
-        "stages": stages,
-        "uninstalled_stages": uninstalled_stages,
+        "intervention_points": intervention_points,
+        "uninstalled_intervention_points": uninstalled_intervention_points,
         "tracks": tracks,
         "canvas_url": get_lti_param(request, "launch_presentation_return_url"),
         "is_finalized": is_finalized,
+        "incomplete_intervention_points": incomplete_intervention_points,
     }
     return render_to_response("control_panel.html", context)
 

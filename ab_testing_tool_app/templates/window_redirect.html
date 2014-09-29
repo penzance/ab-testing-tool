@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="stylesheet" href="../static/css/bootstrap.min.css"  type="text/css"/>
+</head>
+<body>
+<script>
+/* Redirect the topmost window to the url instead of only inside the iframe.*/
+ window.top.location.href = "{{ url }}";
+</script>
+
+<!-- The HTML is fall-back to open the URL in a new tab in the event the above block fails -->
+<span>
+<br>
+<p class="text-center"> To visit the URL, click the button below. </p>
+<br>
+<div class="text-center"><a target="_blank" href="{{url}}" class="btn btn-lg btn-primary">Open in New Tab</a></div>
+</span>
+</body>
+</html>
