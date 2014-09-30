@@ -47,6 +47,7 @@ class SessionTestCase(TestCase):
         lti_launch["custom_canvas_api_domain"] = TEST_DOMAIN
         lti_launch["launch_presentation_return_url"] = TEST_DOMAIN
         lti_launch["custom_canvas_user_login_id"] = TEST_STUDENT_ID
+        lti_launch["lis_person_sourcedid"] = TEST_STUDENT_ID
         lti_launch["context_title"] = "Course title"
         session = self.client.session
         session["LTI_LAUNCH"] = lti_launch
