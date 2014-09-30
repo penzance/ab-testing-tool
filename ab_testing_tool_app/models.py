@@ -54,7 +54,7 @@ class CourseStudent(CustomModel):
         and will have a separate object for each course they are in. """
     course_id = models.CharField(max_length=128, db_index=True)
     student_id = models.CharField(max_length=128, db_index=True)
-    lis_person_sourcedid = models.CharField(max_length=128, db_index=True)
+    lis_person_sourcedid = models.CharField(max_length=128, db_index=True, null=True)
     track = models.ForeignKey(Track)
     
     class Meta:
