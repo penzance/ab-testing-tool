@@ -37,6 +37,7 @@ def deploy_intervention_point(request, intervention_point_id):
         raise COURSE_TRACKS_NOT_FINALIZED
     
     student_id = get_lti_param(request, "custom_canvas_user_login_id")
+    lis_person_sourcedid = get_lti_param(request, "lis_person_sourcedid")
     
     # Get or create an object to track the student for this course
     try:
@@ -50,7 +51,8 @@ def deploy_intervention_point(request, intervention_point_id):
             raise NO_TRACKS_FOR_COURSE
         chosen_track = choice(tracks)
         student = CourseStudent.objects.create(
-                student_id=student_id, course_id=course_id, track=chosen_track)
+                student_id=student_id, course_id=course_id, track=chosen_track,
+                lis_person_sourcedid=lis_person_sourcedid)
     
     # Retrieve the url for the student's track at the current intervention point
     # Return an error page if there is no url configured.

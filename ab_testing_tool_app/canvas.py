@@ -1,4 +1,5 @@
-import json
+import logging
+import traceback
 from canvas_sdk.methods import modules
 from canvas_sdk import RequestContext
 
@@ -8,6 +9,7 @@ from ab_testing_tool_app.exceptions import (MISSING_LTI_PARAM, MISSING_LTI_LAUNC
     NO_SDK_RESPONSE)
 from requests.exceptions import RequestException
 
+logger = logging.getLogger(__name__)
 
 """
 Canvas API related methods are located in this module
@@ -17,14 +19,18 @@ def list_module_items(request_context, course_id, module_id):
     try:
         return modules.list_module_items(request_context, course_id, module_id,
                                          "content_details").json()
-    except RequestException:
+    except RequestException as exception:
+        logger.error(repr(exception))
+        logger.error(traceback.format_exc())
         raise NO_SDK_RESPONSE
 
 def list_modules(request_context, course_id):
     try:
         return modules.list_modules(request_context, course_id,
                                     "content_details").json()
-    except RequestException:
+    except RequestException as exception:
+        logger.error(repr(exception))
+        logger.error(traceback.format_exc())
         raise NO_SDK_RESPONSE
 
 def get_lti_param(request, key):
