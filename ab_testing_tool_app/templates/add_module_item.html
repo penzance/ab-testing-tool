@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    {% load staticfiles %}
     <meta charset="utf-8" />
     <title>A/B Testing Tool</title>
-    <script src="../static/js/jquery-1.10.1.min.js"></script>
-    <link rel="stylesheet" href="../static/css/bootstrap.min.css"  type="text/css"/>
+    <link rel="stylesheet" href="{% static 'ab_tool/css/bootstrap.min.css' %}" type="text/css"/>
 </head>
 <body>
 <div class="container">
@@ -51,5 +51,6 @@
            </form>
 
 </div>
+<script src="{% static 'ab_tool/js/jquery-1.10.1.min.js' %}"></script>
 </body>
 </html>
