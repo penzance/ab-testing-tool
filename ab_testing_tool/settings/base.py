@@ -75,7 +75,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'ab_testing_tool_app',
+    'ab_tool',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -133,7 +133,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
-STATIC_URL = '/ab_testing_tool_app/static/'
+STATIC_URL = '/ab_tool/static/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (

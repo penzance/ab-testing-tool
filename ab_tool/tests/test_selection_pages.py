@@ -1,13 +1,13 @@
 from django.core.urlresolvers import reverse
-from ab_testing_tool_app.tests.common import (SessionTestCase, TEST_COURSE_ID,
+from ab_tool.tests.common import (SessionTestCase, TEST_COURSE_ID,
     TEST_DOMAIN, NONEXISTENT_STAGE_ID)
-from ab_testing_tool_app.models import InterventionPoint, InterventionPointUrl, Track
+from ab_tool.models import InterventionPoint, InterventionPointUrl, Track
 from django.utils.http import urlencode
-from ab_testing_tool_app.controllers import intervention_point_url
+from ab_tool.controllers import intervention_point_url
 from mock import patch
-from ab_testing_tool_app.exceptions import (MISSING_RETURN_TYPES_PARAM,
+from ab_tool.exceptions import (MISSING_RETURN_TYPES_PARAM,
     MISSING_RETURN_URL, missing_param_error)
-from ab_testing_tool_app.constants import STAGE_URL_TAG
+from ab_tool.constants import STAGE_URL_TAG
 
 class TestSelectionPages(SessionTestCase):
     """ Tests related to selection pages and methods """

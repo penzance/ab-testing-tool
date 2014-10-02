@@ -1,11 +1,11 @@
 from mock import patch, MagicMock
 
-from ab_testing_tool_app.controllers import (get_uninstalled_intervention_points, intervention_point_url,
+from ab_tool.controllers import (get_uninstalled_intervention_points, intervention_point_url,
     all_intervention_point_urls, format_url, post_param)
-from ab_testing_tool_app.tests.common import (SessionTestCase, APIReturn,
+from ab_tool.tests.common import (SessionTestCase, APIReturn,
     LIST_MODULES, LIST_ITEMS, TEST_COURSE_ID, TEST_OTHER_COURSE_ID)
-from ab_testing_tool_app.models import InterventionPoint
-from ab_testing_tool_app.exceptions import BAD_STAGE_ID
+from ab_tool.models import InterventionPoint
+from ab_tool.exceptions import BAD_STAGE_ID
 
 
 class TestControllers(SessionTestCase):

@@ -1,4 +1,4 @@
-from ab_testing_tool_app.tests.common import SessionTestCase
+from ab_tool.tests.common import SessionTestCase
 
 class ItemWithId(object):
     def __init__(self, _id):

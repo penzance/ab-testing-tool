@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from ab_testing_tool_app.models import (CourseSettings, CourseStudent, InterventionPoint,
+from ab_tool.models import (CourseSettings, CourseStudent, InterventionPoint,
     InterventionPointUrl, Track)
 
 admin.site.register(CourseSettings)

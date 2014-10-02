@@ -1,13 +1,13 @@
 from django.core.urlresolvers import reverse
 from mock import patch
 
-from ab_testing_tool_app.constants import STAGE_URL_TAG, DEPLOY_OPTION_TAG
-from ab_testing_tool_app.models import (InterventionPoint, InterventionPointUrl, Track, CourseStudent,
+from ab_tool.constants import STAGE_URL_TAG, DEPLOY_OPTION_TAG
+from ab_tool.models import (InterventionPoint, InterventionPointUrl, Track, CourseStudent,
     CourseSettings)
-from ab_testing_tool_app.tests.common import (SessionTestCase, TEST_COURSE_ID,
+from ab_tool.tests.common import (SessionTestCase, TEST_COURSE_ID,
     TEST_OTHER_COURSE_ID, NONEXISTENT_STAGE_ID, APIReturn, LIST_MODULES,
     TEST_STUDENT_ID)
-from ab_testing_tool_app.exceptions import (NO_URL_FOR_TRACK,
+from ab_tool.exceptions import (NO_URL_FOR_TRACK,
     COURSE_TRACKS_NOT_FINALIZED, UNAUTHORIZED_ACCESS,
     DELETING_INSTALLED_STAGE, NO_TRACKS_FOR_COURSE)
 
@@ -324,7 +324,7 @@ class TestInterventionPointPages(SessionTestCase):
         intervention_point = InterventionPoint.objects.create(name="testname", course_id=TEST_COURSE_ID)
         self.assertEqual(first_num_intervention_points + 1, InterventionPoint.objects.count())
         ret_val = [True]
-        with patch("ab_testing_tool_app.views.intervention_point_pages.intervention_point_is_installed",
+        with patch("ab_tool.views.intervention_point_pages.intervention_point_is_installed",
                    return_value=ret_val):
             response = self.client.get(reverse("ab:delete_intervention_point", args=(intervention_point.id,)),
                                        follow=True)

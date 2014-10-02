@@ -1,8 +1,8 @@
-from ab_testing_tool_app.tests.common import (SessionTestCase, TEST_COURSE_ID,
+from ab_tool.tests.common import (SessionTestCase, TEST_COURSE_ID,
     TEST_OTHER_COURSE_ID, NONEXISTENT_TRACK_ID)
 from django.core.urlresolvers import reverse
-from ab_testing_tool_app.models import Track, CourseSettings, InterventionPoint, InterventionPointUrl
-from ab_testing_tool_app.exceptions import (COURSE_TRACKS_ALREADY_FINALIZED,
+from ab_tool.models import Track, CourseSettings, InterventionPoint, InterventionPointUrl
+from ab_tool.exceptions import (COURSE_TRACKS_ALREADY_FINALIZED,
     NO_TRACKS_FOR_COURSE, UNAUTHORIZED_ACCESS)
 
 class TestTrackPages(SessionTestCase):

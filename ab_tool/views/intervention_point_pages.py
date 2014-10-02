@@ -3,14 +3,14 @@ from django.core.urlresolvers import reverse
 from django_auth_lti.decorators import lti_role_required
 from random import choice
 
-from ab_testing_tool_app.constants import (ADMINS, STAGE_URL_TAG,
+from ab_tool.constants import (ADMINS, STAGE_URL_TAG,
     DEPLOY_OPTION_TAG, AS_TAB_TAG)
-from ab_testing_tool_app.models import (InterventionPoint, Track, InterventionPointUrl, CourseSettings,
+from ab_tool.models import (InterventionPoint, Track, InterventionPointUrl, CourseSettings,
     CourseStudent)
-from ab_testing_tool_app.canvas import get_lti_param
-from ab_testing_tool_app.controllers import (intervention_point_is_installed, format_url,
+from ab_tool.canvas import get_lti_param
+from ab_tool.controllers import (intervention_point_is_installed, format_url,
     post_param)
-from ab_testing_tool_app.exceptions import (UNAUTHORIZED_ACCESS,
+from ab_tool.exceptions import (UNAUTHORIZED_ACCESS,
     DELETING_INSTALLED_STAGE, COURSE_TRACKS_NOT_FINALIZED,
     NO_URL_FOR_TRACK, NO_TRACKS_FOR_COURSE)
 

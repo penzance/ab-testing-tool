@@ -1,5 +1,5 @@
-from ab_testing_tool_app.tests.common import SessionTestCase, TEST_COURSE_ID
-from ab_testing_tool_app.models import CourseSettings, Track, InterventionPoint, InterventionPointUrl
+from ab_tool.tests.common import SessionTestCase, TEST_COURSE_ID
+from ab_tool.models import CourseSettings, Track, InterventionPoint, InterventionPointUrl
 
 
 class TestModels(SessionTestCase):

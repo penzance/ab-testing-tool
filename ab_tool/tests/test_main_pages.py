@@ -1,11 +1,11 @@
 from django.core.urlresolvers import reverse
 from mock import patch
 
-from ab_testing_tool_app.controllers import intervention_point_url, get_uninstalled_intervention_points
-from ab_testing_tool_app.tests.common import (SessionTestCase, LIST_MODULES,
+from ab_tool.controllers import intervention_point_url, get_uninstalled_intervention_points
+from ab_tool.tests.common import (SessionTestCase, LIST_MODULES,
     LIST_ITEMS, APIReturn, TEST_COURSE_ID, TEST_OTHER_COURSE_ID)
-from ab_testing_tool_app.models import InterventionPoint, Track, CourseStudent
-from ab_testing_tool_app.views.main_pages import tool_config
+from ab_tool.models import InterventionPoint, Track, CourseStudent
+from ab_tool.views.main_pages import tool_config
 
 
 class TestMainPages(SessionTestCase):
@@ -84,7 +84,7 @@ class TestMainPages(SessionTestCase):
             the uninstalled intervention_points for the course """
         intervention_point1 =InterventionPoint.objects.create(name="intervention_point1", course_id=TEST_COURSE_ID)
         intervention_point2 = InterventionPoint.objects.create(name="intervention_point2", course_id=TEST_COURSE_ID)
-        with patch("ab_testing_tool_app.views.main_pages.get_uninstalled_intervention_points",
+        with patch("ab_tool.views.main_pages.get_uninstalled_intervention_points",
                    return_value=[intervention_point1]):
             response = self.client.get(reverse("ab:index"), follow=True)
             self.assertSameIds(response.context["uninstalled_intervention_points"], [intervention_point1])
@@ -92,7 +92,7 @@ class TestMainPages(SessionTestCase):
     
     def test_index_context_modules(self):
         ret_val = [{"name": "module1"}]
-        with patch("ab_testing_tool_app.views.main_pages.get_modules_with_items",
+        with patch("ab_tool.views.main_pages.get_modules_with_items",
                    return_value=ret_val):
             response = self.client.get(reverse("ab:index"), follow=True)
             self.assertEqual(response.context["modules"], ret_val)
