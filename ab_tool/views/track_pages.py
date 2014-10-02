@@ -1,5 +1,6 @@
 from django.shortcuts import render_to_response, redirect, get_object_or_404
 from django_auth_lti.decorators import lti_role_required
+from django.core.urlresolvers import reverse
 
 from ab_tool.constants import ADMINS
 from ab_tool.models import Track, CourseSettings, InterventionPoint
@@ -38,7 +39,7 @@ def submit_create_track(request):
     name = post_param(request, "name")
     notes = post_param(request, "notes")
     Track.objects.create(name=name, notes=notes, course_id=course_id)
-    return redirect("/")
+    return redirect(reverse("ab:index"))
 
 
 @lti_role_required(ADMINS)
@@ -50,7 +51,7 @@ def submit_edit_track(request, track_id):
     if course_id != track.course_id:
         raise UNAUTHORIZED_ACCESS
     track.update(name=name, notes=notes)
-    return redirect("/")
+    return redirect(reverse("ab:index"))
 
 
 @lti_role_required(ADMINS)
@@ -66,7 +67,7 @@ def delete_track(request, track_id):
     if course_id != track.course_id:
         raise UNAUTHORIZED_ACCESS
     track.delete()
-    return redirect("/")
+    return redirect(reverse("ab:index"))
 
 
 @lti_role_required(ADMINS)
@@ -80,4 +81,4 @@ def finalize_tracks(request):
         #TODO: replace with better error display
         return HttpResponse("URLs missing for these tracks in these Intervention Points: %s" % incomplete_intervention_points)
     CourseSettings.set_finalized(course_id)
-    return redirect("/")
+    return redirect(reverse("ab:index"))

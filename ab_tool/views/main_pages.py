@@ -17,7 +17,7 @@ from ab_tool.constants import ADMINS
 
 
 def not_authorized(request):
-    return HttpResponse(loader.render_to_string("not_authorized.html"), status=401)
+    return HttpResponse(loader.render_to_string("ab_tool/not_authorized.html"), status=401)
 
 
 @lti_role_required(ADMINS)

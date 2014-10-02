@@ -22,15 +22,15 @@ class TestSelectionPages(SessionTestCase):
         self.assertIn("content_return_url", response.context)
         self.assertEqual(response.context["content_return_url"],
                          "http://test_content_return_url.com")
-        self.assertTemplateUsed(response, "add_module_item.html")
+        self.assertTemplateUsed(response, "ab_tool/add_module_item.html")
     
     def test_resource_selection_view_unauthorized(self):
         """ Tests add_module_item template does not render for url
             'resource_selection' when unauthorized """
         self.set_roles([])
         response = self.client.post(reverse("ab:resource_selection"), follow=True)
-        self.assertTemplateNotUsed(response, "add_module_item.html")
-        self.assertTemplateUsed(response, "not_authorized.html")
+        self.assertTemplateNotUsed(response, "ab_tool/add_module_item.html")
+        self.assertTemplateUsed(response, "ab_tool/not_authorized.html")
     
     def test_resource_selection_view_without_ext_content_return_url(self):
         """ Test that an error is raised when there is no ext_content_return_url """

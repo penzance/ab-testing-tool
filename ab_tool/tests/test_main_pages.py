@@ -15,14 +15,14 @@ class TestMainPages(SessionTestCase):
         """ Tests that the not_authorized page renders """
         response = self.client.get(reverse("ab:not_authorized"), follow=True)
         self.assertEqual(response.status_code, 401)
-        self.assertTemplateUsed(response, "not_authorized.html")
+        self.assertTemplateUsed(response, "ab_tool/not_authorized.html")
     
     def test_index_and_control_panel_view(self):
         """ Tests control_panel template renders when authenticated and with no
             contents returned from Canvas"""
         response = self.client.get(reverse("ab:index"), follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "control_panel.html")
+        self.assertTemplateUsed(response, "ab_tool/control_panel.html")
     
     @patch(LIST_MODULES, return_value=APIReturn([{"id": 0}]))
     def test_control_panel_with_module_and_item(self, _mock1):
@@ -33,15 +33,15 @@ class TestMainPages(SessionTestCase):
         with patch(LIST_ITEMS, return_value=api_return):
             response = self.client.get(reverse("ab:index"), follow=True)
             self.assertEqual(response.status_code, 200)
-            self.assertTemplateUsed(response, "control_panel.html")
+            self.assertTemplateUsed(response, "ab_tool/control_panel.html")
     
     def test_unauthenticated_index(self):
         """ Tests control_panel template does not render when unauthorized"""
         self.set_roles([])
         response = self.client.get(reverse("ab:index"), follow=True)
-        self.assertTemplateNotUsed(response, "control_panel.html")
+        self.assertTemplateNotUsed(response, "ab_tool/control_panel.html")
         self.assertEqual(response.status_code, 401)
-        self.assertTemplateUsed(response, "not_authorized.html")
+        self.assertTemplateUsed(response, "ab_tool/not_authorized.html")
     
     def test_index_context(self):
         """ Checks that the context of the index contains the relevant fields """

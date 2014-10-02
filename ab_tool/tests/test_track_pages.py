@@ -12,7 +12,7 @@ class TestTrackPages(SessionTestCase):
         """ Tests edit_track template renders for url 'create_track' """
         response = self.client.get(reverse("ab:create_track"))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "edit_track.html")
+        self.assertTemplateUsed(response, "ab_tool/edit_track.html")
     
     def test_create_track_view_already_finalized(self):
         """ Tests that create track doesn't render when tracks are finalized """
@@ -25,14 +25,14 @@ class TestTrackPages(SessionTestCase):
             when unauthorized """
         self.set_roles([])
         response = self.client.get(reverse("ab:create_track"), follow=True)
-        self.assertTemplateNotUsed(response, "edit_track.html")
-        self.assertTemplateUsed(response, "not_authorized.html")
+        self.assertTemplateNotUsed(response, "ab_tool/edit_track.html")
+        self.assertTemplateUsed(response, "ab_tool/not_authorized.html")
     
     def test_edit_track_view(self):
         """ Tests edit_track template renders when authenticated """
         track = Track.objects.create(name="track1", course_id=TEST_COURSE_ID)
         response = self.client.get(reverse("ab:edit_track", args=(track.id,)))
-        self.assertTemplateUsed(response, "edit_track.html")
+        self.assertTemplateUsed(response, "ab_tool/edit_track.html")
     
     def test_edit_track_view_unauthorized(self):
         """ Tests edit_track template renders when unauthorized """
@@ -40,14 +40,14 @@ class TestTrackPages(SessionTestCase):
         track = Track.objects.create(name="track1")
         response = self.client.get(reverse("ab:edit_track", args=(track.id,)),
                                    follow=True)
-        self.assertTemplateNotUsed(response, "edit_track.html")
-        self.assertTemplateUsed(response, "not_authorized.html")
+        self.assertTemplateNotUsed(response, "ab_tool/edit_track.html")
+        self.assertTemplateUsed(response, "ab_tool/not_authorized.html")
     
     def test_edit_track_view_nonexistent(self):
         """Tests edit_track when track does not exist"""
         t_id = NONEXISTENT_TRACK_ID
         response = self.client.get(reverse("ab:edit_track", args=(t_id,)))
-        self.assertTemplateNotUsed(response, "edit_track.html")
+        self.assertTemplateNotUsed(response, "ab_tool/edit_track.html")
         self.assertEquals(response.status_code, 404)
     
     def test_edit_track_view_wrong_course(self):
@@ -78,7 +78,7 @@ class TestTrackPages(SessionTestCase):
         response = self.client.post(reverse("ab:submit_create_track"), data,
                                     follow=True)
         self.assertEquals(num_tracks, Track.objects.count())
-        self.assertTemplateUsed(response, "not_authorized.html")
+        self.assertTemplateUsed(response, "ab_tool/not_authorized.html")
     
     def test_submit_edit_track(self):
         """ Tests that submit_edit_track does not change DB count but does change Track
@@ -104,7 +104,7 @@ class TestTrackPages(SessionTestCase):
                 "url2": "http://example.com/otherpage", "notes": ""}
         response = self.client.post(
                 reverse("ab:submit_edit_track", args=(track_id,)), data, follow=True)
-        self.assertTemplateUsed(response, "not_authorized.html")
+        self.assertTemplateUsed(response, "ab_tool/not_authorized.html")
     
     def test_submit_edit_track_nonexistent(self):
         """ Tests that submit_edit_track method raises error for non-existent Track """
@@ -156,7 +156,7 @@ class TestTrackPages(SessionTestCase):
         response = self.client.get(reverse("ab:delete_track", args=(track.id,)),
                                    follow=True)
         second_num_tracks = Track.objects.count()
-        self.assertTemplateUsed(response, "not_authorized.html")
+        self.assertTemplateUsed(response, "ab_tool/not_authorized.html")
         self.assertEqual(first_num_tracks, second_num_tracks)
     
     def test_delete_track_nonexistent(self):

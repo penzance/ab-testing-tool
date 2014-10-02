@@ -89,21 +89,21 @@ class TestInterventionPointPages(SessionTestCase):
         """ Tests edit_intervention_point template renders for url 'create_intervention_point' when authenticated """
         response = self.client.get(reverse("ab:create_intervention_point"))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "edit_intervention_point.html")
+        self.assertTemplateUsed(response, "ab_tool/edit_intervention_point.html")
     
     def test_create_intervention_point_view_unauthorized(self):
         """ Tests edit_intervention_point template does not render for url 'create_intervention_point' when unauthorized """
         self.set_roles([])
         response = self.client.get(reverse("ab:create_intervention_point"), follow=True)
-        self.assertTemplateNotUsed(response, "edit_intervention_point.html")
-        self.assertTemplateUsed(response, "not_authorized.html")
+        self.assertTemplateNotUsed(response, "ab_tool/edit_intervention_point.html")
+        self.assertTemplateUsed(response, "ab_tool/not_authorized.html")
     
     def test_edit_intervention_point_view(self):
         """ Tests edit_intervention_point template renders when authenticated """
         intervention_point = InterventionPoint.objects.create(name="intervention_point1", course_id=TEST_COURSE_ID)
         response = self.client.get(reverse("ab:edit_intervention_point", args=(intervention_point.id,)))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "edit_intervention_point.html")
+        self.assertTemplateUsed(response, "ab_tool/edit_intervention_point.html")
     
     def test_edit_intervention_point_view_unauthorized(self):
         """ Tests edit_intervention_point template renders when unauthorized """
@@ -111,8 +111,8 @@ class TestInterventionPointPages(SessionTestCase):
         intervention_point = InterventionPoint.objects.create(name="intervention_point1")
         t_id = intervention_point.id
         response = self.client.get(reverse("ab:edit_intervention_point", args=(t_id,)), follow=True)
-        self.assertTemplateNotUsed(response, "edit_intervention_point.html")
-        self.assertTemplateUsed(response, "not_authorized.html")
+        self.assertTemplateNotUsed(response, "ab_tool/edit_intervention_point.html")
+        self.assertTemplateUsed(response, "ab_tool/not_authorized.html")
     
     def test_edit_intervention_point_view_nonexistent(self):
         """ Tests edit_intervention_point template renders when intervention_point does not exist """
@@ -173,7 +173,7 @@ class TestInterventionPointPages(SessionTestCase):
         self.assertEqual(response.status_code, 401)
         self.assertEqual(num_intervention_points, InterventionPoint.objects.count())
         self.assertEqual(num_intervention_pointurls, InterventionPointUrl.objects.count())
-        self.assertTemplateUsed(response, "not_authorized.html")
+        self.assertTemplateUsed(response, "ab_tool/not_authorized.html")
     
     def test_edit_intervention_point_view_with_intervention_pointurls(self):
         """ Tests edit_intervention_point template renders with InterventionPointUrls """
@@ -184,7 +184,7 @@ class TestInterventionPointPages(SessionTestCase):
                                             url="http://www.example.com", track=track)
         response = self.client.get(reverse("ab:edit_intervention_point", args=(intervention_point.id,)))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "edit_intervention_point.html")
+        self.assertTemplateUsed(response, "ab_tool/edit_intervention_point.html")
         self.assertIn("tracks", response.context)
         self.assertEqual(set(response.context["tracks"]), set([(track,intervention_pointurl), (track2,None)]))
     
@@ -204,7 +204,7 @@ class TestInterventionPointPages(SessionTestCase):
         intervention_point = InterventionPoint.objects.get(id=intervention_point_id)
         self.assertEqual(intervention_point.name, "new_name")
     
-    def test_submit_edit_intervention_point_with_intervention_pointurls(self):
+    def test_submit_edit_intervention_point_with_intervention_point_urls(self):
         """ Tests that submit_edit_intervention_point does not change DB count but does change InterventionPoint
             attribute, edits the existing InterventionPointUrl, and creates a new InterventionPointUrl"""
         intervention_point = InterventionPoint.objects.create(name="old_name", course_id=TEST_COURSE_ID)
@@ -242,7 +242,7 @@ class TestInterventionPointPages(SessionTestCase):
         response = self.client.post(
                 reverse("ab:submit_edit_intervention_point", args=(intervention_point.id,)), data, follow=True)
         self.assertEqual(num_intervention_points, InterventionPoint.objects.count())
-        self.assertTemplateUsed(response, "not_authorized.html")
+        self.assertTemplateUsed(response, "ab_tool/not_authorized.html")
     
     def test_submit_edit_intervention_point_nonexistent(self):
         """ Tests that submit_edit_intervention_point method raises error for non-existent InterventionPoint """
@@ -292,7 +292,7 @@ class TestInterventionPointPages(SessionTestCase):
         response = self.client.get(reverse("ab:delete_intervention_point", args=(intervention_point.id,)),
                                    follow=True)
         second_num_intervention_points = InterventionPoint.objects.count()
-        self.assertTemplateUsed(response, "not_authorized.html")
+        self.assertTemplateUsed(response, "ab_tool/not_authorized.html")
         self.assertNotEqual(first_num_intervention_points, second_num_intervention_points)
     
     def test_delete_intervention_point_nonexistent(self):
