@@ -38,7 +38,7 @@ def render_intervention_point_control_panel(request):
         "is_finalized": is_finalized,
         "incomplete_intervention_points": incomplete_intervention_points,
     }
-    return render_to_response("control_panel.html", context)
+    return render_to_response("ab_tool/control_panel.html", context)
 
 
 def tool_config(request):

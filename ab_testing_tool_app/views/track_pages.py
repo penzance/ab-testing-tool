@@ -15,7 +15,7 @@ def create_track(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     if CourseSettings.get_is_finalized(course_id):
         raise COURSE_TRACKS_ALREADY_FINALIZED
-    return render_to_response("edit_track.html")
+    return render_to_response("ab_tool/edit_track.html")
 
 
 @lti_role_required(ADMINS)
@@ -27,7 +27,7 @@ def edit_track(request, track_id):
     is_finalized = CourseSettings.get_is_finalized(course_id)
     context = {"track": track,
                "is_finalized": is_finalized}
-    return render_to_response("edit_track.html", context)
+    return render_to_response("ab_tool/edit_track.html", context)
 
 
 @lti_role_required(ADMINS)

@@ -25,7 +25,7 @@ def resource_selection(request):
                "intervention_points": get_uninstalled_intervention_points(request),
                "tracks": Track.objects.filter(course_id=course_id),
                }
-    return render_to_response("add_module_item.html", context)
+    return render_to_response("ab_tool/add_module_item.html", context)
 
 
 @lti_role_required(ADMINS)
