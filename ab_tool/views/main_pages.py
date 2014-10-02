@@ -8,12 +8,12 @@ from django.template.defaultfilters import slugify
 from django.template import loader
 from ims_lti_py.tool_config import ToolConfig
 
-from ab_testing_tool_app.canvas import get_lti_param
-from ab_testing_tool_app.controllers import (get_uninstalled_intervention_points,
+from ab_tool.canvas import get_lti_param
+from ab_tool.controllers import (get_uninstalled_intervention_points,
     get_modules_with_items, get_incomplete_intervention_points)
-from ab_testing_tool_app.models import (InterventionPoint, Track, CourseStudent,
+from ab_tool.models import (InterventionPoint, Track, CourseStudent,
     CourseSettings)
-from ab_testing_tool_app.constants import ADMINS
+from ab_tool.constants import ADMINS
 
 
 def not_authorized(request):
@@ -38,12 +38,12 @@ def render_intervention_point_control_panel(request):
         "is_finalized": is_finalized,
         "incomplete_intervention_points": incomplete_intervention_points,
     }
-    return render_to_response("control_panel.html", context)
+    return render_to_response("ab_tool/control_panel.html", context)
 
 
 def tool_config(request):
-    index_url = request.build_absolute_uri(reverse("index"))
-    resource_selection_url = request.build_absolute_uri(reverse("resource_selection"))
+    index_url = request.build_absolute_uri(reverse("ab:index"))
+    resource_selection_url = request.build_absolute_uri(reverse("ab:resource_selection"))
     
     config = ToolConfig(
         title="A/B Testing Tool",

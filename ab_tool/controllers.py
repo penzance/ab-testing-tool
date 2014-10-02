@@ -1,9 +1,9 @@
 from django.core.urlresolvers import reverse
 
-from ab_testing_tool_app.models import InterventionPoint
-from ab_testing_tool_app.canvas import (get_canvas_request_context, list_module_items, list_modules,
+from ab_tool.models import InterventionPoint
+from ab_tool.canvas import (get_canvas_request_context, list_module_items, list_modules,
     get_lti_param)
-from ab_testing_tool_app.exceptions import BAD_STAGE_ID, missing_param_error
+from ab_tool.exceptions import BAD_STAGE_ID, missing_param_error
 from error_middleware.middleware import RenderableError
 
 
@@ -13,7 +13,7 @@ def intervention_point_url(request, intervention_point_id):
         intervention_point_id = int(intervention_point_id)
     except (TypeError, ValueError):
         raise BAD_STAGE_ID
-    return request.build_absolute_uri(reverse("deploy_intervention_point", args=(intervention_point_id,)))
+    return request.build_absolute_uri(reverse("ab:deploy_intervention_point", args=(intervention_point_id,)))
 
 
 def format_url(url):

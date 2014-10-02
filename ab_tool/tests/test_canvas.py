@@ -1,8 +1,8 @@
-from ab_testing_tool_app.tests.common import (SessionTestCase, APIReturn,
+from ab_tool.tests.common import (SessionTestCase, APIReturn,
     LIST_MODULES, LIST_ITEMS, TEST_COURSE_ID)
-from ab_testing_tool_app.canvas import (get_lti_param, list_modules,
+from ab_tool.canvas import (get_lti_param, list_modules,
     list_module_items, get_canvas_request_context)
-from ab_testing_tool_app.exceptions import (MISSING_LTI_LAUNCH, MISSING_LTI_PARAM,
+from ab_tool.exceptions import (MISSING_LTI_LAUNCH, MISSING_LTI_PARAM,
     NO_SDK_RESPONSE)
 from mock import patch
 from requests.exceptions import RequestException

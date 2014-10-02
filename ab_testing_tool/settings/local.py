@@ -44,7 +44,7 @@ LOGGING = {
             'propagate': True,
             'level': 'DEBUG',
         },
-        'ab_testing_tool_app': {
+        'ab_tool': {
             'handlers': ['console'],
             'propagate': True,
             'level': 'DEBUG',

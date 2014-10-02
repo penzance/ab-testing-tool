@@ -2,12 +2,12 @@ from django.shortcuts import render_to_response, redirect, get_object_or_404
 from django.utils.http import urlencode
 from django_auth_lti.decorators import lti_role_required
 
-from ab_testing_tool_app.models import Track, InterventionPointUrl, InterventionPoint
-from ab_testing_tool_app.controllers import (get_uninstalled_intervention_points, intervention_point_url,
+from ab_tool.models import Track, InterventionPointUrl, InterventionPoint
+from ab_tool.controllers import (get_uninstalled_intervention_points, intervention_point_url,
     post_param)
-from ab_testing_tool_app.constants import STAGE_URL_TAG, ADMINS
-from ab_testing_tool_app.canvas import get_lti_param
-from ab_testing_tool_app.exceptions import (MISSING_RETURN_TYPES_PARAM,
+from ab_tool.constants import STAGE_URL_TAG, ADMINS
+from ab_tool.canvas import get_lti_param
+from ab_tool.exceptions import (MISSING_RETURN_TYPES_PARAM,
     MISSING_RETURN_URL)
 
 
@@ -25,7 +25,7 @@ def resource_selection(request):
                "intervention_points": get_uninstalled_intervention_points(request),
                "tracks": Track.objects.filter(course_id=course_id),
                }
-    return render_to_response("add_module_item.html", context)
+    return render_to_response("ab_tool/add_module_item.html", context)
 
 
 @lti_role_required(ADMINS)

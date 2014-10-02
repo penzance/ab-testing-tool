@@ -75,7 +75,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'ab_testing_tool_app',
+    'ab_tool',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -101,7 +101,7 @@ AUTHENTICATION_BACKENDS = (
 #X_FRAME_OPTIONS = 'EXEMPT'
 #SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-ROOT_URLCONF = 'ab_testing_tool_app.urls'
+ROOT_URLCONF = 'ab_testing_tool.urls'
 
 WSGI_APPLICATION = 'ab_testing_tool.wsgi.application'
 
@@ -133,7 +133,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = '/ab_tool/static/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (

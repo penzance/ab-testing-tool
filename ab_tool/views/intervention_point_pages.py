@@ -3,14 +3,14 @@ from django.core.urlresolvers import reverse
 from django_auth_lti.decorators import lti_role_required
 from random import choice
 
-from ab_testing_tool_app.constants import (ADMINS, STAGE_URL_TAG,
+from ab_tool.constants import (ADMINS, STAGE_URL_TAG,
     DEPLOY_OPTION_TAG, AS_TAB_TAG)
-from ab_testing_tool_app.models import (InterventionPoint, Track, InterventionPointUrl, CourseSettings,
+from ab_tool.models import (InterventionPoint, Track, InterventionPointUrl, CourseSettings,
     CourseStudent)
-from ab_testing_tool_app.canvas import get_lti_param
-from ab_testing_tool_app.controllers import (intervention_point_is_installed, format_url,
+from ab_tool.canvas import get_lti_param
+from ab_tool.controllers import (intervention_point_is_installed, format_url,
     post_param)
-from ab_testing_tool_app.exceptions import (UNAUTHORIZED_ACCESS,
+from ab_tool.exceptions import (UNAUTHORIZED_ACCESS,
     DELETING_INSTALLED_STAGE, COURSE_TRACKS_NOT_FINALIZED,
     NO_URL_FOR_TRACK, NO_TRACKS_FOR_COURSE)
 
@@ -29,7 +29,7 @@ def deploy_intervention_point(request, intervention_point_id):
     
     # If user is an admin, let them edit the intervention_point
     if set(ADMINS) & set(user_roles):
-        return redirect(reverse("modules_page_edit_intervention_point", args=(intervention_point_id,)))
+        return redirect(reverse("ab:modules_page_edit_intervention_point", args=(intervention_point_id,)))
     
     # Otherwise, user is a student.  Tracks for the course must be finalized
     # for a student to be able to access content from the ab_testing_tool
@@ -59,9 +59,9 @@ def deploy_intervention_point(request, intervention_point_id):
     try:
         chosen_intervention_point_url = InterventionPointUrl.objects.get(intervention_point__pk=intervention_point_id, track=student.track)
         if chosen_intervention_point_url.open_as_tab:
-            return render_to_response("new_tab_redirect.html", {"url": chosen_intervention_point_url.url})
+            return render_to_response("ab_tool/new_tab_redirect.html", {"url": chosen_intervention_point_url.url})
         if chosen_intervention_point_url.is_canvas_page:
-            return render_to_response("window_redirect.html", {"url": chosen_intervention_point_url.url})
+            return render_to_response("ab_tool/window_redirect.html", {"url": chosen_intervention_point_url.url})
     except InterventionPointUrl.DoesNotExist:
         raise NO_URL_FOR_TRACK
     if not chosen_intervention_point_url.url:
@@ -79,7 +79,7 @@ def create_intervention_point(request):
     context = {"tracks" : [(t, None) for t in
                            Track.objects.filter(course_id=course_id)],
                "cancel_url": "/#tabs-2"}
-    return render_to_response("edit_intervention_point.html", context)
+    return render_to_response("ab_tool/edit_intervention_point.html", context)
 
 
 @lti_role_required(ADMINS)
@@ -105,13 +105,13 @@ def submit_create_intervention_point(request):
 @lti_role_required(ADMINS)
 def modules_page_edit_intervention_point(request, intervention_point_id):
     context = edit_intervention_point_common(request, intervention_point_id)
-    return render_to_response("modules_page_edit_intervention_point.html", context)
+    return render_to_response("ab_tool/modules_page_edit_intervention_point.html", context)
 
 @lti_role_required(ADMINS)
 def edit_intervention_point(request, intervention_point_id):
     context = edit_intervention_point_common(request, intervention_point_id)
     context["cancel_url"] = "/#tabs-2"
-    return render_to_response("edit_intervention_point.html", context)
+    return render_to_response("ab_tool/edit_intervention_point.html", context)
 
 def edit_intervention_point_common(request, intervention_point_id):
     """ Common core shared bewteen edit_intervention_point and modules_page_edit_intervention_point """
