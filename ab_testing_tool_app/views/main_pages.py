@@ -42,8 +42,8 @@ def render_intervention_point_control_panel(request):
 
 
 def tool_config(request):
-    index_url = request.build_absolute_uri(reverse("index"))
-    resource_selection_url = request.build_absolute_uri(reverse("resource_selection"))
+    index_url = request.build_absolute_uri(reverse("ab:index"))
+    resource_selection_url = request.build_absolute_uri(reverse("ab:resource_selection"))
     
     config = ToolConfig(
         title="A/B Testing Tool",

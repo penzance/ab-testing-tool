@@ -8,7 +8,7 @@
 </head>
 <body>
 <div class="container">
-    <form method="POST" action="{% url 'submit_selection' %}">
+    <form method="POST" action="{% url 'ab:submit_selection' %}">
         <h4> To install a new A/B Intervention Point, select one from list of uninstalled intervention points below:</h4>
         <br>
         <select name="intervention_point_id">
@@ -23,7 +23,7 @@
     <br>
     <h4> Or, create a new Intervention Point:</h4>
     <br>
-  <form method="post" name="intervention_point_form" action="{% url 'submit_selection_new_intervention_point' %}">
+  <form method="post" name="intervention_point_form" action="{% url 'ab:submit_selection_new_intervention_point' %}">
             {% csrf_token %}
             <input type="hidden" value="{{content_return_url}}" name="content_return_url">
                 <input type='hidden' name='id' value="{{ intervention_point.id }}">

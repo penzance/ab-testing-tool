@@ -28,7 +28,7 @@
                 <p> Create and Edit your A/B Tracks here. You can assign student cohorts to a track <b> only after </b> finalizing your tracks.</p>
                 <br>
                 {% if not is_finalized %}
-                <a id="create_track_button" class="btn btn-lg btn-success"  href="{% url 'create_track' %}"> Create New Track</a>
+                <a id="create_track_button" class="btn btn-lg btn-success"  href="{% url 'ab:create_track' %}"> Create New Track</a>
                 <a id="finalize_button" class="btn btn-lg btn-danger" {% if incomplete_intervention_points %} href="#incomplete_intervention_points_modal" {% else %} href="#finalize_modal" {% endif %} data-toggle="modal" > Finalize Tracks</a>
                 {% if incomplete_intervention_points %}
                 <!-- START Modal code for incomplete_intervention_points confirmation box-->
@@ -66,7 +66,7 @@
                             </div>
                             <div class="modal-footer">
                                 <a class="btn btn-lg btn-primary" data-dismiss="modal"> Close </a>
-                                <a class="btn btn-lg btn-danger" href="{% url 'finalize_tracks' %}"> Yes, Finalize Tracks </a>
+                                <a class="btn btn-lg btn-danger" href="{% url 'ab:finalize_tracks' %}"> Yes, Finalize Tracks </a>
                             </div>
                         </div>
                     </div>
@@ -83,7 +83,7 @@
                 <br>
                 <div class="list-group span4">
                     {% for m in tracks %}
-                        <h4><a href="{% url 'edit_track' m.id %}" class="list-group-item clearfix" id="track_{{m.id}}">
+                        <h4><a href="{% url 'ab:edit_track' m.id %}" class="list-group-item clearfix" id="track_{{m.id}}">
                                 <span><strong>{{m.name}} </strong></span>
                             </a>
                         </h4>
@@ -100,12 +100,12 @@
             <div class="span8">
                 <p> Create and Edit your A/B intervention points here. </p>
                 <br>
-                <a id="create_new_intervention_point_button" class="btn btn-lg btn-success" style="align:left" href="{% url 'create_intervention_point' %}"> Create New Intervention Point</a>
+                <a id="create_new_intervention_point_button" class="btn btn-lg btn-success" style="align:left" href="{% url 'ab:create_intervention_point' %}"> Create New Intervention Point</a>
                 <br><br>
         
                 <div class="list-group span4">
                     {% for t in intervention_points %}
-                    <a href="{% url 'edit_intervention_point' t.id %}" class="list-group-item"><strong>{{t.name}}</strong> <i>{{t.is_missing_urls|yesno:"- URLs missing,complete"}}</i></a>
+                    <a href="{% url 'ab:edit_intervention_point' t.id %}" class="list-group-item"><strong>{{t.name}}</strong> <i>{{t.is_missing_urls|yesno:"- URLs missing,complete"}}</i></a>
                     {% endfor %}
                 </div>
             </div>
@@ -144,7 +144,7 @@
             <div class="span8">
                 <p> Download a CSV file of your A/B testing data here. </p>
                 <br>
-                <a id="download_data_button" href="{% url 'download_data' %}" class="btn btn-lg btn-primary"> Download Data</a>
+                <a id="download_data_button" href="{% url 'ab:download_data' %}" class="btn btn-lg btn-primary"> Download Data</a>
             </div>
         </div>
     </div>

@@ -29,7 +29,7 @@ def deploy_intervention_point(request, intervention_point_id):
     
     # If user is an admin, let them edit the intervention_point
     if set(ADMINS) & set(user_roles):
-        return redirect(reverse("modules_page_edit_intervention_point", args=(intervention_point_id,)))
+        return redirect(reverse("ab:modules_page_edit_intervention_point", args=(intervention_point_id,)))
     
     # Otherwise, user is a student.  Tracks for the course must be finalized
     # for a student to be able to access content from the ab_testing_tool

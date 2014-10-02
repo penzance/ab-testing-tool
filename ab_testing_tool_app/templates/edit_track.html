@@ -18,7 +18,7 @@
 
         <td><p>Created: {{track.created_on}} | Last updated: {{track.updated_on}} </p></td>
         {% if track.id and not is_finalized%}
-        <td class="text-right nowrap"><a id="delete_track_button" href="{% url 'delete_track' track.id %}" class="btn btn-lg btn-danger">Delete Track</a></td>
+        <td class="text-right nowrap"><a id="delete_track_button" href="{% url 'ab:delete_track' track.id %}" class="btn btn-lg btn-danger">Delete Track</a></td>
         {% elif track.id and is_finalized %}
         <td class="text-right nowrap"><a id="delete_track_button_disabled" class="btn btn-lg btn-danger disabled">Delete Track</a></td>
         {% endif %}
@@ -30,7 +30,7 @@
             <h4 class="text-center nowrap">Tracks Are Finalized.</h4>
             <h5 class="text-center nowrap">Note: Tracks can no longer be deleted or created. Existing tracks can still be edited.</h5>
             {% endif %}
-            <form method="post" name="track_form" {% if track.id %} action="{% url 'submit_edit_track' track.id %}"{% else %} action="{% url 'submit_create_track' %}" {% endif %}>
+            <form method="post" name="track_form" {% if track.id %} action="{% url 'ab:submit_edit_track' track.id %}"{% else %} action="{% url 'ab:submit_create_track' %}" {% endif %}>
             {% csrf_token %}
                 <table class="table table-striped">
                 <tr align="left">
@@ -44,7 +44,7 @@
                 <tr>
                 <td></td>
                 <td><input id="submit_edit_track_button" type="submit" name="submit" value="Submit Changes" class="btn btn-lg btn-success submit">
-                <a id="cancel_submit_edit_track_button" href="{% url 'index' %}" class="btn btn-lg btn-primary">Cancel</a></td>
+                <a id="cancel_submit_edit_track_button" href="{% url 'ab:index' %}" class="btn btn-lg btn-primary">Cancel</a></td>
                 </tr>
                 </table>
 

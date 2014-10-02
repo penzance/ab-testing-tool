@@ -13,7 +13,7 @@ def intervention_point_url(request, intervention_point_id):
         intervention_point_id = int(intervention_point_id)
     except (TypeError, ValueError):
         raise BAD_STAGE_ID
-    return request.build_absolute_uri(reverse("deploy_intervention_point", args=(intervention_point_id,)))
+    return request.build_absolute_uri(reverse("ab:deploy_intervention_point", args=(intervention_point_id,)))
 
 
 def format_url(url):

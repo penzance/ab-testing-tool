@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, url, include
+    from django.conf.urls import patterns, url, include
 from django.contrib import admin
 
 from ab_testing_tool_app.views.main_pages import (render_intervention_point_control_panel, not_authorized,
