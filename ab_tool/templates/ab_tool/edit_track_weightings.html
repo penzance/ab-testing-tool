@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>A/B Testing Tool</title>
+    <link rel="stylesheet" href="{% static 'ab_tool/css/bootstrap.min.css' %}" type="text/css"/>
+    <link rel="stylesheet" href="{% static 'ab_tool/css/dashboard.css' %}" type="text/css"/>
+</head>
+
+<body>
+<div class="container containter-fluid">
+    <div class="jumbotron">
+        <h2>Track Probability Weightings</h2>
+    </div class="row-fluid">
+            <form method="post" class="form-horizontal" name="track_weightings_form" action="{% url 'ab:submit_assign_track_weights' %}">
+            {% csrf_token %}
+                <table class="table">
+                {% for t, s in weighting_objs %}
+                <tr align="left" class="weighting_box">
+                    <td class="col-xs-3"><label>Probability Weighting for Track "{{t.name}}" </label></td>
+                    <td class="col-xs-4"><input id="weight_for_track_{{t.id}}" class="form-control"  type="number" step="0.01"  name="weight_for_track_{{t.id}}" value="{{ s.weighting }}"/></td>
+                </tr>
+                {% endfor %}
+                <td><input id="submit_edit_track_weightings_button" type="submit" name="submit" value="Submit Changes" class="btn btn-lg btn-success submit">
+                {% block cancel_url %}
+                <a id="cancel_submit_edit_track_weightings_button" href="{{ cancel_url }}" class="btn btn-lg btn-primary">Cancel</a></td>
+                {% endblock %}
+                </tr>
+                </table>
+
+           </form>
+</div>
+<script src="{% static 'ab_tool/js/jquery-1.10.1.min.js' %}"></script>
+<script src="{% static 'ab_tool/js/bootstrap.min.js' %}"></script>
+</body>
+</html>

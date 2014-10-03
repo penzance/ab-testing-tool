@@ -20,6 +20,13 @@ class Track(CustomModel):
     course_id = models.CharField(max_length=128, db_index=True)
 
 
+class TrackProbabilityWeight(CustomModel):
+    #Definition: A `weighting` is a number between 0 and 1
+    weighting = models.FloatField(null=True)
+    track = models.ForeignKey(Track)
+    course_id = models.CharField(max_length=128, db_index=True)
+
+
 class InterventionPoint(CustomModel):
     """ This model stores the configuration of an intervention point"""
     name = models.CharField(max_length=256)
@@ -35,6 +42,7 @@ class InterventionPoint(CustomModel):
             if not intervention_point_url.url:
                 return True
         return False
+
 
 class InterventionPointUrl(CustomModel):
     """ This model stores the URL of a single intervention """
@@ -73,8 +81,16 @@ class CourseSettings(CustomModel):
     WARNING: DO NOT HAVE FOREIGN KEYS TO THIS MODEL.  THERE IS NO GUARANTEE
         IT WILL EXIST FOR A GIVEN COURSE.
     """
+    ASSIGNMENT_ENUM_TYPES = (
+        (1, "uniform_random"),
+        (2, "weighted_random"),
+        (3, "csv"),
+        (4, "reverse_api"),
+     )
     course_id = models.CharField(max_length=128, db_index=True, unique=True)
     tracks_finalized = models.BooleanField(default=False)
+    track_assignment_type = models.IntegerField(max_length=1, choices=ASSIGNMENT_ENUM_TYPES,
+                                                default=1)
     
     @classmethod
     def get_is_finalized(cls, course_id):

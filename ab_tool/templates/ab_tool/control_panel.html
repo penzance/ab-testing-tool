@@ -20,6 +20,7 @@
     <ul>
     <li><a href="#tabs-1">Tracks</a></li>
     <li><a href="#tabs-2">A/B Intervention Points</a></li>
+    <li><a href="#tabs-5">Track Assignment</a></li>
     <li><a href="#tabs-3">Course Modules</a></li>
     <li><a href="#tabs-4">Data</a></li>
     </ul>
@@ -151,6 +152,26 @@
     </div>
 </div>
 
+        <!-- Tab for Track Assignment-->
+        <div id="tabs-5">
+            <div class="span8">
+                <p> Select your track assignment method here. </p>
+                <ul>
+                <li><p>Uniform Random - Students are randomly assigned a track, with every track having an equal chance.</p></li>
+                <li><p>Weighted Random - Students are randomly assigned a track that are weighted by your specified probabilities. <b>This does not mean that tracks will necessarily have students in them that are proportional to the weights.</b></p></li>
+                <li><p>CSV Upload - Using this method, you download a template CSV file to fill out a mapping of students to tracks and upload it here once finished. If more students join the course, the system will alert you to download, fill out, and upload a new CSV file containing the newly joined students.</p></li>
+                </ul>
+                <br>
+                <form class="form">
+                <input type="radio" name="" value="uniform_random" checked="checked"> Uniform Random
+                <input type="radio" name="" value="weighted_random"> Weighted Random
+                <input type="radio" name="" value="upload_CSV"> Upload CSV
+                <a id="update_track_assignment_button" href="" class="btn btn-lg btn-primary"> Update </a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script src="{% static 'ab_tool/js/jquery-1.10.1.min.js' %}"></script>
 <script src="{% static 'ab_tool/js/jquery-ui.min.js' %}"></script>
