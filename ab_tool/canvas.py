@@ -2,9 +2,8 @@ import logging
 import traceback
 from canvas_sdk.methods import modules
 from canvas_sdk import RequestContext
+from django.conf import settings
 
-#TODO: change from secure.py setting to oauth handoff
-from ab_testing_tool.settings.secure import COURSE_OAUTH_TOKEN
 from ab_tool.exceptions import (MISSING_LTI_PARAM, MISSING_LTI_LAUNCH,
     NO_SDK_RESPONSE)
 from requests.exceptions import RequestException
@@ -46,7 +45,8 @@ def get_lti_param(request, key):
 
 
 def get_canvas_request_context(request):
-    oauth_token = COURSE_OAUTH_TOKEN
+    #TODO: change from secure.py setting to oauth handoff
+    oauth_token = settings.SECURE_SETTINGS["COURSE_OAUTH_TOKEN"]
     canvas_domain = get_lti_param(request, "custom_canvas_api_domain")
     canvas_url = "https://{0}/api".format(canvas_domain)
     return RequestContext(oauth_token, canvas_url)

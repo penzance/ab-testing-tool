@@ -11,6 +11,8 @@ import os
 from os.path import abspath, basename, dirname, join, normpath
 from sys import path
 
+from .secure import SECURE_SETTINGS
+
 # Normally you should not import ANYTHING from Django directly
 # into your settings, but ImproperlyConfigured is an exception.
 from django.core.exceptions import ImproperlyConfigured
@@ -48,15 +50,13 @@ path.append(SITE_ROOT)
 ### End path stuff
 
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
+# THESE ADDRESSES WILL RECEIVE EMAIL ABOUT CERTAIN ERRORS!
+ADMINS = SECURE_SETTINGS.get('admins')
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "TODO: CHANGE ME"  # get_env_variable('DJANGO_SECRET_KEY')
-LTI_OAUTH_CREDENTIALS = {
-        'test': 'secret',  #TODO: change me
-    }
+SECRET_KEY = SECURE_SETTINGS.get('django_secret_key', 'changeme')
+
+LTI_OAUTH_CREDENTIALS = SECURE_SETTINGS.get('lti_oauth_credentials', None)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
