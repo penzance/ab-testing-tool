@@ -10,8 +10,7 @@ from ab_tool.views.intervention_point_pages import (create_intervention_point, s
                     edit_intervention_point,  delete_intervention_point, deploy_intervention_point, submit_edit_intervention_point,
                     modules_page_edit_intervention_point)
 from ab_tool.views.track_pages import (create_track, submit_create_track,
-                    submit_edit_track, edit_track, delete_track, finalize_tracks,
-                    track_weights, submit_track_weights)
+                    submit_edit_track, edit_track, delete_track, finalize_tracks)
 
 admin.autodiscover()
 
@@ -38,9 +37,6 @@ urlpatterns = patterns('',
     url(r'^submit_edit_track/(?P<track_id>\d+)$', submit_edit_track, name='submit_edit_track'),
     url(r'^delete_track/(?P<track_id>\d+)$', delete_track, name='delete_track'),
     url(r'^finalize_tracks$', finalize_tracks, name='finalize_tracks'),
-    
-    url(r'^track_weights$', track_weights, name='track_weights'),
-    url(r'^submit_track_weights$', submit_track_weights, name='submit_track_weights'),
     
     url(r'^submit_assignment_method$', submit_assignment_method, name='submit_assignment_method'),
     
