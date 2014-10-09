@@ -81,15 +81,30 @@ class CourseSettings(CustomModel):
     WARNING: DO NOT HAVE FOREIGN KEYS TO THIS MODEL.  THERE IS NO GUARANTEE
         IT WILL EXIST FOR A GIVEN COURSE.
     """
+    UNIFORM_RANDOM = 1
+    WEIGHTED_PROBABILITY_RANDOM = 2
+    CSV_UPLOAD = 3
+    REVERSE_API = 4
+    
+    ASSIGNMENT_METHODS = {
+        "uniform_random": UNIFORM_RANDOM,
+        "weighted_probability_random": WEIGHTED_PROBABILITY_RANDOM,
+        "csv_upload": CSV_UPLOAD,
+        "reverse_api": REVERSE_API,
+    }
+    
+    ASSIGNMENT_METHODS_REVERSE_DICT = {v: k for k, v in ASSIGNMENT_METHODS.items()}
+    
     ASSIGNMENT_ENUM_TYPES = (
-        (1, "uniform_random"),
-        (2, "weighted_random"),
-        (3, "csv"),
-        (4, "reverse_api"),
+        (UNIFORM_RANDOM, "uniform_random"),
+        (WEIGHTED_PROBABILITY_RANDOM, "weighted_probability_random"),
+        (CSV_UPLOAD, "csv_upload"),
+        (REVERSE_API, "reverse_api"),
      )
+    
     course_id = models.CharField(max_length=128, db_index=True, unique=True)
     tracks_finalized = models.BooleanField(default=False)
-    track_assignment_type = models.IntegerField(max_length=1, choices=ASSIGNMENT_ENUM_TYPES,
+    assignment_method = models.IntegerField(max_length=1, choices=ASSIGNMENT_ENUM_TYPES,
                                                 default=1)
     
     @classmethod

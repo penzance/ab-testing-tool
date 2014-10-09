@@ -20,15 +20,16 @@
     <!-- BEGIN Tabs-->
     <ul>
     <li><a href="#tabs-1">Tracks</a></li>
-    <li><a href="#tabs-2">A/B Intervention Points</a></li>
     <li><a href="#tabs-5">Track Assignment</a></li>
+    <li><a href="#tabs-2">Intervention Points</a></li>
     <li><a href="#tabs-3">Course Modules</a></li>
     <li><a href="#tabs-4">Data</a></li>
     </ul>
         <!-- Tab for Tracks-->
         <div id="tabs-1">
              <div class="span8">
-                <p> Create and Edit your A/B Tracks here. You can assign student cohorts to a track <b> only after </b> finalizing your tracks.</p>
+                <p> Create and edit your Tracks here. You can assign students to a track <b> only after </b> finalizing your tracks.</p>
+                <p>Helpful tip: a "Track" is a series of interventions that a cohort of students is assigned to experience.</p>
                 <br>
                 {% if not is_finalized %}
                 <a id="create_track_button" class="btn btn-lg btn-success"  href="{% url 'ab:create_track' %}"> Create New Track</a>
@@ -101,7 +102,8 @@
         <!-- Tab for Intervention Points-->
         <div id="tabs-2">
             <div class="span8">
-                <p> Create and Edit your A/B intervention points here. </p>
+                <p> Create and edit your Intervention Points here.</p>
+                <p>Helpful tip: an "Intervention Point" is a specific place in the course where you want to A/B test across your student track groups using a intervention URL for each track group.</p>
                 <br>
                 <a id="create_new_intervention_point_button" class="btn btn-lg btn-success" style="align:left" href="{% url 'ab:create_intervention_point' %}"> Create New Intervention Point</a>
                 <br><br>
@@ -155,23 +157,52 @@
         <!-- Tab for Track Assignment-->
         <div id="tabs-5">
             <div class="span8">
-                <p> Select your track assignment method here. </p>
+                <p> Select your track assignment method here. The assignment method selected is how students will be assigned to tracks.</p>
+                <p>Helpful tip: The assignment method defaults to 'Uniform Random'. Students are randomly assigned to a track upon hitting their first intervention point.</p>
                 <br>
                 <div class="media-body">
                   <h4 class="media-heading">Uniform Random (Default)</h4>
-                    <p>Students are randomly assigned a track, with every track having an equal chance.</p>
+                    <p>Using this method, students are randomly assigned a track, with every track having an equal chance.</p>
                 </div>
-                <li><p>Uniform Random (Default) - Students are randomly assigned a track, with every track having an equal chance.</p></li>
-                <li><p>Weighted Random - Students are randomly assigned a track that are weighted by your specified probabilities. <b>This does not mean that tracks will necessarily have students in them that are proportional to the weights.</b></p></li>
-                <li><p>CSV Upload - Using this method, you download a template CSV file to fill out a mapping of students to tracks and upload it here once finished. If more students join the course, the system will alert you to download, fill out, and upload a new CSV file containing the newly joined students.</p></li>
-                </ul>
                 <br>
-                <form class="form">
-                <input type="radio" name="" value="uniform_random" checked="checked"> Uniform Random
-                <input type="radio" name="" value="weighted_random"> Weighted Random
-                <input type="radio" name="" value="upload_CSV"> Upload CSV
+                <div class="media-body">
+                  <h4 class="media-heading">Weighted Probability Random</h4>
+                    <p>Using this method, students are randomly assigned a track that are weighted by your specified probabilities. <b>Note that student assignment is probabilistic and does not guarantee a number of students belonging to a certain track.</b></p>
+                </div>
                 <br>
-                <a id="update_track_assignment_button" href="" class="btn btn-lg btn-primary"> Update </a>
+                <div class="media-body">
+                  <h4 class="media-heading">Upload a CSV file</h4>
+                    <p>Using this method, you, the admin, will upload a CSV file containing a mapping of which students should be assigned to which track. The tool will provide you a template CSV file to download containing which students have joined the course so far. If more students join the course, the system will alert you to fill out and upload a new CSV file to assign the newly joined students.</p>
+                </div>
+                <br>
+                <form class="form" method="post" action="{% url 'ab:submit_assignment_method' %}">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <input type="radio" name="assignment_method" value="uniform_random" {% if assignment_method == "uniform_random" %} checked="checked" {% endif %} > Uniform Random
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <input type="radio" name="assignment_method" value="weighted_probability_random" {% if assignment_method == "weighted_probability_random"  %} checked="checked" {% endif %}> Weighted Probability Random
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <input type="radio" name="assignment_method" value="csv_upload" {% if assignment_method == "csv_upload" %} checked="checked" {% endif %}> Upload a CSV file
+                    </div>
+                </div>
+                <br>
+                {% if not is_finalized %}
+                <div class="row">
+                    <div class="col-lg-12"><input type="submit" name="submit" id="update_assignment_button" class=" btn btn-lg btn-primary" value="Submit Changes"></div>
+                </div>
+                {% else %}
+                <h4 >Tracks Are Finalized.</h4>
+                <p> Because students can at this point start joining tracks, track assignment method cannot be changed.</p>
+                <div class="row">
+                    <div class="col-lg-12"><input type="submit" name="submit" id="update_assignment_button" class=" btn btn-lg btn-primary disabled" value="Submit Changes"></div>
+                </div>
+                {% endif %}
                 </form>
             </div>
         </div>
@@ -186,6 +217,7 @@
 
 <!-- JS for expanding modules-->
 <script>
+
 {% for m in modules %}
 $( "#module_" + {{m.id}}).click(function() {
 $( "#module_items_" + {{m.id}}).toggle('fast');

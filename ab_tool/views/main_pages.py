@@ -1,7 +1,7 @@
 import csv
 from django.core.urlresolvers import reverse
 from django.http.response import HttpResponse
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, redirect, get_object_or_404
 #from django.views.decorators.csrf import csrf_exempt
 from django_auth_lti.decorators import lti_role_required
 from django.template.defaultfilters import slugify
@@ -14,6 +14,7 @@ from ab_tool.controllers import (get_uninstalled_intervention_points,
 from ab_tool.models import (InterventionPoint, Track, CourseStudent,
     CourseSettings)
 from ab_tool.constants import ADMINS
+from ab_tool.exceptions import COURSE_TRACKS_ALREADY_FINALIZED
 
 
 def not_authorized(request):
@@ -23,13 +24,16 @@ def not_authorized(request):
 @lti_role_required(ADMINS)
 def render_intervention_point_control_panel(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
+    course_settings,_ = CourseSettings.objects.get_or_create(course_id=course_id)
     modules = get_modules_with_items(request)
     uninstalled_intervention_points = get_uninstalled_intervention_points(request)
     intervention_points = InterventionPoint.objects.filter(course_id=course_id)
     tracks = Track.objects.filter(course_id=course_id)
     is_finalized = CourseSettings.get_is_finalized(course_id=course_id)
     incomplete_intervention_points = get_incomplete_intervention_points(intervention_points)
+    assignment_method = CourseSettings.ASSIGNMENT_METHODS_REVERSE_DICT[course_settings.assignment_method]
     context = {
+        "assignment_method": assignment_method,
         "modules": modules,
         "intervention_points": intervention_points,
         "uninstalled_intervention_points": uninstalled_intervention_points,
@@ -89,3 +93,13 @@ def download_data(request):
         row = [s.student_id, s.lis_person_sourcedid, s.track.name, s.updated_on]
         writer.writerow(row)
     return response
+
+@lti_role_required(ADMINS)
+def submit_assignment_method(request):
+    course_id = get_lti_param(request, "custom_canvas_course_id")
+    if CourseSettings.get_is_finalized(course_id):
+        raise COURSE_TRACKS_ALREADY_FINALIZED
+    method = request.POST.get('assignment_method')
+    course_settings = get_object_or_404(CourseSettings, course_id=course_id)
+    course_settings.update(assignment_method=CourseSettings.ASSIGNMENT_METHODS[method])
+    return redirect(reverse("ab:index") + "#tabs-5")

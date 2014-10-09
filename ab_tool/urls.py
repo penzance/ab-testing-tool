@@ -2,7 +2,7 @@ from django.conf.urls import patterns, url, include
 from django.contrib import admin
 
 from ab_tool.views.main_pages import (render_intervention_point_control_panel, not_authorized,
-     tool_config, download_data)
+     tool_config, download_data, submit_assignment_method)
 
 from ab_tool.views.selection_pages import (resource_selection, submit_selection,
                     submit_selection_new_intervention_point)
@@ -11,7 +11,7 @@ from ab_tool.views.intervention_point_pages import (create_intervention_point, s
                     modules_page_edit_intervention_point)
 from ab_tool.views.track_pages import (create_track, submit_create_track,
                     submit_edit_track, edit_track, delete_track, finalize_tracks,
-                    assign_track_weights, submit_assign_track_weights)
+                    track_weights, submit_track_weights)
 
 admin.autodiscover()
 
@@ -39,8 +39,10 @@ urlpatterns = patterns('',
     url(r'^delete_track/(?P<track_id>\d+)$', delete_track, name='delete_track'),
     url(r'^finalize_tracks$', finalize_tracks, name='finalize_tracks'),
     
-    url(r'^assign_track_weights$', assign_track_weights, name='assign_track_weights'),
-    url(r'^submit_assign_track_weights$', submit_assign_track_weights, name='submit_assign_track_weights'),
+    url(r'^track_weights$', track_weights, name='track_weights'),
+    url(r'^submit_track_weights$', submit_track_weights, name='submit_track_weights'),
+    
+    url(r'^submit_assignment_method$', submit_assignment_method, name='submit_assignment_method'),
     
     url(r'^admin/', include(admin.site.urls)),
 )

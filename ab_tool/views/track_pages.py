@@ -86,7 +86,7 @@ def finalize_tracks(request):
 
 
 @lti_role_required(ADMINS)
-def assign_track_weights(request):
+def track_weights(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     if CourseSettings.get_is_finalized(course_id):
         raise COURSE_TRACKS_ALREADY_FINALIZED
@@ -108,7 +108,7 @@ def format_weighting(weighting):
 
 
 @lti_role_required(ADMINS)
-def submit_assign_track_weights(request, intervention_point_id):
+def submit_track_weights(request, intervention_point_id):
     WEIGHT_TAG = "weight_for_track_"
     course_id = get_lti_param(request, "custom_canvas_course_id")
     intervention_pointurls = [(k,v) for (k,v) in request.POST.iteritems() if WEIGHT_TAG in k and v]
