@@ -1,5 +1,4 @@
 Django>=1.6
 ims_lti_py
-git+https://github.com/penzance/django-canvas-oauth.git@master#egg=django-canvas-oauth
 git+https://github.com/penzance/django-auth-lti.git@develop#egg=django-auth-lti
 git+https://github.com/penzance/canvas_python_sdk.git@v0.5b1#egg=canvas-python-sdk
