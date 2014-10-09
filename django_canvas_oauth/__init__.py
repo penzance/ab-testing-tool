@@ -1,2 +1,2 @@
-from oauth import get_token, get_token_backend
+from oauth import get_token
 from exceptions import NewTokenNeeded
