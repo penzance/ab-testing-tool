@@ -31,9 +31,8 @@ def render_intervention_point_control_panel(request):
     tracks = Track.objects.filter(course_id=course_id)
     is_finalized = CourseSettings.get_is_finalized(course_id=course_id)
     incomplete_intervention_points = get_incomplete_intervention_points(intervention_points)
-    assignment_method = CourseSettings.ASSIGNMENT_METHODS_REVERSE_DICT[course_settings.assignment_method]
     context = {
-        "assignment_method": assignment_method,
+        "course_settings": course_settings,
         "modules": modules,
         "intervention_points": intervention_points,
         "uninstalled_intervention_points": uninstalled_intervention_points,
@@ -99,7 +98,7 @@ def submit_assignment_method(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     if CourseSettings.get_is_finalized(course_id):
         raise COURSE_TRACKS_ALREADY_FINALIZED
-    method = request.POST.get('assignment_method')
+    assignment_method = request.POST.get('assignment_method')
     course_settings = get_object_or_404(CourseSettings, course_id=course_id)
-    course_settings.update(assignment_method=CourseSettings.ASSIGNMENT_METHODS[method])
+    course_settings.update(assignment_method=assignment_method)
     return redirect(reverse("ab:index") + "#tabs-5")

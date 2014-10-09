@@ -79,15 +79,6 @@ class CourseSettings(CustomModel):
     CSV_UPLOAD = 3
     REVERSE_API = 4
     
-    ASSIGNMENT_METHODS = {
-        "uniform_random": UNIFORM_RANDOM,
-        "weighted_probability_random": WEIGHTED_PROBABILITY_RANDOM,
-        "csv_upload": CSV_UPLOAD,
-        "reverse_api": REVERSE_API,
-    }
-    
-    ASSIGNMENT_METHODS_REVERSE_DICT = {v: k for k, v in ASSIGNMENT_METHODS.items()}
-    
     ASSIGNMENT_ENUM_TYPES = (
         (UNIFORM_RANDOM, "uniform_random"),
         (WEIGHTED_PROBABILITY_RANDOM, "weighted_probability_random"),

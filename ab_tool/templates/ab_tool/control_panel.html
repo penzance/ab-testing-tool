@@ -178,17 +178,17 @@
                 <form class="form" method="post" action="{% url 'ab:submit_assignment_method' %}">
                 <div class="row">
                     <div class="col-lg-12">
-                        <input type="radio" name="assignment_method" value="uniform_random" {% if assignment_method == "uniform_random" %} checked="checked" {% endif %} > Uniform Random
+                        <input type="radio" name="assignment_method" value="{{course_settings.UNIFORM_RANDOM}}" {% if course_settings.assignment_method == course_settings.UNIFORM_RANDOM %} checked="checked" {% endif %} > Uniform Random
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-lg-12">
-                        <input type="radio" name="assignment_method" value="weighted_probability_random" {% if assignment_method == "weighted_probability_random"  %} checked="checked" {% endif %}> Weighted Probability Random
+                        <input type="radio" name="assignment_method" value="{{course_settings.WEIGHTED_PROBABILITY_RANDOM}}" {% if course_settings.assignment_method == course_settings.WEIGHTED_PROBABILITY_RANDOM  %} checked="checked" {% endif %}> Weighted Probability Random
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-lg-12">
-                        <input type="radio" name="assignment_method" value="csv_upload" {% if assignment_method == "csv_upload" %} checked="checked" {% endif %}> Upload a CSV file
+                        <input type="radio" name="assignment_method" value="{{course_settings.CSV_UPLOAD}}" {% if course_settings.assignment_method == course_settings.CSV_UPLOAD %} checked="checked" {% endif %}> Upload a CSV file
                     </div>
                 </div>
                 <br>
