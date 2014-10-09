@@ -10,7 +10,7 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 import os
 from os.path import abspath, basename, dirname, join, normpath
 from sys import path
-from secure import CLIENT_SECRET, CLIENT_ID
+from .secure import SECURE_SETTINGS
 
 # Normally you should not import ANYTHING from Django directly
 # into your settings, but ImproperlyConfigured is an exception.
@@ -48,6 +48,9 @@ path.append(SITE_ROOT)
 
 ### End path stuff
 
+CLIENT_SECRET = SECURE_SETTINGS["CLIENT_SECRET"]
+
+CLIENT_ID = SECURE_SETTINGS["CLIENT_ID"]
 
 
 # Quick-start development settings - unsuitable for production
