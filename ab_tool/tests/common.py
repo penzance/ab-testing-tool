@@ -11,7 +11,8 @@ from error_middleware.middleware import ERROR_TEMPLATE
 
 LIST_MODULES = "canvas_sdk.methods.modules.list_modules"
 LIST_ITEMS = "canvas_sdk.methods.modules.list_module_items"
- 
+GET_TOKEN = "ab_tool.canvas.get_token"
+
 TEST_COURSE_ID = "12345"
 TEST_OTHER_COURSE_ID = "5555555"
 TEST_DOMAIN = "example.com"
@@ -61,6 +62,7 @@ class SessionTestCase(TestCase):
         patchers = [
             patch(LIST_MODULES, return_value=APIReturn([])),
             patch(LIST_ITEMS, return_value=APIReturn([])),
+            patch(GET_TOKEN, return_value="MOCK_TOKEN"),
         ]
         for patcher in patchers:
             patcher.start()
