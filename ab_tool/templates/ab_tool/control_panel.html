@@ -20,8 +20,8 @@
     <!-- BEGIN Tabs-->
     <ul>
     <li><a href="#tabs-1">Tracks</a></li>
-    <li><a href="#tabs-5">Track Assignment</a></li>
     <li><a href="#tabs-2">Intervention Points</a></li>
+    <li><a href="#tabs-5">Student Assignment</a></li>
     <li><a href="#tabs-3">Course Modules</a></li>
     <li><a href="#tabs-4">Data</a></li>
     </ul>
@@ -154,10 +154,10 @@
         </div>
 
 
-        <!-- Tab for Track Assignment-->
+        <!-- Tab for Student Assignment-->
         <div id="tabs-5">
             <div class="span8">
-                <p> Select your track assignment method here. The assignment method selected is how students will be assigned to tracks.</p>
+                <p> Select your student assignment method here. The assignment method selected is how students will be assigned to tracks.</p>
                 <p>Helpful tip: The assignment method defaults to 'Uniform Random'. Students are randomly assigned to a track upon hitting their first intervention point.</p>
                 <br>
                 <div class="media-body">
@@ -198,11 +198,18 @@
                 </div>
                 {% else %}
                 <h4 >Tracks Are Finalized.</h4>
-                <p> Because students can at this point start joining tracks, track assignment method cannot be changed.</p>
+                <p> Because students can at this point start joining tracks, student assignment method cannot be changed.</p>
                 <div class="row">
                     <div class="col-lg-12"><input type="submit" name="submit" id="update_assignment_button" class=" btn btn-lg btn-primary disabled" value="Submit Changes"></div>
                 </div>
                 {% endif %}
+                {% if not is_finalized and course_settings.assignment_method == course_settings.WEIGHTED_PROBABILITY_RANDOM %}
+                    <a id="assign_track_weights_button" class="btn btn-lg btn-primary"  href="{% url 'assign_track_weights' %}"> Assign Track Probabilities</a>
+                {% endif %}
+                {% if is_finalized and course_settings.assignment_method == course_settings.WEIGHTED_PROBABILITY_RANDOM %}
+                    <a id="assign_track_weights_button" class="btn btn-lg btn-primary disabled"  href=""> Assign Track Probabilities</a>
+                {% endif %}
+
                 </form>
             </div>
         </div>

@@ -3,7 +3,8 @@ from django_auth_lti.decorators import lti_role_required
 from django.core.urlresolvers import reverse
 
 from ab_tool.constants import ADMINS
-from ab_tool.models import (Track, CourseSettings, InterventionPoint)
+from ab_tool.models import (Track, CourseSettings, InterventionPoint,
+    TrackProbabilityWeight)
 from ab_tool.canvas import get_lti_param
 from ab_tool.exceptions import (UNAUTHORIZED_ACCESS,
     COURSE_TRACKS_ALREADY_FINALIZED, NO_TRACKS_FOR_COURSE)
@@ -82,4 +83,40 @@ def finalize_tracks(request):
         return HttpResponse("URLs missing for these tracks in these Intervention Points: %s" % incomplete_intervention_points)
     CourseSettings.set_finalized(course_id)
     return redirect(reverse("ab:index"))
+
+@lti_role_required(ADMINS)
+def track_weights(request):
+    course_id = get_lti_param(request, "custom_canvas_course_id")
+    if CourseSettings.get_is_finalized(course_id):
+        raise COURSE_TRACKS_ALREADY_FINALIZED
+    all_tracks = Track.objects.filter(course_id=course_id)
+    weighting_objs = []
+    for track in all_tracks:
+        try:
+            weighting_obj = TrackProbabilityWeight.objects.get(track=track)
+            weighting_objs.append((track, weighting_obj))
+        except TrackProbabilityWeight.DoesNotExist:
+            weighting_objs.append((track, None))
+    context = {"weighting_objs": weighting_objs,
+              }
+    return render_to_response("ab_tool/edit_track_weightings.html", context)
+
+
+def format_weighting(weighting):
+    return float(weighting)
+
+
+@lti_role_required(ADMINS)
+def submit_track_weights(request, intervention_point_id):
+    WEIGHT_TAG = "weight_for_track_"
+    course_id = get_lti_param(request, "custom_canvas_course_id")
+    intervention_pointurls = [(k,v) for (k,v) in request.POST.iteritems() if WEIGHT_TAG in k and v]
+    for (k,v) in intervention_pointurls:
+        _, track_id = k.split(WEIGHT_TAG)
+        try:
+            intervention_point_url = TrackProbabilityWeight.objects.get(track__pk=track_id)
+            intervention_point_url.update(weighting=format_weighting(v))
+        except TrackProbabilityWeight.DoesNotExist:
+            TrackProbabilityWeight.objects.create(weighting=format_weighting(v),  track_id=track_id)
+    return redirect(reverse("ab:index") + "#tabs-1")
 
