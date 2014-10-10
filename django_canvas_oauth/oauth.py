@@ -17,7 +17,7 @@ def get_token(request):
         happens outside of a view, then there is no token available for
         that user and they must be directed to the site to authorize a token."""
     try:
-        return request.user.oauthtoken
+        return request.user.oauthtoken.token
     except OAuthToken.DoesNotExist:
         """ If this exception is raised by a view function and not caught,
         it is probably because the oauth_middleware is not installed, since it
