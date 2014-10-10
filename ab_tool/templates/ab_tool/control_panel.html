@@ -203,13 +203,28 @@
                     <div class="col-lg-12"><input type="submit" name="submit" id="update_assignment_button" class=" btn btn-lg btn-primary disabled" value="Submit Changes"></div>
                 </div>
                 {% endif %}
-                {% if not is_finalized and course_settings.assignment_method == course_settings.WEIGHTED_PROBABILITY_RANDOM %}
-                    <a id="assign_track_weights_button" class="btn btn-lg btn-primary"  href="{% url 'assign_track_weights' %}"> Assign Track Probabilities</a>
+                {% if course_settings.assignment_method == course_settings.UNIFORM_RANDOM %}
+                    <br>
+                    <p>Selected: Uniform Random.</p>
+                    <p>Nothing more to do here!</p>
                 {% endif %}
-                {% if is_finalized and course_settings.assignment_method == course_settings.WEIGHTED_PROBABILITY_RANDOM %}
-                    <a id="assign_track_weights_button" class="btn btn-lg btn-primary disabled"  href=""> Assign Track Probabilities</a>
+                {% if course_settings.assignment_method == course_settings.WEIGHTED_PROBABILITY_RANDOM %}
+                    <br>
+                    <p>Selected: Weighted Probability Random.</p>
+                    <p>Now assign probabilities to tracks.</p>
+                    {% if not is_finalized %}
+                        <a id="assign_track_weights_button" class="btn btn-lg btn-success"  href="{% url 'ab:track_weights' %}"> Assign Track Probabilities</a>
+                    {% else %}
+                        <a id="assign_track_weights_button" class="btn btn-lg btn-success disabled"  href=""> Assign Track Probabilities</a>
+                    {% endif %}
                 {% endif %}
-
+                {% if course_settings.assignment_method == course_settings.CSV_UPLOAD %}
+                    <br>
+                    <p>Selected: CSV Upload.</p>
+                    <p>Now download the CSV template to complete and upload.</p>
+                        <a id="" class="btn btn-lg btn-info"  href=""> Download CSV Template </a>
+                        <a id="" class="btn btn-lg btn-success"  href=""> Upload Completed CSV</a>
+                {% endif %}
                 </form>
             </div>
         </div>
