@@ -1,7 +1,7 @@
 from error_middleware.exceptions import (Renderable500, Renderable400,
     Renderable403, Renderable404)
 
-NO_SDK_RESPONSE = Renderable500("Canvas SKD returned an error")
+NO_SDK_RESPONSE = Renderable500("Canvas SDK returned an error")
 
 MISSING_LTI_LAUNCH = Renderable400("LTI_LAUNCH not in session")
 MISSING_LTI_PARAM = Renderable400("Missing LTI parameter in session")
