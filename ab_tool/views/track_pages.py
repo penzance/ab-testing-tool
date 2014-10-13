@@ -81,11 +81,9 @@ def finalize_tracks(request):
     intervention_points = InterventionPoint.objects.filter(course_id=course_id)
     incomplete_intervention_points = get_incomplete_intervention_points(intervention_points)
     if incomplete_intervention_points:
-        #TODO: replace with better error display
         return HttpResponse("URLs missing for these tracks in these Intervention Points: %s" % incomplete_intervention_points)
     missing_track_weights = get_missing_track_weights(tracks, course_id)
     if missing_track_weights:
-        #TODO: replace with better error display
         return HttpResponse("Track weightings missing for these tracks: %s" % missing_track_weights)
     CourseSettings.set_finalized(course_id)
     return redirect(reverse("ab:index"))
