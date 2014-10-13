@@ -37,11 +37,11 @@ class Experiment(CourseObject):
     tracks_finalized = models.BooleanField(default=False)
     
     @classmethod
-    def get_paceholder_course_track(cls, course_id):
+    def get_placeholder_course_experiment(cls, course_id):
         """ Gets or creates a single experiment for the course.  Placeholder
             method until interface supports multiple experiments.
             TODO: Remove once multiple experiments are supported """
-        return Experiment.objects.get_or_create(course_id=course_id, name="Experiment 1")
+        return Experiment.objects.get_or_create(course_id=course_id, name="Experiment 1")[0]
 
 
 class Track(CourseObject):

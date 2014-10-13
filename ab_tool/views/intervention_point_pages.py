@@ -81,7 +81,7 @@ def create_intervention_point(request):
         requiring separate template render function. This also breaks CSRF
         token validation if CSRF Middleware is turned off. """
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    experiment = Experiment.get_paceholder_course_track(course_id)
+    experiment = Experiment.get_placeholder_course_experiment(course_id)
     #Note: Refer to template. (t,None) is passed as there are no existing InterventionPointUrls for a new intervention_point
     context = {"tracks" : [(t, None) for t in
                            Track.objects.filter(course_id=course_id)],

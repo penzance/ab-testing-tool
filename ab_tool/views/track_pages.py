@@ -1,4 +1,4 @@
-from django.shortcuts import render_to_response, redirect, get_object_or_404
+from django.shortcuts import render_to_response, redirect
 from django_auth_lti.decorators import lti_role_required
 from django.core.urlresolvers import reverse
 
@@ -14,7 +14,7 @@ from ab_tool.controllers import (post_param, get_incomplete_intervention_points)
 @lti_role_required(ADMINS)
 def create_track(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    experiment = Experiment.get_paceholder_course_track(course_id)
+    experiment = Experiment.get_placeholder_course_experiment(course_id)
     if experiment.tracks_finalized:
         raise EXPERIMENT_TRACKS_ALREADY_FINALIZED
     return render_to_response("ab_tool/edit_track.html", {"experiment_id": experiment.id})

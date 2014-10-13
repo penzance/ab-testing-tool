@@ -21,7 +21,7 @@ class TestMainPages(SessionTestCase):
         """ Tests control_panel template renders when authenticated and with no
             contents returned from Canvas"""
         response = self.client.get(reverse("ab:index"), follow=True)
-        self.assertEqual(response.status_code, 200)
+        self.assertOkay(response)
         self.assertTemplateUsed(response, "ab_tool/control_panel.html")
     
     @patch(LIST_MODULES, return_value=APIReturn([{"id": 0}]))
@@ -32,7 +32,7 @@ class TestMainPages(SessionTestCase):
         api_return = APIReturn([mock_item])
         with patch(LIST_ITEMS, return_value=api_return):
             response = self.client.get(reverse("ab:index"), follow=True)
-            self.assertEqual(response.status_code, 200)
+            self.assertOkay(response)
             self.assertTemplateUsed(response, "ab_tool/control_panel.html")
     
     def test_unauthenticated_index(self):
@@ -100,7 +100,7 @@ class TestMainPages(SessionTestCase):
     def test_tool_config(self):
         """ Tests that that tool_config page returns XML content"""
         response = self.client.get(reverse("ab:tool_config"))
-        self.assertEqual(response.status_code, 200)
+        self.assertOkay(response)
         self.assertEqual(response._headers["content-type"],
                         ('Content-Type', 'text/xml'))
     

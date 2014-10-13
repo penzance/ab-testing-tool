@@ -1,9 +1,9 @@
-from django.shortcuts import render_to_response, redirect, get_object_or_404
+from django.shortcuts import render_to_response, redirect
 from django.utils.http import urlencode
 from django_auth_lti.decorators import lti_role_required
 
-from ab_tool.models import Track, InterventionPointUrl, InterventionPoint,\
-    Experiment
+from ab_tool.models import (Track, InterventionPointUrl, InterventionPoint,
+    Experiment)
 from ab_tool.controllers import (get_uninstalled_intervention_points, intervention_point_url,
     post_param)
 from ab_tool.constants import STAGE_URL_TAG, ADMINS
@@ -50,7 +50,7 @@ def submit_selection_new_intervention_point(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     name = post_param(request, "name")
     notes = post_param(request, "notes")
-    experiment = Experiment.get_paceholder_course_track(course_id)
+    experiment = Experiment.get_placeholder_course_experiment(course_id)
     intervention_point = InterventionPoint.objects.create(
             name=name, notes=notes, course_id=course_id, experiment=experiment)
     intervention_pointurls = [(k,v) for (k,v) in request.POST.iteritems() if STAGE_URL_TAG in k and v]

@@ -18,7 +18,7 @@ class TestSelectionPages(SessionTestCase):
         data = {"ext_content_return_types": ["lti_launch_url"],
                 "ext_content_return_url": "http://test_content_return_url.com"}
         response = self.client.post(reverse("ab:resource_selection"), data, follow=True)
-        self.assertEqual(response.status_code, 200)
+        self.assertOkay(response)
         self.assertIn("content_return_url", response.context)
         self.assertEqual(response.context["content_return_url"],
                          "http://test_content_return_url.com")

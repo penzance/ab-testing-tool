@@ -27,7 +27,7 @@ def render_intervention_point_control_panel(request):
     uninstalled_intervention_points = get_uninstalled_intervention_points(request)
     intervention_points = InterventionPoint.objects.filter(course_id=course_id)
     tracks = Track.objects.filter(course_id=course_id)
-    is_finalized = Experiment.get_paceholder_course_track(course_id).tracks_finalized
+    is_finalized = Experiment.get_placeholder_course_experiment(course_id).tracks_finalized
     incomplete_intervention_points = get_incomplete_intervention_points(intervention_points)
     context = {
         "modules": modules,

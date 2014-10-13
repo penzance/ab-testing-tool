@@ -77,6 +77,9 @@ class SessionTestCase(TestCase):
     def set_roles(self, roles):
         self.set_lti_param("roles", roles)
     
+    def assertOkay(self, response):
+        self.assertEqual(response.status_code, 200)
+    
     def assertError(self, response, exception_instance):
         self.assertTemplateUsed(response, ERROR_TEMPLATE)
         if isinstance(exception_instance, RenderableError):
@@ -113,6 +116,17 @@ class SessionTestCase(TestCase):
         if error:
             raise Exception("Function either raises no exception or is "
                             "non-deterministic")
+    
+    def create_test_track(self, course_id=TEST_COURSE_ID, name="testtrack"):
+        experiment = Experiment.get_placeholder_course_experiment(course_id)
+        return Track.objects.create(name=name, course_id=course_id,
+                                    experiment=experiment)
+    
+    def create_test_intervention_point(self, course_id=TEST_COURSE_ID, name="testip"):
+        experiment = Experiment.get_placeholder_course_experiment(course_id)
+        return InterventionPoint.objects.create(name=name, course_id=course_id,
+                                                experiment=experiment)
+
 
 class APIReturn(object):
     """ Spoofs returned response from Canvas SDK. Has response.ok property and
