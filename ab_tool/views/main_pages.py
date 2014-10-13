@@ -32,9 +32,7 @@ def render_intervention_point_control_panel(request):
     tracks = Track.objects.filter(course_id=course_id)
     is_finalized = CourseSettings.get_is_finalized(course_id=course_id)
     incomplete_intervention_points = get_incomplete_intervention_points(intervention_points)
-    missing_track_weights = []
-    if course_settings.assignment_method == CourseSettings.WEIGHTED_PROBABILITY_RANDOM:
-        missing_track_weights = get_missing_track_weights(tracks, course_id)
+    missing_track_weights = get_missing_track_weights(tracks, course_id)
     context = {
         "course_settings": course_settings,
         "modules": modules,
