@@ -10,6 +10,7 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 import os
 from os.path import abspath, basename, dirname, join, normpath
 from sys import path
+from .secure import SECURE_SETTINGS
 
 from .secure import SECURE_SETTINGS
 
@@ -49,6 +50,9 @@ path.append(SITE_ROOT)
 
 ### End path stuff
 
+CLIENT_SECRET = SECURE_SETTINGS["CLIENT_SECRET"]
+
+CLIENT_ID = SECURE_SETTINGS["CLIENT_ID"]
 
 # THESE ADDRESSES WILL RECEIVE EMAIL ABOUT CERTAIN ERRORS!
 ADMINS = SECURE_SETTINGS.get('admins')
@@ -75,6 +79,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_canvas_oauth',
     'ab_tool',
 )
 
@@ -83,13 +88,14 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-
+    
     # Disabling these removes the need for @xframe_options_exempt, @csrf_exempt on views
     # TODO: determine if this is a better way to go about this
     #'django.middleware.csrf.CsrfViewMiddleware',
     #'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_auth_lti.middleware.LTIAuthMiddleware',
     'error_middleware.middleware.ErrorMiddleware',
+    'django_canvas_oauth.middleware.OAuthMiddleware'
 )
 
 AUTHENTICATION_BACKENDS = (
@@ -151,3 +157,5 @@ TEMPLATE_DIRS = (
     os.path.join(BASE_DIR, 'templates'),
 )
 
+CANVAS_OAUTH_CLIENT_ID = CLIENT_ID
+CANVAS_OAUTH_CLIENT_SECRET = CLIENT_SECRET
