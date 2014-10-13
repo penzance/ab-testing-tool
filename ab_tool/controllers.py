@@ -104,14 +104,15 @@ def get_missing_track_weights(tracks, course_id):
     for track in tracks:
         if track not in track_weights:
             missing_weights.append(track)
-    return missing_weights
+    return [track.name for track in missing_weights]
 
 def format_weighting(weighting):
     """ Track weights need to be an integer between 1 and 1000, allowing
         probability precision up to 0.001 """
-    if 1 <= weighting <= 1000:
+    if 1 <= int(weighting) <= 1000:
         return int(weighting)
     else:
+        print weighting
         raise INPUT_NOT_ALLOWED
 
 

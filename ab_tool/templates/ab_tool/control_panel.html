@@ -33,7 +33,7 @@
                 <br>
                 {% if not is_finalized %}
                 <a id="create_track_button" class="btn btn-lg btn-success"  href="{% url 'ab:create_track' %}"> Create New Track</a>
-                <a id="finalize_button" class="btn btn-lg btn-danger" {% if incomplete_intervention_points %} href="#incomplete_intervention_points_modal" {% elseif %} href="missing_track_weights_modal" {% else %} href="#finalize_modal" {% endif %} data-toggle="modal" > Finalize Tracks</a>
+                <a id="finalize_button" class="btn btn-lg btn-danger" {% if incomplete_intervention_points %} href="#incomplete_intervention_points_modal" {% elif missing_track_weights %} href="#missing_track_weights_modal" {% else %} href="#finalize_modal" {% endif %} data-toggle="modal" > Finalize Tracks</a>
 
                 {% if incomplete_intervention_points %}
                 <!-- START Modal code for incomplete_intervention_points confirmation box-->
@@ -228,12 +228,12 @@
                 {% endif %}
                 {% if course_settings.assignment_method == course_settings.UNIFORM_RANDOM %}
                     <br>
-                    <p>Selected: Uniform Random.</p>
+                    <p>Currently Selected: Uniform Random.</p>
                     <p>Nothing more to do here!</p>
                 {% endif %}
                 {% if course_settings.assignment_method == course_settings.WEIGHTED_PROBABILITY_RANDOM %}
                     <br>
-                    <p>Selected: Weighted Probability Random.</p>
+                    <p>Currently Selected: Weighted Probability Random.</p>
                     <p>Now assign weightings to tracks.</p>
                     {% if not is_finalized %}
                         <a id="assign_track_weights_button" class="btn btn-lg btn-success"  href="{% url 'ab:track_weights' %}"> Assign Track Probabilities</a>
@@ -243,7 +243,7 @@
                 {% endif %}
                 {% if course_settings.assignment_method == course_settings.CSV_UPLOAD %}
                     <br>
-                    <p>Selected: CSV Upload.</p>
+                    <p>Currently Selected: CSV Upload.</p>
                     <p>Now download the CSV template to complete and upload.</p>
                         <a id="" class="btn btn-lg btn-info"  href=""> Download CSV Template </a>
                         <a id="" class="btn btn-lg btn-success"  href=""> Upload Completed CSV</a>

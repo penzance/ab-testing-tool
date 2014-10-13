@@ -97,7 +97,7 @@ def track_weights(request):
     weighting_objs = []
     for track in all_tracks:
         try:
-            weighting_obj = TrackProbabilityWeight.objects.get(track=track)
+            weighting_obj = TrackProbabilityWeight.objects.get(track=track, course_id=course_id)
             weighting_objs.append((track, weighting_obj))
         except TrackProbabilityWeight.DoesNotExist:
             weighting_objs.append((track, None))
@@ -112,13 +112,15 @@ def submit_track_weights(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     if CourseSettings.get_is_finalized(course_id):
         raise COURSE_TRACKS_ALREADY_FINALIZED
-    intervention_pointurls = [(k,v) for (k,v) in request.POST.iteritems() if WEIGHT_TAG in k and v]
-    for (k,v) in intervention_pointurls:
+    weightings = [(k,v) for (k,v) in request.POST.iteritems() if WEIGHT_TAG in k and v]
+    for (k,v) in weightings:
         _, track_id = k.split(WEIGHT_TAG)
         try:
-            intervention_point_url = TrackProbabilityWeight.objects.get(track__pk=track_id)
-            intervention_point_url.update(weighting=format_weighting(v))
+            weighting_obj = TrackProbabilityWeight.objects.get(track__pk=track_id, course_id=course_id)
+            print weighting_obj
+            weighting_obj.update(weighting=format_weighting(v))
         except TrackProbabilityWeight.DoesNotExist:
-            TrackProbabilityWeight.objects.create(weighting=format_weighting(v),  track_id=track_id)
+            TrackProbabilityWeight.objects.create(track_id=track_id, course_id=course_id,
+                                                  weighting=format_weighting(v))
     return redirect(reverse("ab:index") + "#tabs-5")
 
