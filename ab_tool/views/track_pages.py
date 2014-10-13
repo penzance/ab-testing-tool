@@ -7,9 +7,10 @@ from ab_tool.models import (Track, CourseSettings, InterventionPoint,
     TrackProbabilityWeight)
 from ab_tool.canvas import get_lti_param
 from ab_tool.exceptions import (UNAUTHORIZED_ACCESS,
-    COURSE_TRACKS_ALREADY_FINALIZED, NO_TRACKS_FOR_COURSE)
+    COURSE_TRACKS_ALREADY_FINALIZED, NO_TRACKS_FOR_COURSE, INPUT_NOT_ALLOWED)
 from django.http.response import HttpResponse
-from ab_tool.controllers import (post_param, get_incomplete_intervention_points)
+from ab_tool.controllers import (post_param, get_incomplete_intervention_points,
+    get_missing_track_weights)
 
 
 @lti_role_required(ADMINS)
@@ -74,13 +75,18 @@ def delete_track(request, track_id):
 @lti_role_required(ADMINS)
 def finalize_tracks(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    if Track.objects.filter(course_id=course_id).count() == 0:
+    tracks = Track.objects.filter(course_id=course_id)
+    if tracks.count() == 0:
         raise NO_TRACKS_FOR_COURSE
     intervention_points = InterventionPoint.objects.filter(course_id=course_id)
     incomplete_intervention_points = get_incomplete_intervention_points(intervention_points)
     if incomplete_intervention_points:
         #TODO: replace with better error display
         return HttpResponse("URLs missing for these tracks in these Intervention Points: %s" % incomplete_intervention_points)
+    missing_track_weights = get_missing_track_weights(tracks, course_id)
+    if missing_track_weights:
+        #TODO: replace with better error display
+        return HttpResponse("Track weightings missing for these tracks: %s" % missing_track_weights)
     CourseSettings.set_finalized(course_id)
     return redirect(reverse("ab:index"))
 
@@ -103,7 +109,12 @@ def track_weights(request):
     return render_to_response("ab_tool/edit_track_weights.html", context)
 
 def format_weighting(weighting):
-    return float(weighting)
+    """ Track weights need to be an integer between 1 and 1000, allowing
+        probability precision up to 0.001 """
+    if 1 <= weighting <= 1000:
+        return int(weighting)
+    else:
+        raise INPUT_NOT_ALLOWED
 
 @lti_role_required(ADMINS)
 def submit_track_weights(request):

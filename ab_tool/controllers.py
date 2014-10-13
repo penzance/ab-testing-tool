@@ -1,10 +1,9 @@
 from django.core.urlresolvers import reverse
 
-from ab_tool.models import InterventionPoint
+from ab_tool.models import InterventionPoint, TrackProbabilityWeight
 from ab_tool.canvas import (get_canvas_request_context, list_module_items, list_modules,
     get_lti_param)
 from ab_tool.exceptions import BAD_STAGE_ID, missing_param_error
-from error_middleware.middleware import RenderableError
 
 
 def intervention_point_url(request, intervention_point_id):
@@ -61,6 +60,13 @@ def all_intervention_point_urls(request, course_id):
     return [intervention_point_url(request, intervention_point.id) for intervention_point in
             InterventionPoint.objects.filter(course_id=course_id)]
 
+def get_missing_track_weights(tracks, course_id):
+    missing_weights = []
+    track_weights = [t.track for t in TrackProbabilityWeight.objects.filter(course_id=course_id)]
+    for track in tracks:
+        if track not in track_weights:
+            missing_weights.append(track)
+    return missing_weights
 
 def get_modules_with_items(request):
     """

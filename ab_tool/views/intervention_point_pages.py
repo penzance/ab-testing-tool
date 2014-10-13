@@ -6,13 +6,14 @@ from random import choice
 from ab_tool.constants import (ADMINS, STAGE_URL_TAG,
     DEPLOY_OPTION_TAG, AS_TAB_TAG)
 from ab_tool.models import (InterventionPoint, Track, InterventionPointUrl, CourseSettings,
-    CourseStudent)
+    CourseStudent, TrackProbabilityWeight)
 from ab_tool.canvas import get_lti_param
 from ab_tool.controllers import (intervention_point_is_installed, format_url,
     post_param)
 from ab_tool.exceptions import (UNAUTHORIZED_ACCESS,
     DELETING_INSTALLED_STAGE, COURSE_TRACKS_NOT_FINALIZED,
-    NO_URL_FOR_TRACK, NO_TRACKS_FOR_COURSE)
+    NO_URL_FOR_TRACK, NO_TRACKS_FOR_COURSE, TRACK_WEIGHTS_NOT_SET,
+    CSV_UPLOAD_NEEDED)
 
 
 def deploy_intervention_point(request, intervention_point_id):
@@ -37,23 +38,18 @@ def deploy_intervention_point(request, intervention_point_id):
         raise COURSE_TRACKS_NOT_FINALIZED
     
     student_id = get_lti_param(request, "custom_canvas_user_login_id")
-    lis_person_sourcedid = get_lti_param(request, "lis_person_sourcedid")
     
     # Get or create an object to track the student for this course
     try:
         student = CourseStudent.objects.get(student_id=student_id, course_id=course_id)
     except CourseStudent.DoesNotExist:
         # If this is a new student or the student doesn't yet have a track,
-        # assign the student to a track
-        # TODO: expand this code to allow multiple randomization procedures
-        tracks = Track.objects.filter(course_id=course_id)
-        if not tracks:
-            raise NO_TRACKS_FOR_COURSE
-        chosen_track = choice(tracks)
-        student = CourseStudent.objects.create(
-                student_id=student_id, course_id=course_id, track=chosen_track,
-                lis_person_sourcedid=lis_person_sourcedid)
-    
+        # select a track before creating the student. This avoids a race condition of
+        # a student existing but not having a track assigned (e.g. if the update to
+        # a student database object fails)
+        lis_person_sourcedid = get_lti_param(request, "lis_person_sourcedid")
+        student = assign_track_and_create_student(course_id, student_id, lis_person_sourcedid)
+
     # Retrieve the url for the student's track at the current intervention point
     # Return an error page if there is no url configured.
     try:
@@ -68,6 +64,35 @@ def deploy_intervention_point(request, intervention_point_id):
         raise NO_URL_FOR_TRACK
     return redirect(chosen_intervention_point_url.url)
 
+def assign_track_and_create_student(course_id, student_id, lis_person_sourcedid):
+    """ Method looks up assignment_mode to select track and creates student in selected track.
+        Method returns student object """
+    course_settings = get_object_or_404(CourseSettings, course_id=course_id)
+    if course_settings.assignment_method == CourseSettings.CSV_UPLOAD:
+        # Raise error as student should have already been assigned a track if CSV upload
+        #TODO: infrastructure needed notify course administrator about incomplete student-track mapping
+        raise CSV_UPLOAD_NEEDED
+    tracks = Track.objects.filter(course_id=course_id)
+    if not tracks:
+        raise NO_TRACKS_FOR_COURSE
+    if course_settings.assignment_method == CourseSettings.UNIFORM_RANDOM:
+        # If uniform, pick randomly from the set of tracks
+        chosen_track = choice(tracks)
+    if course_settings.assignment_method == CourseSettings.WEIGHTED_PROBABILITY_RANDOM:
+        # If weighted, generate a weighted list of tracks appropriately and pick one randomly from list
+        weighted_tracks = []
+        for track in tracks:
+            try:
+                track_weight = TrackProbabilityWeight.objects.get(track=track, course_id=course_id)
+            except TrackProbabilityWeight.DoesNotExist:
+                raise TRACK_WEIGHTS_NOT_SET
+            weighted_tracks.extend([track] * track_weight.weighting)
+        chosen_track = choice(weighted_tracks)
+    # Create student with chosen track
+    student = CourseStudent.objects.create(
+            student_id=student_id, course_id=course_id, track=chosen_track,
+            lis_person_sourcedid=lis_person_sourcedid)
+    return student
 
 @lti_role_required(ADMINS)
 def create_intervention_point(request):

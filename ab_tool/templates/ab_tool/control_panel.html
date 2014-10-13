@@ -167,7 +167,7 @@
                 <br>
                 <div class="media-body">
                   <h4 class="media-heading">Weighted Probability Random</h4>
-                    <p>Using this method, students are randomly assigned a track that are weighted by your specified probabilities. <b>Note that student assignment is probabilistic and does not guarantee a number of students belonging to a certain track.</b></p>
+                    <p>Using this method, students are randomly assigned a track with a probability calculated by your specified weightings. <b>Note that student assignment is probabilistic and does not guarantee a number of students belonging to a certain track.</b></p>
                 </div>
                 <br>
                 <div class="media-body">
@@ -211,7 +211,7 @@
                 {% if course_settings.assignment_method == course_settings.WEIGHTED_PROBABILITY_RANDOM %}
                     <br>
                     <p>Selected: Weighted Probability Random.</p>
-                    <p>Now assign probabilities to tracks.</p>
+                    <p>Now assign weightings to tracks.</p>
                     {% if not is_finalized %}
                         <a id="assign_track_weights_button" class="btn btn-lg btn-success"  href="{% url 'ab:track_weights' %}"> Assign Track Probabilities</a>
                     {% else %}

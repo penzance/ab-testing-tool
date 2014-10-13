@@ -21,8 +21,8 @@ class Track(CustomModel):
 
 
 class TrackProbabilityWeight(CustomModel):
-    #Definition: A `weighting` is a number between 0 and 1
-    weighting = models.FloatField(null=True)
+    #Definition: A `weighting` is a number between 0 and 100
+    weighting = models.IntegerField()
     track = models.ForeignKey(Track)
     course_id = models.CharField(max_length=128, db_index=True)
 
