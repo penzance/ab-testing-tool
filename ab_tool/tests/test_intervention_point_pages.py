@@ -2,14 +2,14 @@ from django.core.urlresolvers import reverse
 from mock import patch
 
 from ab_tool.constants import STAGE_URL_TAG, DEPLOY_OPTION_TAG
-from ab_tool.models import (InterventionPoint, InterventionPointUrl, Track, CourseStudent,
-    CourseSettings)
+from ab_tool.models import (InterventionPoint, InterventionPointUrl, Track,
+    ExperimentStudent, Experiment)
 from ab_tool.tests.common import (SessionTestCase, TEST_COURSE_ID,
     TEST_OTHER_COURSE_ID, NONEXISTENT_STAGE_ID, APIReturn, LIST_MODULES,
     TEST_STUDENT_ID)
-from ab_tool.exceptions import (NO_URL_FOR_TRACK,
-    COURSE_TRACKS_NOT_FINALIZED, UNAUTHORIZED_ACCESS,
-    DELETING_INSTALLED_STAGE, NO_TRACKS_FOR_COURSE)
+from ab_tool.exceptions import (NO_URL_FOR_TRACK,  UNAUTHORIZED_ACCESS,
+    EXPERIMENT_TRACKS_NOT_FINALIZED, NO_TRACKS_FOR_EXPERIMENT,
+    DELETING_INSTALLED_STAGE)
 
 
 class TestInterventionPointPages(SessionTestCase):
@@ -26,42 +26,42 @@ class TestInterventionPointPages(SessionTestCase):
         self.set_roles([])
         intervention_point = InterventionPoint.objects.create(name="intervention_point1")
         response = self.client.get(reverse("ab:deploy_intervention_point", args=(intervention_point.id,)))
-        self.assertError(response, COURSE_TRACKS_NOT_FINALIZED)
+        self.assertError(response, EXPERIMENT_TRACKS_NOT_FINALIZED)
     
     def test_deploy_intervention_point_no_tracks_error(self):
         """ Tests deploy intervention_point for student creates errors with no tracks """
         self.set_roles([])
-        CourseSettings.set_finalized(TEST_COURSE_ID)
+        Experiment.set_finalized(TEST_COURSE_ID)
         intervention_point = InterventionPoint.objects.create(name="intervention_point1")
         response = self.client.get(reverse("ab:deploy_intervention_point", args=(intervention_point.id,)))
-        self.assertError(response, NO_TRACKS_FOR_COURSE)
+        self.assertError(response, NO_TRACKS_FOR_EXPERIMENT)
     
     def test_deploy_intervention_point_student_created(self):
         """ Tests deploy intervention_point for student creates student object and assigns
             track to that student object """
         self.set_roles([])
-        CourseSettings.set_finalized(TEST_COURSE_ID)
+        Experiment.set_finalized(TEST_COURSE_ID)
         intervention_point = InterventionPoint.objects.create(name="intervention_point1")
         track = Track.objects.create(name="track1", course_id=TEST_COURSE_ID)
-        students = CourseStudent.objects.filter(course_id=TEST_COURSE_ID,
+        students = ExperimentStudent.objects.filter(course_id=TEST_COURSE_ID,
                                                student_id=TEST_STUDENT_ID)
         self.assertEqual(students.count(), 0)
         InterventionPointUrl.objects.create(intervention_point=intervention_point, track=track,
                                 url="http://www.example.com")
         self.client.get(reverse("ab:deploy_intervention_point", args=(intervention_point.id,)))
-        student = CourseStudent.objects.get(course_id=TEST_COURSE_ID,
+        student = ExperimentStudent.objects.get(course_id=TEST_COURSE_ID,
                                             student_id=TEST_STUDENT_ID)
         self.assertEqual(student.track.name, "track1")
     
     def test_deploy_intervention_point_student_redirect(self):
         """ Tests deploy intervention_point for student redirects to the correct url """
         self.set_roles([])
-        CourseSettings.set_finalized(TEST_COURSE_ID)
+        Experiment.set_finalized(TEST_COURSE_ID)
         intervention_point = InterventionPoint.objects.create(name="intervention_point1")
         track = Track.objects.create(name="track1", course_id=TEST_COURSE_ID)
         intervention_point2 = InterventionPoint.objects.create(name="intervention_point2")
         track2 = Track.objects.create(name="track2", course_id=TEST_COURSE_ID)
-        CourseStudent.objects.create(course_id=TEST_COURSE_ID,
+        ExperimentStudent.objects.create(course_id=TEST_COURSE_ID,
                                student_id=TEST_STUDENT_ID, track=track)
         InterventionPointUrl.objects.create(intervention_point=intervention_point, track=track,
                                 url="http://www.example.com")
@@ -76,10 +76,10 @@ class TestInterventionPointPages(SessionTestCase):
     def test_deploy_intervention_point_no_url(self):
         """ Tests depoloy intervention_point for student with no url errors """
         self.set_roles([])
-        CourseSettings.set_finalized(TEST_COURSE_ID)
+        Experiment.set_finalized(TEST_COURSE_ID)
         intervention_point = InterventionPoint.objects.create(name="intervention_point1")
         track = Track.objects.create(name="track1", course_id=TEST_COURSE_ID)
-        CourseStudent.objects.create(course_id=TEST_COURSE_ID,
+        ExperimentStudent.objects.create(course_id=TEST_COURSE_ID,
                                student_id=TEST_STUDENT_ID, track=track)
         InterventionPointUrl.objects.create(intervention_point=intervention_point, track=track, url="")
         response = self.client.get(reverse("ab:deploy_intervention_point", args=(intervention_point.id,)))

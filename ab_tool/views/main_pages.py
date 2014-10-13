@@ -11,8 +11,8 @@ from ims_lti_py.tool_config import ToolConfig
 from ab_tool.canvas import get_lti_param
 from ab_tool.controllers import (get_uninstalled_intervention_points,
     get_modules_with_items, get_incomplete_intervention_points)
-from ab_tool.models import (InterventionPoint, Track, CourseStudent,
-    CourseSettings)
+from ab_tool.models import (InterventionPoint, Track, ExperimentStudent,
+    Experiment)
 from ab_tool.constants import ADMINS
 
 
@@ -27,7 +27,7 @@ def render_intervention_point_control_panel(request):
     uninstalled_intervention_points = get_uninstalled_intervention_points(request)
     intervention_points = InterventionPoint.objects.filter(course_id=course_id)
     tracks = Track.objects.filter(course_id=course_id)
-    is_finalized = CourseSettings.get_is_finalized(course_id=course_id)
+    is_finalized = Experiment.get_paceholder_course_track(course_id).tracks_finalized
     incomplete_intervention_points = get_incomplete_intervention_points(intervention_points)
     context = {
         "modules": modules,
@@ -81,11 +81,12 @@ def download_data(request):
                                        slugify(course_title))
     writer = csv.writer(response)
     # Write headers to CSV file
-    headers = ["Student ID", "LIS Person Sourcedid", "Assigned Track",
+    headers = ["Student ID", "LIS Person Sourcedid", "Experiment", "Assigned Track",
                "Timestamp Last Updated"]
     writer.writerow(headers)
     # Write data to CSV file
-    for s in CourseStudent.objects.filter(course_id=course_id):
-        row = [s.student_id, s.lis_person_sourcedid, s.track.name, s.updated_on]
+    for s in ExperimentStudent.objects.filter(course_id=course_id):
+        row = [s.student_id, s.lis_person_sourcedid, s.experiment.name,
+               s.track.name, s.updated_on]
         writer.writerow(row)
     return response

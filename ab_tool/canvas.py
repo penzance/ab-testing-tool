@@ -46,7 +46,7 @@ def get_lti_param(request, key):
 
 
 def get_canvas_request_context(request):
-    #FOR LOCAL DEVLEOPEMENT PURPOSES. Remove if-block in production.
+    # FOR LOCAL DEVLEOPEMENT PURPOSES. TODO: Remove if-block in production.
     if "COURSE_OAUTH_TOKEN" in settings.SECURE_SETTINGS:
         oauth_token = settings.SECURE_SETTINGS["COURSE_OAUTH_TOKEN"]
     else:
