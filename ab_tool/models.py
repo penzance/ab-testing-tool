@@ -14,10 +14,49 @@ class CustomModel(models.Model):
         self.save()
 
 
+class CourseSettings(CustomModel):
+    """
+    This model stores various settings about each course.  In order to ensure
+    that this model exists whenever it is needed (since courses exist
+    independently of this external tool), existence of this model for a course
+    is checked (and corrected for) whenever it is requested.  Consequently,
+    instances of this model are generated on-demand, and it is recommended that
+    this model is only used through it's class methods.
+    
+    WARNING: DO NOT HAVE FOREIGN KEYS TO THIS MODEL.  THERE IS NO GUARANTEE
+        IT WILL EXIST FOR A GIVEN COURSE.
+    """
+    course_id = models.CharField(max_length=128, db_index=True, unique=True)
+    tracks_finalized = models.BooleanField(default=False)
+    
+    @classmethod
+    def get_is_finalized(cls, course_id):
+        course_settings, _ = cls.objects.get_or_create(course_id=course_id)
+        return course_settings.tracks_finalized
+    
+    @classmethod
+    def set_finalized(cls, course_id):
+        course_settings, _ = cls.objects.get_or_create(
+                course_id=course_id, defaults={"tracks_finalized": True})
+        if not course_settings.tracks_finalized:
+            course_settings.tracks_finalized = True
+            course_settings.save()
+    
+    @classmethod
+    def get_placeholder_course_experiment(cls, course_id):
+        """ Temporary as part of staged refactor.  TODO: remove """
+        course_settings, _ = cls.objects.get_or_create(course_id=course_id)
+        return course_settings
+
+""" Temporary as part of staged refactor.  TODO: remove """
+Experiment = CourseSettings
+
+
 class Track(CustomModel):
     name = models.CharField(max_length=256)
     notes = models.CharField(max_length=1024)
     course_id = models.CharField(max_length=128, db_index=True)
+    experiment = models.ForeignKey(Experiment, null=True) #TODO: temporary; remove
 
 
 class InterventionPoint(CustomModel):
@@ -26,6 +65,7 @@ class InterventionPoint(CustomModel):
     notes = models.CharField(max_length=1024)
     course_id = models.CharField(max_length=128, db_index=True)
     tracks = models.ManyToManyField(Track, through='InterventionPointUrl')
+    experiment = models.ForeignKey(Experiment, null=True) #TODO: temporary; remove
     
     def is_missing_urls(self):
         if (Track.objects.filter(course_id=self.course_id).count()
@@ -56,35 +96,11 @@ class CourseStudent(CustomModel):
     student_id = models.CharField(max_length=128, db_index=True)
     lis_person_sourcedid = models.CharField(max_length=128, db_index=True, null=True)
     track = models.ForeignKey(Track)
+    experiment = models.ForeignKey(Experiment, null=True) #TODO: temporary; remove
     
     class Meta:
         unique_together = (('course_id', 'student_id'),)
 
 
-class CourseSettings(CustomModel):
-    """
-    This model stores various settings about each course.  In order to ensure
-    that this model exists whenever it is needed (since courses exist
-    independently of this external tool), existence of this model for a course
-    is checked (and corrected for) whenever it is requested.  Consequently,
-    instances of this model are generated on-demand, and it is recommended that
-    this model is only used through it's class methods.
-    
-    WARNING: DO NOT HAVE FOREIGN KEYS TO THIS MODEL.  THERE IS NO GUARANTEE
-        IT WILL EXIST FOR A GIVEN COURSE.
-    """
-    course_id = models.CharField(max_length=128, db_index=True, unique=True)
-    tracks_finalized = models.BooleanField(default=False)
-    
-    @classmethod
-    def get_is_finalized(cls, course_id):
-        course_settings, _ = cls.objects.get_or_create(course_id=course_id)
-        return course_settings.tracks_finalized
-    
-    @classmethod
-    def set_finalized(cls, course_id):
-        course_settings, _ = cls.objects.get_or_create(
-                course_id=course_id, defaults={"tracks_finalized": True})
-        if not course_settings.tracks_finalized:
-            course_settings.tracks_finalized = True
-            course_settings.save()
+""" Temporary as part of staged refactor.  TODO: remove """
+ExperimentStudent = CourseStudent

@@ -11,8 +11,8 @@ from ab_tool.canvas import get_lti_param
 from ab_tool.controllers import (intervention_point_is_installed, format_url,
     post_param)
 from ab_tool.exceptions import (UNAUTHORIZED_ACCESS,
-    DELETING_INSTALLED_STAGE, COURSE_TRACKS_NOT_FINALIZED,
-    NO_URL_FOR_TRACK, NO_TRACKS_FOR_COURSE)
+    DELETING_INSTALLED_STAGE, EXPERIMENT_TRACKS_NOT_FINALIZED,
+    NO_URL_FOR_TRACK, NO_TRACKS_FOR_EXPERIMENT)
 
 
 def deploy_intervention_point(request, intervention_point_id):
@@ -34,7 +34,7 @@ def deploy_intervention_point(request, intervention_point_id):
     # Otherwise, user is a student.  Tracks for the course must be finalized
     # for a student to be able to access content from the ab_testing_tool
     if not CourseSettings.get_is_finalized(course_id):
-        raise COURSE_TRACKS_NOT_FINALIZED
+        raise EXPERIMENT_TRACKS_NOT_FINALIZED
     
     student_id = get_lti_param(request, "custom_canvas_user_login_id")
     lis_person_sourcedid = get_lti_param(request, "lis_person_sourcedid")
@@ -48,7 +48,7 @@ def deploy_intervention_point(request, intervention_point_id):
         # TODO: expand this code to allow multiple randomization procedures
         tracks = Track.objects.filter(course_id=course_id)
         if not tracks:
-            raise NO_TRACKS_FOR_COURSE
+            raise NO_TRACKS_FOR_EXPERIMENT
         chosen_track = choice(tracks)
         student = CourseStudent.objects.create(
                 student_id=student_id, course_id=course_id, track=chosen_track,

@@ -1,7 +1,7 @@
 from django.core.urlresolvers import reverse
-from ab_tool.tests.common import (SessionTestCase, TEST_COURSE_ID,
-    TEST_DOMAIN, NONEXISTENT_STAGE_ID)
-from ab_tool.models import InterventionPoint, InterventionPointUrl, Track
+from ab_tool.tests.common import (SessionTestCase, TEST_DOMAIN,
+    NONEXISTENT_STAGE_ID)
+from ab_tool.models import InterventionPoint, InterventionPointUrl
 from django.utils.http import urlencode
 from ab_tool.controllers import intervention_point_url
 from mock import patch
@@ -18,7 +18,7 @@ class TestSelectionPages(SessionTestCase):
         data = {"ext_content_return_types": ["lti_launch_url"],
                 "ext_content_return_url": "http://test_content_return_url.com"}
         response = self.client.post(reverse("ab:resource_selection"), data, follow=True)
-        self.assertEqual(response.status_code, 200)
+        self.assertOkay(response)
         self.assertIn("content_return_url", response.context)
         self.assertEqual(response.context["content_return_url"],
                          "http://test_content_return_url.com")
@@ -70,7 +70,7 @@ class TestSelectionPages(SessionTestCase):
     def test_submit_selection(self, _mock):
         """ Tests that submit_selection returns a redirect url with the
             described parameters """
-        intervention_point = InterventionPoint.objects.create(name="intervention_point1", course_id=TEST_COURSE_ID)
+        intervention_point = self.create_test_intervention_point()
         content_return_url = "http://test_content_return_url.com"
         data = {"intervention_point_id": intervention_point.id, "content_return_url": content_return_url}
         response = self.client.post(reverse("ab:submit_selection"), data)
@@ -109,8 +109,8 @@ class TestSelectionPages(SessionTestCase):
         intervention_point_name = "this_is_a_intervention_point"
         num_intervention_points = InterventionPoint.objects.count()
         num_intervention_pointurls = InterventionPointUrl.objects.count()
-        track1 = Track.objects.create(name="t1", course_id=TEST_COURSE_ID)
-        track2 = Track.objects.create(name="t2", course_id=TEST_COURSE_ID)
+        track1 = self.create_test_track(name="track1")
+        track2 = self.create_test_track(name="track2")
         content_return_url = "http://test_content_return_url.com"
         data = {"name": intervention_point_name, STAGE_URL_TAG + "1": "http://example.com/page",
                 STAGE_URL_TAG + "2": "http://example.com/otherpage", "notes": "hi",
