@@ -117,7 +117,6 @@ def submit_track_weights(request):
         _, track_id = k.split(WEIGHT_TAG)
         try:
             weighting_obj = TrackProbabilityWeight.objects.get(track__pk=track_id, course_id=course_id)
-            print weighting_obj
             weighting_obj.update(weighting=format_weighting(v))
         except TrackProbabilityWeight.DoesNotExist:
             TrackProbabilityWeight.objects.create(track_id=track_id, course_id=course_id,

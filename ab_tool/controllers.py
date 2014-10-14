@@ -28,7 +28,7 @@ def assign_track_and_create_student(course_id, student_id, lis_person_sourcedid)
         # If uniform, pick randomly from the set of tracks
         chosen_track = choice(tracks)
     if course_settings.assignment_method == CourseSettings.WEIGHTED_PROBABILITY_RANDOM:
-        # If weighted, generate a weighted list of tracks appropriately and pick one randomly from list
+        # If weighted, generate a weighted list of tracks and pick one randomly from list
         weighted_tracks = []
         for track in tracks:
             try:
@@ -112,10 +112,10 @@ def get_missing_track_weights(tracks, course_id):
 def format_weighting(weighting):
     """ Track weights need to be an integer between 1 and 1000, allowing
         probability precision up to 0.001 """
-    if 1 <= int(weighting) <= 1000:
-        return int(weighting)
+    weighting = int(weighting)
+    if 1 <= weighting <= 1000:
+        return weighting
     else:
-        print weighting
         raise INPUT_NOT_ALLOWED
 
 
