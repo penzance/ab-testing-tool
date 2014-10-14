@@ -37,7 +37,7 @@ class TestTrackPages(SessionTestCase):
     def test_edit_track_view_unauthorized(self):
         """ Tests edit_track template renders when unauthorized """
         self.set_roles([])
-        track = self.create_test_track(course=TEST_OTHER_COURSE_ID)
+        track = self.create_test_track(course_id=TEST_OTHER_COURSE_ID)
         response = self.client.get(reverse("ab:edit_track", args=(track.id,)),
                                    follow=True)
         self.assertTemplateNotUsed(response, "ab_tool/edit_track.html")
@@ -52,7 +52,7 @@ class TestTrackPages(SessionTestCase):
     
     def test_edit_track_view_wrong_course(self):
         """ Tests edit_track when attempting to access a track from a different course """
-        track = self.create_test_track(course=TEST_OTHER_COURSE_ID)
+        track = self.create_test_track(course_id=TEST_OTHER_COURSE_ID)
         response = self.client.get(reverse("ab:edit_track", args=(track.id,)))
         self.assertError(response, UNAUTHORIZED_ACCESS)
     
