@@ -1,7 +1,7 @@
 from ab_tool.tests.common import (SessionTestCase, TEST_COURSE_ID,
     TEST_OTHER_COURSE_ID, NONEXISTENT_TRACK_ID)
 from django.core.urlresolvers import reverse
-from ab_tool.models import Track, CourseSettings, InterventionPoint, InterventionPointUrl
+from ab_tool.models import Track, CourseSettings, InterventionPointUrl
 from ab_tool.exceptions import (COURSE_TRACKS_ALREADY_FINALIZED,
     NO_TRACKS_FOR_COURSE, UNAUTHORIZED_ACCESS)
 
@@ -11,7 +11,7 @@ class TestTrackPages(SessionTestCase):
     def test_create_track_view(self):
         """ Tests edit_track template renders for url 'create_track' """
         response = self.client.get(reverse("ab:create_track"))
-        self.assertEqual(response.status_code, 200)
+        self.assertOkay(response)
         self.assertTemplateUsed(response, "ab_tool/edit_track.html")
     
     def test_create_track_view_already_finalized(self):
@@ -30,14 +30,14 @@ class TestTrackPages(SessionTestCase):
     
     def test_edit_track_view(self):
         """ Tests edit_track template renders when authenticated """
-        track = Track.objects.create(name="track1", course_id=TEST_COURSE_ID)
+        track = self.create_test_track()
         response = self.client.get(reverse("ab:edit_track", args=(track.id,)))
         self.assertTemplateUsed(response, "ab_tool/edit_track.html")
     
     def test_edit_track_view_unauthorized(self):
         """ Tests edit_track template renders when unauthorized """
         self.set_roles([])
-        track = Track.objects.create(name="track1")
+        track = self.create_test_track(course_id=TEST_OTHER_COURSE_ID)
         response = self.client.get(reverse("ab:edit_track", args=(track.id,)),
                                    follow=True)
         self.assertTemplateNotUsed(response, "ab_tool/edit_track.html")
@@ -52,7 +52,7 @@ class TestTrackPages(SessionTestCase):
     
     def test_edit_track_view_wrong_course(self):
         """ Tests edit_track when attempting to access a track from a different course """
-        track = Track.objects.create(name="track1", course_id=TEST_OTHER_COURSE_ID)
+        track = self.create_test_track(course_id=TEST_OTHER_COURSE_ID)
         response = self.client.get(reverse("ab:edit_track", args=(track.id,)))
         self.assertError(response, UNAUTHORIZED_ACCESS)
     
@@ -83,14 +83,14 @@ class TestTrackPages(SessionTestCase):
     def test_submit_edit_track(self):
         """ Tests that submit_edit_track does not change DB count but does change Track
             attribute"""
-        track = Track.objects.create(name="old_name", course_id=TEST_COURSE_ID)
+        track = self.create_test_track(name="old_name")
         track_id = track.id
         num_tracks = Track.objects.count()
         data = {"name": "new_name", "url1": "http://example.com/page",
                 "url2": "http://example.com/otherpage", "notes": ""}
         response = self.client.post(
                 reverse("ab:submit_edit_track", args=(track_id,)), data, follow=True)
-        self.assertEqual(response.status_code, 200)
+        self.assertOkay(response)
         self.assertEquals(num_tracks, Track.objects.count())
         track = Track.objects.get(id=track_id)
         self.assertEquals(track.name, "new_name")
@@ -98,7 +98,7 @@ class TestTrackPages(SessionTestCase):
     def test_submit_edit_track_unauthorized(self):
         """ Tests submit_edit_track when unauthorized"""
         self.set_roles([])
-        track = Track.objects.create(name="old_name", course_id=TEST_COURSE_ID)
+        track = self.create_test_track(name="old_name")
         track_id = track.id
         data = {"name": "new_name", "url1": "http://example.com/page",
                 "url2": "http://example.com/otherpage", "notes": ""}
@@ -118,8 +118,8 @@ class TestTrackPages(SessionTestCase):
     def test_submit_edit_track_wrong_course(self):
         """ Tests that submit_edit_track method raises error for existent Track but
             for wrong course"""
-        track = Track.objects.create(name="old_name",
-                                     course_id=TEST_OTHER_COURSE_ID)
+        track = self.create_test_track(name="old_name",
+                                       course_id=TEST_OTHER_COURSE_ID)
         data = {"name": "new_name", "url1": "http://example.com/page",
                 "url2": "http://example.com/otherpage", "notes": ""}
         response = self.client.post(
@@ -129,18 +129,18 @@ class TestTrackPages(SessionTestCase):
     def test_delete_track(self):
         """ Tests that delete_track method properly deletes a track when authorized"""
         first_num_tracks = Track.objects.count()
-        track = Track.objects.create(name="testname", course_id=TEST_COURSE_ID)
+        track = self.create_test_track()
         self.assertEqual(first_num_tracks + 1, Track.objects.count())
         response = self.client.get(reverse("ab:delete_track", args=(track.id,)),
                                    follow=True)
         second_num_tracks = Track.objects.count()
-        self.assertEqual(response.status_code, 200)
+        self.assertOkay(response)
         self.assertEqual(first_num_tracks, second_num_tracks)
     
     def test_delete_track_already_finalized(self):
         """ Tests that delete track doesn't work when tracks are finalized """
         CourseSettings.set_finalized(TEST_COURSE_ID)
-        track = Track.objects.create(name="testname", course_id=TEST_COURSE_ID)
+        track = self.create_test_track()
         first_num_tracks = Track.objects.count()
         response = self.client.get(reverse("ab:delete_track", args=(track.id,)),
                                    follow=True)
@@ -151,7 +151,7 @@ class TestTrackPages(SessionTestCase):
     def test_delete_track_unauthorized(self):
         """ Tests that delete_track method raises error when unauthorized """
         self.set_roles([])
-        track = Track.objects.create(name="testname", course_id=TEST_COURSE_ID)
+        track = self.create_test_track()
         first_num_tracks = Track.objects.count()
         response = self.client.get(reverse("ab:delete_track", args=(track.id,)),
                                    follow=True)
@@ -161,7 +161,7 @@ class TestTrackPages(SessionTestCase):
     
     def test_delete_track_nonexistent(self):
         """ Tests that delete_track method raises error for non-existent Track """
-        Track.objects.create(name="testname", course_id=TEST_COURSE_ID)
+        self.create_test_track()
         t_id = NONEXISTENT_TRACK_ID
         first_num_tracks = Track.objects.count()
         response = self.client.get(reverse("ab:delete_track", args=(t_id,)), follow=True)
@@ -172,7 +172,7 @@ class TestTrackPages(SessionTestCase):
     def test_delete_track_wrong_course(self):
         """ Tests that delete_track method raises error for existent Track but for
             wrong course """
-        track = Track.objects.create(name="testname", course_id=TEST_OTHER_COURSE_ID)
+        track = self.create_test_track(course_id=TEST_OTHER_COURSE_ID)
         first_num_tracks = Track.objects.count()
         response = self.client.get(reverse("ab:delete_track", args=(track.id,)),
                                    follow=True)
@@ -182,31 +182,32 @@ class TestTrackPages(SessionTestCase):
     
     def test_delete_track_deletes_intervention_point_urls(self):
         """ Tests that intervention_point_urls of a track are deleted when the track is """
-        track1 = Track.objects.create(name="track1", course_id=TEST_COURSE_ID)
-        track2 = Track.objects.create(name="track2", course_id=TEST_COURSE_ID)
-        intervention_point = InterventionPoint.objects.create(name="intervention_point1", course_id=TEST_COURSE_ID)
+        track1 = self.create_test_track(name="track1")
+        track2 = self.create_test_track(name="track2")
+        intervention_point = self.create_test_intervention_point()
         InterventionPointUrl.objects.create(intervention_point=intervention_point, track=track1, url="example.com")
         InterventionPointUrl.objects.create(intervention_point=intervention_point, track=track2, url="example.com")
         first_num_intervention_point_urls = InterventionPointUrl.objects.count()
         response = self.client.get(reverse("ab:delete_track", args=(track1.id,)),
                                    follow=True)
         second_num_intervention_point_urls = InterventionPointUrl.objects.count()
-        self.assertEqual(response.status_code, 200)
+        self.assertOkay(response)
         self.assertEqual(first_num_intervention_point_urls - 1, second_num_intervention_point_urls)
     
     def test_finalize_tracks(self):
         """ Tests that the finalize tracks page sets the appropriate course """
         self.assertFalse(CourseSettings.get_is_finalized(TEST_COURSE_ID))
-        Track.objects.create(name="track1", course_id=TEST_COURSE_ID)
+        self.create_test_track()
         response = self.client.get(reverse("ab:finalize_tracks"), follow=True)
-        self.assertTrue(CourseSettings.get_is_finalized(TEST_COURSE_ID), response)
+        self.assertOkay(response)
+        self.assertTrue(CourseSettings.get_is_finalized(TEST_COURSE_ID))
     
     def test_finalize_tracks_missing_urls(self):
         """ Tests that finalize fails if there are missing urls """
         self.assertFalse(CourseSettings.get_is_finalized(TEST_COURSE_ID))
-        track1 = Track.objects.create(name="track1", course_id=TEST_COURSE_ID)
-        Track.objects.create(name="track2", course_id=TEST_COURSE_ID)
-        intervention_point = InterventionPoint.objects.create(name="intervention_point1", course_id=TEST_COURSE_ID)
+        track1 = self.create_test_track(name="track1")
+        self.create_test_track(name="track2")
+        intervention_point = self.create_test_intervention_point()
         InterventionPointUrl.objects.create(intervention_point=intervention_point, track=track1, url="example.com")
         self.client.get(reverse("ab:finalize_tracks"), follow=True)
         self.assertFalse(CourseSettings.get_is_finalized(TEST_COURSE_ID))
