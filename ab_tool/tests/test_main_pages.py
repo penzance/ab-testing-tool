@@ -1,10 +1,10 @@
 from django.core.urlresolvers import reverse
 from mock import patch
 
-from ab_tool.controllers import intervention_point_url, get_uninstalled_intervention_points
+from ab_tool.controllers import intervention_point_url
 from ab_tool.tests.common import (SessionTestCase, LIST_MODULES,
     LIST_ITEMS, APIReturn, TEST_COURSE_ID, TEST_OTHER_COURSE_ID)
-from ab_tool.models import InterventionPoint, Track, CourseStudent
+from ab_tool.models import (CourseStudent, CourseSettings)
 from ab_tool.views.main_pages import tool_config
 
 
@@ -21,7 +21,7 @@ class TestMainPages(SessionTestCase):
         """ Tests control_panel template renders when authenticated and with no
             contents returned from Canvas"""
         response = self.client.get(reverse("ab:index"), follow=True)
-        self.assertEqual(response.status_code, 200)
+        self.assertOkay(response)
         self.assertTemplateUsed(response, "ab_tool/control_panel.html")
     
     @patch(LIST_MODULES, return_value=APIReturn([{"id": 0}]))
@@ -32,7 +32,7 @@ class TestMainPages(SessionTestCase):
         api_return = APIReturn([mock_item])
         with patch(LIST_ITEMS, return_value=api_return):
             response = self.client.get(reverse("ab:index"), follow=True)
-            self.assertEqual(response.status_code, 200)
+            self.assertOkay(response)
             self.assertTemplateUsed(response, "ab_tool/control_panel.html")
     
     def test_unauthenticated_index(self):
@@ -58,8 +58,8 @@ class TestMainPages(SessionTestCase):
         response = self.client.get(reverse("ab:index"), follow=True)
         self.assertEqual(len(response.context["intervention_points"]), 0)
         self.assertEqual(len(response.context["tracks"]), 0)
-        intervention_point = InterventionPoint.objects.create(name="intervention_point1", course_id=TEST_COURSE_ID)
-        track = Track.objects.create(name="track1", course_id=TEST_COURSE_ID)
+        intervention_point = self.create_test_intervention_point()
+        track = self.create_test_track()
         response = self.client.get(reverse("ab:index"), follow=True)
         self.assertEqual(len(response.context["intervention_points"]), 1)
         self.assertEqual(len(response.context["tracks"]), 1)
@@ -69,10 +69,10 @@ class TestMainPages(SessionTestCase):
     def test_index_context_course_specific_intervention_points_and_tracks(self):
         """ Checks that the intervention_points and tracks passed to the index template
             only contain database values matching the course_id """
-        intervention_point = InterventionPoint.objects.create(name="intervention_point1", course_id=TEST_COURSE_ID)
-        InterventionPoint.objects.create(name="intervention_point1", course_id=TEST_OTHER_COURSE_ID)
-        track = Track.objects.create(name="track1", course_id=TEST_COURSE_ID)
-        Track.objects.create(name="track2", course_id=TEST_OTHER_COURSE_ID)
+        intervention_point = self.create_test_intervention_point()
+        self.create_test_intervention_point(course_id=TEST_OTHER_COURSE_ID)
+        track = self.create_test_track()
+        self.create_test_track(course_id=TEST_OTHER_COURSE_ID)
         response = self.client.get(reverse("ab:index"), follow=True)
         self.assertEqual(len(response.context["intervention_points"]), 1)
         self.assertEqual(len(response.context["tracks"]), 1)
@@ -82,8 +82,8 @@ class TestMainPages(SessionTestCase):
     def test_index_context_uninstalled_intervention_points(self):
         """ Tests that the context for the index correctly contains
             the uninstalled intervention_points for the course """
-        intervention_point1 =InterventionPoint.objects.create(name="intervention_point1", course_id=TEST_COURSE_ID)
-        intervention_point2 = InterventionPoint.objects.create(name="intervention_point2", course_id=TEST_COURSE_ID)
+        intervention_point1 = self.create_test_intervention_point(name="intervention_point1")
+        intervention_point2 = self.create_test_intervention_point(name="intervention_point2")
         with patch("ab_tool.views.main_pages.get_uninstalled_intervention_points",
                    return_value=[intervention_point1]):
             response = self.client.get(reverse("ab:index"), follow=True)
@@ -100,7 +100,7 @@ class TestMainPages(SessionTestCase):
     def test_tool_config(self):
         """ Tests that that tool_config page returns XML content"""
         response = self.client.get(reverse("ab:tool_config"))
-        self.assertEqual(response.status_code, 200)
+        self.assertOkay(response)
         self.assertEqual(response._headers["content-type"],
                         ('Content-Type', 'text/xml'))
     
@@ -118,11 +118,11 @@ class TestMainPages(SessionTestCase):
     
     def test_download_data(self):
         """ Tests that download data returns a csv with a row for each student """
-        track = Track.objects.create(name="track1", course_id=TEST_COURSE_ID)
+        track = self.create_test_track()
         CourseStudent.objects.create(course_id=TEST_COURSE_ID, student_id=1,
-                               track=track)
+                                         track=track)
         CourseStudent.objects.create(course_id=TEST_COURSE_ID, student_id=2,
-                               track=track)
+                                         track=track)
         response = self.client.get(reverse("ab:download_data"))
         self.assertEqual(response._headers["content-type"],
                          ('Content-Type', 'text/csv'))
@@ -132,11 +132,11 @@ class TestMainPages(SessionTestCase):
     
     def test_download_data_course_specific(self):
         """ Tests that download data only uses student in the correct course """
-        track = Track.objects.create(name="track1", course_id=TEST_COURSE_ID)
+        track = self.create_test_track()
         CourseStudent.objects.create(course_id=TEST_COURSE_ID, student_id=1,
-                               track=track)
+                                         track=track)
         CourseStudent.objects.create(course_id=TEST_OTHER_COURSE_ID, student_id=2,
-                               track=track)
+                                         track=track)
         response = self.client.get(reverse("ab:download_data"))
         self.assertEqual(response._headers["content-type"],
                          ('Content-Type', 'text/csv'))

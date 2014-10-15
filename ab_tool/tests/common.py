@@ -5,6 +5,7 @@ from json import dumps
 from mock import patch, MagicMock
 
 from ab_tool.constants import ADMINS
+from ab_tool.models import CourseSettings, Track, InterventionPoint
 from error_middleware.exceptions import DEFAULT_ERROR_STATUS, RenderableError
 from error_middleware.middleware import ERROR_TEMPLATE
 
@@ -77,6 +78,9 @@ class SessionTestCase(TestCase):
     def set_roles(self, roles):
         self.set_lti_param("roles", roles)
     
+    def assertOkay(self, response):
+        self.assertEqual(response.status_code, 200)
+    
     def assertError(self, response, exception_instance):
         self.assertTemplateUsed(response, ERROR_TEMPLATE)
         if isinstance(exception_instance, RenderableError):
@@ -113,6 +117,13 @@ class SessionTestCase(TestCase):
         if error:
             raise Exception("Function either raises no exception or is "
                             "non-deterministic")
+    
+    def create_test_track(self, course_id=TEST_COURSE_ID, name="testtrack"):
+        return Track.objects.create(name=name, course_id=course_id)
+    
+    def create_test_intervention_point(self, course_id=TEST_COURSE_ID, name="testip"):
+        return InterventionPoint.objects.create(name=name, course_id=course_id)
+
 
 class APIReturn(object):
     """ Spoofs returned response from Canvas SDK. Has response.ok property and
