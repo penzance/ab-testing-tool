@@ -1,0 +1,14 @@
+SECURE_SETTINGS = {
+    'lti_oauth_credentials': {
+        {{ secure_settings.lti_key }}: {{ secure_settings.lti_secret }},
+    },
+
+    'admins': {{ secure_settings.admins_tuple }},
+
+    'DJANGO_DB_USER': '{{ secure_settings.django_db_user }}',
+    'DJANGO_DB_PASS': '{{ secure_settings.django_db_pass }}',
+
+    'CANVAS_TOKEN': '{{ secure_settings.canvas_token }}',
+
+    'DJANGO_SECRET_KEY': '{{ secure_settings.django_secret_key }}',
+}
