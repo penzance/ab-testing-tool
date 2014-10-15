@@ -91,22 +91,27 @@ def create_intervention_point(request):
 
 
 @lti_role_required(ADMINS)
-def submit_create_intervention_point(request):
+def submit_create_intervention_point(request, experiment_id):
     """ Note: request will always be POST because Canvas fetches pages within iframe by POST
         TODO: use Django forms library to save instead of getting individual POST params """
     course_id = get_lti_param(request, "custom_canvas_course_id")
     name = post_param(request, "name")
     notes = post_param(request, "notes")
-    t = InterventionPoint.objects.create(name=name, notes=notes, course_id=course_id)
-    intervention_pointurls = [(k,v) for (k,v) in request.POST.iteritems() if STAGE_URL_TAG in k and v]
+    experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
+    intervention_point = InterventionPoint.objects.create(
+            name=name, notes=notes, course_id=course_id, experiment=experiment)
+    intervention_pointurls = [(k,v) for (k,v) in request.POST.iteritems()
+                              if STAGE_URL_TAG in k and v]
     for (k,v) in intervention_pointurls:
-        _,track_id = k.split(STAGE_URL_TAG)
+        _, track_id = k.split(STAGE_URL_TAG)
         is_canvas = post_param(request, DEPLOY_OPTION_TAG + track_id)
         as_tab = request.POST.get(AS_TAB_TAG + track_id, None)
         is_canvas_page = bool(is_canvas == "canvas_url")
         open_as_tab = bool(as_tab == "true")
-        InterventionPointUrl.objects.create(url=format_url(v), intervention_point_id=t.id, track_id=track_id,
-                                is_canvas_page=is_canvas_page, open_as_tab=open_as_tab)
+        InterventionPointUrl.objects.create(
+                url=format_url(v), intervention_point_id=intervention_point.id,
+                track_id=track_id, is_canvas_page=is_canvas_page, open_as_tab=open_as_tab
+        )
     return redirect(reverse("ab:index") + "#tabs-2")
 
 
