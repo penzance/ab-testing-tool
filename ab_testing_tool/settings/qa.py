@@ -22,7 +22,7 @@ LOGGING = {
     'handlers': {
         'logfile': {
             'class': 'logging.handlers.WatchedFileHandler',
-            'filename': '/var/opt/tlt/logs/icommons_tools.log',
+            'filename': '/var/opt/tlt/logs/ab_testing_tool.log',
             'formatter': 'verbose',
             'level': 'DEBUG',
         },
@@ -37,11 +37,6 @@ LOGGING = {
             'handlers': ['console'],
             'propagate': True,
             'level': 'DEBUG'
-        },
-        'ab_testing_tool': {
-            'handlers': ['console'],
-            'propagate': True,
-            'level': 'DEBUG',
         },
         'ab_tool': {
             'handlers': ['console'],

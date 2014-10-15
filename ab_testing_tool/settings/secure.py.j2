@@ -1,11 +1,9 @@
 SECURE_SETTINGS = {
     'lti_oauth_credentials': {
-        'test': 'secret',
+        {{ secure_settings.lti_key }}: {{ secure_settings.lti_secret }},
     },
 
-    'admins': (
-        ('Admin User', 'admin_user@example.com'),
-    ),
+    'admins': {{ secure_settings.admins_tuple }},
 
     'DJANGO_DB_USER': '{{ secure_settings.django_db_user }}',
     'DJANGO_DB_PASS': '{{ secure_settings.django_db_pass }}',

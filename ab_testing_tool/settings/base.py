@@ -12,8 +12,6 @@ from os.path import abspath, basename, dirname, join, normpath
 from sys import path
 from .secure import SECURE_SETTINGS
 
-from .secure import SECURE_SETTINGS
-
 # Normally you should not import ANYTHING from Django directly
 # into your settings, but ImproperlyConfigured is an exception.
 from django.core.exceptions import ImproperlyConfigured
