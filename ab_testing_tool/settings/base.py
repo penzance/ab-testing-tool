@@ -52,15 +52,13 @@ CLIENT_SECRET = SECURE_SETTINGS["CLIENT_SECRET"]
 
 CLIENT_ID = SECURE_SETTINGS["CLIENT_ID"]
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
+# THESE ADDRESSES WILL RECEIVE EMAIL ABOUT CERTAIN ERRORS!
+ADMINS = SECURE_SETTINGS.get('admins')
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "TODO: CHANGE ME"  # get_env_variable('DJANGO_SECRET_KEY')
-LTI_OAUTH_CREDENTIALS = {
-        'test': 'secret',  #TODO: change me
-    }
+SECRET_KEY = SECURE_SETTINGS.get('django_secret_key', 'changeme')
+
+LTI_OAUTH_CREDENTIALS = SECURE_SETTINGS.get('lti_oauth_credentials', None)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
