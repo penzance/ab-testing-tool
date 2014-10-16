@@ -2,7 +2,7 @@ from django.conf.urls import patterns, url, include
 from django.contrib import admin
 
 from ab_tool.views.main_pages import (render_intervention_point_control_panel, not_authorized,
-     tool_config, download_data)
+     tool_config, download_data, submit_assignment_method)
 
 from ab_tool.views.selection_pages import (resource_selection, submit_selection,
                     submit_selection_new_intervention_point)
@@ -35,4 +35,8 @@ urlpatterns = patterns('',
     url(r'^submit_edit_track/(?P<track_id>\d+)$', submit_edit_track, name='submit_edit_track'),
     url(r'^delete_track/(?P<track_id>\d+)$', delete_track, name='delete_track'),
     url(r'^finalize_tracks$', finalize_tracks, name='finalize_tracks'),
+    
+    url(r'^submit_assignment_method$', submit_assignment_method, name='submit_assignment_method'),
+    
+    url(r'^admin/', include(admin.site.urls)),
 )

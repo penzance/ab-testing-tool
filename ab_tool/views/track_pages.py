@@ -3,7 +3,7 @@ from django_auth_lti.decorators import lti_role_required
 from django.core.urlresolvers import reverse
 
 from ab_tool.constants import ADMINS
-from ab_tool.models import Track, CourseSettings, InterventionPoint
+from ab_tool.models import (Track, CourseSettings, InterventionPoint)
 from ab_tool.canvas import get_lti_param
 from ab_tool.exceptions import (UNAUTHORIZED_ACCESS,
     COURSE_TRACKS_ALREADY_FINALIZED, NO_TRACKS_FOR_COURSE)
@@ -82,3 +82,4 @@ def finalize_tracks(request):
         return HttpResponse("URLs missing for these tracks in these Intervention Points: %s" % incomplete_intervention_points)
     CourseSettings.set_finalized(course_id)
     return redirect(reverse("ab:index"))
+

@@ -36,6 +36,7 @@ class InterventionPoint(CustomModel):
                 return True
         return False
 
+
 class InterventionPointUrl(CustomModel):
     """ This model stores the URL of a single intervention """
     url = models.URLField(max_length=2048)
@@ -73,8 +74,22 @@ class CourseSettings(CustomModel):
     WARNING: DO NOT HAVE FOREIGN KEYS TO THIS MODEL.  THERE IS NO GUARANTEE
         IT WILL EXIST FOR A GIVEN COURSE.
     """
+    UNIFORM_RANDOM = 1
+    WEIGHTED_PROBABILITY_RANDOM = 2
+    CSV_UPLOAD = 3
+    REVERSE_API = 4
+    
+    ASSIGNMENT_ENUM_TYPES = (
+        (UNIFORM_RANDOM, "uniform_random"),
+        (WEIGHTED_PROBABILITY_RANDOM, "weighted_probability_random"),
+        (CSV_UPLOAD, "csv_upload"),
+        (REVERSE_API, "reverse_api"),
+     )
+    
     course_id = models.CharField(max_length=128, db_index=True, unique=True)
     tracks_finalized = models.BooleanField(default=False)
+    assignment_method = models.IntegerField(max_length=1, choices=ASSIGNMENT_ENUM_TYPES,
+                                                default=1)
     
     @classmethod
     def get_is_finalized(cls, course_id):
