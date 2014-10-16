@@ -1,10 +1,47 @@
 from django.core.urlresolvers import reverse
+from django.shortcuts import get_object_or_404
+from random import choice
 
-from ab_tool.models import InterventionPoint
+from ab_tool.models import (InterventionPoint, TrackProbabilityWeight,
+    CourseSettings, Track, CourseStudent)
 from ab_tool.canvas import (get_canvas_request_context, list_module_items, list_modules,
     get_lti_param)
-from ab_tool.exceptions import BAD_STAGE_ID, missing_param_error
-from error_middleware.middleware import RenderableError
+from ab_tool.exceptions import (BAD_STAGE_ID, missing_param_error,
+    INPUT_NOT_ALLOWED)
+
+from ab_tool.exceptions import (NO_TRACKS_FOR_COURSE, TRACK_WEIGHTS_NOT_SET,
+    CSV_UPLOAD_NEEDED)
+
+
+def assign_track_and_create_student(course_id, student_id, lis_person_sourcedid):
+    """ Method looks up assignment_mode to select track and creates student in selected track.
+        Method returns student object """
+    course_settings = get_object_or_404(CourseSettings, course_id=course_id)
+    if course_settings.assignment_method == CourseSettings.CSV_UPLOAD:
+        # Raise error as student should have already been assigned a track if CSV upload
+        #TODO: infrastructure needed notify course administrator about incomplete student-track mapping
+        raise CSV_UPLOAD_NEEDED
+    tracks = Track.objects.filter(course_id=course_id)
+    if not tracks:
+        raise NO_TRACKS_FOR_COURSE
+    if course_settings.assignment_method == CourseSettings.UNIFORM_RANDOM:
+        # If uniform, pick randomly from the set of tracks
+        chosen_track = choice(tracks)
+    if course_settings.assignment_method == CourseSettings.WEIGHTED_PROBABILITY_RANDOM:
+        # If weighted, generate a weighted list of tracks and pick one randomly from list
+        weighted_tracks = []
+        for track in tracks:
+            try:
+                track_weight = TrackProbabilityWeight.objects.get(track=track, course_id=course_id)
+            except TrackProbabilityWeight.DoesNotExist:
+                raise TRACK_WEIGHTS_NOT_SET
+            weighted_tracks.extend([track] * track_weight.weighting)
+        chosen_track = choice(weighted_tracks)
+    # Create student with chosen track
+    student = CourseStudent.objects.create(
+            student_id=student_id, course_id=course_id, track=chosen_track,
+            lis_person_sourcedid=lis_person_sourcedid)
+    return student
 
 
 def intervention_point_url(request, intervention_point_id):
@@ -60,6 +97,26 @@ def all_intervention_point_urls(request, course_id):
     """ Returns the deploy urls of all intervention_points in the database for that course"""
     return [intervention_point_url(request, intervention_point.id) for intervention_point in
             InterventionPoint.objects.filter(course_id=course_id)]
+
+def get_missing_track_weights(tracks, course_id):
+    course_settings,_ = CourseSettings.objects.get_or_create(course_id=course_id)
+    if course_settings.assignment_method != CourseSettings.WEIGHTED_PROBABILITY_RANDOM:
+        return []
+    missing_weights = []
+    track_weights = [t.track for t in TrackProbabilityWeight.objects.filter(course_id=course_id)]
+    for track in tracks:
+        if track not in track_weights:
+            missing_weights.append(track)
+    return [track.name for track in missing_weights]
+
+def format_weighting(weighting):
+    """ Track weights need to be an integer between 1 and 1000, allowing
+        probability precision up to 0.001 """
+    weighting = int(weighting)
+    if 1 <= weighting <= 1000:
+        return weighting
+    else:
+        raise INPUT_NOT_ALLOWED
 
 
 def get_modules_with_items(request):

@@ -10,7 +10,8 @@ from ims_lti_py.tool_config import ToolConfig
 
 from ab_tool.canvas import get_lti_param
 from ab_tool.controllers import (get_uninstalled_intervention_points,
-    get_modules_with_items, get_incomplete_intervention_points)
+    get_modules_with_items, get_incomplete_intervention_points,
+    get_missing_track_weights)
 from ab_tool.models import (InterventionPoint, Track, CourseStudent,
     CourseSettings)
 from ab_tool.constants import ADMINS
@@ -31,6 +32,7 @@ def render_intervention_point_control_panel(request):
     tracks = Track.objects.filter(course_id=course_id)
     is_finalized = CourseSettings.get_is_finalized(course_id=course_id)
     incomplete_intervention_points = get_incomplete_intervention_points(intervention_points)
+    missing_track_weights = get_missing_track_weights(tracks, course_id)
     context = {
         "course_settings": course_settings,
         "modules": modules,
@@ -40,6 +42,7 @@ def render_intervention_point_control_panel(request):
         "canvas_url": get_lti_param(request, "launch_presentation_return_url"),
         "is_finalized": is_finalized,
         "incomplete_intervention_points": incomplete_intervention_points,
+        "missing_track_weights": missing_track_weights,
     }
     return render_to_response("ab_tool/control_panel.html", context)
 
