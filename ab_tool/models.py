@@ -20,6 +20,13 @@ class Track(CustomModel):
     course_id = models.CharField(max_length=128, db_index=True)
 
 
+class TrackProbabilityWeight(CustomModel):
+    #Definition: A `weighting` is an integer between 1 and 1000 inclusive
+    weighting = models.IntegerField()
+    track = models.ForeignKey(Track)
+    course_id = models.CharField(max_length=128, db_index=True)
+
+
 class InterventionPoint(CustomModel):
     """ This model stores the configuration of an intervention point"""
     name = models.CharField(max_length=256)
