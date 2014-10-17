@@ -1,17 +1,17 @@
-from django.conf.urls import patterns, url, include
-from django.contrib import admin
+from django.conf.urls import patterns, url
 
 from ab_tool.views.main_pages import (render_intervention_point_control_panel, not_authorized,
      tool_config, download_data, submit_assignment_method)
 
 from ab_tool.views.selection_pages import (resource_selection, submit_selection,
-                    submit_selection_new_intervention_point)
-from ab_tool.views.intervention_point_pages import (create_intervention_point, submit_create_intervention_point,
-                    edit_intervention_point,  delete_intervention_point, deploy_intervention_point, submit_edit_intervention_point,
-                    modules_page_edit_intervention_point)
+    submit_selection_new_intervention_point)
+from ab_tool.views.intervention_point_pages import (create_intervention_point,
+    submit_create_intervention_point, edit_intervention_point, 
+    delete_intervention_point, deploy_intervention_point,
+    submit_edit_intervention_point, modules_page_edit_intervention_point)
 from ab_tool.views.track_pages import (create_track, submit_create_track,
-                    submit_edit_track, edit_track, delete_track, finalize_tracks,
-                    track_weights, submit_track_weights)
+    submit_edit_track, edit_track, delete_track, finalize_tracks, track_weights,
+    submit_track_weights)
 
 urlpatterns = patterns('',
     url(r'^$', render_intervention_point_control_panel, name='index'),
@@ -41,6 +41,4 @@ urlpatterns = patterns('',
     
     url(r'^track_weights$', track_weights, name='track_weights'),
     url(r'^submit_track_weights$', submit_track_weights, name='submit_track_weights'),
-    
-    url(r'^admin/', include(admin.site.urls)),
 )
