@@ -58,25 +58,28 @@ class TestTrackPages(SessionTestCase):
     
     def test_submit_create_track(self):
         """Tests that create_track creates a Track object verified by DB count"""
+        experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
         num_tracks = Track.objects.count()
         data = {"name": "track", "notes": "hi"}
-        response = self.client.post(reverse("ab:submit_create_track"), data,
-                                    follow=True)
+        response = self.client.post(reverse("ab:submit_create_track"),
+                                    data, follow=True)
         self.assertEquals(num_tracks + 1, Track.objects.count(), response)
     
     def test_submit_create_track_already_finalized(self):
         """ Tests that submit create track doesn't work when tracks are finalized """
-        Experiment.get_placeholder_course_experiment(TEST_COURSE_ID).update(tracks_finalized=True)
+        experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
+        experiment.update(tracks_finalized=True)
         response = self.client.get(reverse("ab:submit_create_track"))
         self.assertError(response, EXPERIMENT_TRACKS_ALREADY_FINALIZED)
     
     def test_submit_create_track_unauthorized(self):
         """Tests that create_track creates a Track object verified by DB count"""
         self.set_roles([])
+        experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
         num_tracks = Track.objects.count()
         data = {"name": "track", "notes": "hi"}
-        response = self.client.post(reverse("ab:submit_create_track"), data,
-                                    follow=True)
+        response = self.client.post(reverse("ab:submit_create_track"),
+                                    data, follow=True)
         self.assertEquals(num_tracks, Track.objects.count())
         self.assertTemplateUsed(response, "ab_tool/not_authorized.html")
     
@@ -199,7 +202,8 @@ class TestTrackPages(SessionTestCase):
         experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
         self.assertFalse(experiment.tracks_finalized)
         self.create_test_track()
-        response = self.client.get(reverse("ab:finalize_tracks"), follow=True)
+        response = self.client.get(reverse("ab:finalize_tracks"),
+                                   follow=True)
         self.assertOkay(response)
         experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
         self.assertTrue(experiment.tracks_finalized)
@@ -211,12 +215,16 @@ class TestTrackPages(SessionTestCase):
         track1 = self.create_test_track(name="track1")
         self.create_test_track(name="track2")
         intervention_point = self.create_test_intervention_point()
-        InterventionPointUrl.objects.create(intervention_point=intervention_point, track=track1, url="example.com")
-        self.client.get(reverse("ab:finalize_tracks"), follow=True)
+        InterventionPointUrl.objects.create(intervention_point=intervention_point,
+                                            track=track1, url="example.com")
+        self.client.get(reverse("ab:finalize_tracks"),
+                        follow=True)
         experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
         self.assertFalse(experiment.tracks_finalized)
     
     def test_finalize_tracks_no_tracks(self):
         """ Tests that finalize fails if there are no tracks """
-        response = self.client.get(reverse("ab:finalize_tracks"), follow=True)
+        experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
+        response = self.client.get(reverse("ab:finalize_tracks"),
+                                   follow=True)
         self.assertError(response, NO_TRACKS_FOR_EXPERIMENT)

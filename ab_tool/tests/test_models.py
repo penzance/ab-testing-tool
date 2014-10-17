@@ -6,8 +6,8 @@ class TestModels(SessionTestCase):
     def test_is_missing_urls_true(self):
         """ Tests that is_missing_urls returns false when a url is missing """
         intervention_point = self.create_test_intervention_point()
-        track1 = self.create_test_track()
-        Track.objects.create(course_id=TEST_COURSE_ID, name="track2")
+        track1 = self.create_test_track(name="track1")
+        self.create_test_track(name="track2")
         InterventionPointUrl.objects.create(intervention_point=intervention_point, track=track1, url="example.com")
         self.assertTrue(intervention_point.is_missing_urls())
     

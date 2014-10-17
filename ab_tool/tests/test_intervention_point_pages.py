@@ -7,7 +7,7 @@ from ab_tool.models import (InterventionPoint, InterventionPointUrl,
 from ab_tool.tests.common import (SessionTestCase, TEST_COURSE_ID,
     TEST_OTHER_COURSE_ID, NONEXISTENT_STAGE_ID, APIReturn, LIST_MODULES,
     TEST_STUDENT_ID)
-from ab_tool.exceptions import (NO_URL_FOR_TRACK, UNAUTHORIZED_ACCESS,
+from ab_tool.exceptions import (NO_URL_FOR_TRACK,  UNAUTHORIZED_ACCESS,
     EXPERIMENT_TRACKS_NOT_FINALIZED, NO_TRACKS_FOR_EXPERIMENT,
     DELETING_INSTALLED_STAGE)
 
@@ -34,7 +34,7 @@ class TestInterventionPointPages(SessionTestCase):
     def test_deploy_intervention_point_no_tracks_error(self):
         """ Tests deploy intervention_point for student creates errors with no tracks """
         self.set_roles([])
-        Experiment.set_finalized(TEST_COURSE_ID)
+        Experiment.get_placeholder_course_experiment(TEST_COURSE_ID).update(tracks_finalized=True)
         intervention_point = self.create_test_intervention_point()
         response = self.client.get(reverse("ab:deploy_intervention_point",
                                            args=(intervention_point.id,)))
@@ -44,7 +44,7 @@ class TestInterventionPointPages(SessionTestCase):
         """ Tests deploy intervention_point for student creates student object and assigns
             track to that student object """
         self.set_roles([])
-        Experiment.set_finalized(TEST_COURSE_ID)
+        Experiment.get_placeholder_course_experiment(TEST_COURSE_ID).update(tracks_finalized=True)
         intervention_point = self.create_test_intervention_point()
         track = self.create_test_track(name="track1")
         students = ExperimentStudent.objects.filter(course_id=TEST_COURSE_ID,
@@ -146,8 +146,9 @@ class TestInterventionPointPages(SessionTestCase):
             object verified by DB count """
         num_intervention_points = InterventionPoint.objects.count()
         data = {"name": "intervention_point", "notes": "hi"}
-        response = self.client.post(reverse("ab:submit_create_intervention_point"), data,
-                                    follow=True)
+        experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
+        url = reverse("ab:submit_create_intervention_point")
+        response = self.client.post(url, data, follow=True)
         self.assertOkay(response)
         self.assertEqual(num_intervention_points + 1, InterventionPoint.objects.count())
     
@@ -165,8 +166,9 @@ class TestInterventionPointPages(SessionTestCase):
                 DEPLOY_OPTION_TAG + str(track1.id): "non_canvas_url",
                 DEPLOY_OPTION_TAG + str(track2.id): "non_canvas_url",
                 "notes": "hi"}
-        response = self.client.post(reverse("ab:submit_create_intervention_point"), data,
-                                    follow=True)
+        experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
+        url = reverse("ab:submit_create_intervention_point")
+        response = self.client.post(url, data, follow=True)
         self.assertOkay(response)
         self.assertEqual(num_intervention_points + 1, InterventionPoint.objects.count())
         self.assertEqual(num_intervention_pointurls + 2, InterventionPointUrl.objects.count())
@@ -186,8 +188,9 @@ class TestInterventionPointPages(SessionTestCase):
                 STAGE_URL_TAG + "1": "http://example.com/page",
                 STAGE_URL_TAG + "2": "http://example.com/otherpage",
                 "notes": "hi"}
-        response = self.client.post(reverse("ab:submit_create_intervention_point"), data,
-                                    follow=True)
+        experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
+        url = reverse("ab:submit_create_intervention_point")
+        response = self.client.post(url, data, follow=True)
         self.assertEqual(response.status_code, 401)
         self.assertEqual(num_intervention_points, InterventionPoint.objects.count())
         self.assertEqual(num_intervention_pointurls, InterventionPointUrl.objects.count())
