@@ -33,8 +33,22 @@ class CourseObject(TimestampedModel):
 
 
 class Experiment(CourseObject):
+    UNIFORM_RANDOM = 1
+    WEIGHTED_PROBABILITY_RANDOM = 2
+    CSV_UPLOAD = 3
+    REVERSE_API = 4
+    
+    ASSIGNMENT_ENUM_TYPES = (
+        (UNIFORM_RANDOM, "uniform_random"),
+        (WEIGHTED_PROBABILITY_RANDOM, "weighted_probability_random"),
+        (CSV_UPLOAD, "csv_upload"),
+        (REVERSE_API, "reverse_api"),
+    )
+    
     name = models.CharField(max_length=256)
     tracks_finalized = models.BooleanField(default=False)
+    assignment_method = models.IntegerField(max_length=1, default=1,
+                                            choices=ASSIGNMENT_ENUM_TYPES,)
     
     @classmethod
     def get_placeholder_course_experiment(cls, course_id):
@@ -50,12 +64,19 @@ class Track(CourseObject):
     experiment = models.ForeignKey(Experiment, related_name="tracks")
 
 
+class TrackProbabilityWeight(CourseObject):
+    #Definition: A `weighting` is an integer between 1 and 1000 inclusive
+    weighting = models.IntegerField()
+    track = models.ForeignKey(Track)
+    experiment = models.ForeignKey(Experiment, related_name="track_probabilites")
+
+
 class InterventionPoint(CourseObject):
     """ This model stores the configuration of an intervention point"""
     name = models.CharField(max_length=256)
     notes = models.CharField(max_length=1024)
     experiment = models.ForeignKey(Experiment, related_name="intervention_points")
-    tracks = models.ManyToManyField(Track, through='InterventionPointUrl')
+    tracks = models.ManyToManyField(Track, through="InterventionPointUrl")
     
     def is_missing_urls(self):
         if (Track.objects.filter(course_id=self.course_id).count()
@@ -65,6 +86,7 @@ class InterventionPoint(CourseObject):
             if not intervention_point_url.url:
                 return True
         return False
+
 
 class InterventionPointUrl(TimestampedModel):
     """ This model stores the URL of a single intervention """

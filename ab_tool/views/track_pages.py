@@ -3,12 +3,13 @@ from django_auth_lti.decorators import lti_role_required
 from django.core.urlresolvers import reverse
 
 from ab_tool.constants import ADMINS
-from ab_tool.models import Track, Experiment
+from ab_tool.models import (Track, Experiment, TrackProbabilityWeight)
 from ab_tool.canvas import get_lti_param
 from ab_tool.exceptions import (NO_TRACKS_FOR_EXPERIMENT,
     EXPERIMENT_TRACKS_ALREADY_FINALIZED)
 from django.http.response import HttpResponse
-from ab_tool.controllers import (post_param, get_incomplete_intervention_points)
+from ab_tool.controllers import (post_param, get_incomplete_intervention_points,
+    get_missing_track_weights, format_weighting)
 
 
 @lti_role_required(ADMINS)
@@ -79,6 +80,46 @@ def finalize_tracks(request, experiment_id):
         #TODO: replace with better error display
         return HttpResponse("URLs missing for these tracks in these Intervention Points: %s"
                             % incomplete_intervention_points)
+    missing_track_weights = get_missing_track_weights(experiment.tracks.all(), course_id)
+    if missing_track_weights:
+        return HttpResponse("Track weightings missing for these tracks: %s" % missing_track_weights)
     experiment.tracks_finalized = True
     experiment.save()
     return redirect(reverse("ab:index"))
+
+
+@lti_role_required(ADMINS)
+def track_weights(request):
+    course_id = get_lti_param(request, "custom_canvas_course_id")
+    if Experiment.get_is_finalized(course_id):
+        raise EXPERIMENT_TRACKS_ALREADY_FINALIZED
+    all_tracks = Track.objects.filter(course_id=course_id)
+    weighting_objs = []
+    for track in all_tracks:
+        try:
+            weighting_obj = TrackProbabilityWeight.objects.get(track=track, course_id=course_id)
+            weighting_objs.append((track, weighting_obj))
+        except TrackProbabilityWeight.DoesNotExist:
+            weighting_objs.append((track, None))
+    context = {"weighting_objs": weighting_objs,
+               "cancel_url": reverse("ab:index") + "#tabs-5",
+              }
+    return render_to_response("ab_tool/edit_track_weights.html", context)
+
+
+@lti_role_required(ADMINS)
+def submit_track_weights(request):
+    WEIGHT_TAG = "weight_for_track_"
+    course_id = get_lti_param(request, "custom_canvas_course_id")
+    if CourseSettings.get_is_finalized(course_id):
+        raise EXPERIMENT_TRACKS_ALREADY_FINALIZED
+    weightings = [(k,v) for (k,v) in request.POST.iteritems() if WEIGHT_TAG in k and v]
+    for (k,v) in weightings:
+        _, track_id = k.split(WEIGHT_TAG)
+        try:
+            weighting_obj = TrackProbabilityWeight.objects.get(track__pk=track_id, course_id=course_id)
+            weighting_obj.update(weighting=format_weighting(v))
+        except TrackProbabilityWeight.DoesNotExist:
+            TrackProbabilityWeight.objects.create(track_id=track_id, course_id=course_id,
+                                                  weighting=format_weighting(v))
+    return redirect(reverse("ab:index") + "#tabs-5")

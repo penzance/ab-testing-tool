@@ -21,5 +21,9 @@ EXPERIMENT_TRACKS_NOT_FINALIZED = Renderable400("Experiment tracks are not final
 NO_URL_FOR_TRACK = Renderable404("No course content. Ask your course instructors to put something here.")
 NO_TRACKS_FOR_EXPERIMENT = Renderable404("No tracks have been configured for this experiment.")
 
+CSV_UPLOAD_NEEDED = Renderable404("New CSV upload needed. If you are a student, notify your course instructors regarding this page before returning here.")
+TRACK_WEIGHTS_NOT_SET = Renderable404("Missing track configuration. If you are a student, notify your course instructors regarding this page before returning here.")
+INPUT_NOT_ALLOWED = Renderable404("Input does not follow requirements")
+
 def missing_param_error(param_name):
     return Renderable400("Missing POST parameter %s" % param_name)
