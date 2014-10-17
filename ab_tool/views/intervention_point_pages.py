@@ -46,7 +46,8 @@ def deploy_intervention_point(request, intervention_point_id):
         # a student existing but not having a track assigned (e.g. if the update to
         # a student database object fails)
         lis_person_sourcedid = get_lti_param(request, "lis_person_sourcedid")
-        student = assign_track_and_create_student(course_id, student_id, lis_person_sourcedid)
+        experiment = CourseSettings.get_placeholder_course_experiment(course_id)
+        student = assign_track_and_create_student(experiment, student_id, lis_person_sourcedid)
 
     # Retrieve the url for the student's track at the current intervention point
     # Return an error page if there is no url configured.

@@ -1,56 +1,56 @@
 from django.core.urlresolvers import reverse
-from django.shortcuts import get_object_or_404
 from random import choice
 
 from ab_tool.models import (InterventionPoint, TrackProbabilityWeight,
-    CourseSettings, Track, CourseStudent)
-from ab_tool.canvas import (get_canvas_request_context, list_module_items, list_modules,
-    get_lti_param)
+    Experiment, ExperimentStudent)
+from ab_tool.canvas import (get_canvas_request_context, list_module_items,
+    list_modules, get_lti_param)
 from ab_tool.exceptions import (BAD_STAGE_ID, missing_param_error,
-    INPUT_NOT_ALLOWED)
-
-from ab_tool.exceptions import (NO_TRACKS_FOR_EXPERIMENT, TRACK_WEIGHTS_NOT_SET,
+    INPUT_NOT_ALLOWED, NO_TRACKS_FOR_EXPERIMENT, TRACK_WEIGHTS_NOT_SET,
     CSV_UPLOAD_NEEDED)
 
 
-def assign_track_and_create_student(course_id, student_id, lis_person_sourcedid):
+def assign_track_and_create_student(experiment, student_id, lis_person_sourcedid):
     """ Method looks up assignment_mode to select track and creates student in selected track.
         Method returns student object """
-    course_settings = get_object_or_404(CourseSettings, course_id=course_id)
-    if course_settings.assignment_method == CourseSettings.CSV_UPLOAD:
+    if experiment.assignment_method == Experiment.CSV_UPLOAD:
         # Raise error as student should have already been assigned a track if CSV upload
         #TODO: infrastructure needed notify course administrator about incomplete student-track mapping
         raise CSV_UPLOAD_NEEDED
-    tracks = Track.objects.filter(course_id=course_id)
+    tracks = experiment.tracks.all()
     if not tracks:
         raise NO_TRACKS_FOR_EXPERIMENT
-    if course_settings.assignment_method == CourseSettings.UNIFORM_RANDOM:
+    if experiment.assignment_method == Experiment.UNIFORM_RANDOM:
         # If uniform, pick randomly from the set of tracks
         chosen_track = choice(tracks)
-    if course_settings.assignment_method == CourseSettings.WEIGHTED_PROBABILITY_RANDOM:
+    if experiment.assignment_method == Experiment.WEIGHTED_PROBABILITY_RANDOM:
         # If weighted, generate a weighted list of tracks and pick one randomly from list
         weighted_tracks = []
         for track in tracks:
             try:
-                track_weight = TrackProbabilityWeight.objects.get(track=track, course_id=course_id)
+                track_weight = TrackProbabilityWeight.objects.get(track=track, experiment=experiment)
             except TrackProbabilityWeight.DoesNotExist:
                 raise TRACK_WEIGHTS_NOT_SET
             weighted_tracks.extend([track] * track_weight.weighting)
         chosen_track = choice(weighted_tracks)
     # Create student with chosen track
-    student = CourseStudent.objects.create(
-            student_id=student_id, course_id=course_id, track=chosen_track,
-            lis_person_sourcedid=lis_person_sourcedid)
+    student = ExperimentStudent.objects.create(
+            student_id=student_id, course_id=experiment.course_id,
+            track=chosen_track, lis_person_sourcedid=lis_person_sourcedid,
+            experiment=experiment
+    )
     return student
 
 
 def intervention_point_url(request, intervention_point_id):
-    """ Builds a URL to deploy the intervention_point with the database id intervention_point_id """
+    """ Builds a URL to deploy the intervention_point with the database id
+        intervention_point_id """
     try:
         intervention_point_id = int(intervention_point_id)
     except (TypeError, ValueError):
         raise BAD_STAGE_ID
-    return request.build_absolute_uri(reverse("ab:deploy_intervention_point", args=(intervention_point_id,)))
+    return request.build_absolute_uri(reverse("ab:deploy_intervention_point",
+                                              args=(intervention_point_id,)))
 
 
 def format_url(url):
@@ -65,14 +65,16 @@ def get_uninstalled_intervention_points(request):
         current course but not installed in any of that course's modules """
     course_id = get_lti_param(request, "custom_canvas_course_id")
     installed_intervention_point_urls = get_installed_intervention_points(request)
-    intervention_points = [intervention_point for intervention_point in InterventionPoint.objects.filter(course_id=course_id)
-              if intervention_point_url(request, intervention_point.id) not in installed_intervention_point_urls]
+    intervention_points = [intervention_point for intervention_point in
+                           InterventionPoint.objects.filter(course_id=course_id)
+                           if intervention_point_url(request, intervention_point.id)
+                           not in installed_intervention_point_urls]
     return intervention_points
 
 
 def get_installed_intervention_points(request):
-    """ Returns the list of InterventionPointUrls (as strings) for InterventionPoints that have been
-        installed in at least one of the courses modules. """
+    """ Returns the list of InterventionPointUrls (as strings) for InterventionPoints
+        that have been installed in at least one of the courses modules. """
     course_id = get_lti_param(request, "custom_canvas_course_id")
     request_context =  get_canvas_request_context(request)
     all_modules = list_modules(request_context, course_id)
@@ -84,30 +86,38 @@ def get_installed_intervention_points(request):
         installed_intervention_point_urls.extend(intervention_point_urls)
     return installed_intervention_point_urls
 
+
 def intervention_point_is_installed(request, intervention_point):
-    return intervention_point_url(request, intervention_point.id) in get_installed_intervention_points(request)
+    return (intervention_point_url(request, intervention_point.id) in
+            get_installed_intervention_points(request))
+
 
 def get_incomplete_intervention_points(intervention_point_list):
     """ Takes paramter intervention_point_list instead of parameter course_id to avoid
         second database call to the InterventionPoint table in methods that needs to
         already fetch the InterventionPoint table"""
-    return [intervention_point.name for intervention_point in intervention_point_list if intervention_point.is_missing_urls()]
+    return [intervention_point.name for intervention_point in intervention_point_list
+            if intervention_point.is_missing_urls()]
+
 
 def all_intervention_point_urls(request, course_id):
     """ Returns the deploy urls of all intervention_points in the database for that course"""
     return [intervention_point_url(request, intervention_point.id) for intervention_point in
             InterventionPoint.objects.filter(course_id=course_id)]
 
+
 def get_missing_track_weights(tracks, course_id):
-    course_settings,_ = CourseSettings.objects.get_or_create(course_id=course_id)
-    if course_settings.assignment_method != CourseSettings.WEIGHTED_PROBABILITY_RANDOM:
+    experiment = Experiment.get_placeholder_course_experiment(course_id)
+    if experiment.assignment_method != Experiment.WEIGHTED_PROBABILITY_RANDOM:
         return []
     missing_weights = []
-    track_weights = [t.track for t in TrackProbabilityWeight.objects.filter(course_id=course_id)]
+    track_weights = [t.track for t in
+                     TrackProbabilityWeight.objects.filter(course_id=course_id)]
     for track in tracks:
         if track not in track_weights:
             missing_weights.append(track)
     return [track.name for track in missing_weights]
+
 
 def format_weighting(weighting):
     """ Track weights need to be an integer between 1 and 1000, allowing

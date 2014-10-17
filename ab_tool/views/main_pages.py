@@ -25,7 +25,7 @@ def not_authorized(request):
 @lti_role_required(ADMINS)
 def render_intervention_point_control_panel(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    course_settings,_ = CourseSettings.objects.get_or_create(course_id=course_id)
+    course_settings = CourseSettings.get_placeholder_course_experiment(course_id)
     modules = get_modules_with_items(request)
     uninstalled_intervention_points = get_uninstalled_intervention_points(request)
     intervention_points = InterventionPoint.objects.filter(course_id=course_id)
