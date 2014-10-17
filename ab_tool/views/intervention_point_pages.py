@@ -1,7 +1,6 @@
 from django.shortcuts import render_to_response, redirect, get_object_or_404
 from django.core.urlresolvers import reverse
 from django_auth_lti.decorators import lti_role_required
-from random import choice
 
 from ab_tool.constants import (ADMINS, STAGE_URL_TAG,
     DEPLOY_OPTION_TAG, AS_TAB_TAG)
@@ -9,10 +8,10 @@ from ab_tool.models import (InterventionPoint, Track, InterventionPointUrl, Cour
     CourseStudent)
 from ab_tool.canvas import get_lti_param
 from ab_tool.controllers import (intervention_point_is_installed, format_url,
-    post_param)
+    post_param, assign_track_and_create_student)
 from ab_tool.exceptions import (UNAUTHORIZED_ACCESS,
     DELETING_INSTALLED_STAGE, EXPERIMENT_TRACKS_NOT_FINALIZED,
-    NO_URL_FOR_TRACK, NO_TRACKS_FOR_EXPERIMENT)
+    NO_URL_FOR_TRACK)
 
 
 def deploy_intervention_point(request, intervention_point_id):
@@ -37,23 +36,18 @@ def deploy_intervention_point(request, intervention_point_id):
         raise EXPERIMENT_TRACKS_NOT_FINALIZED
     
     student_id = get_lti_param(request, "custom_canvas_user_login_id")
-    lis_person_sourcedid = get_lti_param(request, "lis_person_sourcedid")
     
     # Get or create an object to track the student for this course
     try:
         student = CourseStudent.objects.get(student_id=student_id, course_id=course_id)
     except CourseStudent.DoesNotExist:
         # If this is a new student or the student doesn't yet have a track,
-        # assign the student to a track
-        # TODO: expand this code to allow multiple randomization procedures
-        tracks = Track.objects.filter(course_id=course_id)
-        if not tracks:
-            raise NO_TRACKS_FOR_EXPERIMENT
-        chosen_track = choice(tracks)
-        student = CourseStudent.objects.create(
-                student_id=student_id, course_id=course_id, track=chosen_track,
-                lis_person_sourcedid=lis_person_sourcedid)
-    
+        # select a track before creating the student. This avoids a race condition of
+        # a student existing but not having a track assigned (e.g. if the update to
+        # a student database object fails)
+        lis_person_sourcedid = get_lti_param(request, "lis_person_sourcedid")
+        student = assign_track_and_create_student(course_id, student_id, lis_person_sourcedid)
+
     # Retrieve the url for the student's track at the current intervention point
     # Return an error page if there is no url configured.
     try:
@@ -67,7 +61,6 @@ def deploy_intervention_point(request, intervention_point_id):
     if not chosen_intervention_point_url.url:
         raise NO_URL_FOR_TRACK
     return redirect(chosen_intervention_point_url.url)
-
 
 @lti_role_required(ADMINS)
 def create_intervention_point(request):

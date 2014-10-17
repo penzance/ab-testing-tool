@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load staticfiles %}
+    <meta charset="utf-8" />
+    <title>A/B Testing Tool</title>
+    <link rel="stylesheet" href="{% static 'ab_tool/css/bootstrap.min.css' %}" type="text/css"/>
+    <link rel="stylesheet" href="{% static 'ab_tool/css/dashboard.css' %}" type="text/css"/>
+</head>
+
+<body>
+<div class="container containter-fluid">
+    <div class="jumbotron">
+        <h2>Track Weightings</h2>
+    </div>
+    <div class="alert alert-info" role="alert">
+        <p>Students are randomly assigned a track with a probability calculated by your specified weights. <b>Weights need be integers that are at least 1 and no greater than 1000.</b></p>
+        <p>Example: if Track A has weight "5" and Track B has weight "3", then the total weight is 8, and students have a 5/8 probability of getting assigned Track A and 3/8 probabilty getting assigned Track B. </p>
+        <p>Example: if Track A has weight "30" and Track B has weight "70", then the total weight is 100, and students have a "30/100" probability of getting assigned Track A and "70/100" probability getting assigned Track B.</p>
+    </div>
+    <div class="row">
+            <form method="post" class="form-horizontal" name="track_weightings_form" action="{% url 'ab:submit_track_weights' %}">
+            {% csrf_token %}
+                <div class="col-lg-6 col-md-6 col-sm-6 ">
+                    {% for t, s in weighting_objs %}
+                    <row>
+                        <div class="col-lg-6"><label>Weighting for Track "{{t.name}}" </label></div>
+                        <div class="col-lg-6"><input id="weight_for_track_{{t.id}}" class="form-control"  min="1" max="1000" type="number" step="1" pattern="\d+" name="weight_for_track_{{t.id}}" value="{{ s.weighting }}"/></div>
+                    </row>
+                    {% endfor %}
+                    <row>
+                    <div class="col-lg-12 ">
+                    <br>
+                        <input id="submit_edit_track_weight_button" type="submit" name="submit" value="Submit Changes" class="btn btn-lg btn-success submit">
+                    {% block cancel_url %}
+                        <a id="cancel_submit_edit_track_weight_button" href="{{ cancel_url }}" class="btn btn-lg btn-primary">Cancel</a></td>
+                    {% endblock %}
+                    </div>
+                </div>
+           </form>
+    </div>
+</div>
+<script src="{% static 'ab_tool/js/jquery-1.10.1.min.js' %}"></script>
+<script src="{% static 'ab_tool/js/bootstrap.min.js' %}"></script>
+</body>
+</html>

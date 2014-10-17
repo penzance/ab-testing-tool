@@ -8,3 +8,4 @@ dist
 .pydevproject
 secure.py
 .coverage
+env/
