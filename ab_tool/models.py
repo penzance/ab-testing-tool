@@ -1,6 +1,7 @@
 from django.db import models
 from django.shortcuts import get_object_or_404
-from ab_tool.exceptions import UNAUTHORIZED_ACCESS
+from ab_tool.exceptions import (UNAUTHORIZED_ACCESS,
+    EXPERIMENT_TRACKS_ALREADY_FINALIZED)
 
 class TimestampedModel(models.Model):
     created_on = models.DateTimeField(auto_now_add=True)
@@ -49,6 +50,10 @@ class Experiment(CourseObject):
     tracks_finalized = models.BooleanField(default=False)
     assignment_method = models.IntegerField(max_length=1, default=1,
                                             choices=ASSIGNMENT_ENUM_TYPES,)
+    
+    def assert_not_finalized(self):
+        if self.tracks_finalized:
+            raise EXPERIMENT_TRACKS_ALREADY_FINALIZED
     
     @classmethod
     def get_placeholder_course_experiment(cls, course_id):

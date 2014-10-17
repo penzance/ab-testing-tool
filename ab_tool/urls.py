@@ -37,8 +37,8 @@ urlpatterns = patterns('',
     url(r'^delete_track/(?P<track_id>\d+)$', delete_track, name='delete_track'),
     url(r'^finalize_tracks/(?P<experiment_id>\d+)$', finalize_tracks, name='finalize_tracks'),
     
-    url(r'^submit_assignment_method$', submit_assignment_method, name='submit_assignment_method'),
+    url(r'^submit_assignment_method/(?P<experiment_id>\d+)$', submit_assignment_method, name='submit_assignment_method'),
     
     url(r'^track_weights$', track_weights, name='track_weights'),
-    url(r'^submit_track_weights$', submit_track_weights, name='submit_track_weights'),
+    url(r'^submit_track_weights/(?P<experiment_id>\d+)$', submit_track_weights, name='submit_track_weights'),
 )

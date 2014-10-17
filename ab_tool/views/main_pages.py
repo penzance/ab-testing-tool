@@ -1,7 +1,7 @@
 import csv
 from django.core.urlresolvers import reverse
 from django.http.response import HttpResponse
-from django.shortcuts import render_to_response, redirect, get_object_or_404
+from django.shortcuts import render_to_response, redirect
 #from django.views.decorators.csrf import csrf_exempt
 from django_auth_lti.decorators import lti_role_required
 from django.template.defaultfilters import slugify
@@ -11,11 +11,10 @@ from ims_lti_py.tool_config import ToolConfig
 from ab_tool.canvas import get_lti_param
 from ab_tool.controllers import (get_uninstalled_intervention_points,
     get_modules_with_items, get_incomplete_intervention_points,
-    get_missing_track_weights)
+    get_missing_track_weights, post_param)
 from ab_tool.models import (InterventionPoint, Track, ExperimentStudent,
     Experiment)
 from ab_tool.constants import ADMINS
-from ab_tool.exceptions import EXPERIMENT_TRACKS_ALREADY_FINALIZED
 
 
 def not_authorized(request):
@@ -98,11 +97,10 @@ def download_data(request):
 
 
 @lti_role_required(ADMINS)
-def submit_assignment_method(request):
+def submit_assignment_method(request, experiment_id):
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    if CourseSettings.get_is_finalized(course_id):
-        raise EXPERIMENT_TRACKS_ALREADY_FINALIZED
-    assignment_method = request.POST.get('assignment_method')
-    course_settings = get_object_or_404(CourseSettings, course_id=course_id)
-    course_settings.update(assignment_method=assignment_method)
+    experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
+    experiment.assert_not_finalized()
+    assignment_method = post_param(request, "assignment_method")
+    experiment.update(assignment_method=assignment_method)
     return redirect(reverse("ab:index") + "#tabs-5")

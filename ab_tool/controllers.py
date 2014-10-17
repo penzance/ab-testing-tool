@@ -36,7 +36,8 @@ def assign_track_and_create_student(experiment, student_id, lis_person_sourcedid
     # Create student with chosen track
     student = ExperimentStudent.objects.create(
             student_id=student_id, course_id=experiment.course_id,
-            track=chosen_track, lis_person_sourcedid=lis_person_sourcedid
+            track=chosen_track, lis_person_sourcedid=lis_person_sourcedid,
+            experiment=experiment
     )
     return student
 

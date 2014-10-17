@@ -5,8 +5,7 @@ from django.core.urlresolvers import reverse
 from ab_tool.constants import ADMINS
 from ab_tool.models import (Track, Experiment, TrackProbabilityWeight)
 from ab_tool.canvas import get_lti_param
-from ab_tool.exceptions import (NO_TRACKS_FOR_EXPERIMENT,
-    EXPERIMENT_TRACKS_ALREADY_FINALIZED)
+from ab_tool.exceptions import (NO_TRACKS_FOR_EXPERIMENT)
 from django.http.response import HttpResponse
 from ab_tool.controllers import (post_param, get_incomplete_intervention_points,
     get_missing_track_weights, format_weighting)
@@ -16,8 +15,7 @@ from ab_tool.controllers import (post_param, get_incomplete_intervention_points,
 def create_track(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     experiment = Experiment.get_placeholder_course_experiment(course_id)
-    if experiment.tracks_finalized:
-        raise EXPERIMENT_TRACKS_ALREADY_FINALIZED
+    experiment.assert_not_finalized()
     return render_to_response("ab_tool/edit_track.html", {"experiment_id": experiment.id})
 
 
@@ -35,8 +33,7 @@ def edit_track(request, track_id):
 def submit_create_track(request, experiment_id):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
-    if experiment.tracks_finalized:
-        raise EXPERIMENT_TRACKS_ALREADY_FINALIZED
+    experiment.assert_not_finalized()
     name = post_param(request, "name")
     notes = post_param(request, "notes")
     Track.objects.create(name=name, notes=notes, course_id=course_id,
@@ -62,8 +59,7 @@ def delete_track(request, track_id):
     """
     course_id = get_lti_param(request, "custom_canvas_course_id")
     track = Track.get_or_404_check_course(track_id, course_id)
-    if track.experiment.tracks_finalized:
-        raise EXPERIMENT_TRACKS_ALREADY_FINALIZED
+    track.experiment.assert_not_finalized()
     track.delete()
     return redirect(reverse("ab:index"))
 
@@ -91,35 +87,39 @@ def finalize_tracks(request, experiment_id):
 @lti_role_required(ADMINS)
 def track_weights(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    if Experiment.get_is_finalized(course_id):
-        raise EXPERIMENT_TRACKS_ALREADY_FINALIZED
-    all_tracks = Track.objects.filter(course_id=course_id)
+    experiment = Experiment.get_placeholder_course_experiment(course_id)
+    experiment.assert_not_finalized()
     weighting_objs = []
-    for track in all_tracks:
+    for track in experiment.tracks.all():
         try:
-            weighting_obj = TrackProbabilityWeight.objects.get(track=track, course_id=course_id)
+            weighting_obj = TrackProbabilityWeight.objects.get(
+                    track=track, experiment=experiment)
             weighting_objs.append((track, weighting_obj))
         except TrackProbabilityWeight.DoesNotExist:
             weighting_objs.append((track, None))
     context = {"weighting_objs": weighting_objs,
                "cancel_url": reverse("ab:index") + "#tabs-5",
+               "experiment_id": experiment.id,
               }
     return render_to_response("ab_tool/edit_track_weights.html", context)
 
 
 @lti_role_required(ADMINS)
-def submit_track_weights(request):
+def submit_track_weights(request, experiment_id):
     WEIGHT_TAG = "weight_for_track_"
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    if CourseSettings.get_is_finalized(course_id):
-        raise EXPERIMENT_TRACKS_ALREADY_FINALIZED
+    experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
+    experiment.assert_not_finalized()
     weightings = [(k,v) for (k,v) in request.POST.iteritems() if WEIGHT_TAG in k and v]
     for (k,v) in weightings:
         _, track_id = k.split(WEIGHT_TAG)
         try:
-            weighting_obj = TrackProbabilityWeight.objects.get(track__pk=track_id, course_id=course_id)
+            weighting_obj = TrackProbabilityWeight.objects.get(
+                    track__pk=track_id, experiment=experiment)
             weighting_obj.update(weighting=format_weighting(v))
         except TrackProbabilityWeight.DoesNotExist:
-            TrackProbabilityWeight.objects.create(track_id=track_id, course_id=course_id,
-                                                  weighting=format_weighting(v))
+            TrackProbabilityWeight.objects.create(
+                track_id=track_id, course_id=course_id, experiment=experiment,
+                weighting=format_weighting(v)
+            )
     return redirect(reverse("ab:index") + "#tabs-5")
