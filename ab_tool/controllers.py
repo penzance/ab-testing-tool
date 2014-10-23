@@ -92,14 +92,6 @@ def intervention_point_is_installed(request, intervention_point):
             get_installed_intervention_points(request))
 
 
-def get_incomplete_intervention_points(intervention_point_list):
-    """ Takes paramter intervention_point_list instead of parameter course_id to avoid
-        second database call to the InterventionPoint table in methods that needs to
-        already fetch the InterventionPoint table"""
-    return [intervention_point.name for intervention_point in intervention_point_list
-            if intervention_point.is_missing_urls()]
-
-
 def all_intervention_point_urls(request, course_id):
     """ Returns the deploy urls of all intervention_points in the database for that course"""
     return [intervention_point_url(request, intervention_point.id) for intervention_point in

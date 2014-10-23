@@ -9,9 +9,8 @@ from ab_tool.views.intervention_point_pages import (create_intervention_point,
     submit_create_intervention_point, edit_intervention_point, 
     delete_intervention_point, deploy_intervention_point,
     submit_edit_intervention_point, modules_page_edit_intervention_point)
-from ab_tool.views.track_pages import (create_track, submit_create_track,
-    submit_edit_track, edit_track, delete_track, finalize_tracks, track_weights,
-    submit_track_weights)
+from ab_tool.views.track_pages import (create_experiment, submit_create_experiment,
+    track_weights, submit_track_weights, view_experiment)
 
 urlpatterns = patterns('',
     url(r'^$', render_intervention_point_control_panel, name='index'),
@@ -30,12 +29,9 @@ urlpatterns = patterns('',
     url(r'^intervention_point/(?P<intervention_point_id>\d+)$', deploy_intervention_point, name='deploy_intervention_point'),
     url(r'^delete_intervention_point/(?P<intervention_point_id>\d+)$', delete_intervention_point, name='delete_intervention_point'),
     
-    url(r'^create_track$', create_track, name='create_track'),
-    url(r'^submit_create_track/(?P<experiment_id>\d+)$', submit_create_track, name='submit_create_track'),
-    url(r'^edit_track/(?P<track_id>\d+)$', edit_track, name='edit_track'),
-    url(r'^submit_edit_track/(?P<track_id>\d+)$', submit_edit_track, name='submit_edit_track'),
-    url(r'^delete_track/(?P<track_id>\d+)$', delete_track, name='delete_track'),
-    url(r'^finalize_tracks/(?P<experiment_id>\d+)$', finalize_tracks, name='finalize_tracks'),
+    url(r'^create_experiment$', create_experiment, name='create_experiment'),
+    url(r'^submit_create_experiment$', submit_create_experiment, name='submit_create_experiment'),
+    url(r'^view_experiment/(?P<experiment_id>\d+)$', view_experiment, name='view_experiment'),
     
     url(r'^submit_assignment_method/(?P<experiment_id>\d+)$', submit_assignment_method, name='submit_assignment_method'),
     
