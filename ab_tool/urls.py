@@ -6,11 +6,11 @@ from ab_tool.views.main_pages import (render_intervention_point_control_panel, n
 from ab_tool.views.selection_pages import (resource_selection, submit_selection,
     submit_selection_new_intervention_point)
 from ab_tool.views.intervention_point_pages import (create_intervention_point,
-    submit_create_intervention_point, edit_intervention_point, 
+    submit_create_intervention_point, edit_intervention_point,
     delete_intervention_point, deploy_intervention_point,
     submit_edit_intervention_point, modules_page_edit_intervention_point)
 from ab_tool.views.track_pages import (create_experiment, submit_create_experiment,
-    track_weights, submit_track_weights, view_experiment)
+    track_weights, submit_track_weights, view_experiment, finalize_tracks)
 
 urlpatterns = patterns('',
     url(r'^$', render_intervention_point_control_panel, name='index'),
@@ -29,6 +29,7 @@ urlpatterns = patterns('',
     url(r'^intervention_point/(?P<intervention_point_id>\d+)$', deploy_intervention_point, name='deploy_intervention_point'),
     url(r'^delete_intervention_point/(?P<intervention_point_id>\d+)$', delete_intervention_point, name='delete_intervention_point'),
     
+    url(r'^finalize_tracks/(?P<experiment_id>\d+)$', finalize_tracks, name='finalize_tracks'),
     url(r'^create_experiment$', create_experiment, name='create_experiment'),
     url(r'^submit_create_experiment$', submit_create_experiment, name='submit_create_experiment'),
     url(r'^view_experiment/(?P<experiment_id>\d+)$', view_experiment, name='view_experiment'),

@@ -13,7 +13,7 @@
 <div class="container">
     <div class="jumbotron">
         <h2>A/B Testing Control Panel</h2>
-      <p>Welcome administrator. Manage your A/B course intervention points here.</p>
+      <p>Welcome administrator. Manage your A/B experiments here.</p>
     </div>
 
     <div id="tabs">
@@ -27,9 +27,85 @@
         <!-- Tab for Tracks-->
         <div id="tabs-1">
              <div class="span8">
-                <p>Helpful tip: a "Track" is a series of interventions that a cohort of students is assigned to experience.</p>
+                <p>Helpful tip: You must start the experiment before students can join one of its track. A "track" is a series of interventions that a cohort of students is assigned.</p>
                 <br>
+                {% if not is_finalized %}
+
                 <a id="create_experiment_button" class="btn btn-lg btn-success"  href="{% url 'ab:create_experiment' %}">Create New Experiment</a>
+                <a id="finalize_button" class="btn btn-lg btn-danger" {% if incomplete_intervention_points %} href="#incomplete_intervention_points_modal" {% elif missing_track_weights %} href="#missing_track_weights_modal" {% else %} href="#finalize_modal" {% endif %} data-toggle="modal" > Finalize Tracks</a>
+
+                {% if incomplete_intervention_points %}
+                <!-- START Modal code for incomplete_intervention_points confirmation box-->
+                <div id="incomplete_intervention_points_modal" class="modal fade" role="dialog" aria-labelledby="incomplete_intervention_points_modal" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                <h4 class="modal-title">Some Intervention Points Are Missing URLs</h4>
+                            </div>
+                            <div class="modal-body">
+                                <p>Complete your intervention points by filling in the URLs fields for all tracks.</p>
+                                <p class="text-warning">These following intervention points are incomplete: {{ incomplete_intervention_points|join:", " }} </p>
+                            </div>
+                            <div class="modal-footer">
+                                <a class="btn btn-lg btn-primary" data-dismiss="modal"> Close </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- END Modal code for incomplete_intervention_points confirmation box-->
+                {% endif %}
+                
+                {% if missing_track_weights %}
+                <!-- START Modal code for missing_track_weights confirmation box-->
+                <div id="missing_track_weights_modal" class="modal fade" role="dialog" aria-labelledby="missing_track_weights" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                <h4 class="modal-title">Some Tracks Are Missing Weights</h4>
+                            </div>
+                            <div class="modal-body">
+                                <p>Complete your Track weights by filling out weights for all tracks.</p>
+                                <p class="text-warning">These following tracks are missing weights: {{ missing_track_weights|join:", " }} </p>
+                            </div>
+                            <div class="modal-footer">
+                                <a class="btn btn-lg btn-primary" data-dismiss="modal"> Close </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- END Modal code for missing_track_weights confirmation box-->
+                {% endif %}
+                
+                <!-- START Modal code for Finalize Tracks confirmation box-->
+                <div id="finalize_modal" class="modal fade" role="dialog" aria-labelledby="finalize_modal" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                <h4 class="modal-title">Finalize Tracks Confirmation</h4>
+                            </div>
+                            <div class="modal-body">
+                                <p>Are you sure you want to finalize your tracks?</p>
+                                <p class="text-warning">Finalizing tracks cannot be undone. Once finalized, tracks can no longer be created or deleted. Existing tracks can still be edited. </p>
+                            </div>
+                            <div class="modal-footer">
+                                <a class="btn btn-lg btn-primary" data-dismiss="modal"> Close </a>
+                                <a class="btn btn-lg btn-danger" href=""> Yes, Finalize Tracks </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- END Modal code for Finalize Tracks confirmation box-->
+                <br>
+                {% else %}
+                <a id="create_track_button_disabled" class="btn btn-lg btn-success disabled"> Create New Track</a>
+                <a id="finalize_button_disabled" class="btn btn-lg btn-danger disabled"> Finalize Tracks</a>
+                <br><br>
+                <h4 class="text-center nowrap">Tracks Are Finalized.</h4>
+                <h5 class="text-center nowrap">Note: Tracks can no longer be deleted or created. Existing tracks can still be edited.</h5>
+                {% endif %}
                 
                 <br>
                 <div class="list-group span4">

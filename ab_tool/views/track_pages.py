@@ -8,7 +8,7 @@ from ab_tool.canvas import get_lti_param
 from ab_tool.exceptions import (NO_TRACKS_FOR_EXPERIMENT)
 from django.http.response import HttpResponse
 from ab_tool.controllers import (post_param, get_missing_track_weights,
-    format_weighting)
+    format_weighting, get_incomplete_intervention_points)
 
 
 @lti_role_required(ADMINS)
@@ -62,6 +62,11 @@ def finalize_tracks(request, experiment_id):
     experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
     if not experiment.tracks.count():
         raise NO_TRACKS_FOR_EXPERIMENT
+    intervention_points = experiment.intervention_points.all()
+    incomplete_intervention_points = get_incomplete_intervention_points(intervention_points)
+    if incomplete_intervention_points:
+        return HttpResponse("URLs missing for these tracks in these Intervention Points: %s"
+                            % incomplete_intervention_points)
     missing_track_weights = get_missing_track_weights(experiment.tracks.all(), course_id)
     if missing_track_weights:
         return HttpResponse("Track weightings missing for these tracks: %s" % missing_track_weights)
