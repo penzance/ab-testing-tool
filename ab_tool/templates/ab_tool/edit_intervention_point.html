@@ -30,7 +30,9 @@
             <h4 class="text-center nowrap">Intervention Point Is Installed.</h4>
             <h5 class="text-center nowrap">Note: Intervention Point must first be uninstalled before it can be deleted</h5>
             {% endif %}
-            <form method="post" class="form-horizontal" name="intervention_point_form" {% if intervention_point.id %} action="{% url 'ab:submit_edit_intervention_point' intervention_point.id %}"{% else %} action="{% url 'ab:submit_create_intervention_point' %}" {% endif %}>
+            <form method="post" class="form-horizontal" name="intervention_point_form"
+                {% if intervention_point.id %} action="{% url 'ab:submit_edit_intervention_point' intervention_point.id %}"
+                {% else %} action="{% url 'ab:submit_create_intervention_point' experiment_id %}" {% endif %}>
             {% csrf_token %}
                 <table class="table">
                 <tr align="left">

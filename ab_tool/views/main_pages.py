@@ -1,7 +1,7 @@
 import csv
 from django.core.urlresolvers import reverse
 from django.http.response import HttpResponse
-from django.shortcuts import render_to_response, redirect, get_object_or_404
+from django.shortcuts import render_to_response, redirect
 #from django.views.decorators.csrf import csrf_exempt
 from django_auth_lti.decorators import lti_role_required
 from django.template.defaultfilters import slugify
@@ -11,11 +11,10 @@ from ims_lti_py.tool_config import ToolConfig
 from ab_tool.canvas import get_lti_param
 from ab_tool.controllers import (get_uninstalled_intervention_points,
     get_modules_with_items, get_incomplete_intervention_points,
-    get_missing_track_weights)
-from ab_tool.models import (InterventionPoint, Track, CourseStudent,
-    CourseSettings)
+    get_missing_track_weights, post_param)
+from ab_tool.models import (InterventionPoint, Track, ExperimentStudent,
+    Experiment)
 from ab_tool.constants import ADMINS
-from ab_tool.exceptions import EXPERIMENT_TRACKS_ALREADY_FINALIZED
 
 
 def not_authorized(request):
@@ -25,16 +24,14 @@ def not_authorized(request):
 @lti_role_required(ADMINS)
 def render_intervention_point_control_panel(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    course_settings,_ = CourseSettings.objects.get_or_create(course_id=course_id)
     modules = get_modules_with_items(request)
     uninstalled_intervention_points = get_uninstalled_intervention_points(request)
     intervention_points = InterventionPoint.objects.filter(course_id=course_id)
     tracks = Track.objects.filter(course_id=course_id)
-    is_finalized = CourseSettings.get_is_finalized(course_id=course_id)
+    is_finalized = Experiment.get_placeholder_course_experiment(course_id).tracks_finalized
     incomplete_intervention_points = get_incomplete_intervention_points(intervention_points)
     missing_track_weights = get_missing_track_weights(tracks, course_id)
     context = {
-        "course_settings": course_settings,
         "modules": modules,
         "intervention_points": intervention_points,
         "uninstalled_intervention_points": uninstalled_intervention_points,
@@ -42,6 +39,7 @@ def render_intervention_point_control_panel(request):
         "canvas_url": get_lti_param(request, "launch_presentation_return_url"),
         "is_finalized": is_finalized,
         "incomplete_intervention_points": incomplete_intervention_points,
+        "experiment": Experiment.get_placeholder_course_experiment(course_id),
         "missing_track_weights": missing_track_weights,
     }
     return render_to_response("ab_tool/control_panel.html", context)
@@ -87,21 +85,22 @@ def download_data(request):
                                        slugify(course_title))
     writer = csv.writer(response)
     # Write headers to CSV file
-    headers = ["Student ID", "LIS Person Sourcedid", "Assigned Track",
+    headers = ["Student ID", "LIS Person Sourcedid", "Experiment", "Assigned Track",
                "Timestamp Last Updated"]
     writer.writerow(headers)
     # Write data to CSV file
-    for s in CourseStudent.objects.filter(course_id=course_id):
-        row = [s.student_id, s.lis_person_sourcedid, s.track.name, s.updated_on]
+    for s in ExperimentStudent.objects.filter(course_id=course_id):
+        row = [s.student_id, s.lis_person_sourcedid, s.experiment.name,
+               s.track.name, s.updated_on]
         writer.writerow(row)
     return response
 
+
 @lti_role_required(ADMINS)
-def submit_assignment_method(request):
+def submit_assignment_method(request, experiment_id):
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    if CourseSettings.get_is_finalized(course_id):
-        raise EXPERIMENT_TRACKS_ALREADY_FINALIZED
-    assignment_method = request.POST.get('assignment_method')
-    course_settings = get_object_or_404(CourseSettings, course_id=course_id)
-    course_settings.update(assignment_method=assignment_method)
+    experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
+    experiment.assert_not_finalized()
+    assignment_method = post_param(request, "assignment_method")
+    experiment.update(assignment_method=assignment_method)
     return redirect(reverse("ab:index") + "#tabs-5")

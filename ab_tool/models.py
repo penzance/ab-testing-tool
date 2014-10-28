@@ -1,6 +1,9 @@
 from django.db import models
+from django.shortcuts import get_object_or_404
+from ab_tool.exceptions import (UNAUTHORIZED_ACCESS,
+    EXPERIMENT_TRACKS_ALREADY_FINALIZED)
 
-class CustomModel(models.Model):
+class TimestampedModel(models.Model):
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
     
@@ -14,18 +17,23 @@ class CustomModel(models.Model):
         self.save()
 
 
-class CourseSettings(CustomModel):
-    """
-    This model stores various settings about each course.  In order to ensure
-    that this model exists whenever it is needed (since courses exist
-    independently of this external tool), existence of this model for a course
-    is checked (and corrected for) whenever it is requested.  Consequently,
-    instances of this model are generated on-demand, and it is recommended that
-    this model is only used through it's class methods.
+class CourseObject(TimestampedModel):
+    course_id = models.CharField(max_length=128, db_index=True)
     
-    WARNING: DO NOT HAVE FOREIGN KEYS TO THIS MODEL.  THERE IS NO GUARANTEE
-        IT WILL EXIST FOR A GIVEN COURSE.
-    """
+    class Meta:
+        abstract = True
+    
+    @classmethod
+    def get_or_404_check_course(cls, obj_id, course_id):
+        """ Gets the object, raising a 404 if it does not exist and a 403
+            if it doesn't match the passed course_id) """
+        obj = get_object_or_404(cls, pk=obj_id)
+        if obj.course_id != course_id:
+            raise UNAUTHORIZED_ACCESS
+        return obj
+
+
+class Experiment(CourseObject):
     UNIFORM_RANDOM = 1
     WEIGHTED_PROBABILITY_RANDOM = 2
     CSV_UPLOAD = 3
@@ -36,57 +44,44 @@ class CourseSettings(CustomModel):
         (WEIGHTED_PROBABILITY_RANDOM, "weighted_probability_random"),
         (CSV_UPLOAD, "csv_upload"),
         (REVERSE_API, "reverse_api"),
-     )
+    )
     
-    course_id = models.CharField(max_length=128, db_index=True, unique=True)
+    name = models.CharField(max_length=256)
     tracks_finalized = models.BooleanField(default=False)
-    assignment_method = models.IntegerField(max_length=1, choices=ASSIGNMENT_ENUM_TYPES,
-                                                default=1)
+    assignment_method = models.IntegerField(max_length=1, default=1,
+                                            choices=ASSIGNMENT_ENUM_TYPES,)
     
-    @classmethod
-    def get_is_finalized(cls, course_id):
-        course_settings, _ = cls.objects.get_or_create(course_id=course_id)
-        return course_settings.tracks_finalized
-    
-    @classmethod
-    def set_finalized(cls, course_id):
-        course_settings, _ = cls.objects.get_or_create(
-                course_id=course_id, defaults={"tracks_finalized": True})
-        if not course_settings.tracks_finalized:
-            course_settings.tracks_finalized = True
-            course_settings.save()
+    def assert_not_finalized(self):
+        if self.tracks_finalized:
+            raise EXPERIMENT_TRACKS_ALREADY_FINALIZED
     
     @classmethod
     def get_placeholder_course_experiment(cls, course_id):
-        """ Temporary as part of staged refactor.  TODO: remove """
-        course_settings, _ = cls.objects.get_or_create(course_id=course_id)
-        return course_settings
-
-""" Temporary as part of staged refactor.  TODO: remove """
-Experiment = CourseSettings
+        """ Gets or creates a single experiment for the course.  Placeholder
+            method until interface supports multiple experiments.
+            TODO: Remove once multiple experiments are supported """
+        return Experiment.objects.get_or_create(course_id=course_id, name="Experiment 1")[0]
 
 
-class Track(CustomModel):
+class Track(CourseObject):
     name = models.CharField(max_length=256)
     notes = models.CharField(max_length=1024)
-    course_id = models.CharField(max_length=128, db_index=True)
-    experiment = models.ForeignKey(Experiment, null=True) #TODO: temporary; remove
+    experiment = models.ForeignKey(Experiment, related_name="tracks")
 
 
-class TrackProbabilityWeight(CustomModel):
+class TrackProbabilityWeight(CourseObject):
     #Definition: A `weighting` is an integer between 1 and 1000 inclusive
     weighting = models.IntegerField()
     track = models.ForeignKey(Track)
-    course_id = models.CharField(max_length=128, db_index=True)
+    experiment = models.ForeignKey(Experiment, related_name="track_probabilites")
 
 
-class InterventionPoint(CustomModel):
+class InterventionPoint(CourseObject):
     """ This model stores the configuration of an intervention point"""
     name = models.CharField(max_length=256)
     notes = models.CharField(max_length=1024)
-    course_id = models.CharField(max_length=128, db_index=True)
-    tracks = models.ManyToManyField(Track, through='InterventionPointUrl')
-    experiment = models.ForeignKey(Experiment, null=True) #TODO: temporary; remove
+    experiment = models.ForeignKey(Experiment, related_name="intervention_points")
+    tracks = models.ManyToManyField(Track, through="InterventionPointUrl")
     
     def is_missing_urls(self):
         if (Track.objects.filter(course_id=self.course_id).count()
@@ -98,7 +93,7 @@ class InterventionPoint(CustomModel):
         return False
 
 
-class InterventionPointUrl(CustomModel):
+class InterventionPointUrl(TimestampedModel):
     """ This model stores the URL of a single intervention """
     url = models.URLField(max_length=2048)
     track = models.ForeignKey(Track)
@@ -110,19 +105,16 @@ class InterventionPointUrl(CustomModel):
         unique_together = (('track', 'intervention_point'),)
 
 
-class CourseStudent(CustomModel):
-    """ This model stores which track a student is in for a given course.
-        A real-world can be represented by multiple CourseStudent objects,
-        and will have a separate object for each course they are in. """
+class ExperimentStudent(TimestampedModel):
+    """ This model stores which track a student is in for a given experiment
+        within a given course.  A real-world can be represented by multiple
+        ExperimentStudent objects, and will have a separate object for each 
+        experiment they are in. """
     course_id = models.CharField(max_length=128, db_index=True)
     student_id = models.CharField(max_length=128, db_index=True)
     lis_person_sourcedid = models.CharField(max_length=128, db_index=True, null=True)
+    experiment = models.ForeignKey(Experiment)
     track = models.ForeignKey(Track)
-    experiment = models.ForeignKey(Experiment, null=True) #TODO: temporary; remove
     
     class Meta:
-        unique_together = (('course_id', 'student_id'),)
-
-
-""" Temporary as part of staged refactor.  TODO: remove """
-ExperimentStudent = CourseStudent
+        unique_together = (('experiment', 'student_id'),)
