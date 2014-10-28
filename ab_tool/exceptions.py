@@ -16,10 +16,10 @@ MISSING_RETURN_TYPES_PARAM = Renderable400("Invalid ext_content_return_types")
 
 MISSING_RETURN_URL = Renderable400("No ext_content_return_url")
 
-COURSE_TRACKS_ALREADY_FINALIZED = Renderable400("You can't change tracks after their finalizing")
-COURSE_TRACKS_NOT_FINALIZED = Renderable400("Course tracks are not finalized")
-NO_URL_FOR_TRACK = Renderable404("No course content. If you are a student, notify your course instructors regarding this page before returning here.")
-NO_TRACKS_FOR_COURSE = Renderable404("No tracks have been configured for this course. If you are a student, notify your course instructors regarding this page before returning here.")
+EXPERIMENT_TRACKS_ALREADY_FINALIZED = Renderable400("You can't change tracks after their finalized")
+EXPERIMENT_TRACKS_NOT_FINALIZED = Renderable400("Experiment tracks are not finalized")
+NO_URL_FOR_TRACK = Renderable404("No course content. Ask your course instructors to put something here.")
+NO_TRACKS_FOR_EXPERIMENT = Renderable404("No tracks have been configured for this experiment.")
 
 CSV_UPLOAD_NEEDED = Renderable404("New CSV upload needed. If you are a student, notify your course instructors regarding this page before returning here.")
 TRACK_WEIGHTS_NOT_SET = Renderable404("Missing track configuration. If you are a student, notify your course instructors regarding this page before returning here.")

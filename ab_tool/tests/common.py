@@ -5,7 +5,7 @@ from json import dumps
 from mock import patch, MagicMock
 
 from ab_tool.constants import ADMINS
-from ab_tool.models import CourseSettings, Track, InterventionPoint
+from ab_tool.models import Experiment, Track, InterventionPoint
 from error_middleware.exceptions import DEFAULT_ERROR_STATUS, RenderableError
 from error_middleware.middleware import ERROR_TEMPLATE
 
@@ -119,10 +119,14 @@ class SessionTestCase(TestCase):
                             "non-deterministic")
     
     def create_test_track(self, course_id=TEST_COURSE_ID, name="testtrack"):
-        return Track.objects.create(name=name, course_id=course_id)
+        experiment = Experiment.get_placeholder_course_experiment(course_id)
+        return Track.objects.create(name=name, course_id=course_id,
+                                    experiment=experiment)
     
     def create_test_intervention_point(self, course_id=TEST_COURSE_ID, name="testip"):
-        return InterventionPoint.objects.create(name=name, course_id=course_id)
+        experiment = Experiment.get_placeholder_course_experiment(course_id)
+        return InterventionPoint.objects.create(name=name, course_id=course_id,
+                                                experiment=experiment)
 
 
 class APIReturn(object):

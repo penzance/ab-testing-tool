@@ -15,7 +15,7 @@ from ab_tool.controllers import (get_uninstalled_intervention_points,
 from ab_tool.models import (InterventionPoint, Track, CourseStudent,
     CourseSettings)
 from ab_tool.constants import ADMINS
-from ab_tool.exceptions import COURSE_TRACKS_ALREADY_FINALIZED
+from ab_tool.exceptions import EXPERIMENT_TRACKS_ALREADY_FINALIZED
 
 
 def not_authorized(request):
@@ -100,7 +100,7 @@ def download_data(request):
 def submit_assignment_method(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     if CourseSettings.get_is_finalized(course_id):
-        raise COURSE_TRACKS_ALREADY_FINALIZED
+        raise EXPERIMENT_TRACKS_ALREADY_FINALIZED
     assignment_method = request.POST.get('assignment_method')
     course_settings = get_object_or_404(CourseSettings, course_id=course_id)
     course_settings.update(assignment_method=assignment_method)

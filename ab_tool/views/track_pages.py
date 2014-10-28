@@ -7,7 +7,7 @@ from ab_tool.models import (Track, CourseSettings, InterventionPoint,
     TrackProbabilityWeight)
 from ab_tool.canvas import get_lti_param
 from ab_tool.exceptions import (UNAUTHORIZED_ACCESS,
-    COURSE_TRACKS_ALREADY_FINALIZED, NO_TRACKS_FOR_COURSE)
+    EXPERIMENT_TRACKS_ALREADY_FINALIZED, NO_TRACKS_FOR_EXPERIMENT)
 from django.http.response import HttpResponse
 from ab_tool.controllers import (post_param, get_incomplete_intervention_points,
     get_missing_track_weights, format_weighting)
@@ -17,7 +17,7 @@ from ab_tool.controllers import (post_param, get_incomplete_intervention_points,
 def create_track(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     if CourseSettings.get_is_finalized(course_id):
-        raise COURSE_TRACKS_ALREADY_FINALIZED
+        raise EXPERIMENT_TRACKS_ALREADY_FINALIZED
     return render_to_response("ab_tool/edit_track.html")
 
 
@@ -37,7 +37,7 @@ def edit_track(request, track_id):
 def submit_create_track(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     if CourseSettings.get_is_finalized(course_id):
-        raise COURSE_TRACKS_ALREADY_FINALIZED
+        raise EXPERIMENT_TRACKS_ALREADY_FINALIZED
     name = post_param(request, "name")
     notes = post_param(request, "notes")
     Track.objects.create(name=name, notes=notes, course_id=course_id)
@@ -65,7 +65,7 @@ def delete_track(request, track_id):
     track = get_object_or_404(Track, pk=track_id)
     course_id = get_lti_param(request, "custom_canvas_course_id")
     if CourseSettings.get_is_finalized(course_id):
-        raise COURSE_TRACKS_ALREADY_FINALIZED
+        raise EXPERIMENT_TRACKS_ALREADY_FINALIZED
     if course_id != track.course_id:
         raise UNAUTHORIZED_ACCESS
     track.delete()
@@ -77,7 +77,7 @@ def finalize_tracks(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     tracks = Track.objects.filter(course_id=course_id)
     if tracks.count() == 0:
-        raise NO_TRACKS_FOR_COURSE
+        raise NO_TRACKS_FOR_EXPERIMENT
     intervention_points = InterventionPoint.objects.filter(course_id=course_id)
     incomplete_intervention_points = get_incomplete_intervention_points(intervention_points)
     if incomplete_intervention_points:

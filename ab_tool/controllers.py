@@ -9,7 +9,7 @@ from ab_tool.canvas import (get_canvas_request_context, list_module_items, list_
 from ab_tool.exceptions import (BAD_STAGE_ID, missing_param_error,
     INPUT_NOT_ALLOWED)
 
-from ab_tool.exceptions import (NO_TRACKS_FOR_COURSE, TRACK_WEIGHTS_NOT_SET,
+from ab_tool.exceptions import (NO_TRACKS_FOR_EXPERIMENT, TRACK_WEIGHTS_NOT_SET,
     CSV_UPLOAD_NEEDED)
 
 
@@ -23,7 +23,7 @@ def assign_track_and_create_student(course_id, student_id, lis_person_sourcedid)
         raise CSV_UPLOAD_NEEDED
     tracks = Track.objects.filter(course_id=course_id)
     if not tracks:
-        raise NO_TRACKS_FOR_COURSE
+        raise NO_TRACKS_FOR_EXPERIMENT
     if course_settings.assignment_method == CourseSettings.UNIFORM_RANDOM:
         # If uniform, pick randomly from the set of tracks
         chosen_track = choice(tracks)

@@ -4,7 +4,8 @@ from mock import patch
 from ab_tool.controllers import intervention_point_url
 from ab_tool.tests.common import (SessionTestCase, LIST_MODULES,
     LIST_ITEMS, APIReturn, TEST_COURSE_ID, TEST_OTHER_COURSE_ID)
-from ab_tool.models import (CourseStudent, CourseSettings)
+from ab_tool.models import InterventionPoint, Track, ExperimentStudent,\
+    Experiment
 from ab_tool.views.main_pages import tool_config
 
 
@@ -119,28 +120,30 @@ class TestMainPages(SessionTestCase):
     def test_download_data(self):
         """ Tests that download data returns a csv with a row for each student """
         track = self.create_test_track()
-        CourseStudent.objects.create(course_id=TEST_COURSE_ID, student_id=1,
-                                         track=track)
-        CourseStudent.objects.create(course_id=TEST_COURSE_ID, student_id=2,
-                                         track=track)
+        experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
+        ExperimentStudent.objects.create(course_id=TEST_COURSE_ID, student_id=1,
+                                         track=track, experiment=experiment)
+        ExperimentStudent.objects.create(course_id=TEST_COURSE_ID, student_id=2,
+                                         track=track, experiment=experiment)
         response = self.client.get(reverse("ab:download_data"))
         self.assertEqual(response._headers["content-type"],
                          ('Content-Type', 'text/csv'))
-        num_students = CourseStudent.objects.filter(course_id=TEST_COURSE_ID).count()
+        num_students = ExperimentStudent.objects.filter(course_id=TEST_COURSE_ID).count()
         # Add 2 to length for header and trailing newline
         self.assertEqual(len(response.content.split("\n")), num_students + 2)
     
     def test_download_data_course_specific(self):
         """ Tests that download data only uses student in the correct course """
         track = self.create_test_track()
-        CourseStudent.objects.create(course_id=TEST_COURSE_ID, student_id=1,
-                                         track=track)
-        CourseStudent.objects.create(course_id=TEST_OTHER_COURSE_ID, student_id=2,
-                                         track=track)
+        experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
+        ExperimentStudent.objects.create(course_id=TEST_COURSE_ID, student_id=1,
+                                         track=track, experiment=experiment)
+        ExperimentStudent.objects.create(course_id=TEST_OTHER_COURSE_ID, student_id=2,
+                                         track=track, experiment=experiment)
         response = self.client.get(reverse("ab:download_data"))
         self.assertEqual(response._headers["content-type"],
                          ('Content-Type', 'text/csv'))
-        num_students = CourseStudent.objects.filter(course_id=TEST_COURSE_ID).count()
+        num_students = ExperimentStudent.objects.filter(course_id=TEST_COURSE_ID).count()
         # Add 2 to length for header and trailing newline
         self.assertEqual(len(response.content.split("\n")), num_students + 2)
     
@@ -148,7 +151,7 @@ class TestMainPages(SessionTestCase):
         response = self.client.get(reverse("ab:download_data"))
         self.assertEqual(response._headers["content-type"],
                          ('Content-Type', 'text/csv'))
-        num_students = CourseStudent.objects.filter(course_id=TEST_COURSE_ID).count()
+        num_students = ExperimentStudent.objects.filter(course_id=TEST_COURSE_ID).count()
         self.assertEqual(num_students, 0)
         # Length is 2 for header and trailing newline
         self.assertEqual(len(response.content.split("\n")), 2)

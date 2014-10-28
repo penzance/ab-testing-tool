@@ -19,7 +19,7 @@ class TestControllers(SessionTestCase):
     def test_get_uninstalled_intervention_points_with_item(self, _mock1):
         """ Tests method get_uninstalled_intervention_points returns one when database has
             one item and api returns nothing """
-        self.create_test_intervention_point()
+        InterventionPoint.objects.create(name="intervention_point1", course_id=TEST_COURSE_ID)
         intervention_points = get_uninstalled_intervention_points(self.request)
         self.assertEqual(len(intervention_points), 1)
     
@@ -27,8 +27,8 @@ class TestControllers(SessionTestCase):
     def test_get_uninstalled_intervention_points_against_courses(self, _mock1):
         """ Tests method get_uninstalled_intervention_points returns one when database has
             two items but only one matches the course and api returns nothing """
-        intervention_point = self.create_test_intervention_point(name="ip1")
-        self.create_test_intervention_point(name="ip2", course_id=TEST_OTHER_COURSE_ID)
+        intervention_point = InterventionPoint.objects.create(name="intervention_point1", course_id=TEST_COURSE_ID)
+        InterventionPoint.objects.create(name="intervention_point2", course_id=TEST_OTHER_COURSE_ID)
         intervention_points = get_uninstalled_intervention_points(self.request)
         self.assertEqual(len(intervention_points), 1)
         self.assertSameIds([intervention_point], intervention_points)
@@ -37,7 +37,7 @@ class TestControllers(SessionTestCase):
     def test_get_uninstalled_intervention_points_with_all_installed(self, _mock1):
         """ Tests method get_uninstalled_intervention_points returns zero when intervention_point in
             database is also returned by the API, which means it is installed """
-        intervention_point = self.create_test_intervention_point()
+        intervention_point = InterventionPoint.objects.create(name="intervention_point1", course_id=TEST_COURSE_ID)
         mock_item = {"type": "ExternalTool",
                      "external_url": intervention_point_url(self.request, intervention_point.id)}
         with patch(LIST_ITEMS, return_value=APIReturn([mock_item])):
@@ -49,8 +49,8 @@ class TestControllers(SessionTestCase):
         """ Tests method get_uninstalled_intervention_points returns one when there are two
             intervention_points in the database, one of which is also returned by the API,
             which means it is installed """
-        intervention_point = self.create_test_intervention_point(name="ip1")
-        self.create_test_intervention_point(name="ip2")
+        intervention_point = InterventionPoint.objects.create(name="intervention_point1", course_id=TEST_COURSE_ID)
+        InterventionPoint.objects.create(name="intervention_point2", course_id=TEST_COURSE_ID)
         mock_item = {"type": "ExternalTool",
                      "external_url": intervention_point_url(self.request, intervention_point.id)}
         with patch(LIST_ITEMS, return_value=APIReturn([mock_item])):
@@ -65,7 +65,7 @@ class TestControllers(SessionTestCase):
     def test_all_intervention_point_urls_one_element(self):
         """ Tests that all_intervention_point_urls returns the url for one intervention_point when
             that is in the database """
-        intervention_point = self.create_test_intervention_point()
+        intervention_point = InterventionPoint.objects.create(name="intervention_point1", course_id=TEST_COURSE_ID)
         urls = all_intervention_point_urls(self.request, TEST_COURSE_ID)
         self.assertEqual(len(urls), 1)
         self.assertEqual([intervention_point_url(self.request, intervention_point.id)], urls)
@@ -73,8 +73,8 @@ class TestControllers(SessionTestCase):
     def test_all_intervention_point_urls_multiple_courses(self):
         """ Tests that all_intervention_point_urls only returns the url for the intervention_point
             in the database that matches the course_id """
-        intervention_point = self.create_test_intervention_point(name="ip1")
-        self.create_test_intervention_point(name="ip2", course_id=TEST_OTHER_COURSE_ID)
+        intervention_point = InterventionPoint.objects.create(name="intervention_point1", course_id=TEST_COURSE_ID)
+        InterventionPoint.objects.create(name="intervention_point2", course_id=TEST_OTHER_COURSE_ID)
         urls = all_intervention_point_urls(self.request, TEST_COURSE_ID)
         self.assertEqual(len(urls), 1)
         self.assertEqual([intervention_point_url(self.request, intervention_point.id)], urls)

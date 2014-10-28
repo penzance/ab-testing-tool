@@ -10,7 +10,7 @@ from ab_tool.canvas import get_lti_param
 from ab_tool.controllers import (intervention_point_is_installed, format_url,
     post_param, assign_track_and_create_student)
 from ab_tool.exceptions import (UNAUTHORIZED_ACCESS,
-    DELETING_INSTALLED_STAGE, COURSE_TRACKS_NOT_FINALIZED,
+    DELETING_INSTALLED_STAGE, EXPERIMENT_TRACKS_NOT_FINALIZED,
     NO_URL_FOR_TRACK)
 
 
@@ -33,7 +33,7 @@ def deploy_intervention_point(request, intervention_point_id):
     # Otherwise, user is a student.  Tracks for the course must be finalized
     # for a student to be able to access content from the ab_testing_tool
     if not CourseSettings.get_is_finalized(course_id):
-        raise COURSE_TRACKS_NOT_FINALIZED
+        raise EXPERIMENT_TRACKS_NOT_FINALIZED
     
     student_id = get_lti_param(request, "custom_canvas_user_login_id")
     
