@@ -29,9 +29,10 @@
              <div class="span8">
                 <p>Helpful tip: You must start the experiment before students can join one of its track. A "track" is a series of interventions that a cohort of students is assigned.</p>
                 <br>
+                {% include "ab_tool/create_experiment.html" %}
                 {% if not is_finalized %}
 
-                <a id="create_experiment_button" class="btn btn-lg btn-success"  href="{% url 'ab:create_experiment' %}">Create New Experiment</a>
+                <a id="create_experiment_button" class="btn btn-lg btn-success"  href="{% url 'ab:create_experiment' %}" >Create New Experiment</a>
                 <a id="finalize_button" class="btn btn-lg btn-danger" {% if incomplete_intervention_points %} href="#incomplete_intervention_points_modal" {% elif missing_track_weights %} href="#missing_track_weights_modal" {% else %} href="#finalize_modal" {% endif %} data-toggle="modal" > Finalize Tracks</a>
 
                 {% if incomplete_intervention_points %}

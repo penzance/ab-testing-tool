@@ -13,7 +13,7 @@ from ab_tool.controllers import (post_param, get_missing_track_weights,
 
 @lti_role_required(ADMINS)
 def create_experiment(request):
-    return render_to_response("ab_tool/create_experiment.html")
+    return render_to_response("ab_tool/edit_experiment.html")
 
 
 @lti_role_required(ADMINS)
