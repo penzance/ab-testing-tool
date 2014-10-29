@@ -13,7 +13,8 @@ from ab_tool.controllers import (get_uninstalled_intervention_points,
     get_missing_track_weights, post_param)
 from ab_tool.models import (InterventionPoint, Track, Experiment)
 from ab_tool.constants import ADMINS
-from ab_tool.analytics import get_student_list_csv
+from ab_tool.analytics import get_student_list_csv,\
+    get_intervention_point_deployment_csv
 
 
 def not_authorized(request):
@@ -76,11 +77,19 @@ def tool_config(request):
 
 
 @lti_role_required(ADMINS)
-def download_data(request):
+def download_track_assignments(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     course_title = get_lti_param(request, "context_title")
     file_title = "%s_students.csv" % slugify(course_title)
     return get_student_list_csv(course_id, file_title)
+
+
+@lti_role_required(ADMINS)
+def download_intervention_point_deployments(request):
+    course_id = get_lti_param(request, "custom_canvas_course_id")
+    course_title = get_lti_param(request, "context_title")
+    file_title = "%s_intervention_point_deployments.csv" % slugify(course_title)
+    return get_intervention_point_deployment_csv(course_id, file_title)
 
 
 @lti_role_required(ADMINS)
