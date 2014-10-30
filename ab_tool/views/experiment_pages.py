@@ -59,6 +59,8 @@ def edit_experiment(request, experiment_id):
 @lti_role_required(ADMINS)
 def submit_edit_experiment(request, experiment_id):
     course_id = get_lti_param(request, "custom_canvas_course_id")
+    experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
+    experiment.assert_not_finalized()
     name = post_param(request, "name")
     notes = post_param(request, "notes")
     assignment_method = int(post_param(request, "assignment_method"))
@@ -67,7 +69,6 @@ def submit_edit_experiment(request, experiment_id):
     if assignment_method == Experiment.WEIGHTED_PROBABILITY_RANDOM:
         track_weights = request.POST.getlist(request, "track_weights[]")
         num_tracks = len(track_weights)
-    experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
     experiment.update(name=name, course_id=course_id,
                       assignment_method=assignment_method, notes=notes)
     experiment.set_number_of_tracks(num_tracks)
@@ -82,30 +83,6 @@ def delete_experiment(request, experiment_id):
     experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
     experiment.assert_not_finalized()
     experiment.delete()
-    return redirect(reverse("ab:index"))
-
-
-@lti_role_required(ADMINS)
-def submit_edit_track(request, track_id):
-    course_id = get_lti_param(request, "custom_canvas_course_id")
-    track = Track.get_or_404_check_course(track_id, course_id)
-    name = post_param(request, "name")
-    notes = post_param(request, "notes")
-    track.update(name=name, notes=notes)
-    return redirect(reverse("ab:index"))
-
-
-@lti_role_required(ADMINS)
-def delete_track(request, track_id):
-    #TODO: delete
-    """
-    NOTE: When a track gets deleted, urls for that track get deleted from all
-          intervention_points in that course as a result of cascading delete.
-    """
-    course_id = get_lti_param(request, "custom_canvas_course_id")
-    track = Track.get_or_404_check_course(track_id, course_id)
-    track.experiment.assert_not_finalized()
-    track.delete()
     return redirect(reverse("ab:index"))
 
 
@@ -126,25 +103,3 @@ def finalize_tracks(request, experiment_id):
     experiment.tracks_finalized = True
     experiment.save()
     return redirect(reverse("ab:index"))
-
-
-@lti_role_required(ADMINS)
-def submit_track_weights(request, experiment_id):
-    #TODO: delete
-    WEIGHT_TAG = "weight_for_track_"
-    course_id = get_lti_param(request, "custom_canvas_course_id")
-    experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
-    experiment.assert_not_finalized()
-    weightings = [(k,v) for (k,v) in request.POST.iteritems() if WEIGHT_TAG in k and v]
-    for (k,v) in weightings:
-        _, track_id = k.split(WEIGHT_TAG)
-        try:
-            weighting_obj = TrackProbabilityWeight.objects.get(
-                    track__pk=track_id, experiment=experiment)
-            weighting_obj.update(weighting=format_weighting(v))
-        except TrackProbabilityWeight.DoesNotExist:
-            TrackProbabilityWeight.objects.create(
-                track_id=track_id, course_id=course_id, experiment=experiment,
-                weighting=format_weighting(v)
-            )
-    return redirect(reverse("ab:index") + "#tabs-5")

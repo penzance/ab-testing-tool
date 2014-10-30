@@ -9,7 +9,7 @@ from ab_tool.views.intervention_point_pages import (create_intervention_point,
     submit_create_intervention_point, edit_intervention_point,
     delete_intervention_point, deploy_intervention_point,
     submit_edit_intervention_point, modules_page_edit_intervention_point)
-from ab_tool.views.track_pages import (create_experiment, submit_create_experiment,
+from ab_tool.views.experiment_pages import (create_experiment, submit_create_experiment,
     edit_experiment, submit_edit_experiment, delete_experiment, finalize_tracks)
 
 urlpatterns = patterns('',
