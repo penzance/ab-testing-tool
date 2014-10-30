@@ -113,7 +113,7 @@
                                 </a>
                             </h4>
                             <div class="col-lg-8 col-md-8 col-sm-8" >
-                                <a id="finalize_button" class="btn btn btn-danger" {% if incomplete_intervention_points %} href="#incomplete_intervention_points_modal" {% elif missing_track_weights %} href="#missing_track_weights_modal" {% else %} href="#finalize_modal" {% endif %} data-toggle="modal" > Start Experiment</a>
+                                <a id="finalize_button" class="btn btn btn-danger" {% if incomplete_intervention_points %} href="#incomplete_intervention_points_modal" {% elif missing_track_weights %} href="#missing_track_weights_modal" {% else %} href="{% url 'ab:finalize_tracks' experiment.id %}" {% endif %} data-toggle="modal" > Start Experiment</a>
                                 <a id="add_intervention_point_button" class="btn btn btn-success" href="{% url 'ab:create_intervention_point' %}"> Add Intervention Point</a>
                                 <a id="download_data_button" href="{% url 'ab:download_data' %}" class="btn btn btn-primary"> Download Data</a>
                             </div>
