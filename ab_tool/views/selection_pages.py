@@ -22,9 +22,11 @@ def resource_selection(request):
     content_return_url = request.POST.get('ext_content_return_url')
     if not content_return_url:
         raise MISSING_RETURN_URL
+    all_experiments = Experiment.objects.filter(course_id=course_id)
     context = {"content_return_url": content_return_url,
                "intervention_points": get_uninstalled_intervention_points(request),
                "tracks": Track.objects.filter(course_id=course_id),
+               "experiments": all_experiments,
                }
     return render_to_response("ab_tool/add_module_item.html", context)
 
@@ -38,12 +40,10 @@ def submit_selection(request):
     page_url = intervention_point_url(request, intervention_point_id)
     page_name = intervention_point.name
     content_return_url = post_param(request, "content_return_url")
-    all_experiments = Experiment.objects.filter(course_id=course_id)
     params = {"return_type": "lti_launch_url",
                "url": page_url,
                #"title": "Title",
-               "text": page_name,
-               "experiments": all_experiments}
+               "text": page_name}
     return redirect("%s?%s" % (content_return_url, urlencode(params)))
 
 

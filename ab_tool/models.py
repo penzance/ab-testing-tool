@@ -87,11 +87,11 @@ class Experiment(CourseObject):
             try:
                 weighting_obj = TrackProbabilityWeight.objects.get(
                         track=track, course_id=self.course_id, experiment=self)
-                weighting_obj.update(weighting=weights_list[i])
+                weighting_obj.update(weighting=weights_list[i-1])
             except TrackProbabilityWeight.DoesNotExist:
                 TrackProbabilityWeight.objects.create(
                     track=track, course_id=self.course_id, experiment=self,
-                    weighting=weights_list[i])
+                    weighting=weights_list[i-1])
 
 
 class Track(CourseObject):
