@@ -78,11 +78,12 @@ class Experiment(CourseObject):
             for i in range(num + 1, current_num + 1):
                 Track.objects.filter(track_number=i, experiment=self).delete()
                 #self.tracks[i].delete()
-            
+    
     def set_track_weights(self, weights_list):
         if len(weights_list) != self.tracks.count():
             raise TRACK_WEIGHTS_ERROR
-        for i, track in enumerate(self.tracks.all()):
+        for i in range(1, len(weights_list) + 1):
+            track = Track.objects.get(experiment=self, track_number=i)
             try:
                 weighting_obj = TrackProbabilityWeight.objects.get(
                         track=track, course_id=self.course_id, experiment=self)

@@ -19,6 +19,8 @@ def create_experiment(request):
 
 @lti_role_required(ADMINS)
 def submit_create_experiment(request):
+    print "ZAGS", request.POST
+    print "KEV", request.POST.getlist(request, "track_weights[]")
     course_id = get_lti_param(request, "custom_canvas_course_id")
     name = post_param(request, "name")
     notes = post_param(request, "notes")
@@ -26,7 +28,7 @@ def submit_create_experiment(request):
     if assignment_method == Experiment.UNIFORM_RANDOM:
         num_tracks = int(post_param(request, "uniform_tracks"))
     if assignment_method == Experiment.WEIGHTED_PROBABILITY_RANDOM:
-        track_weights = request.POST.getlist(request, "track_weights[]")
+        track_weights = request.POST.getlist("track_weights[]")
         num_tracks = len(track_weights)
     experiment = Experiment.objects.create(name=name, course_id=course_id,
                                            assignment_method=assignment_method,
@@ -67,7 +69,7 @@ def submit_edit_experiment(request, experiment_id):
     if assignment_method == Experiment.UNIFORM_RANDOM:
         num_tracks = int(post_param(request, "uniform_tracks"))
     if assignment_method == Experiment.WEIGHTED_PROBABILITY_RANDOM:
-        track_weights = request.POST.getlist(request, "track_weights[]")
+        track_weights = request.POST.getlist("track_weights[]")
         num_tracks = len(track_weights)
     experiment.update(name=name, course_id=course_id,
                       assignment_method=assignment_method, notes=notes)
