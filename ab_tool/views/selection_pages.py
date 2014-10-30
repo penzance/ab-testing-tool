@@ -38,10 +38,12 @@ def submit_selection(request):
     page_url = intervention_point_url(request, intervention_point_id)
     page_name = intervention_point.name
     content_return_url = post_param(request, "content_return_url")
+    all_experiments = Experiment.objects.filter(course_id=course_id)
     params = {"return_type": "lti_launch_url",
                "url": page_url,
                #"title": "Title",
-               "text": page_name}
+               "text": page_name,
+               "experiments": all_experiments}
     return redirect("%s?%s" % (content_return_url, urlencode(params)))
 
 
@@ -50,7 +52,8 @@ def submit_selection_new_intervention_point(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     name = post_param(request, "name")
     notes = post_param(request, "notes")
-    experiment = Experiment.get_placeholder_course_experiment(course_id)
+    experiment_id = post_param(request, "experiment")
+    experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
     intervention_point = InterventionPoint.objects.create(
             name=name, notes=notes, course_id=course_id, experiment=experiment)
     intervention_pointurls = [(k,v) for (k,v) in request.POST.iteritems() if STAGE_URL_TAG in k and v]

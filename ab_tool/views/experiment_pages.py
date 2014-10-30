@@ -99,7 +99,7 @@ def finalize_tracks(request, experiment_id):
     if incomplete_intervention_points:
         return HttpResponse("URLs missing for these tracks in these Intervention Points: %s"
                             % incomplete_intervention_points)
-    missing_track_weights = get_missing_track_weights(experiment.tracks.all(), course_id)
+    missing_track_weights = get_missing_track_weights(experiment, course_id)
     if missing_track_weights:
         return HttpResponse("Track weightings missing for these tracks: %s" % missing_track_weights)
     experiment.tracks_finalized = True

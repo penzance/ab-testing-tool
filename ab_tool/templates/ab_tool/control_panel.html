@@ -51,7 +51,11 @@
                                 </a>
                             </h4>
                             <div class="col-lg-8 col-md-8 col-sm-8" >
+                                {% if not experiment.tracks_finalized %}
                                 <a id="finalize_button" class="btn btn btn-danger" href="{% url 'ab:finalize_tracks' experiment.id %}"> Start Experiment</a>
+                                {% else %}
+                                <a id="finalize_button" class="btn btn btn-danger disabled"> Start Experiment</a>
+                                {% endif %}
                                 <a id="add_intervention_point_button" class="btn btn btn-success" href="{% url 'ab:create_intervention_point' experiment.id %}"> Add Intervention Point</a>
                                 <a id="download_students_button" href="{% url 'ab:download_data' experiment.id %}" class="btn btn btn-info"> Download Students</a>
                             </div>
@@ -64,7 +68,7 @@
                             <div class="list-group">
                                 {% for t in intervention_points %}
                                     {% if experiment.id == t.experiment.id %}
-                                        <a href="{% url 'ab:edit_intervention_point' t.id %}" class="list-group-item"><strong>Intervention Point</strong> "{{t.name}}" <i>{{t.is_missing_urls|yesno:"- URLs missing,complete"}}</i> | <i> in experiment "{{t.experiment.name}}"</i></a>
+                                        <a href="{% url 'ab:edit_intervention_point' t.id %}" class="list-group-item"><strong>Intervention Point</strong> "{{t.name}}" <i>{{t.is_missing_urls|yesno:"- URLs missing,complete"}}</i></a>
                                     {% endif %}
                                 {% endfor %}
                             </div>
