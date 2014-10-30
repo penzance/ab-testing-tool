@@ -50,7 +50,7 @@
                             </h4>
                             <div class="col-lg-8 col-md-8 col-sm-8" >
                                 <a id="finalize_button" class="btn btn btn-danger" {% if incomplete_intervention_points %} href="#incomplete_intervention_points_modal" {% elif missing_track_weights %} href="#missing_track_weights_modal" {% else %} href="{% url 'ab:finalize_tracks' experiment.id %}" {% endif %} data-toggle="modal" > Start Experiment</a>
-                                <a id="add_intervention_point_button" class="btn btn btn-success" href="{% url 'ab:create_intervention_point' %}"> Add Intervention Point</a>
+                                <a id="add_intervention_point_button" class="btn btn btn-success" href="{% url 'ab:create_intervention_point' experiment.id %}"> Add Intervention Point</a>
                                 <a id="download_data_button" href="{% url 'ab:download_data' %}" class="btn btn btn-primary"> Download Data</a>
                             </div>
                         </div>
@@ -66,15 +66,12 @@
         <!-- Tab for Intervention Points-->
         <div id="tabs-2">
             <div class="span8">
-                <p> Create and edit your Intervention Points here.</p>
+                <p> Edit your Intervention Points here.</p>
                 <p>Helpful tip: an "Intervention Point" is a specific place in the course where you want to A/B test across your student track groups using a intervention URL for each track group.</p>
                 <br>
-                <a id="create_new_intervention_point_button" class="btn btn-lg btn-success" style="align:left" href="{% url 'ab:create_intervention_point' %}"> Create New Intervention Point</a>
-                <br><br>
-        
                 <div class="list-group span4">
                     {% for t in intervention_points %}
-                    <a href="{% url 'ab:edit_intervention_point' t.id %}" class="list-group-item"><strong>{{t.name}}</strong> <i>{{t.is_missing_urls|yesno:"- URLs missing,complete"}}</i></a>
+                    <a href="{% url 'ab:edit_intervention_point' t.id %}" class="list-group-item"><strong>{{t.name}}</strong> <i>{{t.is_missing_urls|yesno:"- URLs missing,complete"}}</i> | <i> in experiment "{{t.experiment}}"</i></a>
                     {% endfor %}
                 </div>
             </div>
