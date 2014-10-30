@@ -22,18 +22,14 @@
     <li><a href="#tabs-1">Experiments</a></li>
     <li><a href="#tabs-2">Intervention Points</a></li>
     <li><a href="#tabs-3">Course Modules</a></li>
-    <li><a href="#tabs-4">Data</a></li>
     </ul>
         <!-- Tab for Tracks-->
         <div id="tabs-1">
              <div class="span8">
                 <p>Helpful tip: You must start the experiment before students can join one of its track. A "track" is a series of interventions that a cohort of students is assigned.</p>
                 <br>
-                {% include "ab_tool/create_experiment.html" %}
                 {% if not is_finalized %}
-
                 <a id="create_experiment_button" class="btn btn-lg btn-success"  href="{% url 'ab:create_experiment' %}" >Create New Experiment</a>
-                <a id="finalize_button" class="btn btn-lg btn-danger" {% if incomplete_intervention_points %} href="#incomplete_intervention_points_modal" {% elif missing_track_weights %} href="#missing_track_weights_modal" {% else %} href="#finalize_modal" {% endif %} data-toggle="modal" > Finalize Tracks</a>
 
                 {% if incomplete_intervention_points %}
                 <!-- START Modal code for incomplete_intervention_points confirmation box-->
@@ -108,16 +104,25 @@
                 {% endif %}
                 
                 <br>
-                <div class="list-group span4">
+                <div class="row">
+                    <div class="list-group">
                     {% for experiment in experiments %}
-                        <h4><a href="{% url 'ab:view_experiment' experiment.id %}" class="list-group-item clearfix" id="experiment_{{experiment.id}}">
-                                <span><strong>{{experiment.name}} </strong> has {{experiment.tracks.count}} tracks</span>
-                            </a>
-                        </h4>
+                        <div class="col-lg-12 col-md-12 col-sm-12">
+                            <h4><a href="{% url 'ab:edit_experiment' experiment.id %}" class="list-group-item  col-lg-4 col-md-4 col-sm-4 clearfix" id="experiment_{{experiment.id}}">
+                                    <span><strong>{{experiment.name}} </strong> has {{experiment.tracks.count}} tracks</span>
+                                </a>
+                            </h4>
+                            <div class="col-lg-8 col-md-8 col-sm-8" >
+                                <a id="finalize_button" class="btn btn btn-danger" {% if incomplete_intervention_points %} href="#incomplete_intervention_points_modal" {% elif missing_track_weights %} href="#missing_track_weights_modal" {% else %} href="#finalize_modal" {% endif %} data-toggle="modal" > Start Experiment</a>
+                                <a id="add_intervention_point_button" class="btn btn btn-success" href="{% url 'ab:create_intervention_point' %}"> Add Intervention Point</a>
+                                <a id="download_data_button" href="{% url 'ab:download_data' %}" class="btn btn btn-primary"> Download Data</a>
+                            </div>
+                        </div>
                     {% empty %}
                         <br>
                         <p>No Experiments.  Create a new one to get started.</p>
                     {% endfor %}
+                    </div>
                 </div>
             </div>
         </div>
@@ -164,15 +169,6 @@
                         <p>No modules found.</p>
                     {% endfor %}
                 </div>
-            </div>
-        </div>
-        
-        <!-- Tab for Data-->
-        <div id="tabs-4">
-            <div class="span8">
-                <p> Download a CSV file of your A/B testing data here. </p>
-                <br>
-                <a id="download_data_button" href="{% url 'ab:download_data' %}" class="btn btn-lg btn-primary"> Download Data</a>
             </div>
         </div>
     

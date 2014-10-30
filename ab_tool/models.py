@@ -1,7 +1,7 @@
 from django.db import models
 from django.shortcuts import get_object_or_404
 from ab_tool.exceptions import (UNAUTHORIZED_ACCESS,
-    EXPERIMENT_TRACKS_ALREADY_FINALIZED)
+    EXPERIMENT_TRACKS_ALREADY_FINALIZED, TRACK_WEIGHTS_ERROR)
 
 class TimestampedModel(models.Model):
     created_on = models.DateTimeField(auto_now_add=True)
@@ -32,7 +32,6 @@ class CourseObject(TimestampedModel):
             raise UNAUTHORIZED_ACCESS
         return obj
 
-
 class Experiment(CourseObject):
     UNIFORM_RANDOM = 1
     WEIGHTED_PROBABILITY_RANDOM = 2
@@ -47,6 +46,7 @@ class Experiment(CourseObject):
     )
     
     name = models.CharField(max_length=256)
+    notes = models.CharField(max_length=1024)
     tracks_finalized = models.BooleanField(default=False)
     assignment_method = models.IntegerField(max_length=1, default=1,
                                             choices=ASSIGNMENT_ENUM_TYPES,)
@@ -62,11 +62,45 @@ class Experiment(CourseObject):
             TODO: Remove once multiple experiments are supported """
         return Experiment.objects.get_or_create(course_id=course_id, name="Experiment 1")[0]
 
+    def set_number_of_tracks(self, num):
+        current_num = self.tracks.count()
+        if current_num == num:
+            return
+        if current_num < num:
+            #add more tracks
+            for i in range(current_num + 1, num + 1):
+                Track.objects.create(name="Track %s" % i,
+                                     course_id=self.course_id,
+                                     track_number=i,
+                                     experiment=self)
+        if current_num > num:
+            #delete tracks
+            for i in range(num + 1, current_num + 1):
+                Track.objects.filter(track_number=i, experiment=self).delete()
+                #self.tracks[i].delete()
+            
+    def set_track_weights(self, weights_list):
+        if len(weights_list) != self.tracks.count():
+            raise TRACK_WEIGHTS_ERROR
+        for i, track in enumerate(self.tracks.all()):
+            try:
+                weighting_obj = TrackProbabilityWeight.objects.get(
+                        track=track, course_id=self.course_id, experiment=self)
+                weighting_obj.update(weighting=weights_list[i])
+            except TrackProbabilityWeight.DoesNotExist:
+                TrackProbabilityWeight.objects.create(
+                    track=track, course_id=self.course_id, experiment=self,
+                    weighting=weights_list[i])
+
 
 class Track(CourseObject):
+    track_number = models.IntegerField()
     name = models.CharField(max_length=256)
     notes = models.CharField(max_length=1024)
     experiment = models.ForeignKey(Experiment, related_name="tracks")
+    
+    class Meta:
+        unique_together = (('experiment', 'track_number'),)
 
 
 class TrackProbabilityWeight(CourseObject):

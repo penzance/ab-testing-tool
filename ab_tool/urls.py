@@ -1,7 +1,7 @@
 from django.conf.urls import patterns, url
 
 from ab_tool.views.main_pages import (render_intervention_point_control_panel, not_authorized,
-     tool_config, download_data, submit_assignment_method)
+     tool_config, download_data)
 
 from ab_tool.views.selection_pages import (resource_selection, submit_selection,
     submit_selection_new_intervention_point)
@@ -10,7 +10,7 @@ from ab_tool.views.intervention_point_pages import (create_intervention_point,
     delete_intervention_point, deploy_intervention_point,
     submit_edit_intervention_point, modules_page_edit_intervention_point)
 from ab_tool.views.track_pages import (create_experiment, submit_create_experiment,
-    track_weights, submit_track_weights, view_experiment, finalize_tracks)
+    edit_experiment, submit_edit_experiment, delete_experiment, finalize_tracks)
 
 urlpatterns = patterns('',
     url(r'^$', render_intervention_point_control_panel, name='index'),
@@ -30,12 +30,10 @@ urlpatterns = patterns('',
     url(r'^delete_intervention_point/(?P<intervention_point_id>\d+)$', delete_intervention_point, name='delete_intervention_point'),
     
     url(r'^finalize_tracks/(?P<experiment_id>\d+)$', finalize_tracks, name='finalize_tracks'),
+
     url(r'^create_experiment$', create_experiment, name='create_experiment'),
     url(r'^submit_create_experiment$', submit_create_experiment, name='submit_create_experiment'),
-    url(r'^view_experiment/(?P<experiment_id>\d+)$', view_experiment, name='view_experiment'),
-    
-    url(r'^submit_assignment_method/(?P<experiment_id>\d+)$', submit_assignment_method, name='submit_assignment_method'),
-    
-    url(r'^track_weights$', track_weights, name='track_weights'),
-    url(r'^submit_track_weights/(?P<experiment_id>\d+)$', submit_track_weights, name='submit_track_weights'),
+    url(r'^edit_experiment/(?P<experiment_id>\d+)$', edit_experiment, name='edit_experiment'),
+    url(r'^submit_edit_experiment/(?P<experiment_id>\d+)$', submit_edit_experiment, name='submit_edit_experiment'),
+    url(r'^delete_experiment/(?P<experiment_id>\d+)$', delete_experiment, name='delete_experiment'),
 )
