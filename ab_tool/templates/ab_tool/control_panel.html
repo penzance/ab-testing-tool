@@ -13,23 +13,25 @@
 <div class="container">
     <div class="jumbotron">
         <h2>A/B Testing Control Panel</h2>
-      <p>Welcome administrator. Manage your A/B experiments here.</p>
+      <p>Welcome administrator. Manage your A/B experiments here. </p>
     </div>
+
 
     <div id="tabs">
     <!-- BEGIN Tabs-->
     <ul>
     <li><a href="#tabs-1">Experiments</a></li>
-    <li><a href="#tabs-2">Intervention Points</a></li>
     <li><a href="#tabs-3">Course Modules</a></li>
     </ul>
+    
         <!-- Tab for Tracks-->
+    
         <div id="tabs-1">
-             <div class="span8">
-                <p>Helpful tip: You must start the experiment before students can join one of its track. A "track" is a series of interventions that a cohort of students is assigned.</p>
-                <br>
                 {% if not is_finalized %}
-                <a id="create_experiment_button" class="btn btn-lg btn-success"  href="{% url 'ab:create_experiment' %}" >Create New Experiment</a>
+                <div class="col-lg-10 col-md-12 col-sm-12">
+                <a id="create_experiment_button" class="btn btn-lg btn-success btn-block "  href="{% url 'ab:create_experiment' %}" >Create New Experiment</a>
+                </div>
+                <br>
                 {% include "ab_tool/modals.html" %}
                 <br>
                 {% else %}
@@ -40,41 +42,41 @@
                 {% endif %}
                 
                 <br>
-                <div class="row">
-                    <div class="list-group">
-                    {% for experiment in experiments %}
+                <div class="list-group">
+                {% for experiment in experiments %}
+                    <div class="row">
                         <div class="col-lg-12 col-md-12 col-sm-12">
                             <h4><a href="{% url 'ab:edit_experiment' experiment.id %}" class="list-group-item  col-lg-4 col-md-4 col-sm-4 clearfix" id="experiment_{{experiment.id}}">
-                                    <span><strong>{{experiment.name}} </strong> has {{experiment.tracks.count}} tracks</span>
+                                    <span><strong>Experiment</strong> "{{experiment.name}}" has {{experiment.tracks.count}} tracks</span>
                                 </a>
                             </h4>
                             <div class="col-lg-8 col-md-8 col-sm-8" >
-                                <a id="finalize_button" class="btn btn btn-danger" {% if incomplete_intervention_points %} href="#incomplete_intervention_points_modal" {% elif missing_track_weights %} href="#missing_track_weights_modal" {% else %} href="{% url 'ab:finalize_tracks' experiment.id %}" {% endif %} data-toggle="modal" > Start Experiment</a>
+                                <a id="finalize_button" class="btn btn btn-danger" href="{% url 'ab:finalize_tracks' experiment.id %}"> Start Experiment</a>
                                 <a id="add_intervention_point_button" class="btn btn btn-success" href="{% url 'ab:create_intervention_point' experiment.id %}"> Add Intervention Point</a>
-                                <a id="download_data_button" href="{% url 'ab:download_data' %}" class="btn btn btn-primary"> Download Data</a>
+                                <a id="download_students_button" href="{% url 'ab:download_data' experiment.id %}" class="btn btn btn-info"> Download Students</a>
                             </div>
                         </div>
-                    {% empty %}
-                        <br>
-                        <p>No Experiments.  Create a new one to get started.</p>
-                    {% endfor %}
                     </div>
+                    <div class="row">
+                        <div class="col-lg-1 col-md-1 col-sm-1">
+                        </div>
+                        <div class="col-lg-8 col-md-8 col-sm-8">
+                            <div class="list-group">
+                                {% for t in intervention_points %}
+                                    {% if experiment.id == t.experiment.id %}
+                                        <a href="{% url 'ab:edit_intervention_point' t.id %}" class="list-group-item"><strong>Intervention Point</strong> "{{t.name}}" <i>{{t.is_missing_urls|yesno:"- URLs missing,complete"}}</i> | <i> in experiment "{{t.experiment.name}}"</i></a>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-3">
+                        </div>
+                    </div>
+                {% empty %}
+                    <br>
+                    <p>No Experiments.  Create a new one to get started.</p>
+                {% endfor %}
                 </div>
-            </div>
-        </div>
-        
-        <!-- Tab for Intervention Points-->
-        <div id="tabs-2">
-            <div class="span8">
-                <p> Edit your Intervention Points here.</p>
-                <p>Helpful tip: an "Intervention Point" is a specific place in the course where you want to A/B test across your student track groups using a intervention URL for each track group.</p>
-                <br>
-                <div class="list-group span4">
-                    {% for t in intervention_points %}
-                    <a href="{% url 'ab:edit_intervention_point' t.id %}" class="list-group-item"><strong>{{t.name}}</strong> <i>{{t.is_missing_urls|yesno:"- URLs missing,complete"}}</i> | <i> in experiment "{{t.experiment}}"</i></a>
-                    {% endfor %}
-                </div>
-            </div>
         </div>
         
         <!-- Tab for Modules-->
@@ -104,8 +106,6 @@
                 </div>
             </div>
         </div>
-    
-    <!-- End Tabs-->
     </div>
 </div>
 

@@ -68,9 +68,11 @@ def tool_config(request):
 
 
 @lti_role_required(ADMINS)
-def download_data(request):
+def download_data(request, experiment_id):
+    #TODO: change this to streaming
     course_id = get_lti_param(request, "custom_canvas_course_id")
     course_title = get_lti_param(request, "context_title")
+    experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = ('attachment; filename=%s_students.csv' %
                                        slugify(course_title))
@@ -80,7 +82,7 @@ def download_data(request):
                "Timestamp Last Updated"]
     writer.writerow(headers)
     # Write data to CSV file
-    for s in ExperimentStudent.objects.filter(course_id=course_id):
+    for s in ExperimentStudent.objects.filter(course_id=course_id, experiment=experiment):
         row = [s.student_id, s.lis_person_sourcedid, s.experiment.name,
                s.track.name, s.updated_on]
         writer.writerow(row)

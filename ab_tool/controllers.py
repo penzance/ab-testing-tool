@@ -147,6 +147,9 @@ def get_modules_with_items(request):
             is_intervention_point = (item["type"] == "ExternalTool" and "external_url" in item
                         and item["external_url"] in intervention_point_urls)
             item["is_intervention_point"] = is_intervention_point
+    print "================================================"
+    print modules
+    print "================================================"
     return modules
 
 

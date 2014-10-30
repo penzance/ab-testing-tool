@@ -32,7 +32,7 @@
             {% endif %}
             <form method="post" class="form-horizontal" name="intervention_point_form"
                 {% if intervention_point.id %} action="{% url 'ab:submit_edit_intervention_point' intervention_point.id %}"
-                {% else %} action="{% url 'ab:submit_create_intervention_point' experiment_id %}" {% endif %}>
+                {% else %} action="{% url 'ab:submit_create_intervention_point' experiment.id %}" {% endif %}>
             {% csrf_token %}
                 <table class="table">
                 <tr align="left">
