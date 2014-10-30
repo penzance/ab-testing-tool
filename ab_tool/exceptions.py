@@ -16,7 +16,7 @@ MISSING_RETURN_TYPES_PARAM = Renderable400("Invalid ext_content_return_types")
 
 MISSING_RETURN_URL = Renderable400("No ext_content_return_url")
 
-EXPERIMENT_TRACKS_ALREADY_FINALIZED = Renderable400("You can't change tracks after their finalized")
+EXPERIMENT_TRACKS_ALREADY_FINALIZED = Renderable400("You can't edit or delete the experiment after it has been started.")
 EXPERIMENT_TRACKS_NOT_FINALIZED = Renderable400("Experiment tracks are not finalized")
 NO_URL_FOR_TRACK = Renderable404("No course content. Ask your course instructors to put something here.")
 NO_TRACKS_FOR_EXPERIMENT = Renderable404("No tracks have been configured for this experiment.")

@@ -119,7 +119,7 @@ class InterventionPoint(CourseObject):
     tracks = models.ManyToManyField(Track, through="InterventionPointUrl")
     
     def is_missing_urls(self):
-        if (Track.objects.filter(course_id=self.course_id).count()
+        if (Track.objects.filter(course_id=self.course_id, experiment=self.experiment).count()
             != self.tracks.count()):
             return True
         for intervention_point_url in InterventionPointUrl.objects.filter(intervention_point=self):
