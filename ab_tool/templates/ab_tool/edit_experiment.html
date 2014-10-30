@@ -68,14 +68,14 @@
                             <div class="weighted_probability_reveal revealed_content text-center">
                                 {% for track, weight in tracks %}
                                     <div>
-                                        Track {{forloop.counter}} <br><input type="number" name="track_weights[]" value="{{weight}}">
+                                        Track {{forloop.counter}} <br><input type="number"  min="0" max="100" step="1" name="track_weights[]" value="{{weight}}">
                                     </div>
                                 {% empty %}
                                     <div>
-                                        Track 1 <br><input type="number" name="track_weights[]" value="">
+                                        Track 1 <br><input type="number" min="0" max="100" step="1" name="track_weights[]" value="">
                                     </div>
                                     <div>
-                                        Track 2 <br><input type="number" name="track_weights[]" value="">
+                                        Track 2 <br><input type="number" min="0" max="100" step="1" name="track_weights[]" value="">
                                     </div>
                                 {% endfor %}
                                 <div id="all_tracks"></div>
@@ -113,7 +113,7 @@
         var num_tracks = {{experiment.tracks.count|default:2}};
         function add_track() {
             var new_track = document.createElement('div');
-            new_track.innerHTML = "Track " + (num_tracks + 1) + " <br><input type='number' name='track_weights[]'>";
+            new_track.innerHTML = "Track " + (num_tracks + 1) + " <br><input type='number' min='0' max='100' step='1' name='track_weights[]'>";
             document.getElementById("all_tracks").appendChild(new_track);
             num_tracks++;
         };
