@@ -22,6 +22,8 @@ TEST_STUDENT_ID = "70707707"
 NONEXISTENT_STAGE_ID = 12345678987654321 #111111111^2
 NONEXISTENT_TRACK_ID = 31415926535897932 #pi
 
+NONEXISTENT_EXPERIMENT_ID = 31415926535897932 #pi
+
 class RequestMock(MagicMock):
     get_host = MagicMock(return_value=TEST_DOMAIN)
     
@@ -118,8 +120,12 @@ class SessionTestCase(TestCase):
             raise Exception("Function either raises no exception or is "
                             "non-deterministic")
     
-    def create_test_track(self, course_id=TEST_COURSE_ID, name="testtrack"):
-        experiment = Experiment.get_placeholder_course_experiment(course_id)
+    def create_test_experiment(self, course_id=TEST_COURSE_ID, name="testexperiment"):
+        return Experiment.objects.create(name=name, course_id=course_id)
+    
+    def create_test_track(self, course_id=TEST_COURSE_ID, name="testtrack", experiment=None):
+        if not experiment:
+            experiment = Experiment.get_placeholder_course_experiment(course_id)
         track_no = experiment.tracks.count() + 1
         return Track.objects.create(name=name, course_id=course_id,
                                 experiment=experiment, track_number=track_no)

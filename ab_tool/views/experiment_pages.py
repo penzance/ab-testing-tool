@@ -19,8 +19,6 @@ def create_experiment(request):
 
 @lti_role_required(ADMINS)
 def submit_create_experiment(request):
-    print "ZAGS", request.POST
-    print "KEV", request.POST.getlist(request, "track_weights[]")
     course_id = get_lti_param(request, "custom_canvas_course_id")
     name = post_param(request, "name")
     notes = post_param(request, "notes")
