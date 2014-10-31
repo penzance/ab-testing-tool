@@ -27,20 +27,12 @@
         <!-- Tab for Tracks-->
     
         <div id="tabs-1">
-                {% if not is_finalized %}
                 <div class="col-lg-10 col-md-12 col-sm-12">
                 <a id="create_experiment_button" class="btn btn-lg btn-success btn-block "  href="{% url 'ab:create_experiment' %}" >Create New Experiment</a>
                 </div>
                 <br>
                 {% include "ab_tool/modals.html" %}
                 <br>
-                {% else %}
-                <a id="finalize_button_disabled" class="btn btn-lg btn-danger disabled"> Finalize Tracks</a>
-                <br><br>
-                <h4 class="text-center nowrap">Tracks Are Finalized.</h4>
-                <h5 class="text-center nowrap">Note: Tracks can no longer be deleted or created. Existing tracks can still be edited.</h5>
-                {% endif %}
-                
                 <br>
                 <div class="list-group">
                 {% for experiment in experiments %}
