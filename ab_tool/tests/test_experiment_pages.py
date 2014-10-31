@@ -217,7 +217,7 @@ class TestExperimentPages(SessionTestCase):
         experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
         self.assertFalse(experiment.tracks_finalized)
     
-    def test_finalize_tracks_no_experiments(self):
+    def test_finalize_tracks_no_tracks(self):
         """ Tests that finalize fails if there are no experiments """
         experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
         response = self.client.get(reverse("ab:finalize_tracks", args=(experiment.id,)),
