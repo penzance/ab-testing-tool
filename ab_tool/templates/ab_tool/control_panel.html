@@ -52,7 +52,7 @@
                             </h4>
                             <div class="col-lg-6 col-md-6 col-sm-6" >
                                 {% if not experiment.tracks_finalized %}
-                                <a id="finalize_button" class="btn btn btn-danger" href="{% url 'ab:finalize_tracks' experiment.id %}"> Start Experiment</a>
+                                <a id="finalize_button" class="btn btn btn-danger" href="#finalize_modal{{experiment.id}}" data-toggle="modal" > Start Experiment</a>
                                 {% else %}
                                 <a id="finalize_button" class="btn btn btn-danger disabled"> Start Experiment</a>
                                 {% endif %}
