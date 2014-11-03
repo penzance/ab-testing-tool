@@ -127,15 +127,16 @@ class TestMainPages(SessionTestCase):
         # Add 2 to length for header and trailing newline
         self.assertEqual(len(response.content.split("\n")), num_students + 2)
     
-    def test_download_data_course_specific(self):
+    def test_download_data_experiment_specific(self):
         """ Tests that download data only uses student in the correct course """
         track = self.create_test_track()
-        experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
+        experiment1 = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
+        experiment2 = Experiment.get_placeholder_course_experiment(TEST_OTHER_COURSE_ID)
         ExperimentStudent.objects.create(course_id=TEST_COURSE_ID, student_id=1,
-                                         track=track, experiment=experiment)
+                                         track=track, experiment=experiment1)
         ExperimentStudent.objects.create(course_id=TEST_OTHER_COURSE_ID, student_id=2,
-                                         track=track, experiment=experiment)
-        response = self.client.get(reverse("ab:download_data", args=(experiment.id,)))
+                                         track=track, experiment=experiment2)
+        response = self.client.get(reverse("ab:download_data", args=(experiment1.id,)))
         self.assertEqual(response._headers["content-type"],
                          ('Content-Type', 'text/csv'))
         num_students = ExperimentStudent.objects.filter(course_id=TEST_COURSE_ID).count()
