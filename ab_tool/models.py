@@ -105,12 +105,11 @@ class InterventionPointUrl(TimestampedModel):
         unique_together = (('track', 'intervention_point'),)
 
 
-class ExperimentStudent(TimestampedModel):
+class ExperimentStudent(CourseObject):
     """ This model stores which track a student is in for a given experiment
         within a given course.  A real-world can be represented by multiple
         ExperimentStudent objects, and will have a separate object for each 
         experiment they are in. """
-    course_id = models.CharField(max_length=128, db_index=True)
     student_id = models.CharField(max_length=128, db_index=True)
     lis_person_sourcedid = models.CharField(max_length=128, db_index=True, null=True)
     experiment = models.ForeignKey(Experiment)
@@ -118,3 +117,11 @@ class ExperimentStudent(TimestampedModel):
     
     class Meta:
         unique_together = (('experiment', 'student_id'),)
+
+
+class InterventionPointDeployments(CourseObject):
+    """ This model logs every time an intervention point is deployed for a
+        student.  Consider moving this out of the database and into
+        flat file storage. """
+    student = models.ForeignKey(ExperimentStudent)
+    intervention_point = models.ForeignKey(InterventionPoint)
