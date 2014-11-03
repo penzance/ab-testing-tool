@@ -1,4 +1,3 @@
-import csv
 from django.core.urlresolvers import reverse
 from django.http.response import HttpResponse
 from django.shortcuts import render_to_response, redirect
@@ -10,9 +9,12 @@ from ims_lti_py.tool_config import ToolConfig
 
 from ab_tool.canvas import get_lti_param
 from ab_tool.controllers import (get_uninstalled_intervention_points,
-    get_modules_with_items, post_param)
-from ab_tool.models import (InterventionPoint, ExperimentStudent, Experiment)
+    get_modules_with_items, get_incomplete_intervention_points,
+    get_missing_track_weights, post_param)
+from ab_tool.models import (InterventionPoint, Track, Experiment)
 from ab_tool.constants import ADMINS
+from ab_tool.analytics import get_student_list_csv,\
+    get_intervention_point_deployment_csv
 
 
 def not_authorized(request):
@@ -68,25 +70,19 @@ def tool_config(request):
 
 
 @lti_role_required(ADMINS)
-def download_data(request, experiment_id):
-    #TODO: change this to streaming
+def download_track_assignments(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     course_title = get_lti_param(request, "context_title")
-    experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = ('attachment; filename=%s_students.csv' %
-                                       slugify(course_title))
-    writer = csv.writer(response)
-    # Write headers to CSV file
-    headers = ["Student ID", "LIS Person Sourcedid", "Experiment", "Assigned Track",
-               "Timestamp Last Updated"]
-    writer.writerow(headers)
-    # Write data to CSV file
-    for s in ExperimentStudent.objects.filter(course_id=course_id, experiment=experiment):
-        row = [s.student_id, s.lis_person_sourcedid, s.experiment.name,
-               s.track.name, s.updated_on]
-        writer.writerow(row)
-    return response
+    file_title = "%s_students.csv" % slugify(course_title)
+    return get_student_list_csv(course_id, file_title)
+
+
+@lti_role_required(ADMINS)
+def download_intervention_point_deployments(request):
+    course_id = get_lti_param(request, "custom_canvas_course_id")
+    course_title = get_lti_param(request, "context_title")
+    file_title = "%s_intervention_point_deployments.csv" % slugify(course_title)
+    return get_intervention_point_deployment_csv(course_id, file_title)
 
 
 @lti_role_required(ADMINS)

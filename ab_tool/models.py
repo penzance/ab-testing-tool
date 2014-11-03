@@ -154,3 +154,11 @@ class ExperimentStudent(CourseObject):
     
     class Meta:
         unique_together = (('experiment', 'student_id'),)
+
+
+class InterventionPointDeployments(CourseObject):
+    """ This model logs every time an intervention point is deployed for a
+        student.  Consider moving this out of the database and into
+        flat file storage. """
+    student = models.ForeignKey(ExperimentStudent)
+    intervention_point = models.ForeignKey(InterventionPoint)

@@ -26,6 +26,7 @@ TRACK_WEIGHTS_NOT_SET = Renderable404("Missing track configuration. If you are a
 INPUT_NOT_ALLOWED = Renderable404("Input does not follow requirements")
 
 TRACK_WEIGHTS_ERROR = Renderable404("Missing track configuration. If you are a student, notify your course instructors regarding this page before returning here.")
+CSV_ERROR = Renderable500("There was a problem preparing the CSV file for download")
 
 def missing_param_error(param_name):
     return Renderable400("Missing POST parameter %s" % param_name)

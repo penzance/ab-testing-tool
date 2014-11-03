@@ -11,6 +11,7 @@ from ab_tool.controllers import (intervention_point_is_installed, format_url,
     post_param, assign_track_and_create_student)
 from ab_tool.exceptions import (DELETING_INSTALLED_STAGE,
     EXPERIMENT_TRACKS_NOT_FINALIZED, NO_URL_FOR_TRACK)
+from ab_tool.analytics import log_intervention_point_deployment
 
 
 def deploy_intervention_point(request, intervention_point_id):
@@ -53,6 +54,8 @@ def deploy_intervention_point(request, intervention_point_id):
         # a student database object fails)
         lis_person_sourcedid = get_lti_param(request, "lis_person_sourcedid")
         student = assign_track_and_create_student(experiment, student_id, lis_person_sourcedid)
+    
+    log_intervention_point_deployment(course_id, student, intervention_point)
     
     # Retrieve the url for the student's track at the current intervention point
     # Return an error page if there is no url configured.
