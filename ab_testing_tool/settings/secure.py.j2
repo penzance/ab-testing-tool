@@ -1,14 +1,17 @@
 SECURE_SETTINGS = {
     'LTI_OAUTH_CREDENTIALS': {
-        {{ secure_settings.lti_key }}: {{ secure_settings.lti_secret }},
+        '{{ secure_settings.lti_key }}': '{{ secure_settings.lti_secret }}',
     },
-
+    
+    'CLIENT_ID': '{{ secure_settings.client_id }}',
+    'CLIENT_SECRET': '{{ secure_settings.client_secret }}',
+    
     'ADMINS': {{ secure_settings.admins_tuple }},
-
+    
     'DJANGO_DB_USER': '{{ secure_settings.django_db_user }}',
     'DJANGO_DB_PASS': '{{ secure_settings.django_db_pass }}',
-
+    
     'CANVAS_TOKEN': '{{ secure_settings.canvas_token }}',
-
+    
     'DJANGO_SECRET_KEY': '{{ secure_settings.django_secret_key }}',
 }
