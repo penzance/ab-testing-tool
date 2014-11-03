@@ -55,7 +55,7 @@ def deploy_intervention_point(request, intervention_point_id):
         lis_person_sourcedid = get_lti_param(request, "lis_person_sourcedid")
         student = assign_track_and_create_student(experiment, student_id, lis_person_sourcedid)
     
-    log_intervention_point_deployment(course_id, student, intervention_point)
+    log_intervention_point_deployment(course_id, student, intervention_point, experiment)
     
     # Retrieve the url for the student's track at the current intervention point
     # Return an error page if there is no url configured.

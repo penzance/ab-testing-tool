@@ -149,7 +149,7 @@ class ExperimentStudent(CourseObject):
         experiment they are in. """
     student_id = models.CharField(max_length=128, db_index=True)
     lis_person_sourcedid = models.CharField(max_length=128, db_index=True, null=True)
-    experiment = models.ForeignKey(Experiment)
+    experiment = models.ForeignKey(Experiment, related_name="students")
     track = models.ForeignKey(Track)
     
     class Meta:
@@ -162,3 +162,4 @@ class InterventionPointDeployments(CourseObject):
         flat file storage. """
     student = models.ForeignKey(ExperimentStudent)
     intervention_point = models.ForeignKey(InterventionPoint)
+    experiment = models.ForeignKey(Experiment, related_name="intervention_point_deployments")

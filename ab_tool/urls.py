@@ -16,8 +16,8 @@ from ab_tool.views.experiment_pages import (create_experiment, submit_create_exp
 urlpatterns = patterns('',
     url(r'^$', render_intervention_point_control_panel, name='index'),
     url(r'^not_authorized$', not_authorized, name='not_authorized'),
-    url(r'^download_track_assignments$', download_track_assignments, name='download_data'),
-    url(r'^download_intervention_point_deployments$', download_intervention_point_deployments,
+    url(r'^download_track_assignments/(?P<experiment_id>\d+)$', download_track_assignments, name='download_data'),
+    url(r'^download_intervention_point_deployments/(?P<experiment_id>\d+)$', download_intervention_point_deployments,
         name='download_intervention_point_deployments'),
     url(r'^tool_config$', tool_config, name='tool_config'),
     

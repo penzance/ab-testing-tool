@@ -70,19 +70,22 @@ def tool_config(request):
 
 
 @lti_role_required(ADMINS)
-def download_track_assignments(request):
+def download_track_assignments(request, experiment_id):
+    #TODO: change this to streaming
     course_id = get_lti_param(request, "custom_canvas_course_id")
     course_title = get_lti_param(request, "context_title")
     file_title = "%s_students.csv" % slugify(course_title)
-    return get_student_list_csv(course_id, file_title)
+    experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
+    return get_student_list_csv(experiment, file_title)
 
 
 @lti_role_required(ADMINS)
-def download_intervention_point_deployments(request):
+def download_intervention_point_deployments(request, experiment_id):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     course_title = get_lti_param(request, "context_title")
     file_title = "%s_intervention_point_deployments.csv" % slugify(course_title)
-    return get_intervention_point_deployment_csv(course_id, file_title)
+    experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
+    return get_intervention_point_deployment_csv(experiment, file_title)
 
 
 @lti_role_required(ADMINS)
