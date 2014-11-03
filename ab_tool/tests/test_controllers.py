@@ -4,7 +4,6 @@ from ab_tool.controllers import (get_uninstalled_intervention_points, interventi
     all_intervention_point_urls, format_url, post_param)
 from ab_tool.tests.common import (SessionTestCase, APIReturn,
     LIST_MODULES, LIST_ITEMS, TEST_COURSE_ID, TEST_OTHER_COURSE_ID)
-from ab_tool.models import InterventionPoint
 from ab_tool.exceptions import BAD_STAGE_ID
 
 

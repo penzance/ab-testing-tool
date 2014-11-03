@@ -4,8 +4,7 @@ from mock import patch
 from ab_tool.controllers import intervention_point_url
 from ab_tool.tests.common import (SessionTestCase, LIST_MODULES,
     LIST_ITEMS, APIReturn, TEST_COURSE_ID, TEST_OTHER_COURSE_ID)
-from ab_tool.models import InterventionPoint, Track, ExperimentStudent,\
-    Experiment
+from ab_tool.models import (ExperimentStudent, Experiment)
 from ab_tool.views.main_pages import tool_config
 
 
@@ -56,9 +55,8 @@ class TestMainPages(SessionTestCase):
     def test_index_context_experiments(self):
         """ Checks that the intervention_points and tracks passed to the index template
             contain values from the database """
-        response = self.client.get(reverse("ab:index"), follow=True)
-        intervention_point = self.create_test_intervention_point()
         Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
+        intervention_point = self.create_test_intervention_point()
         response = self.client.get(reverse("ab:index"), follow=True)
         self.assertEqual(len(response.context["experiments"]), 1)
         self.assertSameIds([intervention_point], response.context["intervention_points"])
@@ -68,7 +66,7 @@ class TestMainPages(SessionTestCase):
             only contain database values matching the course_id """
         intervention_point = self.create_test_intervention_point()
         self.create_test_intervention_point(course_id=TEST_OTHER_COURSE_ID)
-        track = self.create_test_track()
+        self.create_test_track()
         self.create_test_track(course_id=TEST_OTHER_COURSE_ID)
         experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
         response = self.client.get(reverse("ab:index"), follow=True)

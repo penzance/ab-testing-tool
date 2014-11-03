@@ -63,6 +63,7 @@ class Experiment(CourseObject):
         return Experiment.objects.get_or_create(course_id=course_id, name="Experiment 1")[0]
 
     def set_number_of_tracks(self, num):
+        """ Sets number of tracks to num """
         current_num = self.tracks.count()
         if current_num == num:
             return
@@ -80,10 +81,11 @@ class Experiment(CourseObject):
                 #self.tracks[i].delete()
     
     def set_track_weights(self, weights_list):
+        """ Sets TrackProbabilityWeights for tracks in weights_list """
         if len(weights_list) != self.tracks.count():
             raise TRACK_WEIGHTS_ERROR
         for i in range(1, len(weights_list) + 1):
-            track = Track.objects.get(experiment=self, track_number=i)
+            track = Track.objects.get(experiment=self, course_id=self.course_id, track_number=i)
             try:
                 weighting_obj = TrackProbabilityWeight.objects.get(
                         track=track, course_id=self.course_id, experiment=self)

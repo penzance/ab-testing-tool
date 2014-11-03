@@ -1,7 +1,7 @@
 from ab_tool.tests.common import (SessionTestCase, TEST_COURSE_ID,
     TEST_OTHER_COURSE_ID, NONEXISTENT_TRACK_ID, NONEXISTENT_EXPERIMENT_ID)
 from django.core.urlresolvers import reverse
-from ab_tool.models import Track, Experiment, InterventionPointUrl
+from ab_tool.models import (Experiment, InterventionPointUrl)
 from ab_tool.exceptions import (EXPERIMENT_TRACKS_ALREADY_FINALIZED,
     NO_TRACKS_FOR_EXPERIMENT, UNAUTHORIZED_ACCESS)
 
@@ -52,7 +52,7 @@ class TestExperimentPages(SessionTestCase):
 
     def test_submit_create_experiment(self):
         """Tests that create_experiment creates a Experiment object verified by DB count"""
-        experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
+        Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
         num_experiments = Experiment.objects.count()
         data = {"name": "experiment", "notes": "hi", "assignment_method": 1, "uniform_tracks": 2 }
         response = self.client.post(reverse("ab:submit_create_experiment"),
@@ -61,7 +61,7 @@ class TestExperimentPages(SessionTestCase):
 
     def test_submit_create_experiment_with_weights_as_assignment_method(self):
         """Tests that create_experiment creates a Experiment object verified by DB count"""
-        experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
+        Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
         num_experiments = Experiment.objects.count()
         data = {"name": "experiment", "notes": "hi", "assignment_method": 2, "track_weights[]": [2,4] }
         response = self.client.post(reverse("ab:submit_create_experiment"),
@@ -71,7 +71,7 @@ class TestExperimentPages(SessionTestCase):
     def test_submit_create_experiment_unauthorized(self):
         """Tests that create_experiment creates a Experiment object verified by DB count"""
         self.set_roles([])
-        experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
+        Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
         num_experiments = Experiment.objects.count()
         data = {"name": "experiment", "notes": "hi"}
         response = self.client.post(reverse("ab:submit_create_experiment"),

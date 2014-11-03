@@ -5,7 +5,8 @@ from json import dumps
 from mock import patch, MagicMock
 
 from ab_tool.constants import ADMINS
-from ab_tool.models import Experiment, Track, InterventionPoint
+from ab_tool.models import Experiment, Track, InterventionPoint,\
+    TrackProbabilityWeight
 from error_middleware.exceptions import DEFAULT_ERROR_STATUS, RenderableError
 from error_middleware.middleware import ERROR_TEMPLATE
 
@@ -129,6 +130,18 @@ class SessionTestCase(TestCase):
         track_no = experiment.tracks.count() + 1
         return Track.objects.create(name=name, course_id=course_id,
                                 experiment=experiment, track_number=track_no)
+    
+    def create_test_track_weight(self, course_id=TEST_COURSE_ID, weighting=1,
+                                 track=None, experiment=None):
+        if not experiment:
+            experiment = Experiment.get_placeholder_course_experiment(course_id)
+        if not track:
+            track_no = experiment.tracks.count() + 1
+            Track.objects.create(name="testtrack", course_id=course_id,
+                                experiment=experiment, track_number=track_no)
+        return TrackProbabilityWeight.objects.create(course_id=course_id,
+                                            weighting=weighting, track=track,
+                                            experiment=experiment)
     
     def create_test_intervention_point(self, course_id=TEST_COURSE_ID, name="testip"):
         experiment = Experiment.get_placeholder_course_experiment(course_id)
