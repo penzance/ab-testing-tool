@@ -1,7 +1,13 @@
 import csv
+import logging
+import traceback
 from django.http.response import HttpResponse
 
 from ab_tool.models import ExperimentStudent, InterventionPointDeployments
+from ab_tool.exceptions import CSV_ERROR
+
+logger = logging.getLogger(__name__)
+
 
 def log_intervention_point_deployment(course_id, student, intervention_point):
     InterventionPointDeployments.objects.create(
@@ -11,9 +17,14 @@ def log_intervention_point_deployment(course_id, student, intervention_point):
 
 
 def csv_response_and_writer(file_title):
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = ("attachment; filename=%s" % file_title)
-    return response, csv.writer(response)
+    try:
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = ("attachment; filename=%s" % file_title)
+        return response, csv.writer(response)
+    except ValueError as exception:
+        logger.error(repr(exception))
+        logger.error(traceback.format_exc())
+        raise CSV_ERROR
 
 
 def get_student_list_csv(course_id, file_title):
