@@ -123,10 +123,12 @@ class SessionTestCase(TestCase):
     def create_test_experiment(self, course_id=TEST_COURSE_ID, name="testexperiment"):
         return Experiment.objects.create(name=name, course_id=course_id)
     
-    def create_test_track(self, course_id=TEST_COURSE_ID, name="testtrack"):
-        experiment = Experiment.get_placeholder_course_experiment(course_id)
+    def create_test_track(self, course_id=TEST_COURSE_ID, name="testtrack", experiment=None):
+        if not experiment:
+            experiment = Experiment.get_placeholder_course_experiment(course_id)
+        track_no = experiment.tracks.count() + 1
         return Track.objects.create(name=name, course_id=course_id,
-                                    experiment=experiment)
+                                experiment=experiment, track_number=track_no)
     
     def create_test_intervention_point(self, course_id=TEST_COURSE_ID, name="testip"):
         experiment = Experiment.get_placeholder_course_experiment(course_id)

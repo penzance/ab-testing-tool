@@ -27,20 +27,13 @@ def render_intervention_point_control_panel(request):
     modules = get_modules_with_items(request)
     uninstalled_intervention_points = get_uninstalled_intervention_points(request)
     intervention_points = InterventionPoint.objects.filter(course_id=course_id)
-    tracks = Track.objects.filter(course_id=course_id)
-    is_finalized = Experiment.get_placeholder_course_experiment(course_id).tracks_finalized
-    incomplete_intervention_points = get_incomplete_intervention_points(intervention_points)
-    missing_track_weights = get_missing_track_weights(tracks, course_id)
+    experiments = Experiment.objects.filter(course_id=course_id)
     context = {
         "modules": modules,
         "intervention_points": intervention_points,
         "uninstalled_intervention_points": uninstalled_intervention_points,
-        "tracks": tracks,
         "canvas_url": get_lti_param(request, "launch_presentation_return_url"),
-        "is_finalized": is_finalized,
-        "incomplete_intervention_points": incomplete_intervention_points,
-        "experiment": Experiment.get_placeholder_course_experiment(course_id),
-        "missing_track_weights": missing_track_weights,
+        "experiments": experiments,
     }
     return render_to_response("ab_tool/control_panel.html", context)
 
@@ -77,19 +70,22 @@ def tool_config(request):
 
 
 @lti_role_required(ADMINS)
-def download_track_assignments(request):
+def download_track_assignments(request, experiment_id):
+    #TODO: change this to streaming
     course_id = get_lti_param(request, "custom_canvas_course_id")
     course_title = get_lti_param(request, "context_title")
     file_title = "%s_students.csv" % slugify(course_title)
-    return get_student_list_csv(course_id, file_title)
+    experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
+    return get_student_list_csv(experiment, file_title)
 
 
 @lti_role_required(ADMINS)
-def download_intervention_point_deployments(request):
+def download_intervention_point_deployments(request, experiment_id):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     course_title = get_lti_param(request, "context_title")
     file_title = "%s_intervention_point_deployments.csv" % slugify(course_title)
-    return get_intervention_point_deployment_csv(course_id, file_title)
+    experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
+    return get_intervention_point_deployment_csv(experiment, file_title)
 
 
 @lti_role_required(ADMINS)

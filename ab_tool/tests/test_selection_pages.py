@@ -82,42 +82,44 @@ class TestSelectionPages(SessionTestCase):
         for k, v in params.items():
             self.assertTrue(urlencode({k: v}) in response.url, urlencode({k: v}))
     
-    @patch("django.http.request.HttpRequest.get_host", return_value=TEST_DOMAIN)
-    def test_submit_selection_new_intervention_point(self, _mock):
-        """ Tests that submit_selection_new_intervention_point creates a intervention_point object and
-            returns a redirect url with the described parameters """
-        intervention_point_name = "this_is_a_intervention_point"
-        num_intervention_points = InterventionPoint.objects.count()
-        content_return_url = "http://test_content_return_url.com"
-        data = {"name": intervention_point_name, "notes": "hi",
-                "content_return_url": content_return_url}
-        response = self.client.post(reverse("ab:submit_selection_new_intervention_point"), data)
-        self.assertEqual(num_intervention_points + 1, InterventionPoint.objects.count())
-        intervention_point = InterventionPoint.objects.get(name=intervention_point_name)
-        self.request.is_secure.return_value = False
-        params = {"return_type": "lti_launch_url",
-                   "url": intervention_point_url(self.request, intervention_point.id),
-                   "text": intervention_point_name,
-                  }
-        for k, v in params.items():
-            self.assertTrue(urlencode({k: v}) in response.url, urlencode({k: v}))
-    
-    @patch("django.http.request.HttpRequest.get_host", return_value=TEST_DOMAIN)
-    def test_submit_selection_new_intervention_point_with_intervention_pointurls(self, _mock):
-        """ Tests that submit_selection_new_intervention_point creates a intervention_point object and
-        intervention_point url objects"""
-        intervention_point_name = "this_is_a_intervention_point"
-        num_intervention_points = InterventionPoint.objects.count()
-        num_intervention_pointurls = InterventionPointUrl.objects.count()
-        track1 = self.create_test_track(name="track1")
-        track2 = self.create_test_track(name="track2")
-        content_return_url = "http://test_content_return_url.com"
-        data = {"name": intervention_point_name, STAGE_URL_TAG + "1": "http://example.com/page",
-                STAGE_URL_TAG + "2": "http://example.com/otherpage", "notes": "hi",
-                "content_return_url": content_return_url}
-        self.client.post(reverse("ab:submit_selection_new_intervention_point"), data)
-        self.assertEqual(num_intervention_points + 1, InterventionPoint.objects.count())
-        self.assertEqual(num_intervention_pointurls + 2, InterventionPointUrl.objects.count())
-        intervention_point = InterventionPoint.objects.get(name=intervention_point_name)
-        self.assertIsNotNone(InterventionPointUrl.objects.get(intervention_point=intervention_point.id, track=track1.id))
-        self.assertIsNotNone(InterventionPointUrl.objects.get(intervention_point=intervention_point.id, track=track2.id))
+#     @patch("django.http.request.HttpRequest.get_host", return_value=TEST_DOMAIN)
+#     def test_submit_selection_new_intervention_point(self, _mock):
+#        #TODO: test commented due to currently disabled feature
+#         """ Tests that submit_selection_new_intervention_point creates a intervention_point object and
+#             returns a redirect url with the described parameters """
+#         intervention_point_name = "this_is_a_intervention_point"
+#         num_intervention_points = InterventionPoint.objects.count()
+#         content_return_url = "http://test_content_return_url.com"
+#         data = {"name": intervention_point_name, "notes": "hi",
+#                 "content_return_url": content_return_url}
+#         response = self.client.post(reverse("ab:submit_selection_new_intervention_point"), data)
+#         self.assertEqual(num_intervention_points + 1, InterventionPoint.objects.count())
+#         intervention_point = InterventionPoint.objects.get(name=intervention_point_name)
+#         self.request.is_secure.return_value = False
+#         params = {"return_type": "lti_launch_url",
+#                    "url": intervention_point_url(self.request, intervention_point.id),
+#                    "text": intervention_point_name,
+#                   }
+#         for k, v in params.items():
+#             self.assertTrue(urlencode({k: v}) in response.url, urlencode({k: v}))
+#
+#     @patch("django.http.request.HttpRequest.get_host", return_value=TEST_DOMAIN)
+#     def test_submit_selection_new_intervention_point_with_intervention_pointurls(self, _mock):
+#        #TODO: test commented due to currently disabled feature
+#         """ Tests that submit_selection_new_intervention_point creates a intervention_point object and
+#         intervention_point url objects"""
+#         intervention_point_name = "this_is_a_intervention_point"
+#         num_intervention_points = InterventionPoint.objects.count()
+#         num_intervention_pointurls = InterventionPointUrl.objects.count()
+#         track1 = self.create_test_track(name="track1")
+#         track2 = self.create_test_track(name="track2")
+#         content_return_url = "http://test_content_return_url.com"
+#         data = {"name": intervention_point_name, STAGE_URL_TAG + "1": "http://example.com/page",
+#                 STAGE_URL_TAG + "2": "http://example.com/otherpage", "notes": "hi",
+#                 "content_return_url": content_return_url}
+#         self.client.post(reverse("ab:submit_selection_new_intervention_point"), data)
+#         self.assertEqual(num_intervention_points + 1, InterventionPoint.objects.count())
+#         self.assertEqual(num_intervention_pointurls + 2, InterventionPointUrl.objects.count())
+#         intervention_point = InterventionPoint.objects.get(name=intervention_point_name)
+#         self.assertIsNotNone(InterventionPointUrl.objects.get(intervention_point=intervention_point.id, track=track1.id))
+#         self.assertIsNotNone(InterventionPointUrl.objects.get(intervention_point=intervention_point.id, track=track2.id))

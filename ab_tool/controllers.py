@@ -106,14 +106,13 @@ def all_intervention_point_urls(request, course_id):
             InterventionPoint.objects.filter(course_id=course_id)]
 
 
-def get_missing_track_weights(tracks, course_id):
-    experiment = Experiment.get_placeholder_course_experiment(course_id)
+def get_missing_track_weights(experiment, course_id):
     if experiment.assignment_method != Experiment.WEIGHTED_PROBABILITY_RANDOM:
         return []
     missing_weights = []
     track_weights = [t.track for t in
-                     TrackProbabilityWeight.objects.filter(course_id=course_id)]
-    for track in tracks:
+                     TrackProbabilityWeight.objects.filter(course_id=course_id, experiment=experiment)]
+    for track in experiment.tracks.all():
         if track not in track_weights:
             missing_weights.append(track)
     return [track.name for track in missing_weights]

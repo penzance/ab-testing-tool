@@ -22,9 +22,11 @@ def resource_selection(request):
     content_return_url = request.POST.get('ext_content_return_url')
     if not content_return_url:
         raise MISSING_RETURN_URL
+    all_experiments = Experiment.objects.filter(course_id=course_id)
     context = {"content_return_url": content_return_url,
                "intervention_points": get_uninstalled_intervention_points(request),
                "tracks": Track.objects.filter(course_id=course_id),
+               "experiments": all_experiments,
                }
     return render_to_response("ab_tool/add_module_item.html", context)
 
@@ -50,7 +52,8 @@ def submit_selection_new_intervention_point(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     name = post_param(request, "name")
     notes = post_param(request, "notes")
-    experiment = Experiment.get_placeholder_course_experiment(course_id)
+    experiment_id = post_param(request, "experiment")
+    experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
     intervention_point = InterventionPoint.objects.create(
             name=name, notes=notes, course_id=course_id, experiment=experiment)
     intervention_pointurls = [(k,v) for (k,v) in request.POST.iteritems() if STAGE_URL_TAG in k and v]

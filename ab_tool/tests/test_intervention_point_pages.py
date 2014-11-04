@@ -97,7 +97,8 @@ class TestInterventionPointPages(SessionTestCase):
     def test_create_intervention_point_view(self):
         """ Tests edit_intervention_point template renders for url
             'create_intervention_point' when authenticated """
-        response = self.client.get(reverse("ab:create_intervention_point"))
+        experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
+        response = self.client.get(reverse("ab:create_intervention_point", args=(experiment.id,)))
         self.assertOkay(response)
         self.assertTemplateUsed(response, "ab_tool/edit_intervention_point.html")
     
@@ -105,7 +106,9 @@ class TestInterventionPointPages(SessionTestCase):
         """ Tests edit_intervention_point template does not render for url
             'create_intervention_point' when unauthorized """
         self.set_roles([])
-        response = self.client.get(reverse("ab:create_intervention_point"), follow=True)
+        experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
+        response = self.client.get(reverse("ab:create_intervention_point",
+                                           args=(experiment.id,)), follow=True)
         self.assertTemplateNotUsed(response, "ab_tool/edit_intervention_point.html")
         self.assertTemplateUsed(response, "ab_tool/not_authorized.html")
     

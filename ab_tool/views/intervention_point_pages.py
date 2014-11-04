@@ -55,7 +55,7 @@ def deploy_intervention_point(request, intervention_point_id):
         lis_person_sourcedid = get_lti_param(request, "lis_person_sourcedid")
         student = assign_track_and_create_student(experiment, student_id, lis_person_sourcedid)
     
-    log_intervention_point_deployment(course_id, student, intervention_point)
+    log_intervention_point_deployment(course_id, student, intervention_point, experiment)
     
     # Retrieve the url for the student's track at the current intervention point
     # Return an error page if there is no url configured.
@@ -73,17 +73,17 @@ def deploy_intervention_point(request, intervention_point_id):
 
 
 @lti_role_required(ADMINS)
-def create_intervention_point(request):
+def create_intervention_point(request, experiment_id):
     """ Note: Canvas fetches all pages within iframe with POST request,
         requiring separate template render function. This also breaks CSRF
         token validation if CSRF Middleware is turned off. """
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    experiment = Experiment.get_placeholder_course_experiment(course_id)
+    experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
     #Note: Refer to template. (t,None) is passed as there are no existing InterventionPointUrls for a new intervention_point
     context = {"tracks" : [(t, None) for t in
-                           Track.objects.filter(course_id=course_id)],
-               "cancel_url": reverse("ab:index") + "#tabs-2",
-               "experiment_id": experiment.id}
+                           Track.objects.filter(course_id=course_id, experiment=experiment)],
+               "cancel_url": reverse("ab:index"),
+               "experiment": experiment}
     return render_to_response("ab_tool/edit_intervention_point.html", context)
 
 
@@ -109,7 +109,7 @@ def submit_create_intervention_point(request, experiment_id):
                 url=format_url(v), intervention_point_id=intervention_point.id,
                 track_id=track_id, is_canvas_page=is_canvas_page, open_as_tab=open_as_tab
         )
-    return redirect(reverse("ab:index") + "#tabs-2")
+    return redirect(reverse("ab:index"))
 
 
 @lti_role_required(ADMINS)
@@ -120,7 +120,7 @@ def modules_page_edit_intervention_point(request, intervention_point_id):
 @lti_role_required(ADMINS)
 def edit_intervention_point(request, intervention_point_id):
     context = edit_intervention_point_common(request, intervention_point_id)
-    context["cancel_url"] = reverse("ab:index") + "#tabs-2"
+    context["cancel_url"] = reverse("ab:index")
     return render_to_response("ab_tool/edit_intervention_point.html", context)
 
 def edit_intervention_point_common(request, intervention_point_id):
@@ -128,7 +128,8 @@ def edit_intervention_point_common(request, intervention_point_id):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     intervention_point = InterventionPoint.get_or_404_check_course(
             intervention_point_id, course_id)
-    all_tracks = Track.objects.filter(course_id=course_id)
+    all_tracks = Track.objects.filter(course_id=course_id,
+                                      experiment=intervention_point.experiment)
     track_urls = []
     for track in all_tracks:
         # This is a search for the joint unique index of InterventionPointUrl, so it
@@ -172,7 +173,7 @@ def submit_edit_intervention_point(request, intervention_point_id):
         except InterventionPointUrl.DoesNotExist:
             InterventionPointUrl.objects.create(url=format_url(v), intervention_point_id=intervention_point_id, track_id=track_id,
                                     is_canvas_page=is_canvas_page, open_as_tab=open_as_tab)
-    return redirect(reverse("ab:index") + "#tabs-2")
+    return redirect(reverse("ab:index"))
 
 
 @lti_role_required(ADMINS)
@@ -185,4 +186,4 @@ def delete_intervention_point(request, intervention_point_id):
     if intervention_point_is_installed(request, intervention_point):
         raise DELETING_INSTALLED_STAGE
     intervention_point.delete()
-    return redirect(reverse("ab:index") + "#tabs-2")
+    return redirect(reverse("ab:index"))

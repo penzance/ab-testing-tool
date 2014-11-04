@@ -10,3 +10,7 @@
   color: white;
 
 }
+
+.revealed_content {
+    display: none;
+}

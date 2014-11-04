@@ -50,35 +50,30 @@ class TestMainPages(SessionTestCase):
         self.assertIn("intervention_points", response.context)
         self.assertIn("modules", response.context)
         self.assertIn("uninstalled_intervention_points", response.context)
-        self.assertIn("tracks", response.context)
+        self.assertIn("experiments", response.context)
         self.assertIn("canvas_url", response.context)
     
-    def test_index_context_intervention_points_and_tracks(self):
+    def test_index_context_experiments(self):
         """ Checks that the intervention_points and tracks passed to the index template
             contain values from the database """
         response = self.client.get(reverse("ab:index"), follow=True)
-        self.assertEqual(len(response.context["intervention_points"]), 0)
-        self.assertEqual(len(response.context["tracks"]), 0)
         intervention_point = self.create_test_intervention_point()
-        track = self.create_test_track()
+        Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
         response = self.client.get(reverse("ab:index"), follow=True)
-        self.assertEqual(len(response.context["intervention_points"]), 1)
-        self.assertEqual(len(response.context["tracks"]), 1)
+        self.assertEqual(len(response.context["experiments"]), 1)
         self.assertSameIds([intervention_point], response.context["intervention_points"])
-        self.assertSameIds([track], response.context["tracks"])
     
-    def test_index_context_course_specific_intervention_points_and_tracks(self):
+    def test_index_context_course_specific_intervention_points_and_experiments(self):
         """ Checks that the intervention_points and tracks passed to the index template
             only contain database values matching the course_id """
         intervention_point = self.create_test_intervention_point()
         self.create_test_intervention_point(course_id=TEST_OTHER_COURSE_ID)
         track = self.create_test_track()
         self.create_test_track(course_id=TEST_OTHER_COURSE_ID)
+        experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
         response = self.client.get(reverse("ab:index"), follow=True)
-        self.assertEqual(len(response.context["intervention_points"]), 1)
-        self.assertEqual(len(response.context["tracks"]), 1)
+        self.assertSameIds([experiment], response.context["experiments"])
         self.assertSameIds([intervention_point], response.context["intervention_points"])
-        self.assertSameIds([track], response.context["tracks"])
     
     def test_index_context_uninstalled_intervention_points(self):
         """ Tests that the context for the index correctly contains
@@ -125,22 +120,23 @@ class TestMainPages(SessionTestCase):
                                          track=track, experiment=experiment)
         ExperimentStudent.objects.create(course_id=TEST_COURSE_ID, student_id=2,
                                          track=track, experiment=experiment)
-        response = self.client.get(reverse("ab:download_data"))
+        response = self.client.get(reverse("ab:download_data", args=(experiment.id,)))
         self.assertEqual(response._headers["content-type"],
                          ('Content-Type', 'text/csv'))
         num_students = ExperimentStudent.objects.filter(course_id=TEST_COURSE_ID).count()
         # Add 2 to length for header and trailing newline
         self.assertEqual(len(response.content.split("\n")), num_students + 2)
     
-    def test_download_data_course_specific(self):
+    def test_download_data_experiment_specific(self):
         """ Tests that download data only uses student in the correct course """
         track = self.create_test_track()
-        experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
+        experiment1 = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
+        experiment2 = Experiment.get_placeholder_course_experiment(TEST_OTHER_COURSE_ID)
         ExperimentStudent.objects.create(course_id=TEST_COURSE_ID, student_id=1,
-                                         track=track, experiment=experiment)
+                                         track=track, experiment=experiment1)
         ExperimentStudent.objects.create(course_id=TEST_OTHER_COURSE_ID, student_id=2,
-                                         track=track, experiment=experiment)
-        response = self.client.get(reverse("ab:download_data"))
+                                         track=track, experiment=experiment2)
+        response = self.client.get(reverse("ab:download_data", args=(experiment1.id,)))
         self.assertEqual(response._headers["content-type"],
                          ('Content-Type', 'text/csv'))
         num_students = ExperimentStudent.objects.filter(course_id=TEST_COURSE_ID).count()
@@ -148,7 +144,8 @@ class TestMainPages(SessionTestCase):
         self.assertEqual(len(response.content.split("\n")), num_students + 2)
     
     def test_download_data_no_students(self):
-        response = self.client.get(reverse("ab:download_data"))
+        experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
+        response = self.client.get(reverse("ab:download_data", args=(experiment.id,)))
         self.assertEqual(response._headers["content-type"],
                          ('Content-Type', 'text/csv'))
         num_students = ExperimentStudent.objects.filter(course_id=TEST_COURSE_ID).count()
