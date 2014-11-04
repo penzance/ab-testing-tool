@@ -1,8 +1,7 @@
 from django.conf.urls import patterns, url
 
 from ab_tool.views.main_pages import (render_intervention_point_control_panel, not_authorized,
-    tool_config, download_track_assignments, submit_assignment_method,
-    download_intervention_point_deployments)
+    tool_config, download_track_assignments, download_intervention_point_deployments)
 
 from ab_tool.views.selection_pages import (resource_selection, submit_selection,
     submit_selection_new_intervention_point)
