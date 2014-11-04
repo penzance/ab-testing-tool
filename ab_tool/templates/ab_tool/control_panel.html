@@ -39,10 +39,10 @@
                     <div class="row">
                         <div class="col-lg-12 col-md-12 col-sm-12">
                             <h4><a href="{% url 'ab:edit_experiment' experiment.id %}" class="list-group-item  col-lg-5 col-md-5 col-sm-5 clearfix" id="experiment_{{experiment.id}}">
-                                    <span><strong>Experiment</strong> "{{experiment.name}}" has {{experiment.tracks.count}} tracks</span>
+                                    <span><strong>Experiment</strong> <span>"{{experiment.name}}"</span> has {{experiment.tracks.count}} tracks</span>
                                 </a>
                             </h4>
-                            <div class="col-lg-6 col-md-6 col-sm-6" >
+                            <div class="col-lg-7 col-md-7 col-sm-7" >
                                 {% if not experiment.tracks_finalized %}
                                 <a id="finalize_button" class="btn btn btn-danger" href="#finalize_modal{{experiment.id}}" data-toggle="modal" > Start Experiment</a>
                                 {% else %}
@@ -59,10 +59,8 @@
                         </div>
                         <div class="col-lg-8 col-md-8 col-sm-8">
                             <div class="list-group">
-                                {% for t in intervention_points %}
-                                    {% if experiment.id == t.experiment.id %}
-                                        <a href="{% url 'ab:edit_intervention_point' t.id %}" class="list-group-item"><strong>Intervention Point</strong> "{{t.name}}" <i>{{t.is_missing_urls|yesno:"- URLs missing,complete"}}</i></a>
-                                    {% endif %}
+                                {% for t in experiment.intervention_points.all %}
+                                    <a href="{% url 'ab:edit_intervention_point' t.id %}" class="list-group-item"><strong>Intervention Point</strong> "{{t.name}}" <i>{{t.is_missing_urls|yesno:"- URLs missing,complete"}}</i></a>
                                 {% endfor %}
                             </div>
                         </div>
