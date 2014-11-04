@@ -49,15 +49,15 @@
                         <div class="modal-content">
                             <div class="modal-header">
                                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                                <h4 class="modal-title">Finalize Tracks Confirmation</h4>
+                                <h4 class="modal-title">Start Experiment Confirmation</h4>
                             </div>
                             <div class="modal-body">
-                                <p>Are you sure you want to finalize your tracks?</p>
-                                <p class="text-warning">Finalizing tracks cannot be undone. Once finalized, tracks can no longer be created or deleted. Existing tracks can still be edited. </p>
+                                <p>Are you sure you want to start this experiment?</p>
+                                <p class="text-warning">Starting an experiment cannot be undone. Once started, experiment tracks can no longer be created or deleted. </p>
                             </div>
                             <div class="modal-footer">
                                 <a class="btn btn-lg btn-primary" data-dismiss="modal"> Close </a>
-                                <a class="btn btn-lg btn-danger"  href="{% url 'ab:finalize_tracks' experiment.id %}"> Yes, Finalize Tracks </a>
+                                <a class="btn btn-lg btn-danger"  href="{% url 'ab:finalize_tracks' experiment.id %}"> Yes, Start Experiment </a>
                             </div>
                         </div>
                     </div>
