@@ -1,4 +1,6 @@
 from ab_tool.tests.common import SessionTestCase
+from ab_tool.models import (Experiment, Track, TrackProbabilityWeight,
+    InterventionPoint)
 
 class ItemWithId(object):
     def __init__(self, _id):
@@ -95,3 +97,35 @@ class TestCommon(SessionTestCase):
                 raise Exception(message)
         self.assertRaises(Exception, self.assertRaisesSpecific,
                           Exception(message), f, self)
+    
+    def test_create_test_experiment(self):
+        """ Tests helper method via DB count """
+        experiment_count = Experiment.objects.count()
+        self.create_test_experiment()
+        self.assertTrue(Experiment.objects.count() == experiment_count + 1)
+    
+    def test_create_test_track(self):
+        """ Tests helper method via DB count """
+        experiment_count = Experiment.objects.count()
+        track_count = Track.objects.count()
+        self.create_test_track()
+        self.assertTrue(Experiment.objects.count() == experiment_count + 1)
+        self.assertTrue(Track.objects.count() == track_count + 1)
+    
+    def test_create_test_track_weight(self):
+        """ Tests helper method via DB count """
+        experiment_count = Experiment.objects.count()
+        track_count = Track.objects.count()
+        weight_count = TrackProbabilityWeight.objects.count()
+        self.create_test_track_weight()
+        self.assertTrue(Experiment.objects.count() == experiment_count + 1)
+        self.assertTrue(Track.objects.count() == track_count + 1)
+        self.assertTrue(TrackProbabilityWeight.objects.count() == weight_count + 1)
+    
+    def test_create_test_intervention_point(self):
+        """ Tests helper method via DB count """
+        experiment_count = Experiment.objects.count()
+        intervention_count = InterventionPoint.objects.count()
+        self.create_test_intervention_point()
+        self.assertTrue(Experiment.objects.count() == experiment_count + 1)
+        self.assertTrue(InterventionPoint.objects.count() == intervention_count + 1)

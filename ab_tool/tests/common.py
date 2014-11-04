@@ -139,7 +139,7 @@ class SessionTestCase(TestCase):
             experiment = Experiment.get_placeholder_course_experiment(course_id)
         if not track:
             track_no = experiment.tracks.count() + 1
-            Track.objects.create(name="testtrack", course_id=course_id,
+            track = Track.objects.create(name="testtrack", course_id=course_id,
                                 experiment=experiment, track_number=track_no)
         return TrackProbabilityWeight.objects.create(course_id=course_id,
                                             weighting=weighting, track=track,
