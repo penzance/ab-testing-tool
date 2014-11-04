@@ -13,129 +13,66 @@
 <div class="container">
     <div class="jumbotron">
         <h2>A/B Testing Control Panel</h2>
-      <p>Welcome administrator. Manage your A/B course intervention points here.</p>
+      <p>Welcome administrator. Manage your A/B experiments here. </p>
     </div>
+
 
     <div id="tabs">
     <!-- BEGIN Tabs-->
     <ul>
-    <li><a href="#tabs-1">Tracks</a></li>
-    <li><a href="#tabs-2">Intervention Points</a></li>
-    <li><a href="#tabs-5">Student Assignment</a></li>
+    <li><a href="#tabs-1">Experiments</a></li>
     <li><a href="#tabs-3">Course Modules</a></li>
-    <li><a href="#tabs-4">Data</a></li>
     </ul>
+    
         <!-- Tab for Tracks-->
+    
         <div id="tabs-1">
-             <div class="span8">
-                <p> Create and edit your Tracks here. You can assign students to a track <b> only after </b> finalizing your tracks.</p>
-                <p>Helpful tip: a "Track" is a series of interventions that a cohort of students is assigned to experience.</p>
+                <div class="col-lg-10 col-md-12 col-sm-12">
+                <a id="create_experiment_button" class="btn btn-lg btn-success btn-block "  href="{% url 'ab:create_experiment' %}" >Create New Experiment</a>
+                </div>
                 <br>
-                {% if not is_finalized %}
-                
-                <a id="finalize_button" class="btn btn-lg btn-danger" {% if incomplete_intervention_points %} href="#incomplete_intervention_points_modal" {% elif missing_track_weights %} href="#missing_track_weights_modal" {% else %} href="#finalize_modal" {% endif %} data-toggle="modal" > Finalize Tracks</a>
-
-                {% if incomplete_intervention_points %}
-                <!-- START Modal code for incomplete_intervention_points confirmation box-->
-                <div id="incomplete_intervention_points_modal" class="modal fade" role="dialog" aria-labelledby="incomplete_intervention_points_modal" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                                <h4 class="modal-title">Some Intervention Points Are Missing URLs</h4>
-                            </div>
-                            <div class="modal-body">
-                                <p>Complete your intervention points by filling in the URLs fields for all tracks.</p>
-                                <p class="text-warning">These following intervention points are incomplete: {{ incomplete_intervention_points|join:", " }} </p>
-                            </div>
-                            <div class="modal-footer">
-                                <a class="btn btn-lg btn-primary" data-dismiss="modal"> Close </a>
+                {% include "ab_tool/modals.html" %}
+                <br>
+                <br>
+                <div class="list-group">
+                {% for experiment in experiments %}
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12">
+                            <h4><a href="{% url 'ab:edit_experiment' experiment.id %}" class="list-group-item  col-lg-5 col-md-5 col-sm-5 clearfix" id="experiment_{{experiment.id}}">
+                                    <span><strong>Experiment</strong> "{{experiment.name}}" has {{experiment.tracks.count}} tracks</span>
+                                </a>
+                            </h4>
+                            <div class="col-lg-6 col-md-6 col-sm-6" >
+                                {% if not experiment.tracks_finalized %}
+                                <a id="finalize_button" class="btn btn btn-danger" href="#finalize_modal{{experiment.id}}" data-toggle="modal" > Start Experiment</a>
+                                {% else %}
+                                <a id="finalize_button" class="btn btn btn-danger disabled"> Start Experiment</a>
+                                {% endif %}
+                                <a id="add_intervention_point_button" class="btn btn btn-success" href="{% url 'ab:create_intervention_point' experiment.id %}"> Add Intervention Point</a>
+                                <a id="download_students_button" href="{% url 'ab:download_data' experiment.id %}" class="btn btn btn-info"> Download Students</a>
                             </div>
                         </div>
                     </div>
-                </div>
-                <!-- END Modal code for incomplete_intervention_points confirmation box-->
-                {% endif %}
-                
-                {% if missing_track_weights %}
-                <!-- START Modal code for missing_track_weights confirmation box-->
-                <div id="missing_track_weights_modal" class="modal fade" role="dialog" aria-labelledby="missing_track_weights" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                                <h4 class="modal-title">Some Tracks Are Missing Weights</h4>
-                            </div>
-                            <div class="modal-body">
-                                <p>Complete your Track weights by filling out weights for all tracks.</p>
-                                <p class="text-warning">These following tracks are missing weights: {{ missing_track_weights|join:", " }} </p>
-                            </div>
-                            <div class="modal-footer">
-                                <a class="btn btn-lg btn-primary" data-dismiss="modal"> Close </a>
+                    <div class="row">
+                        <div class="col-lg-1 col-md-1 col-sm-1">
+                        </div>
+                        <div class="col-lg-8 col-md-8 col-sm-8">
+                            <div class="list-group">
+                                {% for t in intervention_points %}
+                                    {% if experiment.id == t.experiment.id %}
+                                        <a href="{% url 'ab:edit_intervention_point' t.id %}" class="list-group-item"><strong>Intervention Point</strong> "{{t.name}}" <i>{{t.is_missing_urls|yesno:"- URLs missing,complete"}}</i></a>
+                                    {% endif %}
+                                {% endfor %}
                             </div>
                         </div>
-                    </div>
-                </div>
-                <!-- END Modal code for missing_track_weights confirmation box-->
-                {% endif %}
-                
-                <!-- START Modal code for Finalize Tracks confirmation box-->
-                <div id="finalize_modal" class="modal fade" role="dialog" aria-labelledby="finalize_modal" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                                <h4 class="modal-title">Finalize Tracks Confirmation</h4>
-                            </div>
-                            <div class="modal-body">
-                                <p>Are you sure you want to finalize your tracks?</p>
-                                <p class="text-warning">Finalizing tracks cannot be undone. Once finalized, tracks can no longer be created or deleted. Existing tracks can still be edited. </p>
-                            </div>
-                            <div class="modal-footer">
-                                <a class="btn btn-lg btn-primary" data-dismiss="modal"> Close </a>
-                                <a class="btn btn-lg btn-danger" href="{% url 'ab:finalize_tracks' experiment.id %}"> Yes, Finalize Tracks </a>
-                            </div>
+                        <div class="col-lg-3 col-md-3 col-sm-3">
                         </div>
                     </div>
+                {% empty %}
+                    <br>
+                    <p>No Experiments.  Create a new one to get started.</p>
+                {% endfor %}
                 </div>
-                <!-- END Modal code for Finalize Tracks confirmation box-->
-                <br>
-                {% else %}
-                <a id="create_track_button_disabled" class="btn btn-lg btn-success disabled"> Create New Track</a>
-                <a id="finalize_button_disabled" class="btn btn-lg btn-danger disabled"> Finalize Tracks</a>
-                <br><br>
-                <h4 class="text-center nowrap">Tracks Are Finalized.</h4>
-                <h5 class="text-center nowrap">Note: Tracks can no longer be deleted or created. Existing tracks can still be edited.</h5>
-                {% endif %}
-                <br>
-                <div class="list-group span4">
-                    {% for m in tracks %}
-                        <h4>
-                            <span><strong>{{m.name}} </strong></span>
-                        </h4>
-                    {% empty %}
-                        <br>
-                        <p>No Tracks found.</p>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-        
-        <!-- Tab for Intervention Points-->
-        <div id="tabs-2">
-            <div class="span8">
-                <p> Create and edit your Intervention Points here.</p>
-                <p>Helpful tip: an "Intervention Point" is a specific place in the course where you want to A/B test across your student track groups using a intervention URL for each track group.</p>
-                <br>
-                <a id="create_new_intervention_point_button" class="btn btn-lg btn-success" style="align:left" href="{% url 'ab:create_intervention_point' %}"> Create New Intervention Point</a>
-                <br><br>
-        
-                <div class="list-group span4">
-                    {% for t in intervention_points %}
-                    <a href="{% url 'ab:edit_intervention_point' t.id %}" class="list-group-item"><strong>{{t.name}}</strong> <i>{{t.is_missing_urls|yesno:"- URLs missing,complete"}}</i></a>
-                    {% endfor %}
-                </div>
-            </div>
         </div>
         
         <!-- Tab for Modules-->
@@ -165,18 +102,6 @@
                 </div>
             </div>
         </div>
-        
-        <!-- Tab for Data-->
-        <div id="tabs-4">
-            <div class="span8">
-                <p> Download a CSV file of your A/B testing data here. </p>
-                <br>
-                <a id="download_data_button" href="{% url 'ab:download_data' %}" class="btn btn-lg btn-primary"> Download Data</a>
-                <a id="download_intervention_point_deployments_button" href="{% url 'ab:download_intervention_point_deployments' %}" class="btn btn-lg btn-primary"> Download Intervention Point Deployments</a>
-            </div>
-        </div>
-
-    <!-- End Tabs-->
     </div>
 </div>
 

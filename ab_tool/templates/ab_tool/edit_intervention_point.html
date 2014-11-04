@@ -32,7 +32,7 @@
             {% endif %}
             <form method="post" class="form-horizontal" name="intervention_point_form"
                 {% if intervention_point.id %} action="{% url 'ab:submit_edit_intervention_point' intervention_point.id %}"
-                {% else %} action="{% url 'ab:submit_create_intervention_point' experiment_id %}" {% endif %}>
+                {% else %} action="{% url 'ab:submit_create_intervention_point' experiment.id %}" {% endif %}>
             {% csrf_token %}
                 <table class="table">
                 <tr align="left">
@@ -49,12 +49,12 @@
                         <input type="radio" name="is_canvas_page_for_track_{{t.id}}" value="canvas_url" {% if s.is_canvas_page %} checked="checked" {% endif %}> Canvas Page
                     </td>
                     <td class="col-xs-2"><input type="checkbox"  name="open_as_tab_for_track_{{t.id}}" value="true" {% if s.open_as_tab == True %} checked="checked" {% endif %} > Open In New Tab</td>
-                    <td><a id="preview_{{t.id}}" target="_blank" href="" class="btn btn-xs btn-success preview-btn"/>Preview URL</a></td>
+                    <td><a id="preview_{{t.id}}" target="_blank" href="" class="btn btn-xs btn-success preview-btn">Preview URL</a></td>
                 </tr>
                 {% endfor %}
                 <tr align="left">
                     <td><label>Intervention Point Notes</label></td>
-                    <td><textarea name="notes" rows="6" cols="80" >{{ intervention_point.notes }}</textarea></td>
+                    <td><textarea name="notes" rows="3" cols="80" >{{ intervention_point.notes }}</textarea></td>
                 </tr>
                 <tr>
                 <td></td>
@@ -69,18 +69,6 @@
 </div>
 <script src="{% static 'ab_tool/js/jquery-1.10.1.min.js' %}"></script>
 <script src="{% static 'ab_tool/js/bootstrap.min.js' %}"></script>
-<script>
-
-function set_preview_href() {
-    url = $(this).closest('.url_box').find(".url_box_input")[0].value; // fetches value from input
-    if (url.substring(0, 7) != "http://" && url.substring(0, 8) != "https://") {
-        url = "http://" + url;
-    }
-    this.href = url;
-}
-
-$(".preview-btn").click(set_preview_href);
-
-</script>
+<script src="{% static 'ab_tool/js/edit_intervention_point.js' %}"></script>
 </body>
 </html>
