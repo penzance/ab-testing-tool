@@ -9,6 +9,11 @@ from django_canvas_oauth.exceptions import (NewTokenNeeded, BadLTIConfigError,
     BadOAuthReturnError)
 
 
+BASE_URL_PATTERN = "https://%s/"
+AUTHORIZE_URL_PATTERN = "https://%s/login/oauth2/auth"
+ACCESS_TOKEN_URL_PATTERN = "https://%s/login/oauth2/token"
+
+
 def get_token(request):
     """ Retrieves a token for the user if one exists already.
         If there isn't one, it raises a NewTokenNeeded exception.  If this
@@ -61,9 +66,9 @@ def oauth_callback(request):
 def get_oauth_service(request):
     """ Gets the rauth oauth2 service to handle this request """
     canvas_domain = get_lti_param(request, "custom_canvas_api_domain")
-    base_url = "https://%s/" % canvas_domain
-    authorize_url = "https://%s/login/oauth2/auth" % canvas_domain
-    access_token_url = "https://%s/login/oauth2/token" % canvas_domain
+    base_url = BASE_URL_PATTERN % canvas_domain
+    authorize_url = AUTHORIZE_URL_PATTERN % canvas_domain
+    access_token_url = ACCESS_TOKEN_URL_PATTERN % canvas_domain
     return OAuth2Service(client_id=settings.CANVAS_OAUTH_CLIENT_ID,
                          client_secret=settings.CANVAS_OAUTH_CLIENT_SECRET,
                          name="canvas",
