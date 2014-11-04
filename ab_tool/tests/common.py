@@ -121,8 +121,10 @@ class SessionTestCase(TestCase):
             raise Exception("Function either raises no exception or is "
                             "non-deterministic")
     
-    def create_test_experiment(self, course_id=TEST_COURSE_ID, name="testexperiment"):
-        return Experiment.objects.create(name=name, course_id=course_id)
+    def create_test_experiment(self, course_id=TEST_COURSE_ID, name="testexperiment",
+                               assignment_method=Experiment.UNIFORM_RANDOM):
+        return Experiment.objects.create(name=name, course_id=course_id,
+                                         assignment_method=assignment_method)
     
     def create_test_track(self, course_id=TEST_COURSE_ID, name="testtrack", experiment=None):
         if not experiment:

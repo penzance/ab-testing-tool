@@ -29,7 +29,7 @@ class TestExperimentPages(SessionTestCase):
         self.assertTemplateUsed(response, "ab_tool/edit_experiment.html")
     
     def test_edit_experiment_view_with_tracks_weights(self):
-        """ Tests edit_experiment template renders when authenticated """
+        """ Tests edit_experiment template renders properly with track weights """
         experiment = self.create_test_experiment()
         track1 = self.create_test_track(name="track1", experiment=experiment)
         self.create_test_track(name="track2", experiment=experiment)
@@ -105,7 +105,7 @@ class TestExperimentPages(SessionTestCase):
     
     def test_submit_edit_experiment_with_track_weights(self):
         """ Tests that submit_edit_experiment does not change DB count but does change Experiment
-            attribute"""
+            attribute with track weights"""
         experiment = self.create_test_experiment(name="old_name")
         experiment_id = experiment.id
         num_experiments = Experiment.objects.count()
@@ -235,8 +235,8 @@ class TestExperimentPages(SessionTestCase):
         """ Tests that finalize fails if there are missing urls """
         experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
         self.assertFalse(experiment.tracks_finalized)
-        track1 = self.create_test_track(name="track1")
-        self.create_test_track(name="track2")
+        track1 = self.create_test_track(name="track1", experiment=experiment)
+        self.create_test_track(name="track2", experiment=experiment)
         intervention_point = self.create_test_intervention_point()
         InterventionPointUrl.objects.create(intervention_point=intervention_point,
                                             track=track1, url="example.com")
@@ -246,8 +246,17 @@ class TestExperimentPages(SessionTestCase):
         self.assertFalse(experiment.tracks_finalized)
     
     def test_finalize_tracks_no_tracks(self):
-        """ Tests that finalize fails if there are no experiments """
+        """ Tests that finalize fails if there are no tracks for an experiment """
         experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
         response = self.client.get(reverse("ab:finalize_tracks", args=(experiment.id,)),
                                    follow=True)
         self.assertError(response, NO_TRACKS_FOR_EXPERIMENT)
+    
+    def test_finalize_tracks_missing_track_weights(self):
+        """ Tests that finalize fails if there are no track weights for an weighted
+            probability experiment """
+        experiment = self.create_test_experiment(assignment_method=Experiment.WEIGHTED_PROBABILITY_RANDOM)
+        self.create_test_track(name="track1", experiment=experiment)
+        self.client.get(reverse("ab:finalize_tracks", args=(experiment.id,)),
+                                   follow=True)
+        self.assertFalse(experiment.tracks_finalized)

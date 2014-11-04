@@ -80,7 +80,8 @@ class TestInterventionPointPages(SessionTestCase):
         self.assertEqual(response.status_code, 302)
     
     def test_deploy_intervention_point_no_url(self):
-        """ Tests depoloy intervention_point for student with no url errors """
+        """ Tests deploy intervention_point with existing InterventionPointUrl
+            for student with NO_URL_FOR_TRACK error """
         self.set_roles([])
         experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
         experiment.update(tracks_finalized=True)
@@ -93,6 +94,50 @@ class TestInterventionPointPages(SessionTestCase):
         response = self.client.get(reverse("ab:deploy_intervention_point",
                                            args=(intervention_point.id,)))
         self.assertError(response, NO_URL_FOR_TRACK)
+    
+    def test_deploy_intervention_point_with_no_interventionpointurl_created(self):
+        """ Tests deploy intervention_point with no InterventionPointUrl
+            for student with NO_URL_FOR_TRACK error """
+        self.set_roles([])
+        experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
+        experiment.update(tracks_finalized=True)
+        intervention_point = self.create_test_intervention_point()
+        track = self.create_test_track()
+        ExperimentStudent.objects.create(course_id=TEST_COURSE_ID, experiment=experiment,
+                                         student_id=TEST_STUDENT_ID, track=track)
+        response = self.client.get(reverse("ab:deploy_intervention_point",
+                                           args=(intervention_point.id,)))
+        self.assertError(response, NO_URL_FOR_TRACK)
+    
+    def test_deploy_intervention_point_with_url_as_new_tab(self):
+        """ Tests deploy intervention_point successfully loads url as new tab"""
+        self.set_roles([])
+        experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
+        experiment.update(tracks_finalized=True)
+        intervention_point = self.create_test_intervention_point()
+        track = self.create_test_track()
+        ExperimentStudent.objects.create(course_id=TEST_COURSE_ID, experiment=experiment,
+                                         student_id=TEST_STUDENT_ID, track=track)
+        InterventionPointUrl.objects.create(intervention_point=intervention_point,
+                                            track=track, url="www.google.com", open_as_tab=True)
+        response = self.client.get(reverse("ab:deploy_intervention_point",
+                                           args=(intervention_point.id,)), follow=True)
+        self.assertTemplateUsed(response, "ab_tool/new_tab_redirect.html")
+    
+    def test_deploy_intervention_point_with_url_as_canvas_page(self):
+        """ Tests deploy intervention_point successfully loads url in a window redirect"""
+        self.set_roles([])
+        experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
+        experiment.update(tracks_finalized=True)
+        intervention_point = self.create_test_intervention_point()
+        track = self.create_test_track()
+        ExperimentStudent.objects.create(course_id=TEST_COURSE_ID, experiment=experiment,
+                                         student_id=TEST_STUDENT_ID, track=track)
+        InterventionPointUrl.objects.create(intervention_point=intervention_point,
+                                            track=track, url="www.google.com", is_canvas_page=True)
+        response = self.client.get(reverse("ab:deploy_intervention_point",
+                                           args=(intervention_point.id,)), follow=True)
+        self.assertTemplateUsed(response, "ab_tool/window_redirect.html")
     
     def test_create_intervention_point_view(self):
         """ Tests edit_intervention_point template renders for url
