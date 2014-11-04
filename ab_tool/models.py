@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404
 from ab_tool.exceptions import (UNAUTHORIZED_ACCESS,
     EXPERIMENT_TRACKS_ALREADY_FINALIZED, TRACK_WEIGHTS_ERROR)
 
+
 class TimestampedModel(models.Model):
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
@@ -31,6 +32,7 @@ class CourseObject(TimestampedModel):
         if obj.course_id != course_id:
             raise UNAUTHORIZED_ACCESS
         return obj
+
 
 class Experiment(CourseObject):
     UNIFORM_RANDOM = 1
@@ -61,7 +63,7 @@ class Experiment(CourseObject):
             method until interface supports multiple experiments.
             TODO: Remove once multiple experiments are supported """
         return Experiment.objects.get_or_create(course_id=course_id, name="Experiment 1")[0]
-
+    
     def set_number_of_tracks(self, num):
         """ Sets number of tracks to num """
         current_num = self.tracks.count()
