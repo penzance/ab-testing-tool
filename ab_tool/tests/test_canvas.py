@@ -9,6 +9,11 @@ from requests.exceptions import RequestException
 from django_canvas_oauth.exceptions import NewTokenNeeded
 
 class TestCanvas(SessionTestCase):
+    def mock_request_exception(self):
+        exception = RequestException()
+        exception.response = MagicMock()
+        return exception
+    
     def mock_unauthorized_exception(self):
         exception = RequestException()
         exception.response = MagicMock()
@@ -42,12 +47,12 @@ class TestCanvas(SessionTestCase):
         self.assertEqual(list_module_items(request_context, TEST_COURSE_ID, 0),
                          ["item"])
     
-    @patch(LIST_ITEMS, side_effect=RequestException())
-    def test_list_module_items_error(self, _mock):
+    def test_list_module_items_error(self):
         """ Tests that list_module_items correctly catches RequestExceptions """
         request_context = get_canvas_request_context(self.request)
-        self.assertRaisesSpecific(NO_SDK_RESPONSE, list_module_items,
-                                  request_context, TEST_COURSE_ID, 0)
+        with patch(LIST_ITEMS, side_effect=self.mock_request_exception()):
+            self.assertRaisesSpecific(NO_SDK_RESPONSE, list_module_items,
+                                      request_context, TEST_COURSE_ID, 0)
     
     def test_list_module_items_new_token_needed(self):
         """ Tests that list_module_items raises a NewTokenNeeded exception
@@ -64,12 +69,12 @@ class TestCanvas(SessionTestCase):
         request_context = get_canvas_request_context(self.request)
         self.assertEqual(list_modules(request_context, TEST_COURSE_ID), ["item"])
     
-    @patch(LIST_MODULES, side_effect=RequestException())
-    def test_list_modules_error(self, _mock):
+    def test_list_modules_error(self):
         """ Tests that list_modules correctly catches RequestExceptions """
         request_context = get_canvas_request_context(self.request)
-        self.assertRaisesSpecific(NO_SDK_RESPONSE, list_modules,
-                                  request_context, TEST_COURSE_ID)
+        with patch(LIST_MODULES, side_effect=self.mock_request_exception()):
+            self.assertRaisesSpecific(NO_SDK_RESPONSE, list_modules,
+                                      request_context, TEST_COURSE_ID)
     
     def test_list_modules_new_token_needed(self):
         """ Tests that list_modules raises a NewTokenNeeded exception
