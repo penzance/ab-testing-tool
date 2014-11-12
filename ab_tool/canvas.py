@@ -8,6 +8,7 @@ from ab_tool.exceptions import (MISSING_LTI_PARAM, MISSING_LTI_LAUNCH,
     NO_SDK_RESPONSE)
 from requests.exceptions import RequestException
 from django_canvas_oauth import get_token
+from django_canvas_oauth.exceptions import NewTokenNeeded
 
 
 logger = logging.getLogger(__name__)
@@ -18,19 +19,14 @@ def list_module_items(request_context, course_id, module_id):
         return modules.list_module_items(request_context, course_id, module_id,
                                          "content_details").json()
     except RequestException as exception:
-        logger.error(repr(exception))
-        logger.error(traceback.format_exc())
-        raise NO_SDK_RESPONSE
-
+        handle_canvas_error(exception)
 
 def list_modules(request_context, course_id):
     try:
         return modules.list_modules(request_context, course_id,
                                     "content_details").json()
     except RequestException as exception:
-        logger.error(repr(exception))
-        logger.error(traceback.format_exc())
-        raise NO_SDK_RESPONSE
+        handle_canvas_error(exception)
 
 
 def get_lti_param(request, key):
@@ -54,3 +50,12 @@ def get_canvas_request_context(request):
     canvas_domain = get_lti_param(request, "custom_canvas_api_domain")
     canvas_url = "https://%s/api" % (canvas_domain)
     return RequestContext(oauth_token, canvas_url)
+
+
+def handle_canvas_error(exception):
+    if (exception.response.status_code == 401
+        and exception.response.reason == "Unauthorized"):
+        raise NewTokenNeeded("Your canvas oauth token is invalid")
+    logger.error(repr(exception))
+    logger.error(traceback.format_exc())
+    raise NO_SDK_RESPONSE
