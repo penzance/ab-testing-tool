@@ -4,10 +4,9 @@ from django_auth_lti.decorators import lti_role_required
 
 from ab_tool.models import (Track, InterventionPointUrl, InterventionPoint,
     Experiment)
-from ab_tool.controllers import (get_uninstalled_intervention_points, intervention_point_url,
-    post_param)
+from ab_tool.controllers import (intervention_point_url, post_param)
 from ab_tool.constants import STAGE_URL_TAG, ADMINS
-from ab_tool.canvas import get_lti_param
+from ab_tool.canvas import get_lti_param, CanvasModules
 from ab_tool.exceptions import (MISSING_RETURN_TYPES_PARAM,
     MISSING_RETURN_URL)
 
@@ -16,6 +15,7 @@ from ab_tool.exceptions import (MISSING_RETURN_TYPES_PARAM,
 def resource_selection(request):
     """ docs: https://canvas.instructure.com/doc/api/file.link_selection_tools.html """
     course_id = get_lti_param(request, "custom_canvas_course_id")
+    canvas_modules = CanvasModules(request)
     ext_content_return_types = request.POST.getlist('ext_content_return_types')
     if ext_content_return_types != ['lti_launch_url']:
         raise MISSING_RETURN_TYPES_PARAM
@@ -24,7 +24,7 @@ def resource_selection(request):
         raise MISSING_RETURN_URL
     all_experiments = Experiment.objects.filter(course_id=course_id)
     context = {"content_return_url": content_return_url,
-               "intervention_points": get_uninstalled_intervention_points(request),
+               "intervention_points": canvas_modules.get_uninstalled_intervention_points(),
                "tracks": Track.objects.filter(course_id=course_id),
                "experiments": all_experiments,
                }

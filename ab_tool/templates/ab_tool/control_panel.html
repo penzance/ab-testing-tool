@@ -60,7 +60,7 @@
                         <div class="col-lg-8 col-md-8 col-sm-8">
                             <div class="list-group">
                                 {% for t in experiment.intervention_points.all %}
-                                    <a href="{% url 'ab:edit_intervention_point' t.id %}" class="list-group-item"><strong>Intervention Point</strong> "{{t.name}}" <i>{{t.is_missing_urls|yesno:"- URLs missing,complete"}}</i></a>
+                                    <a href="{% url 'ab:edit_intervention_point' t.id %}" class="list-group-item"><strong>Intervention Point</strong> "{{t.name|default:"[Not named]"}}" <i>{{t.is_missing_urls|yesno:"- URLs missing,complete"}}</i></a>
                                 {% endfor %}
                             </div>
                         </div>

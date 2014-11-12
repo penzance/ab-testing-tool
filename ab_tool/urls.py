@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, url
 
-from ab_tool.views.main_pages import (render_intervention_point_control_panel, not_authorized,
+from ab_tool.views.main_pages import (render_control_panel, not_authorized,
     tool_config, download_track_assignments, submit_assignment_method,
     download_intervention_point_deployments)
 
@@ -14,7 +14,7 @@ from ab_tool.views.experiment_pages import (create_experiment, submit_create_exp
     edit_experiment, submit_edit_experiment, delete_experiment, finalize_tracks)
 
 urlpatterns = patterns('',
-    url(r'^$', render_intervention_point_control_panel, name='index'),
+    url(r'^$', render_control_panel, name='index'),
     url(r'^not_authorized$', not_authorized, name='not_authorized'),
     url(r'^download_track_assignments/(?P<experiment_id>\d+)$', download_track_assignments, name='download_data'),
     url(r'^download_intervention_point_deployments/(?P<experiment_id>\d+)$', download_intervention_point_deployments,

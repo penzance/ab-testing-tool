@@ -6,9 +6,8 @@ from ab_tool.constants import (ADMINS, STAGE_URL_TAG,
     DEPLOY_OPTION_TAG, AS_TAB_TAG)
 from ab_tool.models import (InterventionPoint, Track, InterventionPointUrl,
      ExperimentStudent, Experiment)
-from ab_tool.canvas import get_lti_param
-from ab_tool.controllers import (intervention_point_is_installed, format_url,
-    post_param, assign_track_and_create_student)
+from ab_tool.canvas import get_lti_param, CanvasModules
+from ab_tool.controllers import (format_url, post_param, assign_track_and_create_student)
 from ab_tool.exceptions import (DELETING_INSTALLED_STAGE,
     EXPERIMENT_TRACKS_NOT_FINALIZED, NO_URL_FOR_TRACK)
 from ab_tool.analytics import log_intervention_point_deployment
@@ -126,6 +125,7 @@ def edit_intervention_point(request, intervention_point_id):
 def edit_intervention_point_common(request, intervention_point_id):
     """ Common core shared between edit_intervention_point and modules_page_edit_intervention_point """
     course_id = get_lti_param(request, "custom_canvas_course_id")
+    canvas_modules = CanvasModules(request)
     intervention_point = InterventionPoint.get_or_404_check_course(
             intervention_point_id, course_id)
     all_tracks = Track.objects.filter(course_id=course_id,
@@ -141,7 +141,7 @@ def edit_intervention_point_common(request, intervention_point_id):
             track_urls.append((track, None))
     context = {"intervention_point": intervention_point,
                "tracks": track_urls,
-               "is_installed": intervention_point_is_installed(request, intervention_point),
+               "is_installed": canvas_modules.intervention_point_is_installed(intervention_point),
                #TODO: "installed_module": installed_module,
                }
     return context
@@ -183,7 +183,8 @@ def delete_intervention_point(request, intervention_point_id):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     intervention_point = InterventionPoint.get_or_404_check_course(
             intervention_point_id, course_id)
-    if intervention_point_is_installed(request, intervention_point):
+    canvas_modules = CanvasModules(request)
+    if canvas_modules.intervention_point_is_installed(intervention_point):
         raise DELETING_INSTALLED_STAGE
     intervention_point.delete()
     return redirect(reverse("ab:index"))
