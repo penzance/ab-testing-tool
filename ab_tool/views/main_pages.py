@@ -86,13 +86,3 @@ def download_intervention_point_deployments(request, experiment_id):
     file_title = "%s_intervention_point_deployments.csv" % slugify(course_title)
     experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
     return get_intervention_point_deployment_csv(experiment, file_title)
-
-
-@lti_role_required(ADMINS)
-def submit_assignment_method(request, experiment_id):
-    course_id = get_lti_param(request, "custom_canvas_course_id")
-    experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
-    experiment.assert_not_finalized()
-    assignment_method = post_param(request, "assignment_method")
-    experiment.update(assignment_method=assignment_method)
-    return redirect(reverse("ab:index") + "#tabs-5")
