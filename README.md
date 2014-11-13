@@ -13,11 +13,11 @@ courses that impact the success of students.
 
 ## About the tool
 The A/B Testing Tool complements existing features within Canvas that provide
-data about how the platform is used. An LTI optimized for Canvas, the A/B Testing Tool:
+data about how the platform is used. An LTI optimized for Canvas, the A/B Testing Tool creates experiments that:
 
-* divides course enrollment into sets of users that are part of a **track** unique to the course
+* divide course enrollment into sets of users that are part of a **track** unique to the course
 
-* applies interventions by displaying different content to each track at
+* apply interventions by displaying different content to each track at
   **intervention points** throughout the course
 
 For more information, take a look at [these slides](https://docs.google.com/a/g.harvard.edu/presentation/d/1Yj5ov_hfg5jryGcwVNKqIRDy12ZYmA6kkSLi24zAZRs)
