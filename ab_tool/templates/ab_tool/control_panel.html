@@ -86,7 +86,7 @@
                                 <ul class="list-group">
                                     {% for i in m.module_items %}
                                         {% if i.is_intervention_point %}
-                                            <a class="list-group-item active">{{i.title}} | <i> Intervention Point</i></a>
+                                            <a class="list-group-item active">{{i.database_name}} | Title Displayed on Canvas: {{i.title}} | <i> Intervention Point</i></a>
                                         {% else %}
                                             <p class="list-group-item">{{i.title|default:"[ Item not titled]"}}</p>
                                         {% endif %}

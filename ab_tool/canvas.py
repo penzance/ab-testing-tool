@@ -64,12 +64,15 @@ class CanvasModules(object):
                 is_intervention_point = (item["type"] == "ExternalTool" and "external_url" in item
                             and item["external_url"] in intervention_point_urls)
                 item["is_intervention_point"] = is_intervention_point
+                if is_intervention_point:
+                    item["database_name"] = intervention_point_urls[item["external_url"]].name
         return self.modules
     
     def _all_intervention_point_urls(self):
-        """ Returns the deploy urls of all intervention_points in the database for that course"""
-        return [intervention_point_url(self.request, intervention_point.id) for intervention_point in
-                InterventionPoint.objects.filter(course_id=self.course_id)]
+        """ Returns a dict of deploy urls to intervention points of all intervention_points
+            in the database for that course"""
+        return {intervention_point_url(self.request, intervention_point.id): intervention_point
+                for intervention_point in InterventionPoint.objects.filter(course_id=self.course_id)}
 
 
 def list_module_items(request_context, course_id, module_id):

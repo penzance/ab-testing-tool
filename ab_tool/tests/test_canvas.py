@@ -9,7 +9,6 @@ from requests.exceptions import RequestException
 from ab_tool.controllers import intervention_point_url
 
 class TestCanvas(SessionTestCase):
-    
     def get_canvas_modules(self, list_modules_return=[], list_items_return=[]):
         with patch(LIST_MODULES, return_value=APIReturn(list_modules_return)):
             with patch(LIST_ITEMS, return_value=APIReturn(list_items_return)):
@@ -119,7 +118,7 @@ class TestCanvas(SessionTestCase):
         intervention_point = self.create_test_intervention_point()
         urls = self.get_canvas_modules()._all_intervention_point_urls()
         self.assertEqual(len(urls), 1)
-        self.assertEqual([intervention_point_url(self.request, intervention_point.id)], urls)
+        self.assertEqual({intervention_point_url(self.request, intervention_point.id): intervention_point}, urls)
     
     def test_all_intervention_point_urls_multiple_courses(self):
         """ Tests that all_intervention_point_urls only returns the url for the intervention_point
@@ -128,4 +127,4 @@ class TestCanvas(SessionTestCase):
         self.create_test_intervention_point(name="ip2", course_id=TEST_OTHER_COURSE_ID)
         urls = self.get_canvas_modules()._all_intervention_point_urls()
         self.assertEqual(len(urls), 1)
-        self.assertEqual([intervention_point_url(self.request, intervention_point.id)], urls)
+        self.assertEqual({intervention_point_url(self.request, intervention_point.id): intervention_point}, urls)

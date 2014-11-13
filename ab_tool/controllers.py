@@ -49,7 +49,6 @@ def intervention_point_url(request, intervention_point_id):
     return request.build_absolute_uri(reverse("ab:deploy_intervention_point",
                                               args=(intervention_point_id,)))
 
-
 def format_url(url):
     """ Adds "http://" to the beginning of a url if it isn't there """
     if url.startswith("http://") or url.startswith("https://"):
