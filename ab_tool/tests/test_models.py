@@ -1,6 +1,6 @@
 from ab_tool.tests.common import SessionTestCase, TEST_COURSE_ID
-from ab_tool.models import Track, InterventionPointUrl, Experiment,\
-    TrackProbabilityWeight
+from ab_tool.models import (Track, InterventionPointUrl, Experiment,
+    TrackProbabilityWeight)
 from ab_tool.exceptions import TRACK_WEIGHTS_ERROR
 
 
@@ -79,6 +79,8 @@ class TestModels(SessionTestCase):
         self.assertTrue(track2 not in experiment.tracks.all())
     
     def test_set_track_weights_raises_error(self):
+        """ Tests that set_track_weights fails because len(weights_list) is less
+            than number of tracks. There needs to be a weight per track """
         experiment = self.create_test_experiment()
         track1 = self.create_test_track(name="track1", experiment=experiment)
         track2 = self.create_test_track(name="track2", experiment=experiment)
@@ -86,11 +88,12 @@ class TestModels(SessionTestCase):
         self.assertRaisesSpecific(TRACK_WEIGHTS_ERROR, experiment.set_track_weights, weights_list)
     
     def test_set_track_weights_updates_weights(self):
+        """ Tests that set_track_weights successfully updates new values for weights """
         experiment = self.create_test_experiment()
         track1 = self.create_test_track(name="track1", experiment=experiment)
         track2 = self.create_test_track(name="track2", experiment=experiment)
-        track1_weight = self.create_test_track_weight(track=track1, experiment=experiment)
-        track2_weight = self.create_test_track_weight(track=track2, experiment=experiment)
+        track1_weight = self.create_test_track_weight(track=track1, experiment=experiment, weighting=1)
+        track2_weight = self.create_test_track_weight(track=track2, experiment=experiment, weighting=1)
         weights_list = [30, 70]
         experiment.set_track_weights(weights_list)
         self.assertTrue(experiment.track_probabilites.count() == len(weights_list))
@@ -98,6 +101,8 @@ class TestModels(SessionTestCase):
         self.assertTrue(TrackProbabilityWeight.objects.get(pk=track2_weight.id).weighting == weights_list[1])
     
     def test_set_track_weights_creates_weights(self):
+        """ Tests that set_track_weights successfully creates correct amount of
+            weights """
         experiment = self.create_test_experiment()
         track1 = self.create_test_track(name="track1", experiment=experiment)
         track2 = self.create_test_track(name="track2", experiment=experiment)

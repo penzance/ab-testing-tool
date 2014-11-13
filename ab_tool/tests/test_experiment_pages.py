@@ -103,9 +103,9 @@ class TestExperimentPages(SessionTestCase):
         experiment = Experiment.objects.get(id=experiment_id)
         self.assertEquals(experiment.name, "new_name")
     
-    def test_submit_edit_experiment_with_track_weights(self):
-        """ Tests that submit_edit_experiment does not change DB count but does change Experiment
-            attribute with track weights"""
+    def test_submit_edit_experiment_changes_assignment_method_to_weighted(self):
+        """ Tests that submit_edit_experiment changes an Experiment's assignment
+            method from uniform (default) to weighted"""
         experiment = self.create_test_experiment(name="old_name")
         experiment_id = experiment.id
         num_experiments = Experiment.objects.count()
@@ -120,6 +120,24 @@ class TestExperimentPages(SessionTestCase):
         experiment = Experiment.objects.get(id=experiment_id)
         self.assertEquals(experiment.assignment_method, new_assignment_method)
         self.assertEquals(experiment.track_probabilites.count(), no_track_weights + 2)
+    
+    def test_submit_edit_experiment_changes_assignment_method_to_uniform(self):
+        """ Tests that submit_edit_experiment changes an Experiment's assignment
+            method from weighted uniform """
+        experiment = self.create_test_experiment(name="old_name", assignment_method=Experiment.WEIGHTED_PROBABILITY_RANDOM)
+        experiment_id = experiment.id
+        num_experiments = Experiment.objects.count()
+        no_tracks = experiment.tracks.count()
+        new_assignment_method = Experiment.UNIFORM_RANDOM
+        data = {"name": "new_name", "notes": "hi", "assignment_method": new_assignment_method,
+                "uniform_tracks": 3 }
+        response = self.client.post(
+                reverse("ab:submit_edit_experiment", args=(experiment_id,)), data, follow=True)
+        self.assertOkay(response)
+        self.assertEquals(num_experiments, Experiment.objects.count())
+        experiment = Experiment.objects.get(id=experiment_id)
+        self.assertEquals(experiment.assignment_method, new_assignment_method)
+        self.assertEquals(experiment.tracks.count(), no_tracks + 3)
     
     def test_submit_edit_experiment_unauthorized(self):
         """ Tests submit_edit_experiment when unauthorized"""

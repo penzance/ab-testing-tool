@@ -5,8 +5,8 @@ from json import dumps
 from mock import patch, MagicMock
 
 from ab_tool.constants import ADMINS
-from ab_tool.models import Experiment, Track, InterventionPoint,\
-    TrackProbabilityWeight
+from ab_tool.models import (Experiment, Track, InterventionPoint,
+    TrackProbabilityWeight)
 from error_middleware.exceptions import DEFAULT_ERROR_STATUS, RenderableError
 from error_middleware.middleware import ERROR_TEMPLATE
 

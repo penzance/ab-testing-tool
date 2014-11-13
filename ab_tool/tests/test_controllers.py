@@ -32,7 +32,7 @@ class TestControllers(SessionTestCase):
         self.assertTrue(student in ExperimentStudent.objects.all())
         self.assertTrue(student.track == track)
 
-    def test_assign_track_and_create_student_with_weights_raises_error(self):
+    def test_assign_track_and_create_student_without_weights_raises_error(self):
         experiment = self.create_test_experiment(assignment_method=Experiment.WEIGHTED_PROBABILITY_RANDOM)
         self.create_test_track(experiment=experiment)
         data = {"experiment": experiment, "student_id":TEST_STUDENT_ID,
