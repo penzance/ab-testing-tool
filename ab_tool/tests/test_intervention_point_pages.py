@@ -362,7 +362,7 @@ class TestInterventionPointPages(SessionTestCase):
         intervention_point = self.create_test_intervention_point()
         self.assertEqual(first_num_intervention_points + 1, InterventionPoint.objects.count())
         ret_val = [True]
-        with patch("ab_tool.canvas.CanvasModules.intervention_point_is_installed",
+        with patch("ab_tool.views.intervention_point_pages.intervention_point_is_installed",
                    return_value=ret_val):
             response = self.client.get(reverse("ab:delete_intervention_point", args=(intervention_point.id,)),
                                        follow=True)
