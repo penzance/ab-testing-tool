@@ -31,26 +31,16 @@ class CanvasModules(object):
         """ Returns the list of InterventionPoint objects that have been created for the
             current course but not installed in any of that course's modules """
         
-        installed_intervention_point_urls = self.get_installed_intervention_points()
+        installed_intervention_point_urls = self._get_installed_intervention_point_urls()
         intervention_points = [intervention_point for intervention_point in
                                InterventionPoint.objects.filter(course_id=self.course_id)
                                if intervention_point_url(self.request, intervention_point.id)
                                not in installed_intervention_point_urls]
         return intervention_points
     
-    def get_installed_intervention_points(self):
-        """ Returns the list of InterventionPointUrls (as strings) for InterventionPoints
-            that have been installed in at least one of the courses modules. """
-        installed_intervention_point_urls = []
-        for module in self.modules:
-            intervention_point_urls = [item["external_url"] for item in module["module_items"]
-                          if item["type"] == "ExternalTool"]
-            installed_intervention_point_urls.extend(intervention_point_urls)
-        return installed_intervention_point_urls
-    
     def intervention_point_is_installed(self, intervention_point):
         return (intervention_point_url(self.request, intervention_point.id) in
-                self.get_installed_intervention_points())
+                self._get_installed_intervention_point_urls())
     
     def get_modules_with_items(self):
         """ Returns a list of all modules with the items of that module added to the
@@ -73,6 +63,16 @@ class CanvasModules(object):
             in the database for that course"""
         return {intervention_point_url(self.request, intervention_point.id): intervention_point
                 for intervention_point in InterventionPoint.objects.filter(course_id=self.course_id)}
+    
+    def _get_installed_intervention_point_urls(self):
+        """ Returns the list of InterventionPointUrls (as strings) for InterventionPoints
+            that have been installed in at least one of the courses modules. """
+        installed_intervention_point_urls = []
+        for module in self.modules:
+            intervention_point_urls = [item["external_url"] for item in module["module_items"]
+                          if item["type"] == "ExternalTool"]
+            installed_intervention_point_urls.extend(intervention_point_urls)
+        return installed_intervention_point_urls
 
 
 def list_module_items(request_context, course_id, module_id):
