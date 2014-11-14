@@ -1,0 +1,254 @@
+
+{% extends "ab_tool/base_lti.html" %}
+{% load static %}
+
+{% block stylesheet %}
+{{ block.super }}
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <header>
+        <div class="row lti-header">
+            <h1>A/B Testing (<a href="experimentsDashboard.html">this</a>)</h1>
+        </div>
+    </header>
+    <main>
+        <div class="row row-lti col-md-8">
+            <p>
+                Pellentesque mattis sit amet felis elementum vulputate. Pellentesque ac ipsum volutpat, ornare dolor quis, interdum ex. Cras consectetur mattis sapien, non fringilla eros convallis pretium. Vivamus volutpat neque sed leo porta auctor. Nullam feugiat vulputate convallis. Nullam mattis porttitor hendrerit. Aenean congue dignissim enim, et pulvinar elit accumsan ac. Donec a lorem leo. Fusce arcu neque, porta a dictum eget, vulputate at quam. Nulla cursus odio eu eros tempus mattis. Read our <a href="#">documentation wiki</a> for
+                more detail info.
+            </p>
+        </div>
+        <div class="row row-lti col-md-8">
+
+            <h2><a href="newExperiment.html">New Experiment</a></h2>
+            <!-- experiment 1 (start) -->
+            <div class="panel panel-default">
+                <!-- Default panel contents -->
+                <div class="panel-heading lti-inline-block">
+                    <div class="pull-left">
+                        <h3><a href="#">Experiment 1</a></h3>
+                        <small>(uniform random)</small>
+                        <p>
+                            <small>
+                            3 tracks | 0 Intervention Points<br/>
+                            Last modified 10/10/2014
+                            </small>
+                        </p>
+                    </div>
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-primary btn-xs">
+                            Start Experiment
+                        </button>
+                        <button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#addIntervention">
+                            Add Intervention
+                        </button>
+                        <button type="button" class="btn btn-primary btn-xs">
+                            Copy Experiment
+                        </button>
+                        <button type="button" class="btn btn-primary btn-xs disabled">
+                            Download Data
+                        </button>
+                    </div>
+                </div>
+                <!--div class="panel-body">
+                    <p>...</p>
+                </div-->
+
+                <!-- List group -->
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <a href="#" data-toggle="modal" data-target="#editIntervention">Intervention point 1</a><br>
+                        <a href="#">Module</a> | Last modified 10/10/14
+                    </li>
+                    <li class="list-group-item">
+                        <a href="#">Intervention point 2</a><br>
+                        <a href="#">Module</a> | Last modified 10/10/14
+                    </li>
+                    <li class="list-group-item">
+                        <a href="#">Intervention point 3</a><br>
+                        <a href="#">Module</a> | Last modified 10/10/14
+                    </li>
+                </ul>
+            </div>
+            <!-- experiment 1 (end) -->
+            <!-- experiment 2 (start) -->
+            <div class="panel panel-default">
+                <!-- Default panel contents -->
+                <div class="panel-heading lti-inline-block">
+                    <div class="pull-left">
+                        <h3><a href="#">Experiment 1</a></h3>
+                        <small>(uniform random)</small>
+                        <p>
+                            <small>
+                            3 tracks | 0 Intervention Points<br/>
+                            Last modified 10/10/2014
+                            </small>
+                        </p>
+                    </div>
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-primary btn-xs">
+                            Start Experiment
+                        </button>
+                        <button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#addIntervention">
+                            Add Intervention
+                        </button>
+                        <button type="button" class="btn btn-primary btn-xs">
+                            Copy Experiment
+                        </button>
+                        <button type="button" class="btn btn-primary btn-xs disabled">
+                            Download Data
+                        </button>
+                    </div>
+                </div>
+                <!--div class="panel-body">
+                    <p>...</p>
+                </div-->
+
+                <!-- List group -->
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <a href="#">Intervention point 1</a><br>
+                        <a href="#">Module</a> | Last modified 10/10/14
+                    </li>
+                    <li class="list-group-item">
+                        <a href="#">Intervention point 2</a><br>
+                        <a href="#">Module</a> | Last modified 10/10/14
+                    </li>
+                </ul>
+            </div>
+            <!-- experiment 2 (end) -->
+        </div>
+    </main>
+</div>
+
+
+<div class="modal fade" id="addIntervention" tabindex="-1" role="dialog" aria-labelledby="addIntervention" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            <h4 class="modal-title" id="myModalLabel">New Intervention</h4>
+        </div>
+        <div class="modal-body">
+            <form class="form-horizontal" role="form">
+                <div class="form-group col-sm-12">
+                    <label for="interventionName">Name:</label>
+                    <input type="text" name="interventionName" id="interventionName" class="form-control" placeholder="Enter Intervention Name">
+                </div>
+                
+                <div class="form-group">
+                    <div class="col-sm-9">
+                        <label for="track1">Track 1:</label>
+                        <input type="text" name="track1" id="track1" class="form-control" placeholder="Enter Intervention URL">
+                    </div>
+                    <div class="col-sm-3">
+                        <label for="openTrack1in">Open in:</label>
+                        <select>
+                            <option value="newTab">New Tab</option>
+                            <option value="fullScreen">Full Screen</option>
+                            <option value="canvasPage">Canvas Page</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <div class="col-sm-9">
+                        <label for="track2">Track 2:</label>
+                        <input type="text" name="track2" id="track2" class="form-control" placeholder="Enter Intervention URL">
+                    </div>
+                    <div class="col-sm-3">
+                        <label for="openTrack1in">Open in:</label>
+                        <select>
+                            <option value="newTab">New Tab</option>
+                            <option value="fullScreen">Full Screen</option>
+                            <option value="canvasPage">Canvas Page</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group col-sm-12">
+                    <label class="contro-label" for="experimentNotes">Notes</label>
+                    <textarea name="experimentNotes" id="experimentNotes" class="form-control"></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <a class="" data-dismiss="modal">Cancel</a>
+            <button type="button" class="btn btn-primary">Save</button>
+        </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="editIntervention" tabindex="-1" role="dialog" aria-labelledby="editIntervention" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            <h4 class="modal-title" id="myModalLabel">Edit Intervention</h4>
+        </div>
+        <div class="modal-body">
+            <form class="form-horizontal" role="form">
+                <div class="form-group col-sm-12">
+                    <label for="interventionName">Name:</label>
+                    <input type="text" name="interventionName" id="interventionName" class="form-control" value="Intervention point (n)">
+                </div>
+                
+                <div class="form-group">
+                    <div class="col-sm-9">
+                        <label for="track1">Track 1:</label>
+                        <input type="text" name="track1" id="track1" class="form-control" value="http://www.google.com">
+                    </div>
+                    <div class="col-sm-3">
+                        <label for="openTrack1in">Open in:</label>
+                        <select>
+                            <option value="newTab">New Tab</option>
+                            <option selected value="fullScreen">Full Screen</option>
+                            <option value="canvasPage">Canvas Page</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <div class="col-sm-9">
+                        <label for="track2">Track 2:</label>
+                        <input type="text" name="track2" id="track2" class="form-control" value="https://canvas.icommons.harvard.edu">
+                    </div>
+                    <div class="col-sm-3">
+                        <label for="openTrack1in">Open in:</label>
+                        <select>
+                            <option selected value="newTab">New Tab</option>
+                            <option value="fullScreen">Full Screen</option>
+                            <option value="canvasPage">Canvas Page</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group col-sm-12">
+                    <label class="contro-label" for="experimentNotes">Notes</label>
+                    <textarea name="experimentNotes" id="experimentNotes" class="form-control"></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <a class="" data-dismiss="modal">Cancel</a>
+            <button type="button" class="btn btn-primary">Save</button>
+        </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block javascript %}
+{{ block.super }}
+<script type="text/javascript">
+$(document).ready(function(){
+    $('.addIntervention').modal('show');
+});
+</script>
+{% endblock %}
