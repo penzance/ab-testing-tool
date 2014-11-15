@@ -16,9 +16,9 @@
     </header>
     <main>
         <div class="row row-lti col-md-8">
-            <h3><a href="{% url 'ab:all_experiments' %}">All Experiments</a> &rsaquo; <span>New Experiment</span></h3>
+            <h3><a href="{% url 'ab:index' %}">All Experiments</a> &rsaquo; <span>New Experiment</span></h3>
             
-            <form class="form-horizontal" role="form">
+            <form class="form-horizontal" role="form" >
                 <div class="form-group">
                     <label for="experimentName">Name:</label>
                     <input type="text" name="experimentName" id="experimentName" class="form-control" placeholder="Experiment Name">
@@ -61,7 +61,7 @@
 
                 <div class="form-group">
                     <a href="#">Cancel</a>
-                    <button class="btn btn-primary" data-toggle="modal" data-target="#createExperiment">Create</button>
+                    <a class="btn btn-primary" data-toggle="modal" href="#createExperiment">Create</a>
             </form>
         </div>
     </main>

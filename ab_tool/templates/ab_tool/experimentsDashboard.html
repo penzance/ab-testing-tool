@@ -67,7 +67,7 @@
                     <ul class="list-group">
                         {% for intervention_point in experiment.intervention_points.all %}
                         <li class="list-group-item">
-                            <a href="#" data-toggle="modal" data-target="#editIntervention">Intervention Point "{{intervention_point.name}}"</a><br>
+                            <a data-toggle="modal" href="#editIntervention_{{intervention_point.id}}">Intervention Point "{{intervention_point.name}}"</a><br>
                              <!--<a href="{% url 'ab:edit_intervention_point' intervention_point.id %}"-->
                            <i>{{intervention_point.is_missing_urls|yesno:"URLs missing,complete"}}</i> | Last modified: {{intervention_point.updated_on}}
                         </li>
