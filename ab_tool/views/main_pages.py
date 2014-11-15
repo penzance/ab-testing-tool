@@ -35,7 +35,7 @@ def render_intervention_point_control_panel(request):
         "canvas_url": get_lti_param(request, "launch_presentation_return_url"),
         "experiments": experiments,
     }
-    return render_to_response("ab_tool/control_panel.html", context)
+    return render_to_response("ab_tool/experimentsDashboard.html", context)
 
 
 def tool_config(request):

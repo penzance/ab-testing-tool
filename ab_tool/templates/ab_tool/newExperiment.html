@@ -11,12 +11,12 @@
 <div class="container">
     <header>
         <div class="row lti-header">
-            <h1>A/B Testing (<a href="newExperiment.html">this</a>)</h1>
+            <h1><a href="{% url 'ab:create_experiment' %}">Create New Experiment</a></h1>
         </div>
     </header>
     <main>
         <div class="row row-lti col-md-8">
-            <h3><a href="index.html">All Experiments</a> &rsaquo; <span>New Experiment</span></h3>
+            <h3><a href="{% url 'ab:all_experiments' %}">All Experiments</a> &rsaquo; <span>New Experiment</span></h3>
             
             <form class="form-horizontal" role="form">
                 <div class="form-group">

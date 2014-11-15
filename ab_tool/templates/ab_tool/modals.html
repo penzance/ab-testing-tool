@@ -1,3 +1,124 @@
+
+<div class="modal fade" id="addIntervention" tabindex="-1" role="dialog" aria-labelledby="addIntervention" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            <h4 class="modal-title" id="myModalLabel">New Intervention</h4>
+        </div>
+        <div class="modal-body">
+            <form class="form-horizontal" role="form">
+                <div class="form-group col-sm-12">
+                    <label for="interventionName">Name:</label>
+                    <input type="text" name="interventionName" id="interventionName" class="form-control" placeholder="Enter Intervention Name">
+                </div>
+                
+                <div class="form-group">
+                    <div class="col-sm-9">
+                        <label for="track1">Track 1:</label>
+                        <input type="text" name="track1" id="track1" class="form-control" placeholder="Enter Intervention URL">
+                    </div>
+                    <div class="col-sm-3">
+                        <label for="openTrack1in">Open in:</label>
+                        <select>
+                            <option value="newTab">New Tab</option>
+                            <option value="fullScreen">Full Screen</option>
+                            <option value="canvasPage">Canvas Page</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <div class="col-sm-9">
+                        <label for="track2">Track 2:</label>
+                        <input type="text" name="track2" id="track2" class="form-control" placeholder="Enter Intervention URL">
+                    </div>
+                    <div class="col-sm-3">
+                        <label for="openTrack1in">Open in:</label>
+                        <select>
+                            <option value="newTab">New Tab</option>
+                            <option value="fullScreen">Full Screen</option>
+                            <option value="canvasPage">Canvas Page</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group col-sm-12">
+                    <label class="contro-label" for="experimentNotes">Notes</label>
+                    <textarea name="experimentNotes" id="experimentNotes" class="form-control"></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <a class="" data-dismiss="modal">Cancel</a>
+            <button type="button" class="btn btn-primary">Save</button>
+        </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="editIntervention" tabindex="-1" role="dialog" aria-labelledby="editIntervention" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            <h4 class="modal-title" id="myModalLabel">Edit Intervention</h4>
+        </div>
+        <div class="modal-body">
+            <form class="form-horizontal" role="form">
+                <div class="form-group col-sm-12">
+                    <label for="interventionName">Name:</label>
+                    <input type="text" name="interventionName" id="interventionName" class="form-control" value="Intervention point (n)">
+                </div>
+                
+                <div class="form-group">
+                    <div class="col-sm-9">
+                        <label for="track1">Track 1:</label>
+                        <input type="text" name="track1" id="track1" class="form-control" value="http://www.google.com">
+                    </div>
+                    <div class="col-sm-3">
+                        <label for="openTrack1in">Open in:</label>
+                        <select>
+                            <option value="newTab">New Tab</option>
+                            <option selected value="fullScreen">Full Screen</option>
+                            <option value="canvasPage">Canvas Page</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <div class="col-sm-9">
+                        <label for="track2">Track 2:</label>
+                        <input type="text" name="track2" id="track2" class="form-control" value="https://canvas.icommons.harvard.edu">
+                    </div>
+                    <div class="col-sm-3">
+                        <label for="openTrack1in">Open in:</label>
+                        <select>
+                            <option selected value="newTab">New Tab</option>
+                            <option value="fullScreen">Full Screen</option>
+                            <option value="canvasPage">Canvas Page</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group col-sm-12">
+                    <label class="contro-label" for="experimentNotes">Notes</label>
+                    <textarea name="experimentNotes" id="experimentNotes" class="form-control"></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <a class="" data-dismiss="modal">Cancel</a>
+            <button type="button" class="btn btn-primary">Save</button>
+        </div>
+    </div>
+  </div>
+</div>
+
+
+
+
                 {% if incomplete_intervention_points %}
                 <!-- START Modal code for incomplete_intervention_points confirmation box-->
                 <div id="incomplete_intervention_points_modal" class="modal fade" role="dialog" aria-labelledby="incomplete_intervention_points_modal" aria-hidden="true">
