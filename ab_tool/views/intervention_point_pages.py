@@ -163,10 +163,9 @@ def submit_edit_intervention_point(request, intervention_point_id):
         _, track_id = k.split(STAGE_URL_TAG)
         # This is a search for the joint unique index of InterventionPointUrl, so it
         # should not ever return multiple objects
-        is_canvas = post_param(request, DEPLOY_OPTION_TAG + track_id)
-        as_tab = request.POST.get(AS_TAB_TAG + track_id, None)
-        is_canvas_page = bool(is_canvas == "canvas_url")
-        open_as_tab = bool(as_tab == "true")
+        deploy_option = post_param(request, DEPLOY_OPTION_TAG + track_id)
+        is_canvas_page = bool(deploy_option == "canvasPage")
+        open_as_tab = bool(deploy_option == "newTab")
         try:
             intervention_point_url = InterventionPointUrl.objects.get(intervention_point__pk=intervention_point_id, track__pk=track_id)
             intervention_point_url.update(url=format_url(v), is_canvas_page=is_canvas_page, open_as_tab=open_as_tab)
