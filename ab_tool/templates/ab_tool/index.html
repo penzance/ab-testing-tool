@@ -1,0 +1,35 @@
+{% extends "ab_tool/base_lti.html" %}
+{% load static %}
+{% block stylesheet %}
+{{ block.super }}
+{% endblock %}
+{% block content %}
+<div class="container">
+<header>
+<div class="row lti-header">
+<h1>A/B Testing (<a href="index.html">this</a>)</h1>
+</div>
+</header>
+<main>
+<div class="row row-lti col-md-8">
+<p>
+Pellentesque mattis sit amet felis elementum vulputate. Pellentesque ac ipsum volutpat, ornare dolor quis, interdum ex. Cras consectetur mattis sapien, non fringilla eros convallis pretium. Vivamus volutpat neque sed leo porta auctor. Nullam feugiat vulputate convallis. Nullam mattis porttitor hendrerit. Aenean congue dignissim enim, et pulvinar elit accumsan ac. Donec a lorem leo. Fusce arcu neque, porta a dictum eget, vulputate at quam. Nulla cursus odio eu eros tempus mattis. Read our <a href="#">documentation wiki</a> for
+more detail info.
+</p>
+<div class="well">
+<div class="container">
+<h3>No experiments have been created.</h3>
+<h4><a title="Create an experiment" href="newExperiment.html">Create an experiment</a></h4>
+</div>
+</div>
+</div>
+</main>
+</div>
+{% endblock %}
+{% block javascript %}
+{{ block.super }}
+<script type="text/javascript">
+$(document).ready(function(){
+});
+</script>
+{% endblock %}

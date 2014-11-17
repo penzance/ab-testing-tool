@@ -1,0 +1,116 @@
+
+{% extends "ab_tool/base_lti.html" %}
+{% load static %}
+
+{% block stylesheet %}
+{{ block.super }}
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <header>
+        <div class="row lti-header">
+            <h1>A/B Testing (<a href="newExperiment.html">this</a>)</h1>
+        </div>
+    </header>
+    <main>
+        <div class="row row-lti col-md-8">
+            <h3><a href="index.html">All Experiments</a> &rsaquo; <span>New Experiment</span></h3>
+            
+            <form class="form-horizontal" role="form">
+                <div class="form-group">
+                    <label for="experimentName">Name:</label>
+                    <input type="text" name="experimentName" id="experimentName" class="form-control" placeholder="Experiment Name">
+                </div>
+
+                <div class="form-group">
+                    <label>Experiment structure</label><br>
+                    
+                    <input type="text" name="track1" id="track1" maxlength="2" size="2"> %
+                    <label class="control-label" for="track1"><a href="#" title="Edit track name">Track 1</a></label><br>
+
+                    <input type="text" name="track2" id="track2" maxlength="2" size="2"> %
+                    <label class="control-label" for="track2"><a href="#" title="Edit track name">Track 2</a></label><br>
+                </div>
+
+                <div class="form-group">
+                    <input type="text" name="newTrackWeight" id="newTrackWeight" maxlength="2" size="2"> %
+                    <input type="text" name="newTrackName" id="newTrackName" placeholder="Enter track name">
+                    <div class="btn btn-default btn-xs">Add Track</div>
+                </div>
+                
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <input type="checkbox" name="uniformRandom"> Choose to make uniform random message
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label">Sort type:</label>
+                    <ul class="list-unstyled">
+                        <li><input type="radio" name="sort" value="sortAt_start"> Sort at start</li>
+                        <li><input type="radio" name="sort" value="sortAt_tool"> Sort at tool</li>
+                    </ul>
+                </div>
+
+                <div class="form-group">
+                    <label class="contro-label" for="experimentNotes">Notes</label>
+                    <textarea name="experimentNotes" id="experimentNotes" class="form-control"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <a href="#">Cancel</a>
+                    <button class="btn btn-primary" data-toggle="modal" data-target="#createExperiment">Create</button>
+            </form>
+        </div>
+    </main>
+</div>
+
+<!-- create confirmation (start) -->
+
+<div class="modal fade" id="createExperiment" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title">Create Summary</h4>
+      </div>
+      <div class="modal-body">
+        <p>Review your experiment set up and choose if you wnat to be sort at start or at tool</p>
+        <h4>Details:</h4>
+        <dl class="dl-horizontal">
+            <dt>Experiment name:</dt>
+            <dd>Name of experiment
+            <dt>Track 1:</dt>
+            <dd>name of track</dd>
+            <dt>Track 2:</dt>
+            <dd>Name of track</dd>
+            <dt>Sort type:</dt>
+            <dd>Sort att tool</td>
+            <dt>Notes</dt>
+            <dd>This are my notes</dd>
+        </dl>
+        
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" id="createNow" class="btn btn-primary" onClick="location.href='experimentsDashboard.html';">Yes, Create</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<!-- create confirmation (end) -->
+
+
+{% endblock %}
+
+{% block javascript %}
+{{ block.super }}
+<script type="text/javascript">
+$(document).ready(function(){
+
+});
+</script>
+{% endblock %}
