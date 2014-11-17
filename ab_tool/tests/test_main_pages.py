@@ -23,7 +23,7 @@ class TestMainPages(SessionTestCase):
             contents returned from Canvas"""
         response = self.client.get(reverse("ab:index"), follow=True)
         self.assertOkay(response)
-        self.assertTemplateUsed(response, "ab_tool/control_panel.html")
+        self.assertTemplateUsed(response, "ab_tool/experimentsDashboard.html")
     
     @patch(LIST_MODULES, return_value=APIReturn([{"id": 0}]))
     def test_control_panel_with_module_and_item(self, _mock1):
@@ -34,7 +34,7 @@ class TestMainPages(SessionTestCase):
         with patch(LIST_ITEMS, return_value=api_return):
             response = self.client.get(reverse("ab:index"), follow=True)
             self.assertOkay(response)
-            self.assertTemplateUsed(response, "ab_tool/control_panel.html")
+            self.assertTemplateUsed(response, "ab_tool/experimentsDashboard.html")
     
     def test_unauthenticated_index(self):
         """ Tests control_panel template does not render when unauthorized"""

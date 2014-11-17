@@ -15,7 +15,6 @@ from ab_tool.controllers import (post_param, get_missing_track_weights,
 def create_experiment(request):
     context = {"Experiment": Experiment}
     return render_to_response("ab_tool/edit_experiment.html", context)
-    #return render_to_response("ab_tool/newExperiment.html", context)
 
 
 @lti_role_required(ADMINS)
