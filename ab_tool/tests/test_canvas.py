@@ -18,7 +18,6 @@ class TestCanvas(SessionTestCase):
         exception = RequestException()
         exception.response = MagicMock()
         exception.response.status_code = 401
-        exception.response.reason = "Unauthorized"
         return exception
     
     def test_get_lti_param_success(self):

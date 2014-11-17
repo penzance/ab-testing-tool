@@ -53,8 +53,7 @@ def get_canvas_request_context(request):
 
 
 def handle_canvas_error(exception):
-    if (hasattr(exception, "response") and exception.response.status_code == 401
-        and exception.response.reason == "Unauthorized"):
+    if (hasattr(exception, "response") and exception.response.status_code == 401):
         raise NewTokenNeeded("Your canvas oauth token is invalid")
     logger.error(repr(exception))
     logger.error(traceback.format_exc())
