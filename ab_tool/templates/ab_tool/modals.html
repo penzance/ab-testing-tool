@@ -42,7 +42,7 @@
                         </select>
                     </div>
                 </div>
-
+                
                 <div class="form-group col-sm-12">
                     <label class="contro-label" for="experimentNotes">Notes</label>
                     <textarea name="experimentNotes" id="experimentNotes" class="form-control"></textarea>
@@ -117,70 +117,69 @@
 <!-- END Modal code for edit intervention-->
 
 
+{% if incomplete_intervention_points %}
+<!-- START Modal code for incomplete_intervention_points confirmation box-->
+<div id="incomplete_intervention_points_modal" class="modal fade" role="dialog" aria-labelledby="incomplete_intervention_points_modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Some Intervention Points Are Missing URLs</h4>
+            </div>
+            <div class="modal-body">
+                <p>Complete your intervention points by filling in the URLs fields for all tracks.</p>
+                <p class="text-warning">These following intervention points are incomplete: {{ incomplete_intervention_points|join:", " }} </p>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-lg btn-primary" data-dismiss="modal"> Close </a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END Modal code for incomplete_intervention_points confirmation box-->
+{% endif %}
 
-                {% if incomplete_intervention_points %}
-                <!-- START Modal code for incomplete_intervention_points confirmation box-->
-                <div id="incomplete_intervention_points_modal" class="modal fade" role="dialog" aria-labelledby="incomplete_intervention_points_modal" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                                <h4 class="modal-title">Some Intervention Points Are Missing URLs</h4>
-                            </div>
-                            <div class="modal-body">
-                                <p>Complete your intervention points by filling in the URLs fields for all tracks.</p>
-                                <p class="text-warning">These following intervention points are incomplete: {{ incomplete_intervention_points|join:", " }} </p>
-                            </div>
-                            <div class="modal-footer">
-                                <a class="btn btn-lg btn-primary" data-dismiss="modal"> Close </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- END Modal code for incomplete_intervention_points confirmation box-->
-                {% endif %}
-                
-                {% if missing_track_weights %}
-                <!-- START Modal code for missing_track_weights confirmation box-->
-                <div id="missing_track_weights_modal" class="modal fade" role="dialog" aria-labelledby="missing_track_weights" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                                <h4 class="modal-title">Some Tracks Are Missing Weights</h4>
-                            </div>
-                            <div class="modal-body">
-                                <p>Complete your Track weights by filling out weights for all tracks.</p>
-                                <p class="text-warning">These following tracks are missing weights: {{ missing_track_weights|join:", " }} </p>
-                            </div>
-                            <div class="modal-footer">
-                                <a class="btn btn-lg btn-primary" data-dismiss="modal"> Close </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- END Modal code for missing_track_weights confirmation box-->
-                {% endif %}
-                
-                {% for experiment in experiments %}
-                <!-- START Modal code for Finalize Tracks confirmation box-->
-                <div id="finalize_modal{{experiment.id}}" class="modal fade" role="dialog" aria-labelledby="finalize_modal{{experiment.id}}" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                                <h4 class="modal-title">Start Experiment Confirmation</h4>
-                            </div>
-                            <div class="modal-body">
-                                <p>Are you sure you want to start this experiment?</p>
-                                <p class="text-warning">Starting an experiment cannot be undone. Once started, experiment tracks can no longer be created or deleted. </p>
-                            </div>
-                            <div class="modal-footer">
-                                <a class="btn btn-lg btn-primary" data-dismiss="modal"> Close </a>
-                                <a class="btn btn-lg btn-danger"  href="{% url 'ab:finalize_tracks' experiment.id %}"> Yes, Start Experiment </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- END Modal code for Finalize Tracks confirmation box-->
-                {% endfor %}
+{% if missing_track_weights %}
+<!-- START Modal code for missing_track_weights confirmation box-->
+<div id="missing_track_weights_modal" class="modal fade" role="dialog" aria-labelledby="missing_track_weights" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Some Tracks Are Missing Weights</h4>
+            </div>
+            <div class="modal-body">
+                <p>Complete your Track weights by filling out weights for all tracks.</p>
+                <p class="text-warning">These following tracks are missing weights: {{ missing_track_weights|join:", " }} </p>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-lg btn-primary" data-dismiss="modal"> Close </a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END Modal code for missing_track_weights confirmation box-->
+{% endif %}
+
+{% for experiment in experiments %}
+<!-- START Modal code for Finalize Tracks confirmation box-->
+<div id="finalize_modal{{experiment.id}}" class="modal fade" role="dialog" aria-labelledby="finalize_modal{{experiment.id}}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Start Experiment Confirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to start this experiment?</p>
+                <p class="text-warning">Starting an experiment cannot be undone. Once started, experiment tracks can no longer be created or deleted. </p>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-lg btn-primary" data-dismiss="modal"> Close </a>
+                <a class="btn btn-lg btn-danger"  href="{% url 'ab:finalize_tracks' experiment.id %}"> Yes, Start Experiment </a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END Modal code for Finalize Tracks confirmation box-->
+{% endfor %}

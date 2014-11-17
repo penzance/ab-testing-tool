@@ -21,7 +21,7 @@
             </p>
         </div>
         <div class="row row-lti col-md-8">
-
+        
             <h2><a href="{% url 'ab:create_experiment' %}">New Experiment</a></h2>
             {% for experiment in experiments %}
                 <div class="panel panel-default">
@@ -78,7 +78,7 @@
                         {% endfor %}
                     </ul>
                 </div>
-
+            
             {% empty %}
             <div class="well">
             <div class="container">
