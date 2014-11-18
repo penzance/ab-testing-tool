@@ -1,9 +1,7 @@
-from mock import patch, MagicMock
+from mock import MagicMock
 
 from ab_tool.controllers import (intervention_point_url, format_url, post_param)
-from ab_tool.tests.common import (SessionTestCase, APIReturn,
-    LIST_MODULES, LIST_ITEMS, TEST_COURSE_ID, TEST_OTHER_COURSE_ID)
-from ab_tool.models import InterventionPoint
+from ab_tool.tests.common import SessionTestCase
 from ab_tool.exceptions import BAD_STAGE_ID
 
 
