@@ -1,0 +1,70 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link href="{% static "favicon.ico" %}" rel="icon" type="image/x-icon">
+  {% block stylesheet %}
+    <link rel="stylesheet" href="{% static 'ab_tool/css/bootstrap.min.css' %}" type="text/css"/>
+    <link rel="stylesheet" href="{% static 'ab_tool/css/bootstrap_customization.css' %}" type="text/css"/>
+    {% block fonts %}
+    {% endblock fonts %}
+ {% endblock stylesheet %}
+  <title>{% block page_title %}{% endblock page_title %}</title>
+</head>
+{% block bodytag %}<body class="lti">{% endblock bodytag %}
+
+  {% block navbar %}
+  {% endblock navbar %}
+
+  {% block jumbotron %}{% endblock jumbotron %}
+
+
+    {% block breadcrumb %}{% endblock %}
+
+    {% if messages %}
+      {% for message in messages %}
+      {% if message.tags == 'error' %}
+        <div class="alert alert-danger alert-dismissable">
+      {% else %}
+        <div class="alert alert-{{ message.tags }} alert-dismissable">
+      {% endif %}
+          <button type="button" class="close" data-dismiss="alert">&times;</button>
+
+          {% comment %}
+          {% if message.tags == 'success' %}
+            <i class="h3 fa fa-check-circle"></i>
+          {% endif %}
+
+          {% if message.tags == 'info' %}
+            <i class="h3 fa fa-info-circle"></i>
+          {% endif %}
+
+          {% if message.tags == 'warning' %}
+            <i class="h3 fa fa-exclamation-circle"></i>
+          {% endif %}
+
+          {% if message.tags == 'error' %}
+            <i class="h3 fa fa-times-circle"></i>
+          {% endif %}
+          {% endcomment %}
+
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    {% block content %}{% endblock content %}
+
+
+    {% block footer %}
+    {% endblock footer %}
+
+
+  {% block javascript %}
+    <script src="{% static "ab_tool/js/jquery-1.10.1.min.js" %}"></script>
+    <script src="{% static "ab_tool/js/bootstrap.min.js" %}"></script>
+  {% endblock javascript %}
+</body>
+</html>
