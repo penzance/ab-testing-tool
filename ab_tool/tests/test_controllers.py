@@ -1,11 +1,9 @@
-from mock import patch, MagicMock
+from mock import MagicMock
 
-from ab_tool.controllers import (get_uninstalled_intervention_points, intervention_point_url,
-    all_intervention_point_urls, format_url, post_param, format_weighting,
+from ab_tool.controllers import (intervention_point_url,
+    format_url, post_param, format_weighting,
     assign_track_and_create_student)
-from ab_tool.tests.common import (SessionTestCase, APIReturn,
-    LIST_MODULES, LIST_ITEMS, TEST_COURSE_ID, TEST_OTHER_COURSE_ID,
-    TEST_STUDENT_ID)
+from ab_tool.tests.common import (SessionTestCase, TEST_STUDENT_ID)
 from ab_tool.exceptions import (BAD_STAGE_ID, INPUT_NOT_ALLOWED,
     CSV_UPLOAD_NEEDED, NO_TRACKS_FOR_EXPERIMENT, TRACK_WEIGHTS_NOT_SET)
 from ab_tool.models import Experiment, ExperimentStudent
@@ -58,76 +56,6 @@ class TestControllers(SessionTestCase):
     def test_format_weighting_raises_error(self):
         self.assertRaisesSpecific(INPUT_NOT_ALLOWED, format_weighting, "-1")
         self.assertRaisesSpecific(INPUT_NOT_ALLOWED, format_weighting, "1001")
-    
-    def test_get_uninstalled_intervention_points(self):
-        """ Tests method get_uninstalled_intervention_points runs and returns no intervention_points when
-            database empty """
-        intervention_points = get_uninstalled_intervention_points(self.request)
-        self.assertEqual(len(intervention_points), 0)
-    
-    @patch(LIST_MODULES, return_value=APIReturn([{"id": 0}]))
-    def test_get_uninstalled_intervention_points_with_item(self, _mock1):
-        """ Tests method get_uninstalled_intervention_points returns one when database has
-            one item and api returns nothing """
-        self.create_test_intervention_point()
-        intervention_points = get_uninstalled_intervention_points(self.request)
-        self.assertEqual(len(intervention_points), 1)
-    
-    @patch(LIST_MODULES, return_value=APIReturn([{"id": 0}]))
-    def test_get_uninstalled_intervention_points_against_courses(self, _mock1):
-        """ Tests method get_uninstalled_intervention_points returns one when database has
-            two items but only one matches the course and api returns nothing """
-        intervention_point = self.create_test_intervention_point(name="ip1")
-        self.create_test_intervention_point(name="ip2", course_id=TEST_OTHER_COURSE_ID)
-        intervention_points = get_uninstalled_intervention_points(self.request)
-        self.assertEqual(len(intervention_points), 1)
-        self.assertSameIds([intervention_point], intervention_points)
-    
-    @patch(LIST_MODULES, return_value=APIReturn([{"id": 0}]))
-    def test_get_uninstalled_intervention_points_with_all_installed(self, _mock1):
-        """ Tests method get_uninstalled_intervention_points returns zero when intervention_point in
-            database is also returned by the API, which means it is installed """
-        intervention_point = self.create_test_intervention_point()
-        mock_item = {"type": "ExternalTool",
-                     "external_url": intervention_point_url(self.request, intervention_point.id)}
-        with patch(LIST_ITEMS, return_value=APIReturn([mock_item])):
-            intervention_points = get_uninstalled_intervention_points(self.request)
-            self.assertEqual(len(intervention_points), 0)
-    
-    @patch(LIST_MODULES, return_value=APIReturn([{"id": 0}]))
-    def test_get_uninstalled_intervention_points_with_some_installed(self, _mock1):
-        """ Tests method get_uninstalled_intervention_points returns one when there are two
-            intervention_points in the database, one of which is also returned by the API,
-            which means it is installed """
-        intervention_point = self.create_test_intervention_point(name="ip1")
-        self.create_test_intervention_point(name="ip2")
-        mock_item = {"type": "ExternalTool",
-                     "external_url": intervention_point_url(self.request, intervention_point.id)}
-        with patch(LIST_ITEMS, return_value=APIReturn([mock_item])):
-            intervention_points = get_uninstalled_intervention_points(self.request)
-            self.assertEqual(len(intervention_points), 1)
-    
-    def test_all_intervention_point_urls_empty(self):
-        """ Tests that all_intervention_point_urls returns empty when there are no intervention_points """
-        urls = all_intervention_point_urls(self.request, TEST_COURSE_ID)
-        self.assertEqual(len(urls), 0)
-    
-    def test_all_intervention_point_urls_one_element(self):
-        """ Tests that all_intervention_point_urls returns the url for one intervention_point when
-            that is in the database """
-        intervention_point = self.create_test_intervention_point()
-        urls = all_intervention_point_urls(self.request, TEST_COURSE_ID)
-        self.assertEqual(len(urls), 1)
-        self.assertEqual([intervention_point_url(self.request, intervention_point.id)], urls)
-    
-    def test_all_intervention_point_urls_multiple_courses(self):
-        """ Tests that all_intervention_point_urls only returns the url for the intervention_point
-            in the database that matches the course_id """
-        intervention_point = self.create_test_intervention_point(name="ip1")
-        self.create_test_intervention_point(name="ip2", course_id=TEST_OTHER_COURSE_ID)
-        urls = all_intervention_point_urls(self.request, TEST_COURSE_ID)
-        self.assertEqual(len(urls), 1)
-        self.assertEqual([intervention_point_url(self.request, intervention_point.id)], urls)
     
     def test_intervention_point_url_contains_intervention_point_id(self):
         """ Tests that intervention_point_url contains the string of the intervention_point_id """

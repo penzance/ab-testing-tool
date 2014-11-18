@@ -79,7 +79,7 @@ class TestMainPages(SessionTestCase):
             the uninstalled intervention_points for the course """
         intervention_point1 = self.create_test_intervention_point(name="intervention_point1")
         intervention_point2 = self.create_test_intervention_point(name="intervention_point2")
-        with patch("ab_tool.views.main_pages.get_uninstalled_intervention_points",
+        with patch("ab_tool.canvas.CanvasModules.get_uninstalled_intervention_points",
                    return_value=[intervention_point1]):
             response = self.client.get(reverse("ab:index"), follow=True)
             self.assertSameIds(response.context["uninstalled_intervention_points"], [intervention_point1])
@@ -87,7 +87,7 @@ class TestMainPages(SessionTestCase):
     
     def test_index_context_modules(self):
         ret_val = [{"name": "module1"}]
-        with patch("ab_tool.views.main_pages.get_modules_with_items",
+        with patch("ab_tool.canvas.CanvasModules.get_modules_with_items",
                    return_value=ret_val):
             response = self.client.get(reverse("ab:index"), follow=True)
             self.assertEqual(response.context["modules"], ret_val)
