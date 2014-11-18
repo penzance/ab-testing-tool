@@ -8,7 +8,7 @@ from ab_tool.canvas import get_lti_param
 from ab_tool.exceptions import (NO_TRACKS_FOR_EXPERIMENT)
 from django.http.response import HttpResponse
 from ab_tool.controllers import (post_param, get_missing_track_weights,
-    format_weighting, get_incomplete_intervention_points)
+    get_incomplete_intervention_points)
 
 
 @lti_role_required(ADMINS)
