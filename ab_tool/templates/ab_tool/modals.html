@@ -1,9 +1,10 @@
+
 <div class="modal fade" id="addIntervention" tabindex="-1" role="dialog" aria-labelledby="addIntervention" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-            <h4 class="modal-title" id="myModalLabel">New Intervention</h4>
+            <h4 class="modal-title" id="">New Intervention</h4>
         </div>
         <div class="modal-body">
             <form class="form-horizontal" role="form">
@@ -41,7 +42,7 @@
                         </select>
                     </div>
                 </div>
-
+                
                 <div class="form-group col-sm-12">
                     <label class="contro-label" for="experimentNotes">Notes</label>
                     <textarea name="experimentNotes" id="experimentNotes" class="form-control"></textarea>
@@ -56,64 +57,64 @@
   </div>
 </div>
 
-
-<div class="modal fade" id="editIntervention" tabindex="-1" role="dialog" aria-labelledby="editIntervention" aria-hidden="true">
+<!-- START Modal code for edit intervention-->
+{% for intervention_point in intervention_points %}
+<div class="modal fade" id="editIntervention_{{intervention_point.id}}"
+    tabindex="-1" role="dialog" aria-labelledby="editIntervention_{{intervention_point.id}}"
+    aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
             <h4 class="modal-title" id="myModalLabel">Edit Intervention</h4>
         </div>
-        <div class="modal-body">
-            <form class="form-horizontal" role="form">
+        <form method="post" class="form-horizontal" name="intervention_point_form"
+            action="{% url 'ab:submit_edit_intervention_point' intervention_point.id %}">
+            <div class="modal-body">
                 <div class="form-group col-sm-12">
                     <label for="interventionName">Name:</label>
-                    <input type="text" name="interventionName" id="interventionName" class="form-control" value="Intervention point (n)">
+                    <input type="text" name="name" id="intervention_{{intervention_point.id}}"
+                        class="form-control" value="{{intervention_point.name}}">
                 </div>
                 
-                <div class="form-group">
-                    <div class="col-sm-9">
-                        <label for="track1">Track 1:</label>
-                        <input type="text" name="track1" id="track1" class="form-control" value="http://www.google.com">
+                    {% for track_url in intervention_point.track_urls %}
+                    <div class="form-group">
+                        <div class="col-sm-9">
+                            <label for="track_{{track_url.track.id}}">Track "{{track_url.track.name}}":</label>
+                            <input type="text" name="intervention_point_url_{{track_url.track.id}}"
+                                id="intervention_point_url_{{track_url.track.id}}" class="form-control"
+                                value="{{track_url.url}}">
+                        </div>
+                        <div class="col-sm-3">
+                            <label for="is_canvas_page_for_track_{{track_url.track.id}}">Open in:</label>
+                            <select name="is_canvas_page_for_track_{{track_url.track.id}}"
+                                id="is_canvas_page_for_track_{{track_url.track.id}}">
+                                <option {% if track_url.open_as_tab %}selected="selected"{% endif %}
+                                    value="newTab">New Tab</option>
+                                <option {% if not track_url.open_as_tab and not track_url.is_canvas_page %}selected="selected"{% endif %}
+                                    value="externalPage">External URL</option>
+                                <option {% if not track_url.open_as_tab and track_url.is_canvas_page %}selected="selected"{% endif %}
+                                    value="canvasPage">Canvas Page</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="col-sm-3">
-                        <label for="openTrack1in">Open in:</label>
-                        <select>
-                            <option value="newTab">New Tab</option>
-                            <option selected value="fullScreen">Full Screen</option>
-                            <option value="canvasPage">Canvas Page</option>
-                        </select>
-                    </div>
-                </div>
+                    {% endfor %}
                 
-                <div class="form-group">
-                    <div class="col-sm-9">
-                        <label for="track2">Track 2:</label>
-                        <input type="text" name="track2" id="track2" class="form-control" value="https://canvas.icommons.harvard.edu">
-                    </div>
-                    <div class="col-sm-3">
-                        <label for="openTrack1in">Open in:</label>
-                        <select>
-                            <option selected value="newTab">New Tab</option>
-                            <option value="fullScreen">Full Screen</option>
-                            <option value="canvasPage">Canvas Page</option>
-                        </select>
-                    </div>
-                </div>
-
                 <div class="form-group col-sm-12">
-                    <label class="contro-label" for="experimentNotes">Notes</label>
-                    <textarea name="experimentNotes" id="experimentNotes" class="form-control"></textarea>
+                    <label class="contro-label" for="interventionPointNotes">Notes</label>
+                    <textarea name="notes" id="interventonPointNotes" class="form-control">{{ intervention_point.notes }}</textarea>
                 </div>
-            </form>
-        </div>
-        <div class="modal-footer">
-            <a class="" data-dismiss="modal">Cancel</a>
-            <button type="button" class="btn btn-primary">Save</button>
-        </div>
+            </div>
+            <div class="modal-footer">
+                <a class="" data-dismiss="modal">Cancel</a>
+                <input type="submit" class="btn btn-primary" value="Save">
+            </div>
+        </form>
     </div>
   </div>
 </div>
+{% endfor %}
+<!-- END Modal code for edit intervention-->
 
 
 {% if incomplete_intervention_points %}

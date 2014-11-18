@@ -11,118 +11,86 @@
 <div class="container">
     <header>
         <div class="row lti-header">
-            <h1>A/B Testing (<a href="experimentsDashboard.html">this</a>)</h1>
+            <h1><a href="{% url 'ab:index' %}">A/B Testing - All Experiments</a></h1>
         </div>
     </header>
     <main>
         <div class="row row-lti col-md-8">
             <p>
-                Pellentesque mattis sit amet felis elementum vulputate. Pellentesque ac ipsum volutpat, ornare dolor quis, interdum ex. Cras consectetur mattis sapien, non fringilla eros convallis pretium. Vivamus volutpat neque sed leo porta auctor. Nullam feugiat vulputate convallis. Nullam mattis porttitor hendrerit. Aenean congue dignissim enim, et pulvinar elit accumsan ac. Donec a lorem leo. Fusce arcu neque, porta a dictum eget, vulputate at quam. Nulla cursus odio eu eros tempus mattis. Read our <a href="#">documentation wiki</a> for
-                more detail info.
+                Welcome administrator. Manage your A/B Testing Experiments here. Read our <a href="#">documentation wiki</a> for more detailed info.
             </p>
         </div>
         <div class="row row-lti col-md-8">
-
-            <h2><a href="newExperiment.html">New Experiment</a></h2>
-            <!-- experiment 1 (start) -->
-            <div class="panel panel-default">
-                <!-- Default panel contents -->
-                <div class="panel-heading lti-inline-block">
-                    <div class="pull-left">
-                        <h3><a href="#">Experiment 1</a></h3>
-                        <small>(uniform random)</small>
-                        <p>
-                            <small>
-                            3 tracks | 0 Intervention Points<br/>
-                            Last modified 10/10/2014
-                            </small>
-                        </p>
+        
+            <h2><a href="{% url 'ab:create_experiment' %}">New Experiment</a></h2>
+            {% for experiment in experiments %}
+                <div class="panel panel-default">
+                    <!-- Default panel contents -->
+                    <div class="panel-heading lti-inline-block">
+                        <div class="pull-left">
+                            <h3><a href="{% url 'ab:edit_experiment' experiment.id %}" id="experiment_{{experiment.id}}">Experiment "{{experiment.name}}"</a></h3>
+                            {% if experiment.assignment_method == experiment.WEIGHTED_PROBABILITY_RANDOM %}
+                                <small>(weighted probability random)</small>
+                            {% endif %}
+                            {% if experiment.assignment_method == experiment.UNIFORM_RANDOM %}
+                                <small>(uniform random)</small>
+                            {% endif %}
+                            <p>
+                                <small>
+                                {{experiment.tracks.count}} Tracks | {{experiment.intervention_points.count}} Intervention Points
+                                <br/>
+                                Last modified: {{experiment.updated_on}}
+                                <br/>
+                                Created: {{experiment.created_on}}
+                                </small>
+                            </p>
+                        </div>
+                        <div class="pull-right">
+                            <a type="button" class="btn btn-primary btn-xs" href="#finalize_modal{{experiment.id}}" data-toggle="modal" >
+                                Start Experiment
+                            </a>
+                            <a type="button" class="btn btn-primary btn-xs" href="{% url 'ab:create_intervention_point' experiment.id %}" id="add_intervention_point_button">
+                            <!-- href="{% url 'ab:create_intervention_point' experiment.id %} -->
+                                Add Intervention
+                            </a>
+                            <!-- <a type="button" class="btn btn-primary btn-xs">
+                                Copy Experiment
+                            </a> -->
+                            <a type="button" class="btn btn-primary btn-xs" id="download_students_button" href="{% url 'ab:download_data' experiment.id %}">
+                                Download Students
+                            </a>
+                            <a type="button" class="btn btn-primary btn-xs" id="download_intervention_point_deployments_button" href="{% url 'ab:download_intervention_point_deployments' experiment.id %}">
+                                Download Interactions
+                            </a>
+                        </div>
                     </div>
-                    <div class="pull-right">
-                        <button type="button" class="btn btn-primary btn-xs">
-                            Start Experiment
-                        </button>
-                        <button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#addIntervention">
-                            Add Intervention
-                        </button>
-                        <button type="button" class="btn btn-primary btn-xs">
-                            Copy Experiment
-                        </button>
-                        <button type="button" class="btn btn-primary btn-xs disabled">
-                            Download Data
-                        </button>
-                    </div>
+                    <ul class="list-group">
+                        {% for intervention_point in experiment.intervention_points.all %}
+                        <li class="list-group-item">
+                            <a data-toggle="modal" href="#editIntervention_{{intervention_point.id}}">Intervention Point "{{intervention_point.name}}"</a><br>
+                             <!--<a href="{% url 'ab:edit_intervention_point' intervention_point.id %}"-->
+                           <i>{{intervention_point.is_missing_urls|yesno:"URLs missing,complete"}}</i> | Last modified: {{intervention_point.updated_on}}
+                        </li>
+                        {% empty %}
+                        <li class="list-group-item">
+                            No Intervention Points have been created for this experiment yet.
+                        </li>
+                        {% endfor %}
+                    </ul>
                 </div>
-                <!--div class="panel-body">
-                    <p>...</p>
-                </div-->
-
-                <!-- List group -->
-                <ul class="list-group">
-                    <li class="list-group-item">
-                        <a href="#" data-toggle="modal" data-target="#editIntervention">Intervention point 1</a><br>
-                        <a href="#">Module</a> | Last modified 10/10/14
-                    </li>
-                    <li class="list-group-item">
-                        <a href="#">Intervention point 2</a><br>
-                        <a href="#">Module</a> | Last modified 10/10/14
-                    </li>
-                    <li class="list-group-item">
-                        <a href="#">Intervention point 3</a><br>
-                        <a href="#">Module</a> | Last modified 10/10/14
-                    </li>
-                </ul>
+            
+            {% empty %}
+            <div class="well">
+            <div class="container">
+            <h3>No experiments have been created yet.</h3>
+            <h4><a title="Create an experiment" href="{% url 'ab:create_experiment' %}">Create an experiment</a></h4>
             </div>
-            <!-- experiment 1 (end) -->
-            <!-- experiment 2 (start) -->
-            <div class="panel panel-default">
-                <!-- Default panel contents -->
-                <div class="panel-heading lti-inline-block">
-                    <div class="pull-left">
-                        <h3><a href="#">Experiment 1</a></h3>
-                        <small>(uniform random)</small>
-                        <p>
-                            <small>
-                            3 tracks | 0 Intervention Points<br/>
-                            Last modified 10/10/2014
-                            </small>
-                        </p>
-                    </div>
-                    <div class="pull-right">
-                        <button type="button" class="btn btn-primary btn-xs">
-                            Start Experiment
-                        </button>
-                        <button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#addIntervention">
-                            Add Intervention
-                        </button>
-                        <button type="button" class="btn btn-primary btn-xs">
-                            Copy Experiment
-                        </button>
-                        <button type="button" class="btn btn-primary btn-xs disabled">
-                            Download Data
-                        </button>
-                    </div>
-                </div>
-                <!--div class="panel-body">
-                    <p>...</p>
-                </div-->
-
-                <!-- List group -->
-                <ul class="list-group">
-                    <li class="list-group-item">
-                        <a href="#">Intervention point 1</a><br>
-                        <a href="#">Module</a> | Last modified 10/10/14
-                    </li>
-                    <li class="list-group-item">
-                        <a href="#">Intervention point 2</a><br>
-                        <a href="#">Module</a> | Last modified 10/10/14
-                    </li>
-                </ul>
             </div>
-            <!-- experiment 2 (end) -->
+            {% endfor %}
         </div>
     </main>
 </div>
+
 {% include "ab_tool/modals.html" %}
 
 {% endblock %}

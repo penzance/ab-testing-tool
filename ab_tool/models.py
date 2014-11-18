@@ -130,6 +130,22 @@ class InterventionPoint(CourseObject):
             if not intervention_point_url.url:
                 return True
         return False
+    
+    def track_urls(self):
+        """ This gets the InterventionPointUrls for an InterventionPoint in the
+            default databse order of Tracks and uses a mock InterventionPointUrl
+            with only the track attribute set in the event an InterventionPointUrl
+            is missing for that track """
+        ip_urls = self.interventionpointurl_set.all()
+        track_urls = []
+        for track in self.experiment.tracks.all():
+            for ip_url in ip_urls:
+                if ip_url.track == track:
+                    track_urls.append(ip_url)
+                    break
+            else:
+                track_urls.append(InterventionPointUrl(track=track))
+        return track_urls
 
 
 class InterventionPointUrl(TimestampedModel):
