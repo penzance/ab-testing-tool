@@ -1,7 +1,7 @@
 from ab_tool.tests.common import (SessionTestCase, TEST_COURSE_ID,
     TEST_OTHER_COURSE_ID, NONEXISTENT_TRACK_ID, NONEXISTENT_EXPERIMENT_ID)
 from django.core.urlresolvers import reverse
-from ab_tool.models import Track, Experiment, InterventionPointUrl
+from ab_tool.models import (Experiment, InterventionPointUrl)
 from ab_tool.exceptions import (EXPERIMENT_TRACKS_ALREADY_FINALIZED,
     NO_TRACKS_FOR_EXPERIMENT, UNAUTHORIZED_ACCESS)
 
@@ -13,7 +13,7 @@ class TestExperimentPages(SessionTestCase):
         response = self.client.get(reverse("ab:create_experiment"))
         self.assertOkay(response)
         self.assertTemplateUsed(response, "ab_tool/edit_experiment.html")
-
+    
     def test_create_experiment_view_unauthorized(self):
         """ Tests edit_experiment template does not render for url 'create_experiment'
             when unauthorized """
@@ -21,13 +21,23 @@ class TestExperimentPages(SessionTestCase):
         response = self.client.get(reverse("ab:create_experiment"), follow=True)
         self.assertTemplateNotUsed(response, "ab_tool/create_experiment.html")
         self.assertTemplateUsed(response, "ab_tool/not_authorized.html")
-
+    
     def test_edit_experiment_view(self):
         """ Tests edit_experiment template renders when authenticated """
         experiment = self.create_test_experiment()
         response = self.client.get(reverse("ab:edit_experiment", args=(experiment.id,)))
         self.assertTemplateUsed(response, "ab_tool/edit_experiment.html")
-
+    
+    def test_edit_experiment_view_with_tracks_weights(self):
+        """ Tests edit_experiment template renders properly with track weights """
+        experiment = self.create_test_experiment()
+        track1 = self.create_test_track(name="track1", experiment=experiment)
+        self.create_test_track(name="track2", experiment=experiment)
+        track1_weight = self.create_test_track_weight(experiment=experiment, track=track1)
+        response = self.client.get(reverse("ab:edit_experiment", args=(experiment.id,)))
+        self.assertTemplateUsed(response, "ab_tool/edit_experiment.html")
+        self.assertTrue((track1, track1_weight.weighting) in response.context["tracks"])
+    
     def test_edit_experiment_view_unauthorized(self):
         """ Tests edit_experiment template renders when unauthorized """
         self.set_roles([])
@@ -36,49 +46,49 @@ class TestExperimentPages(SessionTestCase):
                                    follow=True)
         self.assertTemplateNotUsed(response, "ab_tool/edit_experiment.html")
         self.assertTemplateUsed(response, "ab_tool/not_authorized.html")
-
+    
     def test_edit_experiment_view_nonexistent(self):
         """Tests edit_experiment when experiment does not exist"""
         e_id = NONEXISTENT_EXPERIMENT_ID
         response = self.client.get(reverse("ab:edit_experiment", args=(e_id,)))
         self.assertTemplateNotUsed(response, "ab_tool/edit_experiment.html")
         self.assertEquals(response.status_code, 404)
-
+    
     def test_edit_experiment_view_wrong_course(self):
         """ Tests edit_experiment when attempting to access a experiment from a different course """
         experiment = self.create_test_experiment(course_id=TEST_OTHER_COURSE_ID)
         response = self.client.get(reverse("ab:edit_experiment", args=(experiment.id,)))
         self.assertError(response, UNAUTHORIZED_ACCESS)
-
+    
     def test_submit_create_experiment(self):
         """Tests that create_experiment creates a Experiment object verified by DB count"""
-        experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
+        Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
         num_experiments = Experiment.objects.count()
         data = {"name": "experiment", "notes": "hi", "assignment_method": 1, "uniform_tracks": 2 }
         response = self.client.post(reverse("ab:submit_create_experiment"),
                                     data, follow=True)
         self.assertEquals(num_experiments + 1, Experiment.objects.count(), response)
-
+    
     def test_submit_create_experiment_with_weights_as_assignment_method(self):
         """Tests that create_experiment creates a Experiment object verified by DB count"""
-        experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
+        Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
         num_experiments = Experiment.objects.count()
         data = {"name": "experiment", "notes": "hi", "assignment_method": 2, "track_weights[]": [2,4] }
         response = self.client.post(reverse("ab:submit_create_experiment"),
                                     data, follow=True)
         self.assertEquals(num_experiments + 1, Experiment.objects.count(), response)
-
+    
     def test_submit_create_experiment_unauthorized(self):
         """Tests that create_experiment creates a Experiment object verified by DB count"""
         self.set_roles([])
-        experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
+        Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
         num_experiments = Experiment.objects.count()
         data = {"name": "experiment", "notes": "hi"}
         response = self.client.post(reverse("ab:submit_create_experiment"),
                                     data, follow=True)
         self.assertEquals(num_experiments, Experiment.objects.count())
         self.assertTemplateUsed(response, "ab_tool/not_authorized.html")
-
+    
     def test_submit_edit_experiment(self):
         """ Tests that submit_edit_experiment does not change DB count but does change Experiment
             attribute"""
@@ -92,7 +102,43 @@ class TestExperimentPages(SessionTestCase):
         self.assertEquals(num_experiments, Experiment.objects.count())
         experiment = Experiment.objects.get(id=experiment_id)
         self.assertEquals(experiment.name, "new_name")
-
+    
+    def test_submit_edit_experiment_changes_assignment_method_to_weighted(self):
+        """ Tests that submit_edit_experiment changes an Experiment's assignment
+            method from uniform (default) to weighted"""
+        experiment = self.create_test_experiment(name="old_name")
+        experiment_id = experiment.id
+        num_experiments = Experiment.objects.count()
+        no_track_weights = experiment.track_probabilites.count()
+        new_assignment_method = Experiment.WEIGHTED_PROBABILITY_RANDOM
+        data = {"name": "new_name", "notes": "hi", "assignment_method": new_assignment_method,
+                "track_weights[]": [2,4] }
+        response = self.client.post(
+                reverse("ab:submit_edit_experiment", args=(experiment_id,)), data, follow=True)
+        self.assertOkay(response)
+        self.assertEquals(num_experiments, Experiment.objects.count())
+        experiment = Experiment.objects.get(id=experiment_id)
+        self.assertEquals(experiment.assignment_method, new_assignment_method)
+        self.assertEquals(experiment.track_probabilites.count(), no_track_weights + 2)
+    
+    def test_submit_edit_experiment_changes_assignment_method_to_uniform(self):
+        """ Tests that submit_edit_experiment changes an Experiment's assignment
+            method from weighted uniform """
+        experiment = self.create_test_experiment(name="old_name", assignment_method=Experiment.WEIGHTED_PROBABILITY_RANDOM)
+        experiment_id = experiment.id
+        num_experiments = Experiment.objects.count()
+        no_tracks = experiment.tracks.count()
+        new_assignment_method = Experiment.UNIFORM_RANDOM
+        data = {"name": "new_name", "notes": "hi", "assignment_method": new_assignment_method,
+                "uniform_tracks": 3 }
+        response = self.client.post(
+                reverse("ab:submit_edit_experiment", args=(experiment_id,)), data, follow=True)
+        self.assertOkay(response)
+        self.assertEquals(num_experiments, Experiment.objects.count())
+        experiment = Experiment.objects.get(id=experiment_id)
+        self.assertEquals(experiment.assignment_method, new_assignment_method)
+        self.assertEquals(experiment.tracks.count(), no_tracks + 3)
+    
     def test_submit_edit_experiment_unauthorized(self):
         """ Tests submit_edit_experiment when unauthorized"""
         self.set_roles([])
@@ -102,7 +148,7 @@ class TestExperimentPages(SessionTestCase):
         response = self.client.post(
                 reverse("ab:submit_edit_experiment", args=(experiment_id,)), data, follow=True)
         self.assertTemplateUsed(response, "ab_tool/not_authorized.html")
-
+    
     def test_submit_edit_experiment_nonexistent(self):
         """ Tests that submit_edit_experiment method raises error for non-existent Experiment """
         experiment_id = NONEXISTENT_EXPERIMENT_ID
@@ -110,7 +156,7 @@ class TestExperimentPages(SessionTestCase):
         response = self.client.post(
                 reverse("ab:submit_edit_experiment", args=(experiment_id,)), data, follow=True)
         self.assertEquals(response.status_code, 404)
-
+    
     def test_submit_edit_experiment_wrong_course(self):
         """ Tests that submit_edit_experiment method raises error for existent Experiment but
             for wrong course"""
@@ -120,7 +166,7 @@ class TestExperimentPages(SessionTestCase):
         response = self.client.post(
                 reverse("ab:submit_edit_experiment", args=(experiment.id,)), data, follow=True)
         self.assertError(response, UNAUTHORIZED_ACCESS)
-
+    
     def test_delete_experiment(self):
         """ Tests that delete_experiment method properly deletes a experiment when authorized"""
         first_num_experiments = Experiment.objects.count()
@@ -131,7 +177,7 @@ class TestExperimentPages(SessionTestCase):
         second_num_experiments = Experiment.objects.count()
         self.assertOkay(response)
         self.assertEqual(first_num_experiments, second_num_experiments)
-
+    
     def test_delete_experiment_already_finalized(self):
         """ Tests that delete experiment doesn't work when experiments are finalized """
         experiment = self.create_test_experiment()
@@ -142,7 +188,7 @@ class TestExperimentPages(SessionTestCase):
         second_num_experiments = Experiment.objects.count()
         self.assertError(response, EXPERIMENT_TRACKS_ALREADY_FINALIZED)
         self.assertEqual(first_num_experiments, second_num_experiments)
-
+    
     def test_delete_experiment_unauthorized(self):
         """ Tests that delete_experiment method raises error when unauthorized """
         self.set_roles([])
@@ -153,7 +199,7 @@ class TestExperimentPages(SessionTestCase):
         second_num_experiments = Experiment.objects.count()
         self.assertTemplateUsed(response, "ab_tool/not_authorized.html")
         self.assertEqual(first_num_experiments, second_num_experiments)
-
+    
     def test_delete_experiment_nonexistent(self):
         """ Tests that delete_experiment method raises error for non-existent Experiment """
         self.create_test_experiment()
@@ -174,7 +220,7 @@ class TestExperimentPages(SessionTestCase):
         second_num_experiments = Experiment.objects.count()
         self.assertEqual(first_num_experiments, second_num_experiments)
         self.assertError(response, UNAUTHORIZED_ACCESS)
-
+    
     def test_delete_experiment_deletes_intervention_point_urls(self):
         """ Tests that intervention_point_urls of a experiment are deleted when the experiment is """
         experiment = self.create_test_experiment()
@@ -207,8 +253,8 @@ class TestExperimentPages(SessionTestCase):
         """ Tests that finalize fails if there are missing urls """
         experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
         self.assertFalse(experiment.tracks_finalized)
-        track1 = self.create_test_track(name="track1")
-        self.create_test_track(name="track2")
+        track1 = self.create_test_track(name="track1", experiment=experiment)
+        self.create_test_track(name="track2", experiment=experiment)
         intervention_point = self.create_test_intervention_point()
         InterventionPointUrl.objects.create(intervention_point=intervention_point,
                                             track=track1, url="example.com")
@@ -218,8 +264,17 @@ class TestExperimentPages(SessionTestCase):
         self.assertFalse(experiment.tracks_finalized)
     
     def test_finalize_tracks_no_tracks(self):
-        """ Tests that finalize fails if there are no experiments """
+        """ Tests that finalize fails if there are no tracks for an experiment """
         experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
         response = self.client.get(reverse("ab:finalize_tracks", args=(experiment.id,)),
                                    follow=True)
         self.assertError(response, NO_TRACKS_FOR_EXPERIMENT)
+    
+    def test_finalize_tracks_missing_track_weights(self):
+        """ Tests that finalize fails if there are no track weights for an weighted
+            probability experiment """
+        experiment = self.create_test_experiment(assignment_method=Experiment.WEIGHTED_PROBABILITY_RANDOM)
+        self.create_test_track(name="track1", experiment=experiment)
+        self.client.get(reverse("ab:finalize_tracks", args=(experiment.id,)),
+                                   follow=True)
+        self.assertFalse(experiment.tracks_finalized)

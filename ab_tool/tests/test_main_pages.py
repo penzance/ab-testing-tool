@@ -4,8 +4,8 @@ from mock import patch
 from ab_tool.controllers import intervention_point_url
 from ab_tool.tests.common import (SessionTestCase, LIST_MODULES,
     LIST_ITEMS, APIReturn, TEST_COURSE_ID, TEST_OTHER_COURSE_ID)
-from ab_tool.models import InterventionPoint, Track, ExperimentStudent,\
-    Experiment
+from ab_tool.models import (ExperimentStudent, Experiment,
+    InterventionPointDeployments)
 from ab_tool.views.main_pages import tool_config
 
 
@@ -56,9 +56,8 @@ class TestMainPages(SessionTestCase):
     def test_index_context_experiments(self):
         """ Checks that the intervention_points and tracks passed to the index template
             contain values from the database """
-        response = self.client.get(reverse("ab:index"), follow=True)
-        intervention_point = self.create_test_intervention_point()
         Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
+        intervention_point = self.create_test_intervention_point()
         response = self.client.get(reverse("ab:index"), follow=True)
         self.assertEqual(len(response.context["experiments"]), 1)
         self.assertSameIds([intervention_point], response.context["intervention_points"])
@@ -68,7 +67,7 @@ class TestMainPages(SessionTestCase):
             only contain database values matching the course_id """
         intervention_point = self.create_test_intervention_point()
         self.create_test_intervention_point(course_id=TEST_OTHER_COURSE_ID)
-        track = self.create_test_track()
+        self.create_test_track()
         self.create_test_track(course_id=TEST_OTHER_COURSE_ID)
         experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
         response = self.client.get(reverse("ab:index"), follow=True)
@@ -150,5 +149,55 @@ class TestMainPages(SessionTestCase):
                          ('Content-Type', 'text/csv'))
         num_students = ExperimentStudent.objects.filter(course_id=TEST_COURSE_ID).count()
         self.assertEqual(num_students, 0)
+        # Length is 2 for header and trailing newline
+        self.assertEqual(len(response.content.split("\n")), 2)
+    
+    def test_download_intervention_point_deployments(self):
+        """ Tests that download data returns a csv with a row for each student """
+        track = self.create_test_track()
+        experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
+        student = ExperimentStudent.objects.create(course_id=TEST_COURSE_ID, student_id=1,
+                                         track=track, experiment=experiment)
+        intervention_point = self.create_test_intervention_point(course_id=TEST_COURSE_ID)
+        InterventionPointDeployments.objects.create(course_id=TEST_COURSE_ID, student=student,
+                    intervention_point=intervention_point, experiment=experiment)
+        InterventionPointDeployments.objects.create(course_id=TEST_COURSE_ID, student=student,
+                    intervention_point=intervention_point, experiment=experiment)
+        response = self.client.get(reverse("ab:download_intervention_point_deployments", args=(experiment.id,)))
+        self.assertEqual(response._headers["content-type"],
+                         ('Content-Type', 'text/csv'))
+        deployments = InterventionPointDeployments.objects.filter(course_id=TEST_COURSE_ID).count()
+        # Add 2 to length for header and trailing newline
+        self.assertEqual(len(response.content.split("\n")), deployments + 2)
+    
+    def test_download_intervention_point_deployments_experiment_specific(self):
+        """ Tests that download data only uses student in the correct course """
+        track = self.create_test_track()
+        experiment1 = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
+        experiment2 = Experiment.get_placeholder_course_experiment(TEST_OTHER_COURSE_ID)
+        student1 = ExperimentStudent.objects.create(course_id=TEST_COURSE_ID, student_id=1,
+                                         track=track, experiment=experiment1)
+        student2 = ExperimentStudent.objects.create(course_id=TEST_OTHER_COURSE_ID, student_id=2,
+                                         track=track, experiment=experiment2)
+        intervention_point1 = self.create_test_intervention_point(course_id=TEST_COURSE_ID)
+        InterventionPointDeployments.objects.create(course_id=TEST_COURSE_ID, student=student1,
+                    intervention_point=intervention_point1, experiment=experiment1)
+        intervention_point2 = self.create_test_intervention_point(course_id=TEST_OTHER_COURSE_ID)
+        InterventionPointDeployments.objects.create(course_id=TEST_OTHER_COURSE_ID, student=student2,
+                    intervention_point=intervention_point2, experiment=experiment2)
+        response = self.client.get(reverse("ab:download_intervention_point_deployments", args=(experiment1.id,)))
+        self.assertEqual(response._headers["content-type"],
+                         ('Content-Type', 'text/csv'))
+        deployments = InterventionPointDeployments.objects.filter(course_id=TEST_COURSE_ID).count()
+        # Add 2 to length for header and trailing newline
+        self.assertEqual(len(response.content.split("\n")), deployments + 2)
+    
+    def test_download_intervention_point_deployments_no_students(self):
+        experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
+        response = self.client.get(reverse("ab:download_intervention_point_deployments", args=(experiment.id,)))
+        self.assertEqual(response._headers["content-type"],
+                         ('Content-Type', 'text/csv'))
+        deployments = InterventionPointDeployments.objects.filter(course_id=TEST_COURSE_ID).count()
+        self.assertEqual(deployments, 0)
         # Length is 2 for header and trailing newline
         self.assertEqual(len(response.content.split("\n")), 2)
