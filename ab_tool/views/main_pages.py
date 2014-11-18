@@ -27,18 +27,6 @@ def render_intervention_point_control_panel(request):
     modules = get_modules_with_items(request)
     uninstalled_intervention_points = get_uninstalled_intervention_points(request)
     intervention_points = InterventionPoint.objects.filter(course_id=course_id)
-    for intervention_point in intervention_points:
-        ip_urls = intervention_point.interventionpointurl_set.all()
-        track_urls = []
-        for track in intervention_point.experiment.tracks.all():
-            for ip_url in ip_urls:
-                if ip_url.track == track:
-                    track_urls.append(ip_url)
-                    break
-            else:
-                # Create a dictionary with a track to enable ".track" template lookups
-                track_urls.append({"track": track})
-        intervention_point.track_urls = track_urls
     experiments = Experiment.objects.filter(course_id=course_id)
     context = {
         "modules": modules,
