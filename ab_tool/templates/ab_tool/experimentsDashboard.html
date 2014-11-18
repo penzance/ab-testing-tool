@@ -49,8 +49,8 @@
                             <a type="button" class="btn btn-primary btn-xs" href="#finalize_modal{{experiment.id}}" data-toggle="modal" >
                                 Start Experiment
                             </a>
-                            <a type="button" class="btn btn-primary btn-xs" href="{% url 'ab:create_intervention_point' experiment.id %}" id="add_intervention_point_button">
-                            <!-- href="{% url 'ab:create_intervention_point' experiment.id %} -->
+                            <a type="button" class="btn btn-primary btn-xs" href="#createIntervention_{{experiment.id}}" id="add_intervention_point_button" data-toggle="modal">
+                            <!-- href="#createIntervention_{{experiment.id}}" -->
                                 Add Intervention
                             </a>
                             <!-- <a type="button" class="btn btn-primary btn-xs">
