@@ -19,7 +19,7 @@
                 <div class="form-group">
                     <div class="col-sm-9">
                         <label for="track_{{track.id}}">Track "{{track.name}}":</label>
-                        <input type="text" name="intervention_point_url_{{track.id}}"
+                        <input type="url" name="intervention_point_url_{{track.id}}"
                             id="intervention_point_url_{{track.id}}" class="form-control"
                             value="">
                     </div>
@@ -74,7 +74,7 @@
                     <div class="form-group">
                         <div class="col-sm-9">
                             <label for="track_{{track_url.track.id}}">Track "{{track_url.track.name}}":</label>
-                            <input type="text" name="intervention_point_url_{{track_url.track.id}}"
+                            <input type="url" name="intervention_point_url_{{track_url.track.id}}"
                                 id="intervention_point_url_{{track_url.track.id}}" class="form-control"
                                 value="{{track_url.url}}">
                         </div>

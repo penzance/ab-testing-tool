@@ -40,28 +40,33 @@
                                 {{experiment.tracks.count}} Tracks | {{experiment.intervention_points.count}} Intervention Points
                                 <br/>
                                 Last modified: {{experiment.updated_on}}
-                                <br/>
-                                Created: {{experiment.created_on}}
                                 </small>
                             </p>
                         </div>
                         <div class="pull-right">
-                            <a type="button" class="btn btn-primary btn-xs" href="#finalize_modal{{experiment.id}}" data-toggle="modal" >
-                                Start Experiment
-                            </a>
+                            {% if not experiment.tracks_finalized %}
+                            <a type="button" class="btn btn-primary btn-xs" href="#finalize_modal{{experiment.id}}" data-toggle="modal">
+                                Start Experiment </a>
+                            {% else %}
+                            <a type="button" class="btn btn-primary btn-xs disabled">
+                                Start Experiment </a>
+                            {% endif %}
                             <a type="button" class="btn btn-primary btn-xs" href="#createIntervention_{{experiment.id}}" id="add_intervention_point_button" data-toggle="modal">
-                            <!-- href="#createIntervention_{{experiment.id}}" -->
-                                Add Intervention
-                            </a>
+                                Add Intervention </a>
                             <!-- <a type="button" class="btn btn-primary btn-xs">
                                 Copy Experiment
                             </a> -->
+                            {% if experiment.tracks_finalized %}
                             <a type="button" class="btn btn-primary btn-xs" id="download_students_button" href="{% url 'ab:download_data' experiment.id %}">
-                                Download Students
-                            </a>
+                                Download Students </a>
                             <a type="button" class="btn btn-primary btn-xs" id="download_intervention_point_deployments_button" href="{% url 'ab:download_intervention_point_deployments' experiment.id %}">
-                                Download Interactions
-                            </a>
+                                Download Interactions </a>
+                            {% else %}
+                            <a type="button" class="btn btn-primary btn-xs disabled" id="download_students_button">
+                                Download Students </a>
+                            <a type="button" class="btn btn-primary btn-xs disabled" id="download_intervention_point_deployments_button">
+                                Download Interactions </a>
+                            {% endif %}
                         </div>
                     </div>
                     <ul class="list-group">
