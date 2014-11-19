@@ -59,7 +59,7 @@
     <div class="modal-content">
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-            <h4 class="modal-title" id="myModalLabel">Edit Intervention</h4>
+            <h4 class="modal-title" id="myModalLabel">Edit Intervention Point</h4>
         </div>
         <form method="post" class="form-horizontal" name="intervention_point_form"
             action="{% url 'ab:submit_edit_intervention_point' intervention_point.id %}">
@@ -79,15 +79,15 @@
                                 value="{{track_url.url}}">
                         </div>
                         <div class="col-sm-3">
-                            <label for="is_canvas_page_for_track_{{track_url.track.id}}">Open in:</label>
+                            <label for="is_canvas_page_for_track_{{track_url.track.id}}">Open:</label>
                             <select name="is_canvas_page_for_track_{{track_url.track.id}}"
                                 id="is_canvas_page_for_track_{{track_url.track.id}}">
                                 <option {% if track_url.open_as_tab %}selected="selected"{% endif %}
-                                    value="newTab">New Tab</option>
+                                    value="newTab">In new tab</option>
                                 <option {% if not track_url.open_as_tab and not track_url.is_canvas_page %}selected="selected"{% endif %}
-                                    value="externalPage">External URL</option>
+                                    value="externalPage">External URL in Canvas</option>
                                 <option {% if not track_url.open_as_tab and track_url.is_canvas_page %}selected="selected"{% endif %}
-                                    value="canvasPage">Canvas Page</option>
+                                    value="canvasPage">Canvas URL</option>
                             </select>
                         </div>
                     </div>
@@ -142,7 +142,7 @@
                 <h4 class="modal-title">Some Tracks Are Missing Weights</h4>
             </div>
             <div class="modal-body">
-                <p>Complete your Track weights by filling out weights for all tracks.</p>
+                <p>Complete your track weights by filling out weights for all tracks.</p>
                 <p class="text-warning">These following tracks are missing weights: {{ missing_track_weights|join:", " }} </p>
             </div>
             <div class="modal-footer">
@@ -165,7 +165,7 @@
             </div>
             <div class="modal-body">
                 <p>Are you sure you want to start this experiment?</p>
-                <p class="text-warning">Starting an experiment cannot be undone. Once started, experiment tracks can no longer be created or deleted. </p>
+                <p class="text-warning">Starting an experiment cannot be undone. Once started, the experiment assignment method and number of tracks cannot be changed. Students will be assigned to tracks when they first visit an intervention point in this experiment.</p>
             </div>
             <div class="modal-footer">
                 <a class="btn btn-lg btn-primary" data-dismiss="modal"> Close </a>
