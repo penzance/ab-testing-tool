@@ -8,7 +8,7 @@
             <h4 class="modal-title" id="">New Intervention Point</h4>
         </div>
         <form class="form-horizontal" role="form" method="post" name="intervention_point_creation_form"
-            action="{% url 'ab:submit_create_intervention_point' experiment.id %}">
+            action="{% url 'ab_testing_tool_submit_create_intervention_point' experiment.id %}">
             <div class="modal-body">
                 <div class="form-group col-sm-12">
                     <label for="interventionName">Name:</label>
@@ -62,7 +62,7 @@
             <h4 class="modal-title" id="myModalLabel">Edit Intervention Point</h4>
         </div>
         <form method="post" class="form-horizontal" name="intervention_point_form"
-            action="{% url 'ab:submit_edit_intervention_point' intervention_point.id %}">
+            action="{% url 'ab_testing_tool_submit_edit_intervention_point' intervention_point.id %}">
             <div class="modal-body">
                 <div class="form-group col-sm-12">
                     <label for="interventionName">Name:</label>
@@ -169,7 +169,7 @@
             </div>
             <div class="modal-footer">
                 <a class="btn btn-lg btn-primary" data-dismiss="modal"> Close </a>
-                <a class="btn btn-lg btn-danger"  href="{% url 'ab:finalize_tracks' experiment.id %}"> Yes, Start Experiment </a>
+                <a class="btn btn-lg btn-danger"  href="{% url 'ab_testing_tool_finalize_tracks' experiment.id %}"> Yes, Start Experiment </a>
             </div>
         </div>
     </div>

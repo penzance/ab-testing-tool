@@ -28,7 +28,7 @@ def deploy_intervention_point(request, intervention_point_id):
     
     # If user is an admin, let them edit the intervention_point
     if set(ADMINS) & set(user_roles):
-        return redirect(reverse("ab:modules_page_edit_intervention_point",
+        return redirect(reverse("ab_testing_tool_modules_page_edit_intervention_point",
                                 args=(intervention_point_id,)))
     
     intervention_point = InterventionPoint.get_or_404_check_course(
@@ -81,7 +81,7 @@ def create_intervention_point(request, experiment_id):
     #Note: Refer to template. (t,None) is passed as there are no existing InterventionPointUrls for a new intervention_point
     context = {"tracks" : [(t, None) for t in
                            Track.objects.filter(course_id=course_id, experiment=experiment)],
-               "cancel_url": reverse("ab:index"),
+               "cancel_url": reverse("ab_testing_tool_index"),
                "experiment": experiment}
     return render_to_response("ab_tool/edit_intervention_point.html", context)
 
@@ -108,7 +108,7 @@ def submit_create_intervention_point(request, experiment_id):
                 url=format_url(v), intervention_point_id=intervention_point.id,
                 track_id=track_id, is_canvas_page=is_canvas_page, open_as_tab=open_as_tab
         )
-    return redirect(reverse("ab:index"))
+    return redirect(reverse("ab_testing_tool_index"))
 
 
 @lti_role_required(ADMINS)
@@ -119,7 +119,7 @@ def modules_page_edit_intervention_point(request, intervention_point_id):
 @lti_role_required(ADMINS)
 def edit_intervention_point(request, intervention_point_id):
     context = edit_intervention_point_common(request, intervention_point_id)
-    context["cancel_url"] = reverse("ab:index")
+    context["cancel_url"] = reverse("ab_testing_tool_index")
     return render_to_response("ab_tool/edit_intervention_point.html", context)
 
 def edit_intervention_point_common(request, intervention_point_id):
@@ -172,7 +172,7 @@ def submit_edit_intervention_point(request, intervention_point_id):
         except InterventionPointUrl.DoesNotExist:
             InterventionPointUrl.objects.create(url=format_url(v), intervention_point_id=intervention_point_id, track_id=track_id,
                                     is_canvas_page=is_canvas_page, open_as_tab=open_as_tab)
-    return redirect(reverse("ab:index"))
+    return redirect(reverse("ab_testing_tool_index"))
 
 
 @lti_role_required(ADMINS)
@@ -186,4 +186,4 @@ def delete_intervention_point(request, intervention_point_id):
     if canvas_modules.intervention_point_is_installed(intervention_point):
         raise DELETING_INSTALLED_STAGE
     intervention_point.delete()
-    return redirect(reverse("ab:index"))
+    return redirect(reverse("ab_testing_tool_index"))
