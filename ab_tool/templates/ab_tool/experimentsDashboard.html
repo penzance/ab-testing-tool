@@ -78,7 +78,7 @@
                         </li>
                         {% empty %}
                         <li class="list-group-item">
-                            No Intervention Points have been created for this experiment yet. Click on "Add an Intervention Point" to get started.
+                            No intervention points currently exist for this experiment. Click on "Add an Intervention Point" to get started.
                         </li>
                         {% endfor %}
                     </ul>
@@ -87,7 +87,7 @@
             {% empty %}
             <div class="well">
             <div class="container">
-            <h3>No experiments have been created yet.</h3>
+            <h3>No experiments currently exist for this course. Click on "Add an Experiment" to get started.</h3>
             <h4><a title="Create an experiment" href="{% url 'ab:create_experiment' %}">Create an experiment</a></h4>
             </div>
             </div>
