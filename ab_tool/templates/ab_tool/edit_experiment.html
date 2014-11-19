@@ -17,9 +17,9 @@
             <tr>
     
             <td><p>Created: {{experiment.created_on}} | Last updated: {{experiment.updated_on}} </p></td>
-            {% if experiment.id and not is_finalized and not has_installed%}
-            <td class="text-right nowrap"><a id="delete_experiment_button" href="{% url 'ab:delete_experiment' experiment.id %}" class="btn btn-lg btn-danger">Delete Experiment</a></td>
-            {% elif experiment.id and is_finalized or has_installed %}
+            {% if experiment.id and not is_finalized and not has_installed %}
+            <td class="text-right nowrap"><a id="delete_experiment_button" href="{% url 'ab_testing_tool_delete_experiment' experiment.id %}" class="btn btn-lg btn-danger">Delete Experiment</a></td>
+            {% elif experiment.id and is_finalized %}
             <td class="text-right nowrap"><a id="delete_experiment_button_disabled" class="btn btn-lg btn-danger disabled">Delete Experiment</a></td>
             {% endif %}
             </tr>
@@ -38,8 +38,8 @@
         {% endif %}
 
         <form method="post" name="experiment_form"
-            {% if experiment.id %} action="{% url 'ab:submit_edit_experiment' experiment.id %}"
-            {% else %} action="{% url 'ab:submit_create_experiment'%}" {% endif %}>
+            {% if experiment.id %} action="{% url 'ab_testing_tool_submit_edit_experiment' experiment.id %}"
+            {% else %} action="{% url 'ab_testing_tool_submit_create_experiment'%}" {% endif %}>
         {% csrf_token %}
             <table class="table table-striped">
 
@@ -100,7 +100,7 @@
             </tr>
             <tr>
                 <td>
-                <a id="cancel_submit_edit_experiment_button" href="{% url 'ab:index' %}" class="btn btn-lg btn-primary">Cancel</a>
+                <a id="cancel_submit_edit_experiment_button" href="{% url 'ab_testing_tool_index' %}" class="btn btn-lg btn-primary">Cancel</a>
                 <input id="submit_edit_experiment_button" type="submit" name="submit" value="Submit" class="btn btn-lg btn-success submit">
                 </td>
             </tr>

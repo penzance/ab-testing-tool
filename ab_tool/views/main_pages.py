@@ -36,8 +36,8 @@ def render_control_panel(request):
 
 
 def tool_config(request):
-    index_url = request.build_absolute_uri(reverse("ab:index"))
-    resource_selection_url = request.build_absolute_uri(reverse("ab:resource_selection"))
+    index_url = request.build_absolute_uri(reverse("ab_testing_tool_index"))
+    resource_selection_url = request.build_absolute_uri(reverse("ab_testing_tool_resource_selection"))
     
     config = ToolConfig(
         title="A/B Testing Tool",

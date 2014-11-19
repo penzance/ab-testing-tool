@@ -11,7 +11,7 @@
 <div class="container">
     <header>
         <div class="row lti-header">
-            <h1><a href="{% url 'ab:index' %}">A/B Testing Dashboard</a></h1>
+            <h1><a href="{% url 'ab_testing_tool_index' %}">A/B Testing Dashboard</a></h1>
         </div>
     </header>
     <main>
@@ -22,13 +22,13 @@
         </div>
         <div class="row row-lti col-md-8">
         
-            <h2><a href="{% url 'ab:create_experiment' %}">Add an Experiment</a></h2>
+            <h2><a href="{% url 'ab_testing_tool_create_experiment' %}">Add an Experiment</a></h2>
             {% for experiment in experiments %}
                 <div class="panel panel-default">
                     <!-- Default panel contents -->
                     <div class="panel-heading lti-inline-block">
                         <div class="pull-left">
-                            <h3><a href="{% url 'ab:edit_experiment' experiment.id %}" id="experiment_{{experiment.id}}">Experiment "{{experiment.name}}"</a></h3>
+                            <h3><a href="{% url 'ab_testing_tool_edit_experiment' experiment.id %}" id="experiment_{{experiment.id}}">Experiment "{{experiment.name}}"</a></h3>
                             {% if experiment.assignment_method == experiment.WEIGHTED_PROBABILITY_RANDOM %}
                                 <small>Students assigned according to weighted probability random distribution</small>
                             {% endif %}
@@ -57,9 +57,9 @@
                                 Copy Experiment
                             </a> -->
                             {% if experiment.tracks_finalized %}
-                            <a type="button" class="btn btn-primary btn-xs" id="download_students_button" href="{% url 'ab:download_data' experiment.id %}">
+                            <a type="button" class="btn btn-primary btn-xs" id="download_students_button" href="{% url 'ab_testing_tool_download_data' experiment.id %}">
                                 Download Students </a>
-                            <a type="button" class="btn btn-primary btn-xs" id="download_intervention_point_interactions_button" href="{% url 'ab:download_intervention_point_interactions' experiment.id %}">
+                            <a type="button" class="btn btn-primary btn-xs" id="download_intervention_point_interactions_button" href="{% url 'ab_testing_tool_download_intervention_point_interactions' experiment.id %}">
                                 Download Interactions </a>
                             {% else %}
                             <a type="button" class="btn btn-primary btn-xs disabled" id="download_students_button">
@@ -73,7 +73,7 @@
                         {% for intervention_point in experiment.intervention_points.all %}
                         <li class="list-group-item">
                             <a data-toggle="modal" href="#editIntervention_{{intervention_point.id}}">Intervention Point "{{intervention_point.name}}"</a><br>
-                             <!--<a href="{% url 'ab:edit_intervention_point' intervention_point.id %}"-->
+                             <!--<a href="{% url 'ab_testing_tool_edit_intervention_point' intervention_point.id %}"-->
                            <i>{{intervention_point.is_missing_urls|yesno:"URLs missing,complete"}}</i> | Last modified: {{intervention_point.updated_on}}
                         </li>
                         {% empty %}
@@ -88,7 +88,7 @@
             <div class="well">
             <div class="container">
             <h3>No experiments currently exist for this course. Click on "Add an Experiment" to get started.</h3>
-            <h4><a title="Create an experiment" href="{% url 'ab:create_experiment' %}">Create an experiment</a></h4>
+            <h4><a title="Create an experiment" href="{% url 'ab_testing_tool_create_experiment' %}">Create an experiment</a></h4>
             </div>
             </div>
             {% endfor %}

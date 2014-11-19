@@ -14,14 +14,14 @@ class TestMainPages(SessionTestCase):
     
     def test_not_authorized_renders(self):
         """ Tests that the not_authorized page renders """
-        response = self.client.get(reverse("ab:not_authorized"), follow=True)
+        response = self.client.get(reverse("ab_testing_tool_not_authorized"), follow=True)
         self.assertEqual(response.status_code, 401)
         self.assertTemplateUsed(response, "ab_tool/not_authorized.html")
     
     def test_index_and_control_panel_view(self):
         """ Tests control_panel template renders when authenticated and with no
             contents returned from Canvas"""
-        response = self.client.get(reverse("ab:index"), follow=True)
+        response = self.client.get(reverse("ab_testing_tool_index"), follow=True)
         self.assertOkay(response)
         self.assertTemplateUsed(response, "ab_tool/experimentsDashboard.html")
     
@@ -32,21 +32,21 @@ class TestMainPages(SessionTestCase):
                      "external_url": intervention_point_url(self.request, 0)}
         api_return = APIReturn([mock_item])
         with patch(LIST_ITEMS, return_value=api_return):
-            response = self.client.get(reverse("ab:index"), follow=True)
+            response = self.client.get(reverse("ab_testing_tool_index"), follow=True)
             self.assertOkay(response)
             self.assertTemplateUsed(response, "ab_tool/experimentsDashboard.html")
     
     def test_unauthenticated_index(self):
         """ Tests control_panel template does not render when unauthorized"""
         self.set_roles([])
-        response = self.client.get(reverse("ab:index"), follow=True)
+        response = self.client.get(reverse("ab_testing_tool_index"), follow=True)
         self.assertTemplateNotUsed(response, "ab_tool/control_panel.html")
         self.assertEqual(response.status_code, 401)
         self.assertTemplateUsed(response, "ab_tool/not_authorized.html")
     
     def test_index_context(self):
         """ Checks that the context of the index contains the relevant fields """
-        response = self.client.get(reverse("ab:index"), follow=True)
+        response = self.client.get(reverse("ab_testing_tool_index"), follow=True)
         self.assertIn("intervention_points", response.context)
         self.assertIn("modules", response.context)
         self.assertIn("uninstalled_intervention_points", response.context)
@@ -58,7 +58,7 @@ class TestMainPages(SessionTestCase):
             contain values from the database """
         Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
         intervention_point = self.create_test_intervention_point()
-        response = self.client.get(reverse("ab:index"), follow=True)
+        response = self.client.get(reverse("ab_testing_tool_index"), follow=True)
         self.assertEqual(len(response.context["experiments"]), 1)
         self.assertSameIds([intervention_point], response.context["intervention_points"])
     
@@ -70,7 +70,7 @@ class TestMainPages(SessionTestCase):
         self.create_test_track()
         self.create_test_track(course_id=TEST_OTHER_COURSE_ID)
         experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
-        response = self.client.get(reverse("ab:index"), follow=True)
+        response = self.client.get(reverse("ab_testing_tool_index"), follow=True)
         self.assertSameIds([experiment], response.context["experiments"])
         self.assertSameIds([intervention_point], response.context["intervention_points"])
     
@@ -81,7 +81,7 @@ class TestMainPages(SessionTestCase):
         intervention_point2 = self.create_test_intervention_point(name="intervention_point2")
         with patch("ab_tool.canvas.CanvasModules.get_uninstalled_intervention_points",
                    return_value=[intervention_point1]):
-            response = self.client.get(reverse("ab:index"), follow=True)
+            response = self.client.get(reverse("ab_testing_tool_index"), follow=True)
             self.assertSameIds(response.context["uninstalled_intervention_points"], [intervention_point1])
             self.assertSameIds(response.context["intervention_points"], [intervention_point1, intervention_point2])
     
@@ -89,12 +89,12 @@ class TestMainPages(SessionTestCase):
         ret_val = [{"name": "module1"}]
         with patch("ab_tool.canvas.CanvasModules.get_modules_with_items",
                    return_value=ret_val):
-            response = self.client.get(reverse("ab:index"), follow=True)
+            response = self.client.get(reverse("ab_testing_tool_index"), follow=True)
             self.assertEqual(response.context["modules"], ret_val)
     
     def test_tool_config(self):
         """ Tests that that tool_config page returns XML content"""
-        response = self.client.get(reverse("ab:tool_config"))
+        response = self.client.get(reverse("ab_testing_tool_tool_config"))
         self.assertOkay(response)
         self.assertEqual(response._headers["content-type"],
                         ('Content-Type', 'text/xml'))
@@ -104,9 +104,9 @@ class TestMainPages(SessionTestCase):
             the return of tool config; this test doesn't use self.client
             in order to use the same request for building the comparison uris
             as it does for calling the view """
-        index_url = self.request.build_absolute_uri(reverse("ab:index"))
+        index_url = self.request.build_absolute_uri(reverse("ab_testing_tool_index"))
         resource_selection_url = self.request.build_absolute_uri(
-                reverse("ab:resource_selection"))
+                reverse("ab_testing_tool_resource_selection"))
         response = tool_config(self.request)
         self.assertContains(response, index_url)
         self.assertContains(response, resource_selection_url)
@@ -119,7 +119,7 @@ class TestMainPages(SessionTestCase):
                                          track=track, experiment=experiment)
         ExperimentStudent.objects.create(course_id=TEST_COURSE_ID, student_id=2,
                                          track=track, experiment=experiment)
-        response = self.client.get(reverse("ab:download_data", args=(experiment.id,)))
+        response = self.client.get(reverse("ab_testing_tool_download_data", args=(experiment.id,)))
         self.assertEqual(response._headers["content-type"],
                          ('Content-Type', 'text/csv'))
         num_students = ExperimentStudent.objects.filter(course_id=TEST_COURSE_ID).count()
@@ -135,7 +135,7 @@ class TestMainPages(SessionTestCase):
                                          track=track, experiment=experiment1)
         ExperimentStudent.objects.create(course_id=TEST_OTHER_COURSE_ID, student_id=2,
                                          track=track, experiment=experiment2)
-        response = self.client.get(reverse("ab:download_data", args=(experiment1.id,)))
+        response = self.client.get(reverse("ab_testing_tool_download_data", args=(experiment1.id,)))
         self.assertEqual(response._headers["content-type"],
                          ('Content-Type', 'text/csv'))
         num_students = ExperimentStudent.objects.filter(course_id=TEST_COURSE_ID).count()
@@ -144,7 +144,7 @@ class TestMainPages(SessionTestCase):
     
     def test_download_data_no_students(self):
         experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
-        response = self.client.get(reverse("ab:download_data", args=(experiment.id,)))
+        response = self.client.get(reverse("ab_testing_tool_download_data", args=(experiment.id,)))
         self.assertEqual(response._headers["content-type"],
                          ('Content-Type', 'text/csv'))
         num_students = ExperimentStudent.objects.filter(course_id=TEST_COURSE_ID).count()
@@ -163,7 +163,7 @@ class TestMainPages(SessionTestCase):
                     intervention_point=intervention_point, experiment=experiment)
         InterventionPointInteraction.objects.create(course_id=TEST_COURSE_ID, student=student,
                     intervention_point=intervention_point, experiment=experiment)
-        response = self.client.get(reverse("ab:download_intervention_point_interactions", args=(experiment.id,)))
+        response = self.client.get(reverse("ab_testing_tool_download_intervention_point_interactions", args=(experiment.id,)))
         self.assertEqual(response._headers["content-type"],
                          ('Content-Type', 'text/csv'))
         interactions = InterventionPointInteraction.objects.filter(course_id=TEST_COURSE_ID).count()
@@ -185,7 +185,7 @@ class TestMainPages(SessionTestCase):
         intervention_point2 = self.create_test_intervention_point(course_id=TEST_OTHER_COURSE_ID)
         InterventionPointInteraction.objects.create(course_id=TEST_OTHER_COURSE_ID, student=student2,
                     intervention_point=intervention_point2, experiment=experiment2)
-        response = self.client.get(reverse("ab:download_intervention_point_interactions", args=(experiment1.id,)))
+        response = self.client.get(reverse("ab_testing_tool_download_intervention_point_interactions", args=(experiment1.id,)))
         self.assertEqual(response._headers["content-type"],
                          ('Content-Type', 'text/csv'))
         interactions = InterventionPointInteraction.objects.filter(course_id=TEST_COURSE_ID).count()
@@ -194,7 +194,7 @@ class TestMainPages(SessionTestCase):
     
     def test_download_intervention_point_interactions_no_students(self):
         experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
-        response = self.client.get(reverse("ab:download_intervention_point_interactions", args=(experiment.id,)))
+        response = self.client.get(reverse("ab_testing_tool_download_intervention_point_interactions", args=(experiment.id,)))
         self.assertEqual(response._headers["content-type"],
                          ('Content-Type', 'text/csv'))
         interactions = InterventionPointInteraction.objects.filter(course_id=TEST_COURSE_ID).count()
