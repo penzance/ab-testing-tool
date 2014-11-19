@@ -4,8 +4,9 @@ from django.core.urlresolvers import reverse
 
 from ab_tool.constants import ADMINS
 from ab_tool.models import (Track, Experiment, TrackProbabilityWeight)
-from ab_tool.canvas import get_lti_param
-from ab_tool.exceptions import (NO_TRACKS_FOR_EXPERIMENT)
+from ab_tool.canvas import get_lti_param, CanvasModules
+from ab_tool.exceptions import (NO_TRACKS_FOR_EXPERIMENT,
+    INTERVENTION_POINTS_ARE_INSTALLED)
 from django.http.response import HttpResponse
 from ab_tool.controllers import (post_param, get_missing_track_weights,
     get_incomplete_intervention_points)
@@ -52,6 +53,7 @@ def edit_experiment(request, experiment_id):
     context = {"Experiment": Experiment,
                "experiment": experiment,
                "tracks": track_weights,
+               "has_installed": CanvasModules(request).experiment_has_installed_intervention(experiment)
                }
     return render_to_response("ab_tool/edit_experiment.html", context)
 
@@ -82,6 +84,9 @@ def delete_experiment(request, experiment_id):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
     experiment.assert_not_finalized()
+    canvas_modules = CanvasModules(request)
+    if canvas_modules.experiment_has_installed_intervention(experiment):
+        raise INTERVENTION_POINTS_ARE_INSTALLED
     experiment.delete()
     return redirect(reverse("ab:index"))
 
