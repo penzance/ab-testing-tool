@@ -34,7 +34,7 @@ def submit_create_experiment(request):
     experiment.set_number_of_tracks(num_tracks)
     if assignment_method == Experiment.WEIGHTED_PROBABILITY_RANDOM:
         experiment.set_track_weights(track_weights)
-    return redirect(reverse("ab:index"))
+    return redirect(reverse("ab_testing_tool_index"))
 
 
 @lti_role_required(ADMINS)
@@ -74,7 +74,7 @@ def submit_edit_experiment(request, experiment_id):
     experiment.set_number_of_tracks(num_tracks)
     if assignment_method == Experiment.WEIGHTED_PROBABILITY_RANDOM:
         experiment.set_track_weights(track_weights)
-    return redirect(reverse("ab:index"))
+    return redirect(reverse("ab_testing_tool_index"))
 
 
 @lti_role_required(ADMINS)
@@ -83,7 +83,7 @@ def delete_experiment(request, experiment_id):
     experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
     experiment.assert_not_finalized()
     experiment.delete()
-    return redirect(reverse("ab:index"))
+    return redirect(reverse("ab_testing_tool_index"))
 
 
 @lti_role_required(ADMINS)
@@ -102,4 +102,4 @@ def finalize_tracks(request, experiment_id):
         return HttpResponse("Track weightings missing for these tracks: %s" % missing_track_weights)
     experiment.tracks_finalized = True
     experiment.save()
-    return redirect(reverse("ab:index"))
+    return redirect(reverse("ab_testing_tool_index"))

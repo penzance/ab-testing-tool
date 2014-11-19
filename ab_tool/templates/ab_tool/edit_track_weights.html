@@ -19,7 +19,7 @@
         <p>Example: if Track A has weight "30" and Track B has weight "70", then the total weight is 100, and students have a "30/100" probability of getting assigned Track A and "70/100" probability getting assigned Track B.</p>
     </div>
     <div class="row">
-            <form method="post" class="form-horizontal" name="track_weightings_form" action="{% url 'ab:submit_track_weights' experiment_id %}">
+            <form method="post" class="form-horizontal" name="track_weightings_form" action="{% url 'ab_testing_tool_submit_track_weights' experiment_id %}">
             {% csrf_token %}
                 <div class="col-lg-6 col-md-6 col-sm-6 ">
                     {% for t, s in weighting_objs %}
