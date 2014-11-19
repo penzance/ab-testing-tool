@@ -47,7 +47,7 @@ class CanvasModules(object):
         """ Checks to see if a experiment has any intervention points installed.
             For Python2.6+, the built-in isdisjoint provides the fastest return"""
         return not set([intervention_point_url(self.request, ip.id) for ip in
-               experiment.intervention_points]).isdisjoint(set(self._get_installed_intervention_point_urls()))
+               experiment.intervention_points.all()]).isdisjoint(set(self._get_installed_intervention_point_urls()))
     
     def get_modules_with_items(self):
         """ Returns a list of all modules with the items of that module added to the
