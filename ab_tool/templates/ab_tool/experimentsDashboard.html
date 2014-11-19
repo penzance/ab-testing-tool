@@ -11,18 +11,18 @@
 <div class="container">
     <header>
         <div class="row lti-header">
-            <h1><a href="{% url 'ab:index' %}">A/B Testing - All Experiments</a></h1>
+            <h1><a href="{% url 'ab:index' %}">A/B Testing Dashboard</a></h1>
         </div>
     </header>
     <main>
         <div class="row row-lti col-md-8">
             <p>
-                Welcome administrator. Manage your A/B Testing Experiments here. Read our <a href="#">documentation wiki</a> for more detailed info.
+                Welcome to the A/B Testing dashboard. Manage your A/B Testing Experiments here. Read our <a href="#">documentation wiki</a> for more detailed infodmation.
             </p>
         </div>
         <div class="row row-lti col-md-8">
         
-            <h2><a href="{% url 'ab:create_experiment' %}">New Experiment</a></h2>
+            <h2><a href="{% url 'ab:create_experiment' %}">Add an Experiment</a></h2>
             {% for experiment in experiments %}
                 <div class="panel panel-default">
                     <!-- Default panel contents -->
@@ -30,10 +30,10 @@
                         <div class="pull-left">
                             <h3><a href="{% url 'ab:edit_experiment' experiment.id %}" id="experiment_{{experiment.id}}">Experiment "{{experiment.name}}"</a></h3>
                             {% if experiment.assignment_method == experiment.WEIGHTED_PROBABILITY_RANDOM %}
-                                <small>(weighted probability random)</small>
+                                <small>Students assigned according to weighted probability random distribution</small>
                             {% endif %}
                             {% if experiment.assignment_method == experiment.UNIFORM_RANDOM %}
-                                <small>(uniform random)</small>
+                                <small>Students assigned according to uniform random distribution</small>
                             {% endif %}
                             <p>
                                 <small>
