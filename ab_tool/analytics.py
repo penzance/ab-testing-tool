@@ -9,7 +9,7 @@ from ab_tool.exceptions import CSV_ERROR
 logger = logging.getLogger(__name__)
 
 
-def log_intervention_point_deployment(course_id, student, intervention_point,
+def log_intervention_point_interaction(course_id, student, intervention_point,
                                       experiment):
     InterventionPointInteraction.objects.create(
             course_id=course_id, student=student,
@@ -43,7 +43,7 @@ def get_student_list_csv(experiment, file_title):
     return response
 
 
-def get_intervention_point_deployment_csv(experiment, file_title):
+def get_intervention_point_interactions_csv(experiment, file_title):
     response, writer = csv_response_and_writer(file_title)
     # Write headers to CSV file
     headers = ["Student ID", "LIS Person Sourcedid", "Experiment", "Intervention Point",

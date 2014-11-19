@@ -186,4 +186,4 @@ class InterventionPointInteraction(CourseObject):
         flat file storage. """
     student = models.ForeignKey(ExperimentStudent)
     intervention_point = models.ForeignKey(InterventionPoint)
-    experiment = models.ForeignKey(Experiment, related_name="intervention_point_deployments")
+    experiment = models.ForeignKey(Experiment, related_name="intervention_point_interactions")

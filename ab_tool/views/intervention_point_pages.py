@@ -10,7 +10,7 @@ from ab_tool.canvas import get_lti_param, CanvasModules
 from ab_tool.controllers import (format_url, post_param, assign_track_and_create_student)
 from ab_tool.exceptions import (DELETING_INSTALLED_STAGE,
     EXPERIMENT_TRACKS_NOT_FINALIZED, NO_URL_FOR_TRACK)
-from ab_tool.analytics import log_intervention_point_deployment
+from ab_tool.analytics import log_intervention_point_interaction
 
 
 def deploy_intervention_point(request, intervention_point_id):
@@ -54,7 +54,7 @@ def deploy_intervention_point(request, intervention_point_id):
         lis_person_sourcedid = get_lti_param(request, "lis_person_sourcedid")
         student = assign_track_and_create_student(experiment, student_id, lis_person_sourcedid)
     
-    log_intervention_point_deployment(course_id, student, intervention_point, experiment)
+    log_intervention_point_interaction(course_id, student, intervention_point, experiment)
     
     # Retrieve the url for the student's track at the current intervention point
     # Return an error page if there is no url configured.
