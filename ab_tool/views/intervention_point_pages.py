@@ -54,22 +54,22 @@ def deploy_intervention_point(request, intervention_point_id):
         lis_person_sourcedid = get_lti_param(request, "lis_person_sourcedid")
         student = assign_track_and_create_student(experiment, student_id, lis_person_sourcedid)
     
-    log_intervention_point_interaction(course_id, student, intervention_point, experiment)
-    
     # Retrieve the url for the student's track at the current intervention point
     # Return an error page if there is no url configured.
     try:
         chosen_intervention_point_url = InterventionPointUrl.objects.get(intervention_point__pk=intervention_point_id, track=student.track)
-        if chosen_intervention_point_url.open_as_tab:
-            return render_to_response("ab_tool/new_tab_redirect.html", {"url": chosen_intervention_point_url.url})
-        if chosen_intervention_point_url.is_canvas_page:
-            return render_to_response("ab_tool/window_redirect.html", {"url": chosen_intervention_point_url.url})
     except InterventionPointUrl.DoesNotExist:
         raise NO_URL_FOR_TRACK
     if not chosen_intervention_point_url.url:
         raise NO_URL_FOR_TRACK
+    
+    log_intervention_point_interaction(course_id, student, intervention_point, experiment)
+    
+    if chosen_intervention_point_url.open_as_tab:
+        return render_to_response("ab_tool/new_tab_redirect.html", {"url": chosen_intervention_point_url.url})
+    if chosen_intervention_point_url.is_canvas_page:
+        return render_to_response("ab_tool/window_redirect.html", {"url": chosen_intervention_point_url.url})
     return redirect(chosen_intervention_point_url.url)
-
 
 @lti_role_required(ADMINS)
 def create_intervention_point(request, experiment_id):
