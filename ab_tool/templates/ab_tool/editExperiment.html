@@ -11,17 +11,17 @@
 <div class="container">
     <header>
         <div class="row lti-header">
-            <h1><a href="{% url 'ab_testing_tool_create_experiment' %}">Create New Experiment</a></h1>
+            <h1><a href="{% url 'ab_testing_tool_edit_experiment' %}">Edit Experiment</a></h1>
         </div>
     </header>
     <main>
         <div class="row row-lti col-md-8">
-            <h3><a href="{% url 'ab_testing_tool_index' %}">All Experiments</a> &rsaquo; <span>New Experiment</span></h3>
+            <h3><a href="{% url 'ab_testing_tool_index' %}">All Experiments</a> &rsaquo; <span>Editing Experiment {{experiment.name}}</span></h3>
             
             <form class="form-horizontal" role="form">
                 <div class="form-group col-md-8">
                     <label for="experimentName">Name:</label>
-                    <input type="text" name="experimentName" id="experimentName" class="form-control" placeholder="Experiment Name">
+                    <input type="text" name="experimentName" id="experimentName" class="form-control" value="Experiment 1" placeholder="Experiment Name">
                 </div>
 
                 <div class="form-group col-md-8" id="expStructure">
@@ -29,13 +29,18 @@
                     <ul id="expWeights" class="list-unstyled">
                         <li class="expTrack">
                             <a href="#" data-track="delete">X</a>
-                            <input type="text" data-track="value" id="track-1" data-trackindex="1" maxlength="2" size="2"> %
+                            <input type="text" data-track="value" id="track-1" data-trackindex="1" maxlength="2" size="2" value="30"> %
                             <label class="control-label" for="track-1"><span data-track="name" title="Edit track name">Track 1</span></label>
                         </li>
                         <li class="expTrack">
                             <a href="#" data-track="delete">X</a>
-                            <input type="text" id="track-2" data-trackindex="2" data-track="value" maxlength="2" size="2"> %
+                            <input type="text" id="track-2" data-trackindex="2" data-track="value" maxlength="2" size="2" value="30"> %
                             <label class="control-label" for="track-2"><span data-track="name" title="Edit track name">Track 2</span></label>
+                        </li>
+                        <li class="expTrack">
+                            <a href="#" data-track="delete">X</a>
+                            <input type="text" id="track-3" data-trackindex="3" data-track="value" maxlength="2" size="2" value="40"> %
+                            <label class="control-label" for="track-3"><span data-track="name" title="Edit track name">Track 3</span></label>
                         </li>
                     </ul>
                 </div>
@@ -55,19 +60,19 @@
                 <div class="form-group col-md-8">
                     <label class="control-label">Sort type:</label>
                     <ul class="list-unstyled">
-                        <li><input type="radio" name="sort" value="sortAt_start"> Sort at start</li>
+                        <li><input type="radio" name="sort" value="sortAt_start" checked> Sort at start</li>
                         <li><input type="radio" name="sort" value="sortAt_tool"> Sort at tool</li>
                     </ul>
                 </div>
 
                 <div class="form-group col-md-8">
                     <label class="contro-label" for="experimentNotes">Notes</label>
-                    <textarea name="experimentNotes" id="experimentNotes" class="form-control"></textarea>
+                    <textarea name="experimentNotes" id="experimentNotes" placeholder="Additional notes about experiment..." class="form-control">This are my notes</textarea>
                 </div>
 
                 <div class="form-group col-md-8">
-                    <a href="#">Cancel</a>
-                    <button class="btn btn-primary" id="create-confirm" data-toggle="modal" data-target="#createExperiment">Create</button>
+                    <a id="update-cancel" href="#">Cancel</a>
+                    <button class="btn btn-primary" id="update-confirm" data-toggle="modal" data-target="#updateExperiment">Update</button>
             </form>
         </div>
     </main>
@@ -75,7 +80,7 @@
 
 <!-- create confirmation (start) -->
 
-<div class="modal fade" id="createExperiment" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal fade" id="updateExperiment" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -103,98 +108,80 @@
 
 {% block javascript %}
 {{ block.super }}
+<script src="{% static "js/experiment.js" %}"></script>
 <script type="text/javascript">
 $(document).ready(function(){
-    //reference to the div that holds the tracks inputs and names
-    var $expStructure = $('#expWeights');
-    
-    //custom event for adding tracks to the experiment
-    $expStructure.bind('addAtrack',function(){
-        var $newName = $('input#newTrackName').val();
-        var $newWeight = $('input#newTrackWeight').val();
-        //find the last track on list to get it's index
-        //add one for newly created tracks
-        var $newIndex = parseInt($('.expTrack').last().find('input').attr('data-trackindex')) + 1;
-        //append new track to list-unstyled
-        $(this).append(
-            '<li class="expTrack">' +
-            '<a href="#" data-track="delete">X</a> ' +
-            '<input type="text" data-track="value" data-trackindex="' + $newIndex + '" id="track-' + $newIndex + '" maxlength="2" value="' + $newWeight + '" size="2"> % ' +
-            '<label class="control-label" for="track-' + $newIndex + '"><span data-track="name" title="Edit track name">' + $newName + '</span></label>' +
-            '</li>'
-        );
 
-        //clear the values
-        $('input#newTrackWeight').val('').attr('placeholder', '0');
-        $('input#newTrackName').val('').attr('placeholder', 'Enter track name');
-    });
-    
-    $('#addTrack').bind('click', function(e){
-        $expStructure.trigger('addAtrack');
-    });
-
-    function Experiment(expName, expSortType, expNotes){
-        this.expName = expName;
-        this.sortType = expSortType;
-        this.notes = expNotes;
-
-        //tracks object
-        var tr = {};
-
-        //get all tracks names and values
-        this.getTracks = function(){
-            var allTracks = '';
-            for (var property in tr) {
-              allTracks += '<dt>' + property + '</dt><dd>' + tr[property]+ '</dd>';
-            }
-            return allTracks;
-        }
-        //add a track name and value
-        this.addTracks = function(tname, tvalue){
-            tr[tname] = tvalue;
-        }
-        //delete by track name
-        this.deleteTrack = function(tname){
-            delete tr[tname];
-        }
-    }
-
-    $('#create-confirm').bind('click', function(e){
-        var newObjExp = new Experiment(
+    var newObjExp = new Experiment(
                                 $('#experimentName').val()
-                                , sortType
+                                , $("input[name='sort']:checked").val()
+                                , $('textarea#experimentNotes').val()
+                            );
+
+    $("ul#expWeights li").each(function( index ) {
+        var name = $(this).find("[data-track='name']").text();
+        var value = $(this).find("[data-track='value']").val();
+        
+        newObjExp.addTracks(name, value);
+    });
+
+    $('#addTrack').bind('click', function(e){
+        newObjExp.addTrackInput('#expWeights');
+    });
+
+
+    $('#expWeights').on('click', "[data-track='delete']", function(e){
+        newObjExp.deleteTrackInput(this);
+        newObjExp.getTracks();
+    });
+
+    $('#update-confirm').bind('click', function(e){
+        var updatedObjExp = new Experiment(
+                                $('#experimentName').val()
+                                , $("input[name='sort']:checked").val()
                                 , $('textarea#experimentNotes').val()
                             );
 
         $("ul#expWeights li").each(function( index ) {
             var name = $(this).find("[data-track='name']").text();
             var value = $(this).find("[data-track='value']").val();
-            newObjExp.addTracks(name, value);
+            
+            updatedObjExp.addTracks(name, value);
         });
         //empty ul before displaying it
         $('#expSummary').empty();
         $('#expSummary').append(
-            '<dt>Name:</dt><dd>' + newObjExp.expName + '</dd>' +
-            newObjExp.getTracks() +
-            '<dt>Sort</dt><dd>' + newObjExp.sortType + '</dd>' +
-            '<dt>Notes:</dt><dd>' + newObjExp.notes + '</dd>'
+            '<dt>Name:</dt><dd>' + updatedObjExp.expName + '</dd>' +
+            updatedObjExp.getTracks() +
+            '<dt>Sort</dt><dd>' + updatedObjExp.sortType + '</dd>' +
+            '<dt>Notes:</dt><dd>' + updatedObjExp.notes + '</dd>'
         );
+        
         //newObjExp.getTracks();
     });
+    
+    $('#update-cancel').bind('click', function(){
+        //tmp object use to check against original for updates before cancelling
+        var tmpObj = {};
+        $("ul#expWeights li").each(function( index ) {
+            var name = $(this).find("[data-track='name']").text();
+            var value = $(this).find("[data-track='value']").val();
+            
+            tmpObj[name] = value;
+        });
 
-    //bind 'click' via on() because new tracks get added via JS
-    //this = the delete icon so we remove the parent from the DOM,
-    //which is the whole <li>
-    $('#expWeights').on('click', "[data-track='delete']", function(e){
-        $(this).parent().remove();
+        //has name changed?
+        //has the numbers of tracks or their data changed?
+        if ( $('#experimentName').val() != newObjExp.expName ||
+            !(newObjExp.isEquivalent(newObjExp.getTrObj(), tmpObj)) ||
+            $("input[name='sort']:checked").val() != newObjExp.sortType ||
+            $('textarea#experimentNotes').val() != newObjExp.notes ){
+
+            if (confirm("You have unsaved changes. Are you sure you want to cancel?") == true) {
+                location.href='experimentsDashboard.html';
+            }
+        }
     });
-
-    var sortType;
-    $("input:radio[name=sort]").click(function() {
-        sortType = $(this).val();
-        return sortType;
-    });
-
 });
 </script>
 {% endblock %}
