@@ -3,15 +3,15 @@ import logging
 import traceback
 from django.http.response import HttpResponse
 
-from ab_tool.models import ExperimentStudent, InterventionPointDeployments
+from ab_tool.models import ExperimentStudent, InterventionPointInteraction
 from ab_tool.exceptions import CSV_ERROR
 
 logger = logging.getLogger(__name__)
 
 
-def log_intervention_point_deployment(course_id, student, intervention_point,
+def log_intervention_point_interaction(course_id, student, intervention_point,
                                       experiment):
-    InterventionPointDeployments.objects.create(
+    InterventionPointInteraction.objects.create(
             course_id=course_id, student=student,
             intervention_point=intervention_point,
             experiment=experiment,
@@ -43,14 +43,14 @@ def get_student_list_csv(experiment, file_title):
     return response
 
 
-def get_intervention_point_deployment_csv(experiment, file_title):
+def get_intervention_point_interactions_csv(experiment, file_title):
     response, writer = csv_response_and_writer(file_title)
     # Write headers to CSV file
     headers = ["Student ID", "LIS Person Sourcedid", "Experiment", "Intervention Point",
                "Timestamp Encountered"]
     writer.writerow(headers)
     # Write data to CSV file
-    for i in InterventionPointDeployments.objects.filter(experiment=experiment):
+    for i in InterventionPointInteraction.objects.filter(experiment=experiment):
         row = [i.student.student_id, i.student.lis_person_sourcedid,
                i.intervention_point.experiment.name, i.intervention_point.name,
                i.created_on]

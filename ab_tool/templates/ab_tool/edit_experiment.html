@@ -17,7 +17,7 @@
             <tr>
     
             <td><p>Created: {{experiment.created_on}} | Last updated: {{experiment.updated_on}} </p></td>
-            {% if experiment.id and not is_finalized%}
+            {% if experiment.id and not is_finalized and not has_installed %}
             <td class="text-right nowrap"><a id="delete_experiment_button" href="{% url 'ab_testing_tool_delete_experiment' experiment.id %}" class="btn btn-lg btn-danger">Delete Experiment</a></td>
             {% elif experiment.id and is_finalized %}
             <td class="text-right nowrap"><a id="delete_experiment_button_disabled" class="btn btn-lg btn-danger disabled">Delete Experiment</a></td>
@@ -30,7 +30,11 @@
 
         {% if experiment.id and is_finalized %}
         <h4 class="text-center nowrap">Experiment has been started.</h4>
-        <h5 class="text-center nowrap">Note: Tracks can no longer be deleted or created.</h5>
+        <h5 class="text-center nowrap">Note: Experiment can't be deleted. Tracks can no longer be deleted or created.</h5>
+        {% endif %}
+        {% if experiment.id and has_installed %}
+        <h4 class="text-center nowrap">Experiment has installed Intervention Points.</h4>
+        <h5 class="text-center nowrap">Note: Experiment can't be deleted until its installed intervention points have been removed.</h5>
         {% endif %}
 
         <form method="post" name="experiment_form"

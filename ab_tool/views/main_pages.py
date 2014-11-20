@@ -12,7 +12,7 @@ from ab_tool.controllers import post_param
 from ab_tool.models import (InterventionPoint, Experiment)
 from ab_tool.constants import ADMINS
 from ab_tool.analytics import (get_student_list_csv,
-    get_intervention_point_deployment_csv)
+    get_intervention_point_interactions_csv)
 
 
 def not_authorized(request):
@@ -77,9 +77,9 @@ def download_track_assignments(request, experiment_id):
 
 
 @lti_role_required(ADMINS)
-def download_intervention_point_deployments(request, experiment_id):
+def download_intervention_point_interactions(request, experiment_id):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     course_title = get_lti_param(request, "context_title")
-    file_title = "%s_intervention_point_deployments.csv" % slugify(course_title)
+    file_title = "%s_intervention_point_interactions.csv" % slugify(course_title)
     experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
-    return get_intervention_point_deployment_csv(experiment, file_title)
+    return get_intervention_point_interactions_csv(experiment, file_title)

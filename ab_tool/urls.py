@@ -1,7 +1,7 @@
 from django.conf.urls import patterns, url
 
 from ab_tool.views.main_pages import (render_control_panel, not_authorized,
-    tool_config, download_track_assignments, download_intervention_point_deployments)
+    tool_config, download_track_assignments, download_intervention_point_interactions)
 
 from ab_tool.views.selection_pages import (resource_selection, submit_selection,
     submit_selection_new_intervention_point)
@@ -16,8 +16,8 @@ urlpatterns = patterns('',
     url(r'^$', render_control_panel, name='ab_testing_tool_index'),
     url(r'^not_authorized$', not_authorized, name='ab_testing_tool_not_authorized'),
     url(r'^download_track_assignments/(?P<experiment_id>\d+)$', download_track_assignments, name='ab_testing_tool_download_data'),
-    url(r'^download_intervention_point_deployments/(?P<experiment_id>\d+)$', download_intervention_point_deployments,
-        name='ab_testing_tool_download_intervention_point_deployments'),
+    url(r'^download_intervention_point_interactions/(?P<experiment_id>\d+)$', download_intervention_point_interactions,
+        name='ab_testing_tool_download_intervention_point_interactions'),
     url(r'^tool_config$', tool_config, name='ab_testing_tool_tool_config'),
     
     url(r'^resource_selection$', resource_selection, name="ab_testing_tool_resource_selection"),

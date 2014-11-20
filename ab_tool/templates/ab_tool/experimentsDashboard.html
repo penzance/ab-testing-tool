@@ -59,12 +59,12 @@
                             {% if experiment.tracks_finalized %}
                             <a type="button" class="btn btn-primary btn-xs" id="download_students_button" href="{% url 'ab_testing_tool_download_data' experiment.id %}">
                                 Download Students </a>
-                            <a type="button" class="btn btn-primary btn-xs" id="download_intervention_point_deployments_button" href="{% url 'ab_testing_tool_download_intervention_point_deployments' experiment.id %}">
+                            <a type="button" class="btn btn-primary btn-xs" id="download_intervention_point_interactions_button" href="{% url 'ab_testing_tool_download_intervention_point_interactions' experiment.id %}">
                                 Download Interactions </a>
                             {% else %}
                             <a type="button" class="btn btn-primary btn-xs disabled" id="download_students_button">
                                 Download Students </a>
-                            <a type="button" class="btn btn-primary btn-xs disabled" id="download_intervention_point_deployments_button">
+                            <a type="button" class="btn btn-primary btn-xs disabled" id="download_intervention_point_interactions_button">
                                 Download Interactions </a>
                             {% endif %}
                         </div>

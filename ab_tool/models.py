@@ -53,6 +53,9 @@ class Experiment(CourseObject):
     assignment_method = models.IntegerField(max_length=1, default=1,
                                             choices=ASSIGNMENT_ENUM_TYPES,)
     
+    class Meta:
+        unique_together = (('course_id', 'name'),)
+    
     def assert_not_finalized(self):
         if self.tracks_finalized:
             raise EXPERIMENT_TRACKS_ALREADY_FINALIZED
@@ -131,6 +134,9 @@ class InterventionPoint(CourseObject):
                 return True
         return False
     
+    class Meta:
+        unique_together = (('experiment', 'name'),)
+    
     def track_urls(self):
         """ This gets the InterventionPointUrls for an InterventionPoint in the
             default databse order of Tracks and uses a mock InterventionPointUrl
@@ -174,10 +180,10 @@ class ExperimentStudent(CourseObject):
         unique_together = (('experiment', 'student_id'),)
 
 
-class InterventionPointDeployments(CourseObject):
+class InterventionPointInteraction(CourseObject):
     """ This model logs every time an intervention point is deployed for a
         student.  Consider moving this out of the database and into
         flat file storage. """
     student = models.ForeignKey(ExperimentStudent)
     intervention_point = models.ForeignKey(InterventionPoint)
-    experiment = models.ForeignKey(Experiment, related_name="intervention_point_deployments")
+    experiment = models.ForeignKey(Experiment, related_name="intervention_point_interactions")
