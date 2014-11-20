@@ -11,7 +11,7 @@
 <div class="container">
     <header>
         <div class="row lti-header">
-            <h1><a href="{% url 'ab_testing_tool_edit_experiment' %}">Edit Experiment</a></h1>
+            <h1><a href="{% url 'ab_testing_tool_edit_experiment' experiment.id %}">Edit Experiment "{{experiment.name}}"</a></h1>
         </div>
     </header>
     <main>
@@ -21,27 +21,19 @@
             <form class="form-horizontal" role="form">
                 <div class="form-group col-md-8">
                     <label for="experimentName">Name:</label>
-                    <input type="text" name="experimentName" id="experimentName" class="form-control" value="Experiment 1" placeholder="Experiment Name">
+                    <input type="text" name="experimentName" id="experimentName" class="form-control" value="{{experiment.name}}" placeholder="Experiment Name">
                 </div>
 
                 <div class="form-group col-md-8" id="expStructure">
                     <label>Experiment structure</label><br>
                     <ul id="expWeights" class="list-unstyled">
+                        {% for track, weight in tracks %}
                         <li class="expTrack">
                             <a href="#" data-track="delete">X</a>
-                            <input type="text" data-track="value" id="track-1" data-trackindex="1" maxlength="2" size="2" value="30"> %
-                            <label class="control-label" for="track-1"><span data-track="name" title="Edit track name">Track 1</span></label>
+                            <input name="track_id_{{track.id}}" type="number" min="0" max="100" step="1" data-track="value" id="track_id_{{track.id}}" data-trackindex="1" maxlength="2" size="2" value="{{weight}}"> %
+                            <label class="control-label" for="track_id_{{track.id}}"><span data-track="name" title="Edit track name">Track "{{track.name}}"</span></label>
                         </li>
-                        <li class="expTrack">
-                            <a href="#" data-track="delete">X</a>
-                            <input type="text" id="track-2" data-trackindex="2" data-track="value" maxlength="2" size="2" value="30"> %
-                            <label class="control-label" for="track-2"><span data-track="name" title="Edit track name">Track 2</span></label>
-                        </li>
-                        <li class="expTrack">
-                            <a href="#" data-track="delete">X</a>
-                            <input type="text" id="track-3" data-trackindex="3" data-track="value" maxlength="2" size="2" value="40"> %
-                            <label class="control-label" for="track-3"><span data-track="name" title="Edit track name">Track 3</span></label>
-                        </li>
+                        {% endfor %}
                     </ul>
                 </div>
 
@@ -53,25 +45,25 @@
                 
                 <div class="panel panel-default col-md-8">
                     <div class="panel-body">
-                        <input type="checkbox" name="uniformRandom"> Choose to make uniform random message
+                        <input type="checkbox" name="uniformRandom"> Give each track equal weighting (uniform random)
                     </div>
                 </div>
 
                 <div class="form-group col-md-8">
                     <label class="control-label">Sort type:</label>
                     <ul class="list-unstyled">
-                        <li><input type="radio" name="sort" value="sortAt_start" checked> Sort at start</li>
-                        <li><input type="radio" name="sort" value="sortAt_tool"> Sort at tool</li>
+                        <li><input type="radio" name="sort" value="sortAt_start" checked> Sort upon student's course registration</li>
+                        <li><input type="radio" name="sort" value="sortAt_tool"> Sort upon student encountering first intervention</li>
                     </ul>
                 </div>
 
                 <div class="form-group col-md-8">
                     <label class="contro-label" for="experimentNotes">Notes</label>
-                    <textarea name="experimentNotes" id="experimentNotes" placeholder="Additional notes about experiment..." class="form-control">This are my notes</textarea>
+                    <textarea name="experimentNotes" id="experimentNotes" placeholder="Additional notes about experiment..." class="form-control">{{experiment.notes}}</textarea>
                 </div>
 
                 <div class="form-group col-md-8">
-                    <a id="update-cancel" href="#">Cancel</a>
+                    <a id="update-cancel" href="{% url 'ab_testing_tool_index' %}">Cancel</a>
                     <button class="btn btn-primary" id="update-confirm" data-toggle="modal" data-target="#updateExperiment">Update</button>
             </form>
         </div>
@@ -95,7 +87,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="button" id="createNow" class="btn btn-primary" onClick="location.href='experimentsDashboard.html';">Yes, Create</button>
+        <button type="button" id="createNow" class="btn btn-primary" onClick="">Yes, Create</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
@@ -178,7 +170,7 @@ $(document).ready(function(){
             $('textarea#experimentNotes').val() != newObjExp.notes ){
 
             if (confirm("You have unsaved changes. Are you sure you want to cancel?") == true) {
-                location.href='experimentsDashboard.html';
+                location.href="{% url 'ab_testing_tool_submit_edit_experiment' experiment.id %}";
             }
         }
     });
