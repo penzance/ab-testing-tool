@@ -102,19 +102,17 @@ class Experiment(CourseObject):
 
 
 class Track(CourseObject):
-    track_number = models.IntegerField()
     name = models.CharField(max_length=256)
-    notes = models.CharField(max_length=1024)
     experiment = models.ForeignKey(Experiment, related_name="tracks")
     
     class Meta:
-        unique_together = (('experiment', 'track_number'),)
+        unique_together = (('experiment', 'name'),)
 
 
 class TrackProbabilityWeight(CourseObject):
     #Definition: A `weighting` is an integer between 1 and 1000 inclusive
     weighting = models.IntegerField()
-    track = models.ForeignKey(Track)
+    track = models.ForeignKey(Track, related_name="weight")
     experiment = models.ForeignKey(Experiment, related_name="track_probabilites")
 
 
