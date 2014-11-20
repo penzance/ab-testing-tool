@@ -21,21 +21,36 @@ def create_experiment(request):
 
 @lti_role_required(ADMINS)
 def submit_create_experiment(request):
+    """ Expects a post parameter 'experiment' to be json of the form:
+            {"expName": name(str),
+             "expNotes": notes(str),
+             "uniformRandom": True/False,
+             "newTracks": {track_name(str) : track_weight(int)}
+            }
+    """
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    name = post_param(request, "name")
-    notes = post_param(request, "notes")
-    assignment_method = int(post_param(request, "assignment_method"))
-    if assignment_method == Experiment.UNIFORM_RANDOM:
-        num_tracks = int(post_param(request, "uniform_tracks"))
-    if assignment_method == Experiment.WEIGHTED_PROBABILITY_RANDOM:
-        track_weights = request.POST.getlist("track_weights[]")
-        num_tracks = len(track_weights)
-    experiment = Experiment.objects.create(name=name, course_id=course_id,
-                                           assignment_method=assignment_method,
-                                           notes=notes)
-    experiment.set_number_of_tracks(num_tracks)
-    if assignment_method == Experiment.WEIGHTED_PROBABILITY_RANDOM:
-        experiment.set_track_weights(track_weights)
+    experiment_json = post_param(request, "experiment")
+    experiment_dict = json.loads(experiment_json)
+    
+    # Unpack data from experiment_dict and update experiment
+    name = experiment_dict["expName"]
+    notes = experiment_dict["expNotes"]
+    uniform_random = experiment_dict["uniformRandom"]
+    new_tracks = experiment_dict["newTracks"]
+    if uniform_random:
+        assignment_method = Experiment.UNIFORM_RANDOM
+    else:
+        assignment_method = Experiment.WEIGHTED_PROBABILITY_RANDOM
+    experiment = Experiment.objects.create(
+            name=name, course_id=course_id, notes=notes,
+            assignment_method=assignment_method
+    )
+    
+    # Update existing tracks
+    for track_name, track_weight in new_tracks.items():
+        track = experiment.new_track(track_name)
+        if not uniform_random:
+            track.set_weighting(track_weight)
     return redirect(reverse("ab_testing_tool_index"))
 
 
@@ -43,18 +58,9 @@ def submit_create_experiment(request):
 def edit_experiment(request, experiment_id):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
-    all_tracks = Track.objects.filter(course_id=course_id, experiment=experiment)
-    track_weights = []
     has_installed_intervention = CanvasModules(request).experiment_has_installed_intervention(experiment)
-    for track in all_tracks:
-        try:
-            weight = TrackProbabilityWeight.objects.get(experiment=experiment,track=track).weighting
-            track_weights.append((track, weight))
-        except TrackProbabilityWeight.DoesNotExist:
-            track_weights.append((track, None))
     context = {"Experiment": Experiment,
                "experiment": experiment,
-               "tracks": track_weights,
                "experiment_has_installed_intervention": has_installed_intervention
                }
     return render_to_response("ab_tool/editExperiment.html", context)
@@ -75,8 +81,8 @@ def submit_edit_experiment(request, experiment_id):
              "expNotes": notes(str),
              "uniformRandom": True/False,
              "oldTrackNames": {track_id(int) : track_name(str)},
-             "oldTrackWeights": {track_id(int) : track_weight(float or int)},
-             "newTracks": {track_name(str) : track_weight(float or int)}
+             "oldTrackWeights": {track_id(int) : track_weight(int)},
+             "newTracks": {track_name(str) : track_weight(int)}
             }
     """
     course_id = get_lti_param(request, "custom_canvas_course_id")
@@ -103,15 +109,13 @@ def submit_edit_experiment(request, experiment_id):
         track = Track.get_or_404_check_course(track_id, course_id)
         track.update(name=track_name)
         if not uniform_random:
-            track.weight.update(weighting=old_track_weights[track_id])
+            track.set_weighting(old_track_weights[track_id])
     
     # Create new tracks
     for track_name, track_weight in new_tracks.items():
-        track = Track.objects.create(course_id=course_id, experiment=experiment,
-                                     name=track_name)
+        track = experiment.new_track(track_name)
         if not uniform_random:
-            TrackProbabilityWeight.objects.create(track=track, weighting=track_weight,
-                                                  experiment=experiment)
+            track.set_weighting(track_weight)
     return redirect(reverse("ab_testing_tool_index"))
 
 
