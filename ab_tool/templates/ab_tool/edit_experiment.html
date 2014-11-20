@@ -17,9 +17,9 @@
             <tr>
     
             <td><p>Created: {{experiment.created_on}} | Last updated: {{experiment.updated_on}} </p></td>
-            {% if experiment.id and not is_finalized and not has_installed %}
+            {% if experiment.id and not experiment.tracks_finalized and not experiment_has_installed_intervention %}
             <td class="text-right nowrap"><a id="delete_experiment_button" href="{% url 'ab_testing_tool_delete_experiment' experiment.id %}" class="btn btn-lg btn-danger">Delete Experiment</a></td>
-            {% elif experiment.id and is_finalized %}
+            {% elif experiment.id and experiment.tracks_finalized %}
             <td class="text-right nowrap"><a id="delete_experiment_button_disabled" class="btn btn-lg btn-danger disabled">Delete Experiment</a></td>
             {% endif %}
             </tr>
@@ -28,11 +28,11 @@
         </div>
         <p>You must start the experiment before students can join one of its track. A "track" is a series of interventions that a cohort of students is assigned.</p>
 
-        {% if experiment.id and is_finalized %}
+        {% if experiment.id and experiment.tracks_finalized %}
         <h4 class="text-center nowrap">Experiment has been started.</h4>
         <h5 class="text-center nowrap">Note: Experiment can't be deleted. Tracks can no longer be deleted or created.</h5>
         {% endif %}
-        {% if experiment.id and has_installed %}
+        {% if experiment.id and experiment_has_installed_intervention %}
         <h4 class="text-center nowrap">Experiment has installed Intervention Points.</h4>
         <h5 class="text-center nowrap">Note: Experiment can't be deleted until its installed intervention points have been removed.</h5>
         {% endif %}
