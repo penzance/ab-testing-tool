@@ -44,6 +44,7 @@ def edit_experiment(request, experiment_id):
     experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
     all_tracks = Track.objects.filter(course_id=course_id, experiment=experiment)
     track_weights = []
+    has_installed_intervention = CanvasModules(request).experiment_has_installed_intervention(experiment)
     for track in all_tracks:
         try:
             weight = TrackProbabilityWeight.objects.get(experiment=experiment,track=track).weighting
@@ -53,7 +54,7 @@ def edit_experiment(request, experiment_id):
     context = {"Experiment": Experiment,
                "experiment": experiment,
                "tracks": track_weights,
-               "has_installed": CanvasModules(request).experiment_has_installed_intervention(experiment)
+               "experiment_has_installed_intervention": has_installed_intervention
                }
     return render_to_response("ab_tool/edit_experiment.html", context)
 
