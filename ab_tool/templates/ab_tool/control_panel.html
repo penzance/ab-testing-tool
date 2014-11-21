@@ -49,7 +49,7 @@
                                 <a id="finalize_button" class="btn btn btn-danger disabled"> Start Experiment</a>
                                 {% endif %}
                                 <a id="add_intervention_point_button" class="btn btn btn-success" href="{% url 'ab_testing_tool_create_intervention_point' experiment.id %}"> Add Intervention Point</a>
-                                <a id="download_students_button" href="{% url 'ab_testing_tool_download_data' experiment.id %}" class="btn btn btn-info"> Download Students</a>
+                                <a id="download_students_button" href="{% url 'ab_testing_tool_download_data' experiment.id %}" class="btn btn btn-info"> Download Track Assignments</a>
                                 <a id="download_intervention_point_interactions_button" href="{% url 'ab_testing_tool_download_intervention_point_interactions' experiment.id %}" class="btn btn btn-primary"> Download Data</a>
                             </div>
                         </div>
