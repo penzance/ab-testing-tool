@@ -58,10 +58,11 @@ def submit_create_experiment(request):
 def edit_experiment(request, experiment_id):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
+    uniform_random = bool(experiment.assignment_method == experiment.UNIFORM_RANDOM)
     has_installed_intervention = CanvasModules(request).experiment_has_installed_intervention(experiment)
-    context = {"Experiment": Experiment,
-               "experiment": experiment,
-               "experiment_has_installed_intervention": has_installed_intervention
+    context = {"experiment": experiment,
+               "experiment_has_installed_intervention": has_installed_intervention,
+               "uniform_random": uniform_random,
                }
     return render_to_response("ab_tool/editExperiment.html", context)
 
@@ -80,8 +81,8 @@ def submit_edit_experiment(request, experiment_id):
             {"expName": name(str),
              "expNotes": notes(str),
              "uniformRandom": True/False,
-             "oldTrackNames": {track_id(int) : track_name(str)},
-             "oldTrackWeights": {track_id(int) : track_weight(int)},
+             "currentTrackNames": {track_id(int) : track_name(str)},
+             "currentTrackWeights": {track_id(int) : track_weight(int)},
              "newTracks": {track_name(str) : track_weight(int)}
             }
     """
@@ -95,8 +96,8 @@ def submit_edit_experiment(request, experiment_id):
     name = experiment_dict["expName"]
     notes = experiment_dict["expNotes"]
     uniform_random = experiment_dict["uniformRandom"]
-    old_track_names = experiment_dict["oldTrackNames"]
-    old_track_weights = experiment_dict["oldTrackWeights"]
+    old_track_names = experiment_dict["currentTrackNames"]
+    old_track_weights = experiment_dict["currentTrackWeights"]
     new_tracks = experiment_dict["newTracks"]
     if uniform_random:
         assignment_method = Experiment.UNIFORM_RANDOM

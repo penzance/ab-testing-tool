@@ -90,7 +90,7 @@ class Track(CourseObject):
     
     def get_weighting(self):
         try:
-            return self.weight.weigthing
+            return self.weight.weighting
         except TrackProbabilityWeight.DoesNotExist:
             return None
 
@@ -98,7 +98,7 @@ class Track(CourseObject):
 class TrackProbabilityWeight(CourseObject):
     #Definition: A `weighting` is an integer between 1 and 1000 inclusive
     weighting = models.IntegerField()
-    track = models.ForeignKey(Track, related_name="weight")
+    track = models.OneToOneField(Track, related_name="weight")
     experiment = models.ForeignKey(Experiment, related_name="track_probabilites")
 
 
