@@ -58,12 +58,9 @@ def submit_create_experiment(request):
 def edit_experiment(request, experiment_id):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
-    uniform_random = bool(experiment.assignment_method == experiment.UNIFORM_RANDOM)
     has_installed_intervention = CanvasModules(request).experiment_has_installed_intervention(experiment)
     context = {"experiment": experiment,
-               "experiment_has_installed_intervention": has_installed_intervention,
-               "uniform_random": uniform_random,
-               }
+               "experiment_has_installed_intervention": has_installed_intervention,}
     return render_to_response("ab_tool/editExperiment.html", context)
 
 

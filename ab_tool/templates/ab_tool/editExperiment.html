@@ -75,7 +75,7 @@
                 </div>
                 
                 <div class="form-group col-md-8">
-                    <a id="update-cancel" href="{% url 'ab_testing_tool_index' %}">Cancel</a>
+                    <a id="update-cancel" ng-click="cancel()">Cancel</a>
                     <button class="btn btn-primary" id="update-confirm" data-toggle="modal" data-target="#updateExperiment">Update</button>
                 </div>
             </form>
@@ -124,69 +124,16 @@
 <script src="{% static "ab_tool/js/angular.min.js" %}"></script>
 <script src="{% static "ab_tool/js/experiment.js" %}"></script>
 <script type="text/javascript">
-window.initialExperiment = {
-    name: "{{experiment.name | escapejs}}",
-    notes: "{{experiment.notes | escapejs}}",
-    uniformRandom: {% if uniform_random %} true {% else %} false {% endif %},
-    tracks: [
-        {% for track in experiment.tracks.all %}
-        {
-            id: "{{track.id | escapejs}}",
-            weighting: {% if track.get_weighting != None %} {{ track.get_weighting | escapejs}} 
-                            {% else %} null {% endif %},
-            name: "{{track.name | escapejs}}",
-        },
-        {% endfor %}
-    ],
+window.initialExperiment = JSON.parse("{{ experiment.to_json | escapejs}}");
+window.modifiedExperiment = JSON.parse("{{ experiment.to_json | escapejs}}");
+
+window.cancelChanges = function(confirmCancel) {
+    if (!confirmCancel) {
+        location.href = "{% url 'ab_testing_tool_index' %}";
+    } else if (confirm("You have unsaved changes. Are you sure you want to cancel?") == true) {
+        location.href = "{% url 'ab_testing_tool_index' %}";
+    }
 };
 
-$(document).ready(function(){
-    
-    var newObjExp = new Experiment(
-                                $('#experimentName').val()
-                                , $("input[name='sort']:checked").val()
-                                , $('textarea#experimentNotes').val()
-                            );
-    
-    $("ul#expWeights li").each(function( index ) {
-        var name = $(this).find("[data-track='name']").text();
-        var value = $(this).find("[data-track='value']").val();
-        
-        newObjExp.addTracks(name, value);
-    });
-    
-    $('#addTrack').bind('click', function(e){
-        newObjExp.addTrackInput('#expWeights');
-    });
-    
-    
-    $('#expWeights').on('click', "[data-track='delete']", function(e){
-        newObjExp.deleteTrackInput(this);
-        newObjExp.getTracks();
-    });
-    
-    $('#update-cancel').bind('click', function(){
-        //tmp object use to check against original for updates before cancelling
-        var tmpObj = {};
-        $("ul#expWeights li").each(function( index ) {
-            var name = $(this).find("[data-track='name']").text();
-            var value = $(this).find("[data-track='value']").val();
-            
-            tmpObj[name] = value;
-        });
-        
-        //has name changed?
-        //has the numbers of tracks or their data changed?
-        if ( $('#experimentName').val() != newObjExp.expName ||
-            !(newObjExp.isEquivalent(newObjExp.getTrObj(), tmpObj)) ||
-            $("input[name='sort']:checked").val() != newObjExp.sortType ||
-            $('textarea#experimentNotes').val() != newObjExp.notes ){
-            
-            if (confirm("You have unsaved changes. Are you sure you want to cancel?") == true) {
-                location.href="{% url 'ab_testing_tool_submit_edit_experiment' experiment.id %}";
-            }
-        }
-    });
-});
 </script>
 {% endblock %}
