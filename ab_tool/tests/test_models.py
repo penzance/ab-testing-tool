@@ -37,3 +37,9 @@ class TestModels(SessionTestCase):
         InterventionPointUrl.objects.create(intervention_point=intervention_point,
                                             track=track2, url="http://example.com")
         self.assertFalse(intervention_point.is_missing_urls())
+    
+    def test_new_track(self):
+        experiment = self.create_test_experiment()
+        num_tracks = experiment.tracks.count()
+        experiment.new_track("new_track")
+        self.assertEqual(num_tracks + 1, experiment.tracks.count())
