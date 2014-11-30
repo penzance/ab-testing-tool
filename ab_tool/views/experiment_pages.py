@@ -1,9 +1,10 @@
+import json
 from django.shortcuts import render_to_response, redirect
 from django_auth_lti.decorators import lti_role_required
 from django.core.urlresolvers import reverse
 
 from ab_tool.constants import ADMINS
-from ab_tool.models import (Track, Experiment, TrackProbabilityWeight)
+from ab_tool.models import Track, Experiment
 from ab_tool.canvas import get_lti_param, CanvasModules
 from ab_tool.exceptions import (NO_TRACKS_FOR_EXPERIMENT,
     INTERVENTION_POINTS_ARE_INSTALLED)
@@ -14,27 +15,45 @@ from ab_tool.controllers import (post_param, get_missing_track_weights,
 
 @lti_role_required(ADMINS)
 def create_experiment(request):
-    context = {"Experiment": Experiment}
-    return render_to_response("ab_tool/edit_experiment.html", context)
+    context = {"create": True}
+    return render_to_response("ab_tool/editExperiment.html", context)
 
 
 @lti_role_required(ADMINS)
 def submit_create_experiment(request):
+    """ Expects a post parameter 'experiment' to be json of the form:
+            {"name": name(str),
+             "notes": notes(str),
+             "uniformRandom": True/False,
+             "tracks": [{"id": None # This is none for all because all tracks are new
+                         "weighting": track_weighting(int),
+                         "name": track_name(str),
+                        }]
+            }
+    """
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    name = post_param(request, "name")
-    notes = post_param(request, "notes")
-    assignment_method = int(post_param(request, "assignment_method"))
-    if assignment_method == Experiment.UNIFORM_RANDOM:
-        num_tracks = int(post_param(request, "uniform_tracks"))
-    if assignment_method == Experiment.WEIGHTED_PROBABILITY_RANDOM:
-        track_weights = request.POST.getlist("track_weights[]")
-        num_tracks = len(track_weights)
-    experiment = Experiment.objects.create(name=name, course_id=course_id,
-                                           assignment_method=assignment_method,
-                                           notes=notes)
-    experiment.set_number_of_tracks(num_tracks)
-    if assignment_method == Experiment.WEIGHTED_PROBABILITY_RANDOM:
-        experiment.set_track_weights(track_weights)
+    experiment_json = post_param(request, "experiment")
+    experiment_dict = json.loads(experiment_json)
+    
+    # Unpack data from experiment_dict and update experiment
+    name = experiment_dict["name"]
+    notes = experiment_dict["notes"]
+    uniform_random = experiment_dict["uniformRandom"]
+    tracks = experiment_dict["tracks"]
+    if uniform_random:
+        assignment_method = Experiment.UNIFORM_RANDOM
+    else:
+        assignment_method = Experiment.WEIGHTED_PROBABILITY_RANDOM
+    experiment = Experiment.objects.create(
+            name=name, course_id=course_id, notes=notes,
+            assignment_method=assignment_method
+    )
+    
+    # Update existing tracks
+    for track_dict in tracks:
+        track = experiment.new_track(track_dict["name"])
+        if not uniform_random:
+            track.set_weighting(track_dict["weighting"])
     return redirect(reverse("ab_testing_tool_index"))
 
 
@@ -42,41 +61,65 @@ def submit_create_experiment(request):
 def edit_experiment(request, experiment_id):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
-    all_tracks = Track.objects.filter(course_id=course_id, experiment=experiment)
-    track_weights = []
     has_installed_intervention = CanvasModules(request).experiment_has_installed_intervention(experiment)
-    for track in all_tracks:
-        try:
-            weight = TrackProbabilityWeight.objects.get(experiment=experiment,track=track).weighting
-            track_weights.append((track, weight))
-        except TrackProbabilityWeight.DoesNotExist:
-            track_weights.append((track, None))
-    context = {"Experiment": Experiment,
-               "experiment": experiment,
-               "tracks": track_weights,
-               "experiment_has_installed_intervention": has_installed_intervention
-               }
-    return render_to_response("ab_tool/edit_experiment.html", context)
+    context = {"experiment": experiment,
+               "experiment_has_installed_intervention": has_installed_intervention,
+               "create": False,}
+    return render_to_response("ab_tool/editExperiment.html", context)
+
+
+@lti_role_required(ADMINS)
+def delete_track(request, track_id):
+    course_id = get_lti_param(request, "custom_canvas_course_id")
+    track = Track.get_or_404_check_course(track_id, course_id)
+    track.delete()
+    return HttpResponse("success")
 
 
 @lti_role_required(ADMINS)
 def submit_edit_experiment(request, experiment_id):
+    """ Expects a post parameter 'experiment' to be json of the form:
+            {"name": name(str),
+             "notes": notes(str),
+             "uniformRandom": True/False,
+             "tracks": [{"id": track_id(int), # this is None if track is new
+                         "weighting": track_weighting(int),
+                         "name": track_name(str),
+                        }]
+            }
+    """
     course_id = get_lti_param(request, "custom_canvas_course_id")
     experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
     experiment.assert_not_finalized()
-    name = post_param(request, "name")
-    notes = post_param(request, "notes")
-    assignment_method = int(post_param(request, "assignment_method"))
-    if assignment_method == Experiment.UNIFORM_RANDOM:
-        num_tracks = int(post_param(request, "uniform_tracks"))
-    if assignment_method == Experiment.WEIGHTED_PROBABILITY_RANDOM:
-        track_weights = request.POST.getlist("track_weights[]")
-        num_tracks = len(track_weights)
-    experiment.update(name=name, course_id=course_id,
-                      assignment_method=assignment_method, notes=notes)
-    experiment.set_number_of_tracks(num_tracks)
-    if assignment_method == Experiment.WEIGHTED_PROBABILITY_RANDOM:
-        experiment.set_track_weights(track_weights)
+    experiment_json = post_param(request, "experiment")
+    experiment_dict = json.loads(experiment_json)
+    
+    # Unpack data from experiment_dict and update experiment
+    name = experiment_dict["name"]
+    notes = experiment_dict["notes"]
+    uniform_random = experiment_dict["uniformRandom"]
+    old_tracks = [i for i in experiment_dict["tracks"] if i["id"] is not None]
+    new_tracks = [i for i in experiment_dict["tracks"] if i["id"] is None]
+    if uniform_random:
+        assignment_method = Experiment.UNIFORM_RANDOM
+    else:
+        assignment_method = Experiment.WEIGHTED_PROBABILITY_RANDOM
+    experiment.update(name=name, notes=notes, assignment_method=assignment_method)
+    
+    # Update existing tracks
+    for track_dict in old_tracks:
+        track = Track.get_or_404_check_course(track_dict["id"], course_id)
+        track.update(name=track_dict["name"])
+        print track_dict["name"]
+        if not uniform_random:
+            print track_dict["weighting"]
+            track.set_weighting(track_dict["weighting"])
+    
+    # Create new tracks
+    for track_dict in new_tracks:
+        track = experiment.new_track(track_dict["name"])
+        if not uniform_random:
+            track.set_weighting(track_dict["weighting"])
     return redirect(reverse("ab_testing_tool_index"))
 
 
