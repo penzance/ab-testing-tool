@@ -40,10 +40,13 @@
                         <!-- Angular loop over tracks -->
                             <li class="expTrack" ng-repeat="track in experiment.tracks">
                                 <a href="#" data-track="delete">X</a>
-                                <input type="number" min="0" max="100" step="1"
-                                    data-track="value" data-trackindex="1"
-                                    maxlength="2" size="2"
-                                    ng-pattern="/^\d+$/" ng-model="track.weighting"> %
+                                <!-- Hide weighting if uniformRandom is set -->
+                                <label ng-hide="experiment.uniformRandom">
+                                    <input type="number" min="0" max="100" step="1"
+                                        data-track="value" data-trackindex="1"
+                                        maxlength="2" size="2"
+                                        ng-pattern="/^\d+$/" ng-model="track.weighting"> %
+                                </label>
                                 <label class="control-label">
                                     <span data-track="name" title="Edit track name">Track "{{track.name}}"</span>
                                 </label>
@@ -54,10 +57,13 @@
                 {% endverbatim %}
                 
                 <div class="form-group col-md-8">
-                    <input type="number" min="0" max="100" step="1"
-                            data-track="value" data-trackindex="1"
-                            maxlength="2" size="2" placeholder="0" maxlength="2" size="2"
-                            ng-pattern="/^\d+$/" ng-model="newTrackWeighting"> %
+                    <!-- Hide weighting if uniformRandom is set -->
+                    <label ng-hide="experiment.uniformRandom">
+                        <input type="number" min="0" max="100" step="1"
+                                data-track="value" data-trackindex="1"
+                                maxlength="2" size="2" placeholder="0"
+                                ng-pattern="/^\d+$/" ng-model="newTrackWeighting"> %
+                    </label>
                     <input type="text" name="newTrackName" id="newTrackName" placeholder="Enter track name" ng-model="newTrackName">
                     <a ng-click="addTrack()" class="btn btn-default btn-xs" id="addTrack">Add Track</a>
                 </div>
@@ -79,7 +85,7 @@
                 -->
                 
                 <div class="form-group col-md-8">
-                    <label class="contro-label" for="experimentNotes">Notes</label>
+                    <label class="control-label" for="experimentNotes">Notes</label>
                     <textarea name="experimentNotes" id="experimentNotes" placeholder="Additional notes about experiment..." class="form-control" ng-model="experiment.notes"></textarea>
                 </div>
                 

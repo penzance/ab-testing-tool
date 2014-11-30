@@ -12,6 +12,10 @@ angular.module('ABToolExperiment', []).controller(
         if (!$scope.newTrackName) {
             return;
         }
+        if ($scope.experiment.uniformRandom) {
+            $scope.newTrackWeighting = null;
+        }
+        
         $scope.experiment.tracks.push({id: null, name: $scope.newTrackName,
             weighting: $scope.newTrackWeighting});
         $scope.newTrackName = null;
