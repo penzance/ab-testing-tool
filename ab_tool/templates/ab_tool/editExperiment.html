@@ -12,13 +12,20 @@
 <div class="container">
     <header>
         <div class="row lti-header">
-            <h1><a href="{% url 'ab_testing_tool_edit_experiment' experiment.id %}">Edit Experiment "{{experiment.name}}"</a></h1>
+            {% if create %}
+                <h1><a href="{% url 'ab_testing_tool_create_experiment' %}">Create New Experiment</a></h1>
+            {% else %}
+                <h1><a href="{% url 'ab_testing_tool_edit_experiment' experiment.id %}">Edit Experiment "{{experiment.name}}"</a></h1>
+            {% endif %}
         </div>
     </header>
     <main>
         <div class="row row-lti col-md-8">
-            <h3><a href="{% url 'ab_testing_tool_index' %}">All Experiments</a> &rsaquo; <span>Editing Experiment {{experiment.name}}</span></h3>
-            
+            {% if create %}
+                <h3><a href="{% url 'ab_testing_tool_index' %}">All Experiments</a> &rsaquo; <span>New Experiment</span></h3>
+            {% else %}
+                <h3><a href="{% url 'ab_testing_tool_index' %}">All Experiments</a> &rsaquo; <span>Editing Experiment {{experiment.name}}</span></h3>
+            {% endif %}
             <form class="form-horizontal" role="form">
                 <div class="form-group col-md-8">
                     <label for="experimentName">Name:</label>
@@ -57,17 +64,19 @@
                 
                 <div class="panel panel-default col-md-8">
                     <div class="panel-body">
-                        <input type="checkbox" name="uniformRandom" ng-model="experiment.uniformRandom"> Give each track equal weighting (uniform random)
+                        <label><input type="checkbox" name="uniformRandom" ng-model="experiment.uniformRandom"> Give each track equal weighting (uniform random)</label>
                     </div>
                 </div>
                 
-                <div class="form-group col-md-8">
-                    <label class="control-label">Sort type:</label>
-                    <ul class="list-unstyled">
-                        <li><input type="radio" name="sort" value="sortAt_start" checked> Sort upon student's course registration</li>
-                        <li><input type="radio" name="sort" value="sortAt_tool"> Sort upon student encountering first intervention</li>
-                    </ul>
-                </div>
+                <!-- Disabled until project phase 2
+                    <div class="form-group col-md-8">
+                        <label class="control-label">Sort type:</label>
+                        <ul class="list-unstyled">
+                            <li><input type="radio" name="sort" value="sortAt_start" checked> Sort upon student's course registration</li>
+                            <li><input type="radio" name="sort" value="sortAt_tool"> Sort upon student encountering first intervention</li>
+                        </ul>
+                    </div>
+                -->
                 
                 <div class="form-group col-md-8">
                     <label class="contro-label" for="experimentNotes">Notes</label>
@@ -76,7 +85,11 @@
                 
                 <div class="form-group col-md-8">
                     <a id="update-cancel" ng-click="cancel()">Cancel</a>
-                    <button class="btn btn-primary" id="update-confirm" data-toggle="modal" data-target="#updateExperiment">Update</button>
+                    {% if create %}
+                        <button class="btn btn-primary" id="create-confirm" data-toggle="modal" data-target="#confirmSubmit">Create</button>
+                    {% else %}
+                        <button class="btn btn-primary" id="update-confirm" data-toggle="modal" data-target="#confirmSubmit">Update</button>
+                    {% endif %}
                 </div>
             </form>
         </div>
@@ -85,12 +98,16 @@
 
 <!-- create confirmation (start) -->
 
-<div class="modal fade" id="updateExperiment" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal fade" id="confirmSubmit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-        <h4 class="modal-title">Edit Summary</h4>
+        {% if create %}
+            <h4 class="modal-title">Create Summary</h4>
+        {% else %}
+            <h4 class="modal-title">Edit Summary</h4>
+        {% endif %}
       </div>
       <div class="modal-body">
         <p>Review your experiment set up and choose if you want to be sort at start or at tool</p>
@@ -110,7 +127,11 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="button" id="createNow" class="btn btn-primary" ng-click="submit()">Submit Update</button>
+        {% if create %}
+            <button type="button" id="createNow" class="btn btn-primary" ng-click="submit()">Submit Create</button>
+        {% else %}
+            <button type="button" id="createNow" class="btn btn-primary" ng-click="submit()">Submit Update</button>
+        {% endif %}
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
@@ -123,15 +144,31 @@
 
 {% block javascript %}
 {{ block.super }}
+{% if create %}
+    <script type="text/javascript">
+    
+    window.initialExperiment = {"name": "", "notes": "", "uniformRandom": true,
+        "tracks": [{"id": null, "name": "A"}, {"id": null, "name": "B"}]};
+    window.modifiedExperiment = {"name": "", "notes": "", "uniformRandom": true,
+        "tracks": [{"id": null, "name": "A"}, {"id": null, "name": "B"}]};
+    
+    window.submitURL = "{% url 'ab_testing_tool_submit_create_experiment' %}";
+    window.parentPage = "{% url 'ab_testing_tool_index' %}";
+    
+    </script>
+{% else %}
+    <script type="text/javascript">
+    
+    window.initialExperiment = JSON.parse("{{ experiment.to_json | escapejs}}");
+    window.modifiedExperiment = JSON.parse("{{ experiment.to_json | escapejs}}");
+    
+    window.submitURL = "{% url 'ab_testing_tool_submit_edit_experiment' experiment.id %}";
+    window.parentPage = "{% url 'ab_testing_tool_index' %}";
+    
+    </script>
+{% endif %}
+
 <script src="{% static "ab_tool/js/angular.min.js" %}"></script>
 <script src="{% static "ab_tool/js/experiment.js" %}"></script>
-<script type="text/javascript">
 
-window.initialExperiment = JSON.parse("{{ experiment.to_json | escapejs}}");
-window.modifiedExperiment = JSON.parse("{{ experiment.to_json | escapejs}}");
-
-window.submitURL = "{% url 'ab_testing_tool_submit_edit_experiment' experiment.id %}";
-window.parentPage = "{% url 'ab_testing_tool_index' %}";
-
-</script>
 {% endblock %}

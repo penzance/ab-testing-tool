@@ -4,7 +4,7 @@ from django_auth_lti.decorators import lti_role_required
 from django.core.urlresolvers import reverse
 
 from ab_tool.constants import ADMINS
-from ab_tool.models import (Track, Experiment, TrackProbabilityWeight)
+from ab_tool.models import Track, Experiment
 from ab_tool.canvas import get_lti_param, CanvasModules
 from ab_tool.exceptions import (NO_TRACKS_FOR_EXPERIMENT,
     INTERVENTION_POINTS_ARE_INSTALLED)
@@ -15,8 +15,8 @@ from ab_tool.controllers import (post_param, get_missing_track_weights,
 
 @lti_role_required(ADMINS)
 def create_experiment(request):
-    context = {"Experiment": Experiment}
-    return render_to_response("ab_tool/newExperiment.html", context)
+    context = {"create": True}
+    return render_to_response("ab_tool/editExperiment.html", context)
 
 
 @lti_role_required(ADMINS)
@@ -53,7 +53,7 @@ def submit_create_experiment(request):
     for track_dict in tracks:
         track = experiment.new_track(track_dict["name"])
         if not uniform_random:
-            track.set_weighting(track_dict["weight"])
+            track.set_weighting(track_dict["weighting"])
     return redirect(reverse("ab_testing_tool_index"))
 
 
@@ -63,7 +63,8 @@ def edit_experiment(request, experiment_id):
     experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
     has_installed_intervention = CanvasModules(request).experiment_has_installed_intervention(experiment)
     context = {"experiment": experiment,
-               "experiment_has_installed_intervention": has_installed_intervention,}
+               "experiment_has_installed_intervention": has_installed_intervention,
+               "create": False,}
     return render_to_response("ab_tool/editExperiment.html", context)
 
 
