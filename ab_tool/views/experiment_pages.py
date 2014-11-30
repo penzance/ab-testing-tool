@@ -22,10 +22,13 @@ def create_experiment(request):
 @lti_role_required(ADMINS)
 def submit_create_experiment(request):
     """ Expects a post parameter 'experiment' to be json of the form:
-            {"expName": name(str),
-             "expNotes": notes(str),
+            {"name": name(str),
+             "notes": notes(str),
              "uniformRandom": True/False,
-             "newTracks": {track_name(str) : track_weight(int)}
+             "tracks": [{"id": None # This is none for all because all tracks are new
+                         "weighting": track_weighting(int),
+                         "name": track_name(str),
+                        }]
             }
     """
     course_id = get_lti_param(request, "custom_canvas_course_id")
@@ -33,10 +36,10 @@ def submit_create_experiment(request):
     experiment_dict = json.loads(experiment_json)
     
     # Unpack data from experiment_dict and update experiment
-    name = experiment_dict["expName"]
-    notes = experiment_dict["expNotes"]
+    name = experiment_dict["name"]
+    notes = experiment_dict["notes"]
     uniform_random = experiment_dict["uniformRandom"]
-    new_tracks = experiment_dict["newTracks"]
+    tracks = experiment_dict["tracks"]
     if uniform_random:
         assignment_method = Experiment.UNIFORM_RANDOM
     else:
@@ -47,10 +50,10 @@ def submit_create_experiment(request):
     )
     
     # Update existing tracks
-    for track_name, track_weight in new_tracks.items():
-        track = experiment.new_track(track_name)
+    for track_dict in tracks:
+        track = experiment.new_track(track_dict["name"])
         if not uniform_random:
-            track.set_weighting(track_weight)
+            track.set_weighting(track_dict["weight"])
     return redirect(reverse("ab_testing_tool_index"))
 
 
@@ -75,12 +78,13 @@ def delete_track(request, track_id):
 @lti_role_required(ADMINS)
 def submit_edit_experiment(request, experiment_id):
     """ Expects a post parameter 'experiment' to be json of the form:
-            {"expName": name(str),
-             "expNotes": notes(str),
+            {"name": name(str),
+             "notes": notes(str),
              "uniformRandom": True/False,
-             "currentTrackNames": {track_id(int) : track_name(str)},
-             "currentTrackWeights": {track_id(int) : track_weight(int)},
-             "newTracks": {track_name(str) : track_weight(int)}
+             "tracks": [{"id": track_id(int), # this is None if track is new
+                         "weighting": track_weighting(int),
+                         "name": track_name(str),
+                        }]
             }
     """
     course_id = get_lti_param(request, "custom_canvas_course_id")
@@ -90,12 +94,11 @@ def submit_edit_experiment(request, experiment_id):
     experiment_dict = json.loads(experiment_json)
     
     # Unpack data from experiment_dict and update experiment
-    name = experiment_dict["expName"]
-    notes = experiment_dict["expNotes"]
+    name = experiment_dict["name"]
+    notes = experiment_dict["notes"]
     uniform_random = experiment_dict["uniformRandom"]
-    old_track_names = experiment_dict["currentTrackNames"]
-    old_track_weights = experiment_dict["currentTrackWeights"]
-    new_tracks = experiment_dict["newTracks"]
+    old_tracks = [i for i in experiment_dict["tracks"] if i["id"] is not None]
+    new_tracks = [i for i in experiment_dict["tracks"] if i["id"] is None]
     if uniform_random:
         assignment_method = Experiment.UNIFORM_RANDOM
     else:
@@ -103,17 +106,19 @@ def submit_edit_experiment(request, experiment_id):
     experiment.update(name=name, notes=notes, assignment_method=assignment_method)
     
     # Update existing tracks
-    for track_id, track_name in old_track_names.items():
-        track = Track.get_or_404_check_course(track_id, course_id)
-        track.update(name=track_name)
+    for track_dict in old_tracks:
+        track = Track.get_or_404_check_course(track_dict["id"], course_id)
+        track.update(name=track_dict["name"])
+        print track_dict["name"]
         if not uniform_random:
-            track.set_weighting(old_track_weights[track_id])
+            print track_dict["weighting"]
+            track.set_weighting(track_dict["weighting"])
     
     # Create new tracks
-    for track_name, track_weight in new_tracks.items():
-        track = experiment.new_track(track_name)
+    for track_dict in new_tracks:
+        track = experiment.new_track(track_dict["name"])
         if not uniform_random:
-            track.set_weighting(track_weight)
+            track.set_weighting(track_dict["weighting"])
     return redirect(reverse("ab_testing_tool_index"))
 
 

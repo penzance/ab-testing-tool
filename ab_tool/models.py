@@ -93,7 +93,7 @@ class Track(CourseObject):
     
     def set_weighting(self, new_weighting):
         try:
-            self.weight.update(wieghting=new_weighting)
+            self.weight.update(weighting=new_weighting)
         except TrackProbabilityWeight.DoesNotExist:
             TrackProbabilityWeight.objects.create(
                     track=self, weighting=new_weighting,

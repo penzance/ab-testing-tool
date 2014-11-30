@@ -23,7 +23,7 @@
                 <div class="form-group col-md-8">
                     <label for="experimentName">Name:</label>
                     <input type="text" name="experimentName" id="experimentName"
-                        class="form-control" value="{{experiment.name}}" placeholder="Experiment Name">
+                        class="form-control" ng-model="experiment.name" placeholder="Experiment Name">
                 </div>
                 
                 {% verbatim %}
@@ -90,7 +90,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-        <h4 class="modal-title">Create Summary</h4>
+        <h4 class="modal-title">Edit Summary</h4>
       </div>
       <div class="modal-body">
         <p>Review your experiment set up and choose if you want to be sort at start or at tool</p>
@@ -98,9 +98,11 @@
         {% verbatim %}
         <dl id="expSummary" class="dl-horizontal">
             <dt>Name:</dt><dd>{{experiment.name}}</dd>
-            <div ng-repeat="track in experiment.tracks">
-                <dt>{{track.name}}</dt><dd>{{track.weighting}}</dd>
-            </div>
+            <!-- Angular loop over tracks -->
+                <div ng-repeat="track in experiment.tracks">
+                    <dt>{{track.name}}</dt><dd>{{track.weighting}}</dd>
+                </div>
+            <!-- End Angular loop over tracks -->
             <dt>Notes:</dt><dd>{{experiment.notes}}</dd>
         </dl>
         {% endverbatim %}
@@ -108,7 +110,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="button" id="createNow" class="btn btn-primary" onClick="">Yes, Create</button>
+        <button type="button" id="createNow" class="btn btn-primary" ng-click="submit()">Submit Update</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
@@ -124,16 +126,12 @@
 <script src="{% static "ab_tool/js/angular.min.js" %}"></script>
 <script src="{% static "ab_tool/js/experiment.js" %}"></script>
 <script type="text/javascript">
+
 window.initialExperiment = JSON.parse("{{ experiment.to_json | escapejs}}");
 window.modifiedExperiment = JSON.parse("{{ experiment.to_json | escapejs}}");
 
-window.cancelChanges = function(confirmCancel) {
-    if (!confirmCancel) {
-        location.href = "{% url 'ab_testing_tool_index' %}";
-    } else if (confirm("You have unsaved changes. Are you sure you want to cancel?") == true) {
-        location.href = "{% url 'ab_testing_tool_index' %}";
-    }
-};
+window.submitURL = "{% url 'ab_testing_tool_submit_edit_experiment' experiment.id %}";
+window.parentPage = "{% url 'ab_testing_tool_index' %}";
 
 </script>
 {% endblock %}

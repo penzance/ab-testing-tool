@@ -1,5 +1,8 @@
-angular.module('ABToolExperiment', ['ABToolExperiment.controllers']);
-angular.module('ABToolExperiment', []).controller('experimentController', function($scope, $window) {
+angular.module('ABToolExperiment', []).controller(
+        'experimentController', function($scope, $window, $http) {
+    // Use x-www-form-urlencoded Content-Type
+    $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded;charset=utf-8";
+    
     $scope.experiment = $window.modifiedExperiment;
     
     $scope.newTrackName = null;
@@ -15,6 +18,18 @@ angular.module('ABToolExperiment', []).controller('experimentController', functi
         $scope.newTrackWeighting = null;
     };
     
+    $scope.submit = function() {
+        // Payload has to be encoded using JQuery's $.param to submit properly
+        var payload = $.param({"experiment": JSON.stringify($scope.experiment)});
+        $http.post($window.submitURL, payload).
+        success(function(data, status, headers, config) {
+            $window.location = $window.parentPage;
+          }).
+          error(function(data, status, headers, config) {
+            // TODO: add error behavior
+          });
+    }
+    
     $scope.difference = function() {
         var orig = $window.initialExperiment;
         var curr = $scope.experiment;
@@ -23,14 +38,19 @@ angular.module('ABToolExperiment', []).controller('experimentController', functi
         if (orig.uniformRandom != curr.uniformRandom) { return true; }
         var origNumTracks = orig.tracks.length;
         var currNumTracks = curr.tracks.length;
-        if (origNumTracks != currNumTracks) { return true; }
-        for (var i = 0; i < origNumTracks; i++) {
-            for (var j = 0; j < currNumTracks; j++) {
+        for (var j = 0; j < currNumTracks; j++) {
+            for (var i = 0; i < origNumTracks; i++) {
                 if (orig.tracks[i].id != curr.tracks[j].id) {
                     continue;
                 }
                 if (orig.tracks[i].name != curr.tracks[j].name) { return true; }
                 if (orig.tracks[i].weighting != curr.tracks[j].weighting) { return true; }
+                break;
+            }
+            if (i == origNumTracks) {
+                // Loop reached end without hitting break statement,
+                // meaning a track has been added
+                return true;
             }
         }
         return false;
@@ -38,7 +58,11 @@ angular.module('ABToolExperiment', []).controller('experimentController', functi
     
     $scope.cancel = function() {
         var confirmCancel = $scope.difference();
-        return $window.cancelChanges(confirmCancel);
+        if (!confirmCancel) {
+            $window.location = $window.parentPage;
+        } else if (confirm("You have unsaved changes. Are you sure you want to cancel?") == true) {
+            $window.location = $window.parentPage;
+        }
     };
     
 });
