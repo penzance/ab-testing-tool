@@ -48,7 +48,7 @@
                                         ng-pattern="/^\d+$/" ng-model="track.weighting"> %
                                 </label>
                                 <label class="control-label">
-                                    <span data-track="name" title="Edit track name">Track "{{track.name}}"</span>
+                                    <span data-track="name" title="Edit track name" ng-cloak>Track "{{track.name}}"</span>
                                 </label>
                             </li>
                         <!-- End Angular loop over tracks -->
@@ -123,7 +123,9 @@
             <dt>Name:</dt><dd>{{experiment.name}}</dd>
             <!-- Angular loop over tracks -->
                 <div ng-repeat="track in experiment.tracks">
-                    <dt>{{track.name}}</dt><dd>{{track.weighting}}</dd>
+                    <dt ng-cloak>{{track.name}}</dt>
+                        <dd ng-cloak ng-hide="experiment.uniformRandom">{{track.weighting}}</dd>
+                        <dd ng-cloak ng-show="experiment.uniformRandom">1 / {{experiment.tracks.length}}</dd>
                 </div>
             <!-- End Angular loop over tracks -->
             <dt>Notes:</dt><dd>{{experiment.notes}}</dd>
