@@ -1,6 +1,7 @@
 from ab_tool.tests.common import SessionTestCase, TEST_COURSE_ID
 from ab_tool.models import (Track, InterventionPointUrl, Experiment,
     TrackProbabilityWeight)
+import json
 
 
 class TestModels(SessionTestCase):
@@ -38,8 +39,47 @@ class TestModels(SessionTestCase):
                                             track=track2, url="http://example.com")
         self.assertFalse(intervention_point.is_missing_urls())
     
-    def test_new_track(self):
+    def test_experiment_new_track(self):
+        """ Tests that the new_track method of an experiment creates a new track """
         experiment = self.create_test_experiment()
         num_tracks = experiment.tracks.count()
-        experiment.new_track("new_track")
+        track = experiment.new_track("new_track")
+        self.assertEqual(track.name, "new_track")
         self.assertEqual(num_tracks + 1, experiment.tracks.count())
+    
+    def test_experiment_to_json(self):
+        """ Tests that the json returned by experiment's to_json method
+            contains expeced properties """
+        experiment = self.create_test_experiment(
+                name="test_experiment", assignment_method=Experiment.UNIFORM_RANDOM)
+        self.create_test_track(name="track1", experiment=experiment)
+        self.create_test_track(name="track2", experiment=experiment)
+        experiment_dict = json.loads(experiment.to_json())
+        self.assertEqual(experiment_dict["name"], "test_experiment")
+        self.assertEqual(len(experiment_dict["tracks"]), 2)
+        self.assertEqual(experiment_dict["uniformRandom"], True)
+    
+    def test_track_get_weighting(self):
+        """ Tests that get_weighting returns the weighting of the track """
+        track = self.create_test_track()
+        self.create_test_track_weight(weighting=42, track=track)
+        self.assertEqual(track.get_weighting(), 42)
+    
+    def test_track_get_weighting_none(self):
+        """ Tests that get_weighting returns None if the track has no weighting """
+        track = self.create_test_track()
+        self.assertEqual(track.get_weighting(), None)
+    
+    def test_track_set_weighting(self):
+        """ Tests that set_weighting sets the weighting for a track """
+        track = self.create_test_track()
+        track.set_weighting(42)
+        self.assertEqual(track.weight.weighting, 42)
+    
+    def test_track_set_weighting_existing_weight(self):
+        """ Tests that set_weighting overrides existing weight for a track """
+        track = self.create_test_track()
+        self.create_test_track_weight(weighting=100, track=track)
+        self.assertEqual(track.weight.weighting, 100)
+        track.set_weighting(42)
+        self.assertEqual(track.weight.weighting, 42)
