@@ -40,12 +40,16 @@
                         <!-- Angular loop over tracks -->
                             <li class="expTrack" ng-repeat="track in experiment.tracks">
                                 <a href="#" data-track="delete">X</a>
-                                <!-- Hide weighting if uniformRandom is set -->
+                                <!-- Show different weighting if uniformRandom is set -->
                                 <label ng-hide="experiment.uniformRandom">
                                     <input type="number" min="0" max="100" step="1"
                                         data-track="value" data-trackindex="1"
                                         maxlength="2" size="2"
                                         ng-pattern="/^\d+$/" ng-model="track.weighting"> %
+                                </label>
+                                <label ng-show="experiment.uniformRandom">
+                                    <input type="text" disabled="disabled" size="2"
+                                        ng-cloak value="{{uniformPercent()}}">%
                                 </label>
                                 <label class="control-label">
                                     <span data-track="name" title="Edit track name" ng-cloak>Track "{{track.name}}"</span>
@@ -123,9 +127,9 @@
             <dt>Name:</dt><dd>{{experiment.name}}</dd>
             <!-- Angular loop over tracks -->
                 <div ng-repeat="track in experiment.tracks">
-                    <dt ng-cloak>{{track.name}}</dt>
-                        <dd ng-cloak ng-hide="experiment.uniformRandom">{{track.weighting}}</dd>
-                        <dd ng-cloak ng-show="experiment.uniformRandom">1 / {{experiment.tracks.length}}</dd>
+                    <dt ng-cloak>Track "{{track.name}}":</dt>
+                        <dd ng-cloak ng-hide="experiment.uniformRandom">{{track.weighting}}%</dd>
+                        <dd ng-cloak ng-show="experiment.uniformRandom">{{uniformPercent()}}%</dd>
                 </div>
             <!-- End Angular loop over tracks -->
             <dt>Notes:</dt><dd>{{experiment.notes}}</dd>
