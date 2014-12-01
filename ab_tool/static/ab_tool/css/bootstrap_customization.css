@@ -14,3 +14,7 @@ body.lti {
   display: inline-block;
   width: 100%;
 }
+
+.ng-invalid {
+    background: red;
+}
