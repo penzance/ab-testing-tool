@@ -9,18 +9,31 @@ angular.module('ABToolExperiment', []).controller(
     $scope.newTrackWeighting = null;
     
     $scope.addTrack = function() {
+        // Don't add new track if newTrackName is empty
         if (!$scope.newTrackName) {
             return;
         }
+        
+        var i, len;
+        // Don't add new track if name is the same as an existing track
+        for (i = 0, len = $scope.experiment.tracks.length; i < len; i++) {
+            if ($scope.experiment.tracks[i]["name"] == $scope.newTrackName) {
+                $window.alert("There is already a track with that name");
+                return;
+            }
+        }
+        
+        // Don't include value from hidden weight field if uniformRandom is true
         if ($scope.experiment.uniformRandom) {
             $scope.newTrackWeighting = null;
         }
         
+        // Add the new track
         $scope.experiment.tracks.push({id: null, name: $scope.newTrackName,
             weighting: $scope.newTrackWeighting});
         $scope.newTrackName = null;
         $scope.newTrackWeighting = null;
-    };
+    }
     
     $scope.uniformPercent = function() {
         return Math.round(100 / $scope.experiment.tracks.length);
@@ -31,11 +44,28 @@ angular.module('ABToolExperiment', []).controller(
         var payload = $.param({"experiment": JSON.stringify($scope.experiment)});
         $http.post($window.submitURL, payload).
         success(function(data, status, headers, config) {
-            $window.location = $window.parentPage;
+              $window.location = $window.parentPage;
           }).
           error(function(data, status, headers, config) {
-            // TODO: add error behavior
+              $window.alert("An error occured submitting this form")
           });
+    }
+    
+    $scope.deleteTrack = function(track) {
+        if (track["id"] != null) {
+            if (! $window.confirm("Are you sure you want to delete track \"" + track["name"] +
+                    "\"?  This will also delete any URLs associrated with that track.")) {
+                return;
+            }
+            // TODO: delete on backend
+        }
+        var i, len;
+        for (i = 0, len = $scope.experiment.tracks.length; i < len; i ++) {
+            if ($scope.experiment.tracks[i] == track) {
+                // Delete it from the experiment
+                $scope.experiment.tracks.splice(i, 1);
+            }
+        }
     }
     
     $scope.difference = function() {
@@ -68,9 +98,9 @@ angular.module('ABToolExperiment', []).controller(
         var confirmCancel = $scope.difference();
         if (!confirmCancel) {
             $window.location = $window.parentPage;
-        } else if (confirm("You have unsaved changes. Are you sure you want to cancel?") == true) {
+        } else if ($window.confirm("You have unsaved changes. Are you sure you want to cancel?") == true) {
             $window.location = $window.parentPage;
         }
-    };
+    }
     
 });

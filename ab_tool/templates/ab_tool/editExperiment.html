@@ -38,8 +38,9 @@
                     <label>Experiment structure</label><br>
                     <ul id="expWeights" class="list-unstyled">
                         <!-- Angular loop over tracks -->
-                            <li class="expTrack" ng-repeat="track in experiment.tracks">
-                                <a href="#" data-track="delete">X</a>
+                            <li ng-cloak class="expTrack" ng-repeat="track in experiment.tracks">
+                                <a data-track="delete" ng-show="experiment.tracks.length> 2"
+                                    ng-cloak ng-click="deleteTrack(track)">X</a>
                                 <!-- Show different weighting if uniformRandom is set -->
                                 <label ng-hide="experiment.uniformRandom">
                                     <input type="number" min="0" max="100" step="1"
