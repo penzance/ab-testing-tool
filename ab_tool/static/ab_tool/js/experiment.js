@@ -22,6 +22,10 @@ angular.module('ABToolExperiment', []).controller(
         $scope.newTrackWeighting = null;
     };
     
+    $scope.uniformPercent = function() {
+        return Math.round(100 / $scope.experiment.tracks.length);
+    }
+    
     $scope.submit = function() {
         // Payload has to be encoded using JQuery's $.param to submit properly
         var payload = $.param({"experiment": JSON.stringify($scope.experiment)});
