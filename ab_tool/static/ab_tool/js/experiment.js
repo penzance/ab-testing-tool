@@ -53,6 +53,7 @@ angular.module('ABToolExperiment', []).controller(
     
     $scope.deleteTrack = function(track) {
         if (track["id"] != null) {
+            // Only confirm if the track already exists in the database
             if (! $window.confirm("Are you sure you want to delete track \"" + track["name"] +
                     "\"?  This will also delete any URLs associrated with that track.")) {
                 return;
