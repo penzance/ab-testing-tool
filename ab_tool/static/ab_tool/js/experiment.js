@@ -57,7 +57,11 @@ angular.module('ABToolExperiment', []).controller(
                     "\"?  This will also delete any URLs associrated with that track.")) {
                 return;
             }
-            // TODO: delete on backend
+            $http.post(track["deleteURL"]).
+                error(function(data, status, headers, config) {
+                    $scope.experiment.tracks.push(track)
+                    $window.alert("An error occured deleting a track")
+                });
         }
         var i, len;
         for (i = 0, len = $scope.experiment.tracks.length; i < len; i ++) {
