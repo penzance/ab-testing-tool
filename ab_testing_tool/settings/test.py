@@ -11,24 +11,44 @@ STATIC_ROOT = normpath(join(SITE_ROOT, 'http_static'))
 
 LOGGING = {
     'version': 1,
-    'handlers': {
-        'null': {
-            'level': 'DEBUG',
-            'class': 'logging.NullHandler',
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
         },
+        'simple': {
+            'format': '%(levelname)s %(module)s %(message)s'
+        }
     },
+    'handlers': {
+        'logfile': {
+            'class': 'logging.handlers.WatchedFileHandler',
+            'filename': '/var/opt/tlt/logs/ab_testing_tool.log',
+            'formatter': 'verbose',
+            'level': 'DEBUG',
+        },
+     },
     'loggers': {
-        'ab_tool': {
-            'handlers':['null'],
+        'django.request': {
+            'handlers':['console'],
             'propagate': True,
             'level':'DEBUG',
+        },
+        'django_auth_lti': {
+            'handlers': ['console'],
+            'propagate': True,
+            'level': 'DEBUG'
+        },
+        'ab_tool': {
+            'handlers': ['console'],
+            'propagate': True,
+            'level': 'DEBUG',
         },
         'error_middleware': {
-            'handlers':['null'],
+            'handlers': ['console'],
             'propagate': True,
-            'level':'DEBUG',
-        },
-    }
+            'level': 'DEBUG',
+        }
+    },
 }
 
 CACHES = {
