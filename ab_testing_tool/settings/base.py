@@ -156,3 +156,14 @@ TEMPLATE_DIRS = (
 
 CANVAS_OAUTH_CLIENT_ID = CLIENT_ID
 CANVAS_OAUTH_CLIENT_SECRET = CLIENT_SECRET
+
+# This is for https forwarding on server
+# SECURITY WARNING: https://docs.djangoproject.com/en/1.7/ref/settings/#secure-proxy-ssl-header
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# session cookie lasts for 7 hours (in seconds)
+SESSION_COOKIE_AGE = 60 * 60 * 7
+
+SESSION_COOKIE_NAME = 'djsessionid'
+
+SESSION_COOKIE_HTTPONLY = True

@@ -5,7 +5,7 @@ DEBUG = True
 
 TEMPLATE_DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 STATIC_ROOT = normpath(join(SITE_ROOT, 'http_static'))
 
@@ -30,3 +30,19 @@ LOGGING = {
         },
     }
 }
+
+CACHES = {
+    'default': {
+        'BACKEND': 'redis_cache.RedisCache',
+        'LOCATION': 'django-qa-cache.kc9kh3.0001.use1.cache.amazonaws.com:6379',
+        'OPTIONS': {
+            'PARSER_CLASS': 'redis.connection.HiredisParser'
+        },
+    },
+}
+
+SESSION_ENGINE = 'redis_sessions.session'
+SESSION_REDIS_HOST = 'django-qa-cache.kc9kh3.0001.use1.cache.amazonaws.com'
+SESSION_REDIS_PORT = 6379
+
+SESSION_COOKIE_SECURE = True
