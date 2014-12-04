@@ -9,6 +9,10 @@ ALLOWED_HOSTS = ['*']
 
 STATIC_ROOT = normpath(join(SITE_ROOT, 'http_static'))
 
+INSTALLED_APPS += (
+    'gunicorn',
+)
+
 LOGGING = {
     'version': 1,
     'formatters': {
