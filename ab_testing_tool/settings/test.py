@@ -26,25 +26,30 @@ LOGGING = {
             'formatter': 'verbose',
             'level': 'DEBUG',
         },
-     },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+    },
     'loggers': {
         'django.request': {
-            'handlers':['console'],
+            'handlers':['console', 'logfile'],
             'propagate': True,
             'level':'DEBUG',
         },
         'django_auth_lti': {
-            'handlers': ['console'],
+            'handlers': ['console', 'logfile'],
             'propagate': True,
             'level': 'DEBUG'
         },
         'ab_tool': {
-            'handlers': ['console'],
+            'handlers': ['console', 'logfile'],
             'propagate': True,
             'level': 'DEBUG',
         },
         'error_middleware': {
-            'handlers': ['console'],
+            'handlers': ['console', 'logfile'],
             'propagate': True,
             'level': 'DEBUG',
         }
