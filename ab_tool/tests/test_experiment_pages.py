@@ -71,9 +71,10 @@ class TestExperimentPages(SessionTestCase):
                 "name": "experiment", "notes": "hi", "uniformRandom": True,
                 "tracks": [{"id": None, "weighting": None, "name": "A"}]
         }
-        data = {"experiment": json.dumps(experiment)}
-        response = self.client.post(reverse("ab_testing_tool_submit_create_experiment"),
-                                    data, follow=True)
+        response = self.client.post(
+            reverse("ab_testing_tool_submit_create_experiment"), follow=True,
+            content_type="application/json", data=json.dumps(experiment)
+        )
         self.assertEquals(num_experiments + 1, Experiment.objects.count(), response)
     
     def test_submit_create_experiment_with_weights_as_assignment_method(self):
@@ -84,10 +85,11 @@ class TestExperimentPages(SessionTestCase):
         experiment = {
                 "name": "experiment", "notes": "hi", "uniformRandom": False,
                 "tracks": [{"id": None, "weighting": 100, "name": "A"}]
-       }
-        data = {"experiment": json.dumps(experiment)}
-        response = self.client.post(reverse("ab_testing_tool_submit_create_experiment"),
-                                    data, follow=True)
+        }
+        response = self.client.post(
+            reverse("ab_testing_tool_submit_create_experiment"), follow=True,
+            content_type="application/json", data=json.dumps(experiment)
+        )
         self.assertEquals(num_experiments + 1, Experiment.objects.count(), response)
     
     def test_submit_create_experiment_unauthorized(self):
@@ -95,9 +97,11 @@ class TestExperimentPages(SessionTestCase):
         self.set_roles([])
         Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
         num_experiments = Experiment.objects.count()
-        data = {"name": "experiment", "notes": "hi"}
-        response = self.client.post(reverse("ab_testing_tool_submit_create_experiment"),
-                                    data, follow=True)
+        experiment = {"name": "experiment", "notes": "hi"}
+        response = self.client.post(
+            reverse("ab_testing_tool_submit_create_experiment"), follow=True,
+            content_type="application/json", data=json.dumps(experiment)
+        )
         self.assertEquals(num_experiments, Experiment.objects.count())
         self.assertTemplateUsed(response, "ab_tool/not_authorized.html")
     
@@ -111,10 +115,10 @@ class TestExperimentPages(SessionTestCase):
                 "name": "new_name", "notes": "hi", "uniformRandom": True,
                 "tracks": [{"id": None, "weighting": None, "name": "A"}]
         }
-        data = {"experiment": json.dumps(experiment)}
         response = self.client.post(
-                reverse("ab_testing_tool_submit_edit_experiment", args=(experiment_id,)),
-                data, follow=True)
+            reverse("ab_testing_tool_submit_edit_experiment", args=(experiment_id,)),
+            follow=True, content_type="application/json", data=json.dumps(experiment)
+        )
         self.assertOkay(response)
         self.assertEquals(num_experiments, Experiment.objects.count())
         experiment = Experiment.objects.get(id=experiment_id)
@@ -132,10 +136,10 @@ class TestExperimentPages(SessionTestCase):
                 "tracks": [{"id": None, "weighting": 20, "name": "A"},
                            {"id": None, "weighting": 80, "name": "B"}]
         }
-        data = {"experiment": json.dumps(experiment)}
         response = self.client.post(
-                reverse("ab_testing_tool_submit_edit_experiment", args=(experiment_id,)),
-                data, follow=True)
+            reverse("ab_testing_tool_submit_edit_experiment", args=(experiment_id,)),
+            follow=True, content_type="application/json", data=json.dumps(experiment)
+        )
         self.assertOkay(response)
         self.assertEquals(num_experiments, Experiment.objects.count())
         experiment = Experiment.objects.get(id=experiment_id)
@@ -156,10 +160,10 @@ class TestExperimentPages(SessionTestCase):
                            {"id": None, "weighting": None, "name": "B"},
                            {"id": None, "weighting": None, "name": "C"}]
         }
-        data = {"experiment": json.dumps(experiment)}
         response = self.client.post(
-                reverse("ab_testing_tool_submit_edit_experiment", args=(experiment_id,)),
-                data, follow=True)
+            reverse("ab_testing_tool_submit_edit_experiment", args=(experiment_id,)),
+            follow=True, content_type="application/json", data=json.dumps(experiment)
+        )
         self.assertOkay(response)
         self.assertEquals(num_experiments, Experiment.objects.count())
         experiment = Experiment.objects.get(id=experiment_id)
