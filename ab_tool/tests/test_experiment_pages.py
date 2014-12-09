@@ -4,18 +4,19 @@ from django.core.urlresolvers import reverse
 from ab_tool.models import (Experiment, InterventionPointUrl)
 from ab_tool.exceptions import (EXPERIMENT_TRACKS_ALREADY_FINALIZED,
     NO_TRACKS_FOR_EXPERIMENT, UNAUTHORIZED_ACCESS)
+import json
 
 class TestExperimentPages(SessionTestCase):
     """ Tests related to Experiment and Experiment pages and methods """
     
     def test_create_experiment_view(self):
-        """ Tests edit_experiment template renders for url 'create_experiment' """
+        """ Tests editExperiment template renders for url 'create_experiment' """
         response = self.client.get(reverse("ab_testing_tool_create_experiment"))
         self.assertOkay(response)
-        self.assertTemplateUsed(response, "ab_tool/edit_experiment.html")
+        self.assertTemplateUsed(response, "ab_tool/editExperiment.html")
     
     def test_create_experiment_view_unauthorized(self):
-        """ Tests edit_experiment template does not render for url 'create_experiment'
+        """ Tests editExperiment template does not render for url 'create_experiment'
             when unauthorized """
         self.set_roles([])
         response = self.client.get(reverse("ab_testing_tool_create_experiment"), follow=True)
@@ -23,35 +24,36 @@ class TestExperimentPages(SessionTestCase):
         self.assertTemplateUsed(response, "ab_tool/not_authorized.html")
     
     def test_edit_experiment_view(self):
-        """ Tests edit_experiment template renders when authenticated """
+        """ Tests editExperiment template renders when authenticated """
         experiment = self.create_test_experiment()
         response = self.client.get(reverse("ab_testing_tool_edit_experiment", args=(experiment.id,)))
-        self.assertTemplateUsed(response, "ab_tool/edit_experiment.html")
+        self.assertTemplateUsed(response, "ab_tool/editExperiment.html")
     
     def test_edit_experiment_view_with_tracks_weights(self):
-        """ Tests edit_experiment template renders properly with track weights """
+        """ Tests editExperiment template renders properly with track weights """
         experiment = self.create_test_experiment()
+        experiment.assignment_method = Experiment.WEIGHTED_PROBABILITY_RANDOM
         track1 = self.create_test_track(name="track1", experiment=experiment)
-        self.create_test_track(name="track2", experiment=experiment)
-        track1_weight = self.create_test_track_weight(experiment=experiment, track=track1)
+        track2 = self.create_test_track(name="track2", experiment=experiment)
+        self.create_test_track_weight(experiment=experiment, track=track1)
+        self.create_test_track_weight(experiment=experiment, track=track2)
         response = self.client.get(reverse("ab_testing_tool_edit_experiment", args=(experiment.id,)))
-        self.assertTemplateUsed(response, "ab_tool/edit_experiment.html")
-        self.assertTrue((track1, track1_weight.weighting) in response.context["tracks"])
+        self.assertTemplateUsed(response, "ab_tool/editExperiment.html")
     
     def test_edit_experiment_view_unauthorized(self):
-        """ Tests edit_experiment template renders when unauthorized """
+        """ Tests editExperiment template doesn't render when unauthorized """
         self.set_roles([])
         experiment = self.create_test_experiment(course_id=TEST_OTHER_COURSE_ID)
         response = self.client.get(reverse("ab_testing_tool_edit_experiment", args=(experiment.id,)),
                                    follow=True)
-        self.assertTemplateNotUsed(response, "ab_tool/edit_experiment.html")
+        self.assertTemplateNotUsed(response, "ab_tool/editExperiment.html")
         self.assertTemplateUsed(response, "ab_tool/not_authorized.html")
     
     def test_edit_experiment_view_nonexistent(self):
         """Tests edit_experiment when experiment does not exist"""
         e_id = NONEXISTENT_EXPERIMENT_ID
         response = self.client.get(reverse("ab_testing_tool_edit_experiment", args=(e_id,)))
-        self.assertTemplateNotUsed(response, "ab_tool/edit_experiment.html")
+        self.assertTemplateNotUsed(response, "ab_tool/editExperiment.html")
         self.assertEquals(response.status_code, 404)
     
     def test_edit_experiment_view_wrong_course(self):
@@ -61,19 +63,29 @@ class TestExperimentPages(SessionTestCase):
         self.assertError(response, UNAUTHORIZED_ACCESS)
     
     def test_submit_create_experiment(self):
-        """Tests that create_experiment creates a Experiment object verified by DB count"""
+        """ Tests that create_experiment creates a Experiment object verified by
+            DB count when uniformRandom is true"""
         Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
         num_experiments = Experiment.objects.count()
-        data = {"name": "experiment", "notes": "hi", "assignment_method": 1, "uniform_tracks": 2 }
+        experiment = {
+                "name": "experiment", "notes": "hi", "uniformRandom": True,
+                "tracks": [{"id": None, "weighting": None, "name": "A"}]
+        }
+        data = {"experiment": json.dumps(experiment)}
         response = self.client.post(reverse("ab_testing_tool_submit_create_experiment"),
                                     data, follow=True)
         self.assertEquals(num_experiments + 1, Experiment.objects.count(), response)
     
     def test_submit_create_experiment_with_weights_as_assignment_method(self):
-        """Tests that create_experiment creates a Experiment object verified by DB count"""
+        """ Tests that create_experiment creates a Experiment object verified by
+            DB count when uniformRandom is false and the tracks have weightings """
         Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
         num_experiments = Experiment.objects.count()
-        data = {"name": "experiment", "notes": "hi", "assignment_method": 2, "track_weights[]": [2,4] }
+        experiment = {
+                "name": "experiment", "notes": "hi", "uniformRandom": False,
+                "tracks": [{"id": None, "weighting": 100, "name": "A"}]
+       }
+        data = {"experiment": json.dumps(experiment)}
         response = self.client.post(reverse("ab_testing_tool_submit_create_experiment"),
                                     data, follow=True)
         self.assertEquals(num_experiments + 1, Experiment.objects.count(), response)
@@ -95,9 +107,14 @@ class TestExperimentPages(SessionTestCase):
         experiment = self.create_test_experiment(name="old_name")
         experiment_id = experiment.id
         num_experiments = Experiment.objects.count()
-        data = {"name": "new_name", "notes": "", "assignment_method": 1, "uniform_tracks": 2}
+        experiment = {
+                "name": "new_name", "notes": "hi", "uniformRandom": True,
+                "tracks": [{"id": None, "weighting": None, "name": "A"}]
+        }
+        data = {"experiment": json.dumps(experiment)}
         response = self.client.post(
-                reverse("ab_testing_tool_submit_edit_experiment", args=(experiment_id,)), data, follow=True)
+                reverse("ab_testing_tool_submit_edit_experiment", args=(experiment_id,)),
+                data, follow=True)
         self.assertOkay(response)
         self.assertEquals(num_experiments, Experiment.objects.count())
         experiment = Experiment.objects.get(id=experiment_id)
@@ -110,33 +127,43 @@ class TestExperimentPages(SessionTestCase):
         experiment_id = experiment.id
         num_experiments = Experiment.objects.count()
         no_track_weights = experiment.track_probabilites.count()
-        new_assignment_method = Experiment.WEIGHTED_PROBABILITY_RANDOM
-        data = {"name": "new_name", "notes": "hi", "assignment_method": new_assignment_method,
-                "track_weights[]": [2,4] }
+        experiment = {
+                "name": "new_name", "notes": "hi", "uniformRandom": False,
+                "tracks": [{"id": None, "weighting": 20, "name": "A"},
+                           {"id": None, "weighting": 80, "name": "B"}]
+        }
+        data = {"experiment": json.dumps(experiment)}
         response = self.client.post(
-                reverse("ab_testing_tool_submit_edit_experiment", args=(experiment_id,)), data, follow=True)
+                reverse("ab_testing_tool_submit_edit_experiment", args=(experiment_id,)),
+                data, follow=True)
         self.assertOkay(response)
         self.assertEquals(num_experiments, Experiment.objects.count())
         experiment = Experiment.objects.get(id=experiment_id)
-        self.assertEquals(experiment.assignment_method, new_assignment_method)
+        self.assertEquals(experiment.assignment_method, Experiment.WEIGHTED_PROBABILITY_RANDOM)
         self.assertEquals(experiment.track_probabilites.count(), no_track_weights + 2)
     
     def test_submit_edit_experiment_changes_assignment_method_to_uniform(self):
         """ Tests that submit_edit_experiment changes an Experiment's assignment
             method from weighted uniform """
-        experiment = self.create_test_experiment(name="old_name", assignment_method=Experiment.WEIGHTED_PROBABILITY_RANDOM)
+        experiment = self.create_test_experiment(
+                name="old_name", assignment_method=Experiment.WEIGHTED_PROBABILITY_RANDOM)
         experiment_id = experiment.id
         num_experiments = Experiment.objects.count()
         no_tracks = experiment.tracks.count()
-        new_assignment_method = Experiment.UNIFORM_RANDOM
-        data = {"name": "new_name", "notes": "hi", "assignment_method": new_assignment_method,
-                "uniform_tracks": 3 }
+        experiment = {
+                "name": "new_name", "notes": "hi", "uniformRandom": True,
+                "tracks": [{"id": None, "weighting": None, "name": "A"},
+                           {"id": None, "weighting": None, "name": "B"},
+                           {"id": None, "weighting": None, "name": "C"}]
+        }
+        data = {"experiment": json.dumps(experiment)}
         response = self.client.post(
-                reverse("ab_testing_tool_submit_edit_experiment", args=(experiment_id,)), data, follow=True)
+                reverse("ab_testing_tool_submit_edit_experiment", args=(experiment_id,)),
+                data, follow=True)
         self.assertOkay(response)
         self.assertEquals(num_experiments, Experiment.objects.count())
         experiment = Experiment.objects.get(id=experiment_id)
-        self.assertEquals(experiment.assignment_method, new_assignment_method)
+        self.assertEquals(experiment.assignment_method, Experiment.UNIFORM_RANDOM)
         self.assertEquals(experiment.tracks.count(), no_tracks + 3)
     
     def test_submit_edit_experiment_unauthorized(self):

@@ -1,7 +1,7 @@
 from ab_tool.tests.common import SessionTestCase, TEST_COURSE_ID
 from ab_tool.models import (Track, InterventionPointUrl, Experiment,
     TrackProbabilityWeight)
-from ab_tool.exceptions import TRACK_WEIGHTS_ERROR
+import json
 
 
 class TestModels(SessionTestCase):
@@ -39,73 +39,47 @@ class TestModels(SessionTestCase):
                                             track=track2, url="http://example.com")
         self.assertFalse(intervention_point.is_missing_urls())
     
-    def test_set_number_of_tracks_no_change(self):
-        """ Tests that set_number_of_tracks returns without change when int parameter
-            passed to it is equal to the current number of tracks for an Experiment
-            object """
+    def test_experiment_new_track(self):
+        """ Tests that the new_track method of an experiment creates a new track """
         experiment = self.create_test_experiment()
-        track1 = self.create_test_track(name="track1", experiment=experiment)
-        track2 = self.create_test_track(name="track2", experiment=experiment)
-        num = experiment.tracks.count()
-        experiment.set_number_of_tracks(num)
-        self.assertTrue(experiment.tracks.count() == num)
-        self.assertTrue(track1 in experiment.tracks.all())
-        self.assertTrue(track2 in experiment.tracks.all())
-
-    def test_set_number_of_tracks_adds_tracks(self):
-        """ Tests that set_number_of_tracks creates tracks when int parameter
-            passed to it is greater to the current number of tracks for an Experiment
-            object """
-        experiment = self.create_test_experiment()
-        track1 = self.create_test_track(name="track1", experiment=experiment)
-        track2 = self.create_test_track(name="track2", experiment=experiment)
-        num = experiment.tracks.count()
-        experiment.set_number_of_tracks(num + 3)
-        self.assertTrue(experiment.tracks.count() == (num + 3))
-        self.assertTrue(track1 in experiment.tracks.all())
-        self.assertTrue(track2 in experiment.tracks.all())
+        num_tracks = experiment.tracks.count()
+        track = experiment.new_track("new_track")
+        self.assertEqual(track.name, "new_track")
+        self.assertEqual(num_tracks + 1, experiment.tracks.count())
     
-    def test_set_number_of_tracks_deletes_tracks(self):
-        """ Tests that set_number_of_tracks deletes tracks when int parameter
-            passed to it is less to the current number of tracks for an Experiment
-            object """
-        experiment = self.create_test_experiment()
-        track1 = self.create_test_track(name="track1", experiment=experiment)
-        track2 = self.create_test_track(name="track2", experiment=experiment)
-        num = experiment.tracks.count()
-        experiment.set_number_of_tracks(num - 1)
-        self.assertTrue(experiment.tracks.count() == (num - 1))
-        self.assertTrue(track1 in experiment.tracks.all())
-        self.assertTrue(track2 not in experiment.tracks.all())
+    def test_experiment_to_json(self):
+        """ Tests that the json returned by experiment's to_json method
+            contains expeced properties """
+        experiment = self.create_test_experiment(
+                name="test_experiment", assignment_method=Experiment.UNIFORM_RANDOM)
+        self.create_test_track(name="track1", experiment=experiment)
+        self.create_test_track(name="track2", experiment=experiment)
+        experiment_dict = json.loads(experiment.to_json())
+        self.assertEqual(experiment_dict["name"], "test_experiment")
+        self.assertEqual(len(experiment_dict["tracks"]), 2)
+        self.assertEqual(experiment_dict["uniformRandom"], True)
     
-    def test_set_track_weights_raises_error(self):
-        """ Tests that set_track_weights fails because len(weights_list) is less
-            than number of tracks. There needs to be a weight per track """
-        experiment = self.create_test_experiment()
-        track1 = self.create_test_track(name="track1", experiment=experiment)
-        track2 = self.create_test_track(name="track2", experiment=experiment)
-        weights_list = [30]
-        self.assertRaisesSpecific(TRACK_WEIGHTS_ERROR, experiment.set_track_weights, weights_list)
+    def test_track_get_weighting(self):
+        """ Tests that get_weighting returns the weighting of the track """
+        track = self.create_test_track()
+        self.create_test_track_weight(weighting=42, track=track)
+        self.assertEqual(track.get_weighting(), 42)
     
-    def test_set_track_weights_updates_weights(self):
-        """ Tests that set_track_weights successfully updates new values for weights """
-        experiment = self.create_test_experiment()
-        track1 = self.create_test_track(name="track1", experiment=experiment)
-        track2 = self.create_test_track(name="track2", experiment=experiment)
-        track1_weight = self.create_test_track_weight(track=track1, experiment=experiment, weighting=1)
-        track2_weight = self.create_test_track_weight(track=track2, experiment=experiment, weighting=1)
-        weights_list = [30, 70]
-        experiment.set_track_weights(weights_list)
-        self.assertTrue(experiment.track_probabilites.count() == len(weights_list))
-        self.assertTrue(TrackProbabilityWeight.objects.get(pk=track1_weight.id).weighting == weights_list[0])
-        self.assertTrue(TrackProbabilityWeight.objects.get(pk=track2_weight.id).weighting == weights_list[1])
+    def test_track_get_weighting_none(self):
+        """ Tests that get_weighting returns None if the track has no weighting """
+        track = self.create_test_track()
+        self.assertEqual(track.get_weighting(), None)
     
-    def test_set_track_weights_creates_weights(self):
-        """ Tests that set_track_weights successfully creates correct amount of
-            weights """
-        experiment = self.create_test_experiment()
-        track1 = self.create_test_track(name="track1", experiment=experiment)
-        track2 = self.create_test_track(name="track2", experiment=experiment)
-        weights_list = [30, 70]
-        experiment.set_track_weights(weights_list)
-        self.assertTrue(experiment.track_probabilites.count() == len(weights_list))
+    def test_track_set_weighting(self):
+        """ Tests that set_weighting sets the weighting for a track """
+        track = self.create_test_track()
+        track.set_weighting(42)
+        self.assertEqual(track.weight.weighting, 42)
+    
+    def test_track_set_weighting_existing_weight(self):
+        """ Tests that set_weighting overrides existing weight for a track """
+        track = self.create_test_track()
+        self.create_test_track_weight(weighting=100, track=track)
+        self.assertEqual(track.weight.weighting, 100)
+        track.set_weighting(42)
+        self.assertEqual(track.weight.weighting, 42)
