@@ -129,21 +129,19 @@ class SessionTestCase(TestCase):
     def create_test_track(self, course_id=TEST_COURSE_ID, name="testtrack", experiment=None):
         if not experiment:
             experiment = Experiment.get_placeholder_course_experiment(course_id)
-        track_no = experiment.tracks.count() + 1
         return Track.objects.create(name=name, course_id=course_id,
-                                experiment=experiment, track_number=track_no)
+                                    experiment=experiment)
     
     def create_test_track_weight(self, course_id=TEST_COURSE_ID, weighting=1,
                                  track=None, experiment=None):
         if not experiment:
             experiment = Experiment.get_placeholder_course_experiment(course_id)
         if not track:
-            track_no = experiment.tracks.count() + 1
             track = Track.objects.create(name="testtrack", course_id=course_id,
-                                experiment=experiment, track_number=track_no)
-        return TrackProbabilityWeight.objects.create(course_id=course_id,
-                                            weighting=weighting, track=track,
-                                            experiment=experiment)
+                                         experiment=experiment)
+        return TrackProbabilityWeight.objects.create(
+                course_id=course_id, weighting=weighting, track=track,
+                experiment=experiment)
     
     def create_test_intervention_point(self, course_id=TEST_COURSE_ID, name="testip"):
         experiment = Experiment.get_placeholder_course_experiment(course_id)
