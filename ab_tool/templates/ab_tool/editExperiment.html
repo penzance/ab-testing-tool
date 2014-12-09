@@ -162,11 +162,9 @@
     
     window.initialExperiment = {"name": "", "notes": "", "uniformRandom": true,
         "tracks": [{"id": null, "name": "A"}, {"id": null, "name": "B"}]};
-    window.modifiedExperiment = {"name": "", "notes": "", "uniformRandom": true,
-        "tracks": [{"id": null, "name": "A"}, {"id": null, "name": "B"}]};
+    window.modifiedExperiment = JSON.parse(JSON.stringify(window.initialExperiment));
     
     window.submitURL = "{% url 'ab_testing_tool_submit_create_experiment' %}";
-    window.parentPage = "{% url 'ab_testing_tool_index' %}";
     
     </script>
 {% else %}
@@ -176,12 +174,13 @@
     window.modifiedExperiment = JSON.parse("{{ experiment.to_json | escapejs}}");
     
     window.submitURL = "{% url 'ab_testing_tool_submit_edit_experiment' experiment.id %}";
-    window.parentPage = "{% url 'ab_testing_tool_index' %}";
     
-    </script>
 {% endif %}
+<script type="text/javascript">
+    window.parentPage = "{% url 'ab_testing_tool_index' %}";
+</script>
 
-<script src="{% static "ab_tool/js/angular.min.js" %}"></script>
+<script src="{% static "ab_tool/js/angular-1.2.27.min.js" %}"></script>
 <script src="{% static "ab_tool/js/experiment.js" %}"></script>
 
 {% endblock %}
