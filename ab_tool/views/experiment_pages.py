@@ -32,8 +32,7 @@ def submit_create_experiment(request):
             }
     """
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    experiment_json = post_param(request, "experiment")
-    experiment_dict = json.loads(experiment_json)
+    experiment_dict = json.loads(request.body)
     
     # Unpack data from experiment_dict and update experiment
     name = experiment_dict["name"]
@@ -91,8 +90,7 @@ def submit_edit_experiment(request, experiment_id):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
     experiment.assert_not_finalized()
-    experiment_json = post_param(request, "experiment")
-    experiment_dict = json.loads(experiment_json)
+    experiment_dict = json.loads(request.body)
     
     # Unpack data from experiment_dict and update experiment
     name = experiment_dict["name"]
@@ -110,9 +108,7 @@ def submit_edit_experiment(request, experiment_id):
     for track_dict in old_tracks:
         track = Track.get_or_404_check_course(track_dict["id"], course_id)
         track.update(name=track_dict["name"])
-        print track_dict["name"]
         if not uniform_random:
-            print track_dict["weighting"]
             track.set_weighting(track_dict["weighting"])
     
     # Create new tracks
