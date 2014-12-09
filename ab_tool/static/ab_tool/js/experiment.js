@@ -1,97 +1,103 @@
-//(function($){
-
-    function Experiment(expName, expSortType, expNotes){
-        this.expName = expName;
-        this.sortType = expSortType;
-        this.notes = expNotes;
-
-        //tracks object
-        var tr = {};
-
-        this.getTrObj = function(){
-            return tr;
+angular.module('ABToolExperiment', []).controller(
+        'experimentController', function($scope, $window, $http) {
+    // Use x-www-form-urlencoded Content-Type
+    $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded;charset=utf-8";
+    
+    $scope.experiment = $window.modifiedExperiment;
+    
+    $scope.newTrackName = null;
+    $scope.newTrackWeighting = null;
+    
+    $scope.addTrack = function() {
+        /**
+         * Add a new track based on the inputs in the new track form
+         * (the fields in the new track form are bound to the variables
+         * $scope.newTrackName and $scope.newTrackWeighting)
+         */
+        // Do nothing if newTrackName is empty
+        if (!$scope.newTrackName) {
+            return;
         }
-        //counts the properties of the tr object
-        this.trObjCount = function(){
-            var count = 0;
-            var i;
-
-            for (i in tr){
-                if ( tr.hasOwnProperty(i) ){
-                    count++;
-                }
-            }
-            return count;
+        // Ignore newTrackWeighting if we are in uniformRandom mode
+        if ($scope.experiment.uniformRandom) {
+            $scope.newTrackWeighting = null;
         }
-
-        //get all tracks names and values
-        this.getTracks = function(){
-            var allTracks = '';
-            for (var property in tr) {
-              allTracks += '<dt>' + property + '</dt><dd>' + tr[property]+ '</dd>';
-            }
-            return allTracks;
-        }
-        //add a track name and value
-        this.addTracks = function(tname, tvalue){
-            tr[tname] = tvalue;
-        }
-        //delete by track name
-        this.deleteTrack = function(tname){
-            delete tr[tname];
-        }
-
-        this.addTrackInput = function(DOMparent){
-            
-            var $newName = $('input#newTrackName').val();
-            var $newWeight = $('input#newTrackWeight').val();
-            //find the last track on list to get it's index
-            //add one for newly created tracks
-            var $newIndex = parseInt($('.expTrack').last().find('input').attr('data-trackindex')) + 1;
-            //append new track to list-unstyled
-            $(DOMparent).append(
-                '<li class="expTrack">' +
-                '<a href="#" data-track="delete">X</a> ' +
-                '<input type="text" data-track="value" data-trackindex="' + $newIndex + '" id="track-' + $newIndex + '" maxlength="2" value="' + $newWeight + '" size="2"> % ' +
-                '<label class="control-label" for="track-' + $newIndex + '"><span data-track="name" title="Edit track name">' + $newName + '</span></label>' +
-                '</li>'
-            );
-
-            //clear the values
-            $('input#newTrackWeight').val('').attr('placeholder', '0');
-            $('input#newTrackName').val('').attr('placeholder', 'Enter track name');
-        }
-
-        this.deleteTrackInput = function(ele){
-            $(ele).parent().remove();
-        }
-
-        this.isEquivalent = function(a, b) {
-            // Create arrays of property names
-            var aProps = Object.getOwnPropertyNames(a);
-            var bProps = Object.getOwnPropertyNames(b);
-
-            // If number of properties is different,
-            // objects are not equivalent
-            if (aProps.length != bProps.length) {
-                return false;
-            }
-
-            for (var i = 0; i < aProps.length; i++) {
-                var propName = aProps[i];
-
-                // If values of same property are not equal,
-                // objects are not equivalent
-                if (a[propName] !== b[propName]) {
-                    return false;
-                }
-            }
-
-            // If we made it this far, objects
-            // are considered equivalent
-            return true;
-        }
-
+        
+        $scope.experiment.tracks.push({id: null, name: $scope.newTrackName,
+            weighting: $scope.newTrackWeighting});
+        // Clear the new track form
+        $scope.newTrackName = null;
+        $scope.newTrackWeighting = null;
+    };
+    
+    $scope.uniformPercent = function() {
+        /**
+         * Returns the percentage that should be displayed as weighting for
+         * each track when uniformRandom is true.
+         * Ex. if there are three tracks, this will return 33.
+         */
+        return Math.round(100 / $scope.experiment.tracks.length);
     }
-
-//})(jQuery);
+    
+    $scope.submit = function() {
+        /**
+         * Submits form contents to the backend and redirects to window.parentPage
+         */
+        // Payload has to be encoded using JQuery's $.param to submit properly
+        var payload = $.param({"experiment": JSON.stringify($scope.experiment)});
+        $http.post($window.submitURL, payload).
+        success(function(data, status, headers, config) {
+            $window.location = $window.parentPage;
+          }).
+          error(function(data, status, headers, config) {
+            // TODO: add error behavior
+          });
+    }
+    
+    $scope.difference = function() {
+        /**
+         * Returns true iff the experiment currently in the form differs from
+         * the one the form started with, so that a confirmation can be
+         * selectively displayed on cancelChanges.  Note that deleted tracks
+         * are not included in the difference because track deletion is
+         * confirmed separately.
+         */
+        var orig = $window.initialExperiment;
+        var curr = $scope.experiment;
+        if (orig.name != curr.name) { return true; }
+        if (orig.notes != curr.notes) { return true; }
+        if (orig.uniformRandom != curr.uniformRandom) { return true; }
+        var origNumTracks = orig.tracks.length;
+        var currNumTracks = curr.tracks.length;
+        for (var j = 0; j < currNumTracks; j++) {
+            for (var i = 0; i < origNumTracks; i++) {
+                if (orig.tracks[i].id != curr.tracks[j].id) {
+                    continue;
+                }
+                if (orig.tracks[i].name != curr.tracks[j].name) { return true; }
+                if (orig.tracks[i].weighting != curr.tracks[j].weighting) { return true; }
+                break;
+            }
+            if (i == origNumTracks) {
+                // Loop reached end without hitting break statement,
+                // meaning a track has been added
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    $scope.cancel = function() {
+        /**
+         * Navigates to parent page without saving changes on backend;
+         * confirms cancelation if changes have been made (as determined by
+         * the difference function).
+         */
+        var message = "You have unsaved changes. Are you sure you want to cancel?";
+        var confirmCancel = $scope.difference();
+        if (!confirmCancel || confirm(message)) {
+            $window.location = $window.parentPage;
+        }
+    };
+    
+});
