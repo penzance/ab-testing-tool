@@ -1,7 +1,8 @@
 from django.db import models
 from django.shortcuts import get_object_or_404
 from ab_tool.exceptions import (UNAUTHORIZED_ACCESS,
-    EXPERIMENT_TRACKS_ALREADY_FINALIZED, TRACK_WEIGHTS_ERROR)
+    EXPERIMENT_TRACKS_ALREADY_FINALIZED)
+import json
 
 
 class TimestampedModel(models.Model):
@@ -60,61 +61,59 @@ class Experiment(CourseObject):
         if self.tracks_finalized:
             raise EXPERIMENT_TRACKS_ALREADY_FINALIZED
     
+    def new_track(self, track_name):
+        return Track.objects.create(course_id=self.course_id, experiment=self,
+                                    name=track_name)
+    
+    def to_json(self):
+        """ Converts the experiment and its associated tracks to json,
+            in the form expected by the editExperiment.html template and
+            by experiment.js """
+        experiment_dict = {
+            "id": self.id,
+            "name": self.name,
+            "notes": self.notes,
+            "uniformRandom": bool(self.assignment_method == self.UNIFORM_RANDOM),
+            "tracks": [{"id": t.id, "weighting": t.get_weighting(), "name": t.name}
+                       for t in self.tracks.all()],
+        }
+        return json.dumps(experiment_dict)
+    
     @classmethod
     def get_placeholder_course_experiment(cls, course_id):
         """ Gets or creates a single experiment for the course.  Placeholder
             method until interface supports multiple experiments.
             TODO: Remove once multiple experiments are supported """
         return Experiment.objects.get_or_create(course_id=course_id, name="Experiment 1")[0]
-    
-    def set_number_of_tracks(self, num):
-        """ Sets number of tracks to num """
-        current_num = self.tracks.count()
-        if current_num == num:
-            return
-        if current_num < num:
-            #add more tracks
-            for i in range(current_num + 1, num + 1):
-                Track.objects.create(name="Track %s" % i,
-                                     course_id=self.course_id,
-                                     track_number=i,
-                                     experiment=self)
-        if current_num > num:
-            #delete tracks
-            for i in range(num + 1, current_num + 1):
-                Track.objects.filter(track_number=i, experiment=self).delete()
-                #self.tracks[i].delete()
-    
-    def set_track_weights(self, weights_list):
-        """ Sets TrackProbabilityWeights for tracks in weights_list """
-        if len(weights_list) != self.tracks.count():
-            raise TRACK_WEIGHTS_ERROR
-        for i in range(1, len(weights_list) + 1):
-            track = Track.objects.get(experiment=self, course_id=self.course_id, track_number=i)
-            try:
-                weighting_obj = TrackProbabilityWeight.objects.get(
-                        track=track, course_id=self.course_id, experiment=self)
-                weighting_obj.update(weighting=weights_list[i-1])
-            except TrackProbabilityWeight.DoesNotExist:
-                TrackProbabilityWeight.objects.create(
-                    track=track, course_id=self.course_id, experiment=self,
-                    weighting=weights_list[i-1])
 
 
 class Track(CourseObject):
-    track_number = models.IntegerField()
     name = models.CharField(max_length=256)
-    notes = models.CharField(max_length=1024)
     experiment = models.ForeignKey(Experiment, related_name="tracks")
     
     class Meta:
-        unique_together = (('experiment', 'track_number'),)
+        unique_together = (('experiment', 'name'),)
+    
+    def set_weighting(self, new_weighting):
+        try:
+            self.weight.update(weighting=new_weighting)
+        except TrackProbabilityWeight.DoesNotExist:
+            TrackProbabilityWeight.objects.create(
+                    track=self, weighting=new_weighting,
+                    experiment=self.experiment
+        )
+    
+    def get_weighting(self):
+        try:
+            return self.weight.weighting
+        except TrackProbabilityWeight.DoesNotExist:
+            return None
 
 
 class TrackProbabilityWeight(CourseObject):
     #Definition: A `weighting` is an integer between 1 and 1000 inclusive
     weighting = models.IntegerField()
-    track = models.ForeignKey(Track)
+    track = models.OneToOneField(Track, related_name="weight")
     experiment = models.ForeignKey(Experiment, related_name="track_probabilites")
 
 

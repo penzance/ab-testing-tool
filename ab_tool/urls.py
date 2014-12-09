@@ -33,7 +33,7 @@ urlpatterns = patterns('',
     url(r'^delete_intervention_point/(?P<intervention_point_id>\d+)$', delete_intervention_point, name='ab_testing_tool_delete_intervention_point'),
     
     url(r'^finalize_tracks/(?P<experiment_id>\d+)$', finalize_tracks, name='ab_testing_tool_finalize_tracks'),
-
+    
     url(r'^create_experiment$', create_experiment, name='ab_testing_tool_create_experiment'),
     url(r'^submit_create_experiment$', submit_create_experiment, name='ab_testing_tool_submit_create_experiment'),
     url(r'^edit_experiment/(?P<experiment_id>\d+)$', edit_experiment, name='ab_testing_tool_edit_experiment'),

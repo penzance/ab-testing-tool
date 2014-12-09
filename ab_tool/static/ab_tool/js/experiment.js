@@ -44,8 +44,8 @@ angular.module('ABToolExperiment', []).controller(
          * Submits form contents to the backend and redirects to window.parentPage
          */
         // Payload has to be encoded using JQuery's $.param to submit properly
-        var payload = $.param({"experiment": JSON.stringify($scope.experiment)});
-        $http.post($window.submitURL, payload).
+        //var payload = $.param({"experiment": JSON.stringify($scope.experiment)});
+        $http.post($window.submitURL, $scope.experiment).
         success(function(data, status, headers, config) {
             $window.location = $window.parentPage;
           }).
