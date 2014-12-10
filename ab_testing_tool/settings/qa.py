@@ -9,6 +9,10 @@ ALLOWED_HOSTS = ['*']
 
 STATIC_ROOT = normpath(join(SITE_ROOT, 'http_static'))
 
+INSTALLED_APPS += (
+    'gunicorn',
+)
+
 LOGGING = {
     'version': 1,
     'formatters': {
@@ -26,27 +30,48 @@ LOGGING = {
             'formatter': 'verbose',
             'level': 'DEBUG',
         },
-     },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+    },
     'loggers': {
         'django.request': {
-            'handlers':['console'],
+            'handlers':['console', 'logfile'],
             'propagate': True,
             'level':'DEBUG',
         },
         'django_auth_lti': {
-            'handlers': ['console'],
+            'handlers': ['console', 'logfile'],
             'propagate': True,
             'level': 'DEBUG'
         },
         'ab_tool': {
-            'handlers': ['console'],
+            'handlers': ['console', 'logfile'],
             'propagate': True,
             'level': 'DEBUG',
         },
         'error_middleware': {
-            'handlers': ['console'],
+            'handlers': ['console', 'logfile'],
             'propagate': True,
             'level': 'DEBUG',
         }
     },
 }
+
+CACHES = {
+    'default': {
+        'BACKEND': 'redis_cache.RedisCache',
+        'LOCATION': 'django-qa-cache.kc9kh3.0001.use1.cache.amazonaws.com:6379',
+        'OPTIONS': {
+            'PARSER_CLASS': 'redis.connection.HiredisParser'
+        },
+    },
+}
+
+SESSION_ENGINE = 'redis_sessions.session'
+SESSION_REDIS_HOST = 'django-qa-cache.kc9kh3.0001.use1.cache.amazonaws.com'
+SESSION_REDIS_PORT = 6379
+
+SESSION_COOKIE_SECURE = True
