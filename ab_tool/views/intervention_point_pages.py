@@ -147,9 +147,18 @@ def edit_intervention_point_common(request, intervention_point_id):
                }
     return context
 
-
 @lti_role_required(ADMINS)
 def submit_edit_intervention_point(request, intervention_point_id):
+    submit_edit_intervention_point_common(request, intervention_point_id)
+    return redirect(reverse("ab_testing_tool_index"))
+
+@lti_role_required(ADMINS)
+def modules_page_submit_edit_intervention_point(request, intervention_point_id):
+    submit_edit_intervention_point_common(request, intervention_point_id)
+    return redirect(reverse("ab_testing_tool_modules_page_edit_intervention_point", args=[intervention_point_id]))
+
+@lti_role_required(ADMINS)
+def submit_edit_intervention_point_common(request, intervention_point_id):
     """ Note: Only allowed if admin has privileges on the particular course.
         TODO: consider using Django forms to save rather of getting individual POST params """
     course_id = get_lti_param(request, "custom_canvas_course_id")
@@ -173,7 +182,6 @@ def submit_edit_intervention_point(request, intervention_point_id):
         except InterventionPointUrl.DoesNotExist:
             InterventionPointUrl.objects.create(url=format_url(v), intervention_point_id=intervention_point_id, track_id=track_id,
                                     is_canvas_page=is_canvas_page, open_as_tab=open_as_tab)
-    return redirect(reverse("ab_testing_tool_index"))
 
 
 @lti_role_required(ADMINS)

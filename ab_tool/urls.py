@@ -8,7 +8,8 @@ from ab_tool.views.selection_pages import (resource_selection, submit_selection,
 from ab_tool.views.intervention_point_pages import (create_intervention_point,
     submit_create_intervention_point, edit_intervention_point,
     delete_intervention_point, deploy_intervention_point,
-    submit_edit_intervention_point, modules_page_edit_intervention_point)
+    submit_edit_intervention_point, modules_page_edit_intervention_point,
+    modules_page_submit_edit_intervention_point)
 from ab_tool.views.experiment_pages import (create_experiment, submit_create_experiment,
     edit_experiment, submit_edit_experiment, delete_experiment, finalize_tracks)
 
@@ -28,6 +29,7 @@ urlpatterns = patterns('',
     url(r'^submit_create_intervention_point/(?P<experiment_id>\d+)$', submit_create_intervention_point, name='ab_testing_tool_submit_create_intervention_point'),
     url(r'^edit_intervention_point/(?P<intervention_point_id>\d+)$', edit_intervention_point, name='ab_testing_tool_edit_intervention_point'),
     url(r'^modules_page_edit_intervention_point/(?P<intervention_point_id>\d+)$', modules_page_edit_intervention_point, name='ab_testing_tool_modules_page_edit_intervention_point'),
+    url(r'^modules_page_submit_edit_intervention_point/(?P<intervention_point_id>\d+)$', modules_page_submit_edit_intervention_point, name='ab_testing_tool_modules_page_submit_edit_intervention_point'),
     url(r'^submit_edit_intervention_point/(?P<intervention_point_id>\d+)$', submit_edit_intervention_point, name='ab_testing_tool_submit_edit_intervention_point'),
     url(r'^intervention_point/(?P<intervention_point_id>\d+)$', deploy_intervention_point, name='ab_testing_tool_deploy_intervention_point'),
     url(r'^delete_intervention_point/(?P<intervention_point_id>\d+)$', delete_intervention_point, name='ab_testing_tool_delete_intervention_point'),

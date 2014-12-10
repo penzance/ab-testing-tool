@@ -9,7 +9,7 @@
 <div class="container">
     <header>
         <div class="row lti-header">
-            <h1>Edit Intervention Point {{intervention_point.name}}</h1>
+            <h1><a onclick="history.go(-1);">Modules</a> &rsaquo; <span> Editing Intervention Point "{{intervention_point.name}}"</span></h1>
         </div>
     </header>
 
@@ -17,9 +17,8 @@
         <div class="row row-lti col-md-8">
 
             <form class="form-horizontal" role="form" method="post" class="form-horizontal" name="intervention_point_form"
-            action="{% url 'ab_testing_tool_submit_edit_intervention_point' intervention_point.id %}">
+            action="{% url 'ab_testing_tool_modules_page_submit_edit_intervention_point' intervention_point.id %}">
             <div>
-
                 <div class="form-group col-sm-12">
                     <label for="interventionName">Name:</label>
                     <input type="text" name="name" id="intervention_{{intervention_point.id}}"
@@ -28,24 +27,25 @@
                 
                     {% for track_url in intervention_point.track_urls %}
                     <div class="form-group">
-                        <div class="col-sm-9">
-                            <label for="track_{{track_url.track.id}}">Track "{{track_url.track.name}}":</label>
-                            <input type="url" name="intervention_point_url_{{track_url.track.id}}"
-                                id="intervention_point_url_{{track_url.track.id}}" class="form-control"
-                                value="{{track_url.url}}">
-                        </div>
-                        <div class="col-sm-3">
-                            <label for="is_canvas_page_for_track_{{track_url.track.id}}">Open:</label>
-                            <select name="is_canvas_page_for_track_{{track_url.track.id}}"
-                                id="is_canvas_page_for_track_{{track_url.track.id}}">
-                                <option {% if track_url.open_as_tab %}selected="selected"{% endif %}
-                                    value="newTab">In new tab</option>
-                                <option {% if not track_url.open_as_tab and not track_url.is_canvas_page %}selected="selected"{% endif %}
-                                    value="externalPage">External URL in Canvas</option>
-                                <option {% if not track_url.open_as_tab and track_url.is_canvas_page %}selected="selected"{% endif %}
-                                    value="canvasPage">Canvas URL</option>
-                            </select>
-                        </div>
+                            <div class="col-sm-9">
+                                <label for="track_{{track_url.track.id}}">Track "{{track_url.track.name}}":</label>
+                                <input type="url" name="intervention_point_url_{{track_url.track.id}}"
+                                    id="intervention_point_url_{{track_url.track.id}}" class="form-control"
+                                    value="{{track_url.url}}">
+                            </div>
+                            <div class="col-sm-3">
+                                <br>
+                                <label for="is_canvas_page_for_track_{{track_url.track.id}}">Open:</label>
+                                <select name="is_canvas_page_for_track_{{track_url.track.id}}"
+                                    id="is_canvas_page_for_track_{{track_url.track.id}}">
+                                    <option {% if track_url.open_as_tab %}selected="selected"{% endif %}
+                                        value="newTab">In new tab</option>
+                                    <option {% if not track_url.open_as_tab and not track_url.is_canvas_page %}selected="selected"{% endif %}
+                                        value="externalPage">External URL in Canvas</option>
+                                    <option {% if not track_url.open_as_tab and track_url.is_canvas_page %}selected="selected"{% endif %}
+                                        value="canvasPage">Canvas URL</option>
+                                </select>
+                            </div>
                     </div>
                     {% endfor %}
                 
@@ -60,5 +60,5 @@
         </div>
     </main>
 </div>
-{% endblock %}
 
+{% endblock %}
