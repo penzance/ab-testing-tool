@@ -114,7 +114,8 @@ def submit_create_intervention_point(request, experiment_id):
 @lti_role_required(ADMINS)
 def modules_page_edit_intervention_point(request, intervention_point_id):
     context = edit_intervention_point_common(request, intervention_point_id)
-    return render_to_response("ab_tool/modules_page_edit_intervention_point.html", context)
+    context["cancel_url"] = reverse("ab_testing_tool_index")
+    return render_to_response("ab_tool/editInterventionPointFromCanvas.html", context)
 
 @lti_role_required(ADMINS)
 def edit_intervention_point(request, intervention_point_id):

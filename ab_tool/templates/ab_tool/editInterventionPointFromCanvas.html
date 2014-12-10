@@ -4,23 +4,21 @@
 {% block stylesheet %}
 {{ block.super }}
 {% endblock %}
-
 {% block content %}
 
 <div class="container">
     <header>
         <div class="row lti-header">
-            <h1><a href="{% url 'ab_testing_tool_edit_intervention_point' %}">Edit Intervention Point {{intervention_point.name}}</a></h1>
+            <h1>Edit Intervention Point {{intervention_point.name}}</h1>
         </div>
     </header>
 
     <main>
         <div class="row row-lti col-md-8">
-            <h3><a href="{% cancel_url %}">All Module Items</a> &rsaquo; <span>Editing Intervention Point {{intervention_point.name}}</span></h3>
 
             <form class="form-horizontal" role="form" method="post" class="form-horizontal" name="intervention_point_form"
             action="{% url 'ab_testing_tool_submit_edit_intervention_point' intervention_point.id %}">
-            <div class="modal-body">
+            <div>
 
                 <div class="form-group col-sm-12">
                     <label for="interventionName">Name:</label>
@@ -56,10 +54,11 @@
                     <textarea name="notes" id="interventonPointNotes" class="form-control">{{ intervention_point.notes }}</textarea>
                 </div>
                 <div class="form-group col-md-8">
-                    <a id="update-cancel" href="{{ cancel_url }}">Cancel</a>
+                    <a id="update-cancel" onclick="history.go(-1);">Cancel</a>
                     <input type="submit" class="btn btn-primary" value="Save">
             </form>
         </div>
     </main>
 </div>
+{% endblock %}
 
