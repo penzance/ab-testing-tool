@@ -17,13 +17,13 @@
                 
                 {% for track in experiment.tracks.all %}
                 <div class="form-group">
-                    <div class="col-sm-9">
+                    <div class="col-sm-8">
                         <label for="track_{{track.id}}">Track "{{track.name}}":</label>
                         <input type="url" name="intervention_point_url_{{track.id}}"
                             id="intervention_point_url_{{track.id}}" class="form-control"
                             value="">
                     </div>
-                    <div class="col-sm-3">
+                    <div class="col-sm-4">
                         <label for="is_canvas_page_for_track_{{track.id}}">Open:</label>
                         <select name="is_canvas_page_for_track_{{track.id}}"
                             id="is_canvas_page_for_track_{{track.id}}">
@@ -72,13 +72,13 @@
                 
                     {% for track_url in intervention_point.track_urls %}
                     <div class="form-group">
-                        <div class="col-sm-9">
+                        <div class="col-sm-8">
                             <label for="track_{{track_url.track.id}}">Track "{{track_url.track.name}}":</label>
                             <input type="url" name="intervention_point_url_{{track_url.track.id}}"
                                 id="intervention_point_url_{{track_url.track.id}}" class="form-control"
                                 value="{{track_url.url}}">
                         </div>
-                        <div class="col-sm-3">
+                        <div class="col-sm-4">
                             <label for="is_canvas_page_for_track_{{track_url.track.id}}">Open:</label>
                             <select name="is_canvas_page_for_track_{{track_url.track.id}}"
                                 id="is_canvas_page_for_track_{{track_url.track.id}}">
