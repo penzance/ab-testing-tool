@@ -11,7 +11,7 @@ from ab_tool.views.intervention_point_pages import (create_intervention_point,
     submit_edit_intervention_point, modules_page_edit_intervention_point)
 from ab_tool.views.experiment_pages import (create_experiment, submit_create_experiment,
     edit_experiment, submit_edit_experiment, delete_experiment, finalize_tracks,
-    delete_track)
+    delete_track, submit_edit_started_experiment)
 
 urlpatterns = patterns('',
     url(r'^$', render_control_panel, name='ab_testing_tool_index'),
@@ -39,6 +39,7 @@ urlpatterns = patterns('',
     url(r'^submit_create_experiment$', submit_create_experiment, name='ab_testing_tool_submit_create_experiment'),
     url(r'^edit_experiment/(?P<experiment_id>\d+)$', edit_experiment, name='ab_testing_tool_edit_experiment'),
     url(r'^submit_edit_experiment/(?P<experiment_id>\d+)$', submit_edit_experiment, name='ab_testing_tool_submit_edit_experiment'),
+    url(r'^submit_edit_started_experiment/(?P<experiment_id>\d+)$', submit_edit_started_experiment, name='ab_testing_tool_submit_edit_started_experiment'),
     url(r'^delete_experiment/(?P<experiment_id>\d+)$', delete_experiment, name='ab_testing_tool_delete_experiment'),
     url(r'^delete_track/(?P<track_id>\d+)$', delete_track, name='ab_testing_tool_delete_track'),
 )

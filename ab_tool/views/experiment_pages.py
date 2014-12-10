@@ -9,13 +9,13 @@ from ab_tool.canvas import get_lti_param, CanvasModules
 from ab_tool.exceptions import (NO_TRACKS_FOR_EXPERIMENT,
     INTERVENTION_POINTS_ARE_INSTALLED)
 from django.http.response import HttpResponse
-from ab_tool.controllers import (post_param, get_missing_track_weights,
+from ab_tool.controllers import (get_missing_track_weights,
     get_incomplete_intervention_points)
 
 
 @lti_role_required(ADMINS)
 def create_experiment(request):
-    context = {"create": True}
+    context = {"create": True, "started": False}
     return render_to_response("ab_tool/editExperiment.html", context)
 
 
@@ -53,7 +53,7 @@ def submit_create_experiment(request):
         track = experiment.new_track(track_dict["name"])
         if not uniform_random:
             track.set_weighting(track_dict["weighting"])
-    return redirect(reverse("ab_testing_tool_index"))
+    return HttpResponse("success")
 
 
 @lti_role_required(ADMINS)
@@ -63,7 +63,8 @@ def edit_experiment(request, experiment_id):
     has_installed_intervention = CanvasModules(request).experiment_has_installed_intervention(experiment)
     context = {"experiment": experiment,
                "experiment_has_installed_intervention": has_installed_intervention,
-               "create": False,}
+               "create": False,
+               "started": experiment.tracks_finalized}
     return render_to_response("ab_tool/editExperiment.html", context)
 
 
@@ -116,7 +117,25 @@ def submit_edit_experiment(request, experiment_id):
         track = experiment.new_track(track_dict["name"])
         if not uniform_random:
             track.set_weighting(track_dict["weighting"])
-    return redirect(reverse("ab_testing_tool_index"))
+    return HttpResponse("success")
+
+
+@lti_role_required(ADMINS)
+def submit_edit_started_experiment(request, experiment_id):
+    """ Expects a post parameter 'experiment' to be json of the form:
+            {"name": name(str),
+             "notes": notes(str),
+            }
+    """
+    course_id = get_lti_param(request, "custom_canvas_course_id")
+    experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
+    experiment_dict = json.loads(request.body)
+    
+    # Unpack data from experiment_dict and update experiment
+    name = experiment_dict["name"]
+    notes = experiment_dict["notes"]
+    experiment.update(name=name, notes=notes)
+    return HttpResponse("success")
 
 
 @lti_role_required(ADMINS)
