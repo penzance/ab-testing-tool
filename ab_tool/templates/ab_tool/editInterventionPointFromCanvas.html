@@ -1,0 +1,65 @@
+{% extends "ab_tool/base_lti.html" %}
+{% load static %}
+
+{% block stylesheet %}
+{{ block.super }}
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <header>
+        <div class="row lti-header">
+            <h1><a href="{% url 'ab_testing_tool_edit_intervention_point' %}">Edit Intervention Point {{intervention_point.name}}</a></h1>
+        </div>
+    </header>
+
+    <main>
+        <div class="row row-lti col-md-8">
+            <h3><a href="{% cancel_url %}">All Module Items</a> &rsaquo; <span>Editing Intervention Point {{intervention_point.name}}</span></h3>
+
+            <form class="form-horizontal" role="form" method="post" class="form-horizontal" name="intervention_point_form"
+            action="{% url 'ab_testing_tool_submit_edit_intervention_point' intervention_point.id %}">
+            <div class="modal-body">
+
+                <div class="form-group col-sm-12">
+                    <label for="interventionName">Name:</label>
+                    <input type="text" name="name" id="intervention_{{intervention_point.id}}"
+                        class="form-control" value="{{intervention_point.name}}">
+                </div>
+                
+                    {% for track_url in intervention_point.track_urls %}
+                    <div class="form-group">
+                        <div class="col-sm-9">
+                            <label for="track_{{track_url.track.id}}">Track "{{track_url.track.name}}":</label>
+                            <input type="url" name="intervention_point_url_{{track_url.track.id}}"
+                                id="intervention_point_url_{{track_url.track.id}}" class="form-control"
+                                value="{{track_url.url}}">
+                        </div>
+                        <div class="col-sm-3">
+                            <label for="is_canvas_page_for_track_{{track_url.track.id}}">Open:</label>
+                            <select name="is_canvas_page_for_track_{{track_url.track.id}}"
+                                id="is_canvas_page_for_track_{{track_url.track.id}}">
+                                <option {% if track_url.open_as_tab %}selected="selected"{% endif %}
+                                    value="newTab">In new tab</option>
+                                <option {% if not track_url.open_as_tab and not track_url.is_canvas_page %}selected="selected"{% endif %}
+                                    value="externalPage">External URL in Canvas</option>
+                                <option {% if not track_url.open_as_tab and track_url.is_canvas_page %}selected="selected"{% endif %}
+                                    value="canvasPage">Canvas URL</option>
+                            </select>
+                        </div>
+                    </div>
+                    {% endfor %}
+                
+                <div class="form-group col-sm-12">
+                    <label class="control-label" for="interventionPointNotes">Notes</label>
+                    <textarea name="notes" id="interventonPointNotes" class="form-control">{{ intervention_point.notes }}</textarea>
+                </div>
+                <div class="form-group col-md-8">
+                    <a id="update-cancel" href="{{ cancel_url }}">Cancel</a>
+                    <input type="submit" class="btn btn-primary" value="Save">
+            </form>
+        </div>
+    </main>
+</div>
+
