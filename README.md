@@ -24,7 +24,7 @@ For more information, take a look at [these slides](https://docs.google.com/a/g.
 
 ----------
 
-##In order to run locally:
+## In order to run locally:
 
 Note: In order to run a command from the ab-testing-tool directory, open terminal
 and go to the ab-testing tool using something like `cd ab-testing-tool`
