@@ -36,6 +36,6 @@ urlpatterns = patterns('',
     url(r'^submit_edit_experiment/(?P<experiment_id>\d+)$', submit_edit_experiment, name='ab_testing_tool_submit_edit_experiment'),
     url(r'^delete_experiment/(?P<experiment_id>\d+)$', delete_experiment, name='ab_testing_tool_delete_experiment'),
     url(r'^finalize_tracks/(?P<experiment_id>\d+)$', finalize_tracks, name='ab_testing_tool_finalize_tracks'),
-    url(r'^copy_experiment$', copy_experiment, name='ab_testing_tool_copy_experiment'),
+    url(r'^copy_experiment/(?P<experiment_id>\d+)$', copy_experiment, name='ab_testing_tool_copy_experiment'),
 
 )

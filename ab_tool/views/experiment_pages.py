@@ -125,7 +125,7 @@ def copy_experiment(request, experiment_id):
     orig_exp = Experiment.get_or_404_check_course(experiment_id, course_id)
     copied_name = "%s_copy" % orig_exp.name
     copied_name = "%s%s" % (copied_name, len(Experiment.objects.filter(course_id=course_id,
-                                                                       name=copied_name)) + 1)
+                                                                       name__startswith=copied_name)) + 1)
     # Copies Experiment
     copied_exp = Experiment.objects.create(
             name=copied_name, course_id=course_id, notes=orig_exp.notes,
@@ -134,19 +134,23 @@ def copy_experiment(request, experiment_id):
     track_id_mapping = {}
     # Copies Tracks
     for orig_track in orig_exp.tracks.all():
-        track_id_mapping[orig_track.id] = Track.objects.create(name=orig_track.name, experiment=copied_exp)
+        track_id_mapping[orig_track.id] = Track.objects.create(name=orig_track.name,
+                                                               experiment=copied_exp,
+                                                               course_id=course_id)
     # Copies TrackProbabilityWeights, if any
     for orig_weight in orig_exp.track_probabilites.all():
         TrackProbabilityWeight.objects.create(weighting=orig_weight.weighting,
-                                              name=orig_weight.name,
-                                              experiment=copied_exp)
-    # Copies InterventionPoints,
+                                              track=track_id_mapping[orig_weight.track.id],
+                                              experiment=copied_exp,
+                                              course_id=course_id)
+    # Copies InterventionPoints
     for orig_ip in orig_exp.intervention_points.all():
         copied_ip = InterventionPoint.objects.create(name=orig_ip.name,
                                          notes=orig_ip.notes,
-                                         experiment=copied_exp)
+                                         experiment=copied_exp,
+                                         course_id=course_id)
         # Copies InterventionPointUrls, if any
-        for orig_ip_url in InterventionPointUrl.objects.filter(intervention_point=copied_ip):
+        for orig_ip_url in InterventionPointUrl.objects.filter(intervention_point=orig_ip):
             InterventionPointUrl.objects.create(url=orig_ip_url.url,
                                                 intervention_point=copied_ip,
                                                 track=track_id_mapping[orig_ip_url.track.id],
