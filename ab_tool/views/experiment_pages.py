@@ -4,7 +4,8 @@ from django_auth_lti.decorators import lti_role_required
 from django.core.urlresolvers import reverse
 
 from ab_tool.constants import ADMINS
-from ab_tool.models import Track, Experiment
+from ab_tool.models import (Track, Experiment, TrackProbabilityWeight,
+    InterventionPoint, InterventionPointUrl)
 from ab_tool.canvas import get_lti_param, CanvasModules
 from ab_tool.exceptions import (NO_TRACKS_FOR_EXPERIMENT,
     INTERVENTION_POINTS_ARE_INSTALLED)
@@ -116,6 +117,41 @@ def submit_edit_experiment(request, experiment_id):
         track = experiment.new_track(track_dict["name"])
         if not uniform_random:
             track.set_weighting(track_dict["weighting"])
+    return redirect(reverse("ab_testing_tool_index"))
+
+@lti_role_required(ADMINS)
+def copy_experiment(request, experiment_id):
+    course_id = get_lti_param(request, "custom_canvas_course_id")
+    orig_exp = Experiment.get_or_404_check_course(experiment_id, course_id)
+    copied_name = "%s_copy" % orig_exp.name
+    copied_name = "%s%s" % (copied_name, len(Experiment.objects.filter(course_id=course_id,
+                                                                       name=copied_name)) + 1)
+    # Copies Experiment
+    copied_exp = Experiment.objects.create(
+            name=copied_name, course_id=course_id, notes=orig_exp.notes,
+            assignment_method=orig_exp.assignment_method
+    )
+    track_id_mapping = {}
+    # Copies Tracks
+    for orig_track in orig_exp.tracks.all():
+        track_id_mapping[orig_track.id] = Track.objects.create(name=orig_track.name, experiment=copied_exp)
+    # Copies TrackProbabilityWeights, if any
+    for orig_weight in orig_exp.track_probabilites.all():
+        TrackProbabilityWeight.objects.create(weighting=orig_weight.weighting,
+                                              name=orig_weight.name,
+                                              experiment=copied_exp)
+    # Copies InterventionPoints,
+    for orig_ip in orig_exp.intervention_points.all():
+        copied_ip = InterventionPoint.objects.create(name=orig_ip.name,
+                                         notes=orig_ip.notes,
+                                         experiment=copied_exp)
+        # Copies InterventionPointUrls, if any
+        for orig_ip_url in InterventionPointUrl.objects.filter(intervention_point=copied_ip):
+            InterventionPointUrl.objects.create(url=orig_ip_url.url,
+                                                intervention_point=copied_ip,
+                                                track=track_id_mapping[orig_ip_url.track.id],
+                                                open_as_tab=orig_ip_url.open_as_tab,
+                                                is_canvas_page=orig_ip_url.is_canvas_page)
     return redirect(reverse("ab_testing_tool_index"))
 
 
