@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404
 from ab_tool.exceptions import (UNAUTHORIZED_ACCESS,
     EXPERIMENT_TRACKS_ALREADY_FINALIZED)
 import json
+from django.core.urlresolvers import reverse
 
 
 class TimestampedModel(models.Model):
@@ -74,7 +75,8 @@ class Experiment(CourseObject):
             "name": self.name,
             "notes": self.notes,
             "uniformRandom": bool(self.assignment_method == self.UNIFORM_RANDOM),
-            "tracks": [{"id": t.id, "weighting": t.get_weighting(), "name": t.name}
+            "tracks": [{"id": t.id, "weighting": t.get_weighting(), "name": t.name,
+                        "deleteURL": reverse('ab_testing_tool_delete_track', args=(t.id,))}
                        for t in self.tracks.all()],
         }
         return json.dumps(experiment_dict)

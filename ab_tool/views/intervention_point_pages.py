@@ -71,20 +71,6 @@ def deploy_intervention_point(request, intervention_point_id):
         return render_to_response("ab_tool/window_redirect.html", {"url": chosen_intervention_point_url.url})
     return redirect(chosen_intervention_point_url.url)
 
-@lti_role_required(ADMINS)
-def create_intervention_point(request, experiment_id):
-    """ Note: Canvas fetches all pages within iframe with POST request,
-        requiring separate template render function. This also breaks CSRF
-        token validation if CSRF Middleware is turned off. """
-    course_id = get_lti_param(request, "custom_canvas_course_id")
-    experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
-    #Note: Refer to template. (t,None) is passed as there are no existing InterventionPointUrls for a new intervention_point
-    context = {"tracks" : [(t, None) for t in
-                           Track.objects.filter(course_id=course_id, experiment=experiment)],
-               "cancel_url": reverse("ab_testing_tool_index"),
-               "experiment": experiment}
-    return render_to_response("ab_tool/edit_intervention_point.html", context)
-
 
 @lti_role_required(ADMINS)
 def submit_create_intervention_point(request, experiment_id):
@@ -116,11 +102,6 @@ def modules_page_edit_intervention_point(request, intervention_point_id):
     context = edit_intervention_point_common(request, intervention_point_id)
     return render_to_response("ab_tool/editInterventionPointFromCanvas.html", context)
 
-@lti_role_required(ADMINS)
-def edit_intervention_point(request, intervention_point_id):
-    context = edit_intervention_point_common(request, intervention_point_id)
-    context["cancel_url"] = reverse("ab_testing_tool_index")
-    return render_to_response("ab_tool/edit_intervention_point.html", context)
 
 def edit_intervention_point_common(request, intervention_point_id):
     """ Common core shared between edit_intervention_point and modules_page_edit_intervention_point """
