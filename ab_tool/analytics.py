@@ -18,7 +18,7 @@ def log_intervention_point_interaction(course_id, student, intervention_point,
     )
 
 
-class MockFile(object):
+class Echo(object):
     """ An object that implements just the write method of the file-like
         interface. See: https://docs.djangoproject.com/en/1.7/howto/outputting-csv/ """
     def write(self, value):
@@ -28,7 +28,7 @@ class MockFile(object):
 
 def get_student_list_csv(experiment, file_title):
     def csv_file_generator():
-        writer = csv.writer(MockFile())
+        writer = csv.writer(Echo())
         # Write headers to CSV file
         headers = ["Student ID", "LIS Person Sourcedid", "Experiment", "Assigned Track",
                    "Timestamp Last Updated"]
@@ -45,7 +45,7 @@ def get_student_list_csv(experiment, file_title):
 
 def get_intervention_point_interactions_csv(experiment, file_title):
     def csv_file_generator():
-        writer = csv.writer(MockFile())
+        writer = csv.writer(Echo())
         # Write headers to CSV file
         headers = ["Student ID", "LIS Person Sourcedid", "Experiment", "Intervention Point",
                    "Timestamp Encountered"]
