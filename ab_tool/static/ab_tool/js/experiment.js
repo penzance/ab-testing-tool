@@ -57,7 +57,7 @@ angular.module('ABToolExperiment', []).controller(
         // Payload has to be encoded using JQuery's $.param to submit properly
         //var payload = $.param({"experiment": JSON.stringify($scope.experiment)});
         $http.post($window.submitURL, $scope.experiment).
-        success(function(data, status, headers, config) {
+          success(function(data, status, headers, config) {
               $window.location = $window.parentPage;
           }).
           error(function(data, status, headers, config) {
@@ -66,23 +66,46 @@ angular.module('ABToolExperiment', []).controller(
     }
     
     $scope.deleteTrack = function(track) {
-        if (track["id"] != null) {
-            // Only confirm if the track already exists in the database
-            if (! $window.confirm("Are you sure you want to delete track \"" + track["name"] +
-                    "\"?  This will also delete any URLs associrated with that track.")) {
-                return;
-            }
-            $http.post(track["deleteURL"]).
+        /**
+         * Deletes track from interface; if track already exists in database,
+         * confirms before deletion and only deletes it from interface upon
+         * successful deletion on backend.
+         */
+        if (track["id"] == null) {
+            // null track["id"] means track is not yet in database
+            $scope._removeTrackFromInterface(track)
+        } else {
+            // Confirm if the track already exists in the database
+            var message = ("Are you sure you want to delete track \"" + track["name"] +
+                "\"?  This will also delete any URLs associrated with that track.");
+            if ($window.confirm(message)) {
+                // Delete track on backend
+                $http.post(track["deleteURL"]).
+                success(function(data, status, headers, config) {
+                    $scope._removeTrackFromInterface(track)
+                }).
                 error(function(data, status, headers, config) {
-                    $scope.experiment.tracks.push(track)
                     $window.alert("An error occured deleting a track")
                 });
+            }
         }
+    }
+    
+    $scope._removeTrackFromInterface = function(track) {
+        /**
+         * Removes the track from the list of tracks on the experiment,
+         * causing it to be removed from the interface.
+         * 
+         * Note: this function checks for a matching track by identity;
+         * consequently you must pass the track itself, not just a copy of it
+         * or an object with the same attributes. (i.e. you must pass by reference)
+         */
         var i, len;
         for (i = 0, len = $scope.experiment.tracks.length; i < len; i ++) {
             if ($scope.experiment.tracks[i] == track) {
                 // Delete it from the experiment
                 $scope.experiment.tracks.splice(i, 1);
+                break;
             }
         }
     }

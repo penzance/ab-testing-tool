@@ -40,7 +40,7 @@ class TestMainPages(SessionTestCase):
         """ Tests control_panel template does not render when unauthorized"""
         self.set_roles([])
         response = self.client.get(reverse("ab_testing_tool_index"), follow=True)
-        self.assertTemplateNotUsed(response, "ab_tool/control_panel.html")
+        self.assertTemplateNotUsed(response, "ab_tool/experimentsDashboard.html")
         self.assertEqual(response.status_code, 401)
         self.assertTemplateUsed(response, "ab_tool/not_authorized.html")
     

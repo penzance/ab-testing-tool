@@ -39,7 +39,7 @@
                         <!-- Angular loop over tracks -->
                             <li ng-cloak class="expTrack" ng-repeat="track in experiment.tracks">
                                 {% if not started %}
-                                    <a data-track="delete" ng-show="experiment.tracks.length> 2"
+                                    <a data-track="delete" ng-show="experiment.tracks.length > 2"
                                         ng-cloak ng-click="deleteTrack(track)">X</a>
                                 {% endif %}
                                 <!-- Show different weighting if uniformRandom is set -->
