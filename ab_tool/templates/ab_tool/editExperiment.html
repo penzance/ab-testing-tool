@@ -39,7 +39,7 @@
                     <ul id="expWeights" class="list-unstyled">
                         <!-- Angular loop over tracks -->
                             <li ng-cloak class="expTrack" ng-repeat="track in experiment.tracks">
-                                <a data-track="delete" ng-show="experiment.tracks.length> 2"
+                                <a data-track="delete" ng-show="experiment.tracks.length > 2"
                                     ng-cloak ng-click="deleteTrack(track)">X</a>
                                 <!-- Show different weighting if uniformRandom is set -->
                                 <label ng-hide="experiment.uniformRandom">
