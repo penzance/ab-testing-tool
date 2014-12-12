@@ -55,7 +55,7 @@ when installing lxml, refer to this: http://stackoverflow.com/a/22322645/2812260
 
 * Install app in canvas by adding an external tool by XML.  The key and secret
   will be "test" and "secret" respectively.  Either copy the config from
-  http://localhost:8000/lti_tools/ab_tool/tool_config or use the following:
+  http://localhost:8000/ab-testing/lti/tool_config or use the following:
 
 ```
 <?xml version="1.0" encoding="UTF-8"?>
@@ -73,14 +73,14 @@ when installing lxml, refer to this: http://stackoverflow.com/a/22322645/2812260
         http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
     <blti:title>A/B Testing Tool</blti:title>
     <blti:description>Tool to allow students in a course to get different content in a module item.</blti:description>
-    <blti:launch_url>http://localhost:8000/lti_tools/ab_tool/</blti:launch_url>
-    <blti:secure_launch_url>http://localhost:8000/lti_tools/ab_tool/</blti:secure_launch_url>
+    <blti:launch_url>http://localhost:8000/ab-testing/lti/</blti:launch_url>
+    <blti:secure_launch_url>http://localhost:8000/ab-testing/lti/</blti:secure_launch_url>
     <blti:vendor/>
     <blti:extensions platform="canvas.instructure.com">
         <lticm:property name="tool_id">ab_testing_tool</lticm:property>
         <lticm:property name="privacy_level">public</lticm:property>
         <lticm:options name="resource_selection">
-            <lticm:property name="url">http://localhost:8000/lti_tools/ab_tool/resource_selection</lticm:property>
+            <lticm:property name="url">http://localhost:8000/ab-testing/lti/resource_selection</lticm:property>
             <lticm:property name="enabled">true</lticm:property>
         </lticm:options>
         <lticm:property name="selection_width">800</lticm:property>
