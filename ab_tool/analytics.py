@@ -1,7 +1,7 @@
 import csv
 import logging
 import traceback
-from django.http.response import HttpResponse
+from django.http.response import HttpResponse, StreamingHttpResponse
 
 from ab_tool.models import ExperimentStudent, InterventionPointInteraction
 from ab_tool.exceptions import CSV_ERROR
@@ -18,41 +18,44 @@ def log_intervention_point_interaction(course_id, student, intervention_point,
     )
 
 
-def csv_response_and_writer(file_title):
-    try:
-        response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = ("attachment; filename=%s" % file_title)
-        return response, csv.writer(response)
-    except ValueError as exception:
-        logger.error(repr(exception))
-        logger.error(traceback.format_exc())
-        raise CSV_ERROR
+class Echo(object):
+    """ An object that implements just the write method of the file-like
+        interface. See: https://docs.djangoproject.com/en/1.7/howto/outputting-csv/ """
+    def write(self, value):
+        """Write the value by returning it, instead of storing in a buffer."""
+        return value
 
 
 def get_student_list_csv(experiment, file_title):
-    response, writer = csv_response_and_writer(file_title)
-    # Write headers to CSV file
-    headers = ["Student ID", "LIS Person Sourcedid", "Experiment", "Assigned Track",
-               "Timestamp Last Updated"]
-    writer.writerow(headers)
-    # Write data to CSV file
-    for s in ExperimentStudent.objects.filter(experiment=experiment):
-        row = [s.student_id, s.lis_person_sourcedid, s.experiment.name,
-               s.track.name, s.updated_on]
-        writer.writerow(row)
+    def csv_file_generator():
+        writer = csv.writer(Echo())
+        # Write headers to CSV file
+        headers = ["Student ID", "LIS Person Sourcedid", "Experiment", "Assigned Track",
+                   "Timestamp Last Updated"]
+        yield writer.writerow(headers)
+        # Write data to CSV file
+        for s in ExperimentStudent.objects.filter(experiment=experiment):
+            row = [s.student_id, s.lis_person_sourcedid, s.experiment.name,
+                   s.track.name, s.updated_on]
+            yield writer.writerow(row)
+    response = StreamingHttpResponse(csv_file_generator(), content_type="text/csv")
+    response['Content-Disposition'] = ("attachment; filename=%s" % file_title)
     return response
 
 
 def get_intervention_point_interactions_csv(experiment, file_title):
-    response, writer = csv_response_and_writer(file_title)
-    # Write headers to CSV file
-    headers = ["Student ID", "LIS Person Sourcedid", "Experiment", "Intervention Point",
-               "Timestamp Encountered"]
-    writer.writerow(headers)
-    # Write data to CSV file
-    for i in InterventionPointInteraction.objects.filter(experiment=experiment):
-        row = [i.student.student_id, i.student.lis_person_sourcedid,
-               i.intervention_point.experiment.name, i.intervention_point.name,
-               i.created_on]
-        writer.writerow(row)
+    def csv_file_generator():
+        writer = csv.writer(Echo())
+        # Write headers to CSV file
+        headers = ["Student ID", "LIS Person Sourcedid", "Experiment", "Intervention Point",
+                   "Timestamp Encountered"]
+        yield writer.writerow(headers)
+        # Write data to CSV file
+        for i in InterventionPointInteraction.objects.filter(experiment=experiment):
+            row = [i.student.student_id, i.student.lis_person_sourcedid,
+                   i.intervention_point.experiment.name, i.intervention_point.name,
+                   i.created_on]
+            yield writer.writerow(row)
+    response = StreamingHttpResponse(csv_file_generator(), content_type="text/csv")
+    response['Content-Disposition'] = ("attachment; filename=%s" % file_title)
     return response

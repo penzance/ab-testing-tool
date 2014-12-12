@@ -123,8 +123,7 @@ class TestMainPages(SessionTestCase):
         self.assertEqual(response._headers["content-type"],
                          ('Content-Type', 'text/csv'))
         num_students = ExperimentStudent.objects.filter(course_id=TEST_COURSE_ID).count()
-        # Add 2 to length for header and trailing newline
-        self.assertEqual(len(response.content.split("\n")), num_students + 2)
+        self.assertEqual(len(list(response.streaming_content)), num_students + 1)
     
     def test_download_data_experiment_specific(self):
         """ Tests that download data only uses student in the correct course """
@@ -139,8 +138,7 @@ class TestMainPages(SessionTestCase):
         self.assertEqual(response._headers["content-type"],
                          ('Content-Type', 'text/csv'))
         num_students = ExperimentStudent.objects.filter(course_id=TEST_COURSE_ID).count()
-        # Add 2 to length for header and trailing newline
-        self.assertEqual(len(response.content.split("\n")), num_students + 2)
+        self.assertEqual(len(list(response.streaming_content)), num_students + 1)
     
     def test_download_data_no_students(self):
         experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
@@ -149,8 +147,7 @@ class TestMainPages(SessionTestCase):
                          ('Content-Type', 'text/csv'))
         num_students = ExperimentStudent.objects.filter(course_id=TEST_COURSE_ID).count()
         self.assertEqual(num_students, 0)
-        # Length is 2 for header and trailing newline
-        self.assertEqual(len(response.content.split("\n")), 2)
+        self.assertEqual(len(list(response.streaming_content)), 1)
     
     def test_download_intervention_point_interactions(self):
         """ Tests that download data returns a csv with a row for each student """
@@ -167,8 +164,7 @@ class TestMainPages(SessionTestCase):
         self.assertEqual(response._headers["content-type"],
                          ('Content-Type', 'text/csv'))
         interactions = InterventionPointInteraction.objects.filter(course_id=TEST_COURSE_ID).count()
-        # Add 2 to length for header and trailing newline
-        self.assertEqual(len(response.content.split("\n")), interactions + 2)
+        self.assertEqual(len(list(response.streaming_content)), interactions + 1)
     
     def test_download_intervention_point_interactions_experiment_specific(self):
         """ Tests that download data only uses student in the correct course """
@@ -189,8 +185,7 @@ class TestMainPages(SessionTestCase):
         self.assertEqual(response._headers["content-type"],
                          ('Content-Type', 'text/csv'))
         interactions = InterventionPointInteraction.objects.filter(course_id=TEST_COURSE_ID).count()
-        # Add 2 to length for header and trailing newline
-        self.assertEqual(len(response.content.split("\n")), interactions + 2)
+        self.assertEqual(len(list(response.streaming_content)), interactions + 1)
     
     def test_download_intervention_point_interactions_no_students(self):
         experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
@@ -199,5 +194,4 @@ class TestMainPages(SessionTestCase):
                          ('Content-Type', 'text/csv'))
         interactions = InterventionPointInteraction.objects.filter(course_id=TEST_COURSE_ID).count()
         self.assertEqual(interactions, 0)
-        # Length is 2 for header and trailing newline
-        self.assertEqual(len(response.content.split("\n")), 2)
+        self.assertEqual(len(list(response.streaming_content)), 1)
