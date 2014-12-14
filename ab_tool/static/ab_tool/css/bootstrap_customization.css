@@ -1,7 +1,10 @@
 /* Typography */
 body.lti {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+
 }
+
+
 .lti-header {
   padding: 0 1.032863849765%;
   width: 97.93427230047%;
@@ -16,7 +19,7 @@ body.lti {
 }
 
 
-/* FOR ANGULAR */
+/* FOR ANGULAR validation of track weight*/
 .ng-invalid {
     background: red;
 }
