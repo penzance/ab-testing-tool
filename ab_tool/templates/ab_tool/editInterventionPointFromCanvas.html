@@ -28,7 +28,7 @@
                     {% for track_url in intervention_point.track_urls %}
                     <div class="form-group">
                             <div class="col-sm-9">
-                                <label for="track_{{track_url.track.id}}">Track "{{track_url.track.name}}":</label>
+                                <label for="intervention_point_url_{{track_url.track.id}}">Track "{{track_url.track.name}}":</label>
                                 <input type="url" name="intervention_point_url_{{track_url.track.id}}"
                                     id="intervention_point_url_{{track_url.track.id}}" class="form-control"
                                     value="{{track_url.url}}">
