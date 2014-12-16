@@ -94,27 +94,26 @@
                     
                     <div class="panel-body">
                         <ul class='intervention-points'>
-                            <li>
-                                <a href="#" class="btn btn-icon-only ip-btn-delete">
-                                    <i class="fa fa-trash"></i><span>Delete</span>
-                                </a>
-                                <a href="#">Intervention name for once</a><br>
-                                <span class="label">Installed</span> <span class="date">Last modified 12/20/2014</span>
-                            </li>
-                            <li>
-                                <a href="#" class="btn btn-icon-only ip-btn-delete">
-                                    <i class="fa fa-trash"></i><span>Delete</span>
-                                </a>
-                                <a href="#">Intervention name for once</a><br>
-                                <span class="label">Installed</span> <span class="date">Last modified 12/20/2014</span>
-                            </li>
-                            <li>
-                                <a href="#" class="btn btn-icon-only ip-btn-delete">
-                                    <i class="fa fa-trash"></i><span>Delete</span>
-                                </a>
-                                <a href="#">Intervention name for once</a><br>
-                                <span class="label">Installed</span> <span class="date">Last modified 12/20/2014</span>
-                            </li>
+                            {% for intervention_point in experiment.intervention_points.all %}
+                                <li>
+                                    <a href="#" class="btn btn-icon-only ip-btn-delete">
+                                        <i class="fa fa-trash"></i><span>Delete</span>
+                                    </a>
+                                    <a data-toggle="modal" href="#editIntervention_{{intervention_point.id}}">
+                                        Intervention Point "{{intervention_point.name}}"
+                                    </a><br>
+                                    <span class="label">
+                                        {{intervention_point.is_missing_urls|yesno:"URLs missing,complete"}}
+                                    </span> 
+                                    <span class="date">
+                                        Last modified {{intervention_point.updated_on}}
+                                    </span>
+                                </li>
+                                {% empty %}
+                                <li class="list-group-item">
+                                    No intervention points currently exist for this experiment. Click on "Add an Intervention Point" to get started.
+                                </li>
+                            {% endfor %}
                         </ul>
                     </div>
                     <div class="panel-footer">
@@ -153,8 +152,8 @@
             </div><!-- exp (end) -->
 
 
-            <div class="panel panel-default">
-                <!-- Default panel contents -->
+            <!--div class="panel panel-default">
+                <!-- Default panel contents >
                 <div class="panel-heading lti-inline-block">
                     <div class="pull-left">
                         <h3><a href="{% url 'ab_testing_tool_edit_experiment' experiment.id %}" id="experiment_{{experiment.id}}">Experiment "{{experiment.name}}"</a></h3>
@@ -207,7 +206,7 @@
                     </li>
                     {% endfor %}
                 </ul>
-            </div>
+            </div-->
         
         {% empty %}
         <div class="well">
@@ -218,6 +217,11 @@
         </div>
         {% endfor %}
     </div>
+    <script type="text/javascript">
+    $(document).ready(function(){
+        
+    });
+    </script>
 </main>
 
 
