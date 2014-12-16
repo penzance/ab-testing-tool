@@ -189,4 +189,4 @@ class InterventionPointInteraction(CourseObject):
     intervention_point = models.ForeignKey(InterventionPoint)
     experiment = models.ForeignKey(Experiment, related_name="intervention_point_interactions")
     track = models.ForeignKey(Track)
-    intervention_point_url = models.ForeignKey(InterventionPointUrl)
+    url = models.URLField(max_length=2048)
