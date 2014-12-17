@@ -309,3 +309,33 @@ class TestExperimentPages(SessionTestCase):
         self.client.get(reverse("ab_testing_tool_finalize_tracks", args=(experiment.id,)),
                                    follow=True)
         self.assertFalse(experiment.tracks_finalized)
+    
+    def test_copy_experiment(self):
+        """ Tests that copy_experiment creates a new experiment """
+        experiment = self.create_test_experiment()
+        num_experiments = Experiment.objects.count()
+        url = reverse("ab_testing_tool_copy_experiment", args=(experiment.id,))
+        response = self.client.get(url, follow=True)
+        self.assertOkay(response)
+        self.assertEqual(Experiment.objects.count(), num_experiments + 1)
+    
+    def test_copy_expeirment_unauthorized(self):
+        """ Tests that copy_experiment fails when unauthorized """
+        self.set_roles([])
+        experiment = self.create_test_experiment()
+        url = reverse("ab_testing_tool_copy_experiment", args=(experiment.id,))
+        response = self.client.get(url, follow=True)
+        self.assertTemplateUsed(response, "ab_tool/not_authorized.html")
+    
+    def test_copy_experiment_inavlid_id(self):
+        """ Tests that copy_experiment fails with bad experiment_id """
+        url = reverse("ab_testing_tool_copy_experiment", args=(12345,))
+        response = self.client.get(url, follow=True)
+        self.assertEquals(response.status_code, 404)
+    
+    def test_copy_experiment_wrong_course(self):
+        """ Tests that copy_experiment fails if experiment is different coruse """
+        experiment = self.create_test_experiment(course_id=TEST_OTHER_COURSE_ID)
+        url = reverse("ab_testing_tool_copy_experiment", args=(experiment.id,))
+        response = self.client.get(url, follow=True)
+        self.assertError(response, UNAUTHORIZED_ACCESS)

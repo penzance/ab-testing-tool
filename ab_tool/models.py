@@ -18,6 +18,10 @@ class TimestampedModel(models.Model):
         for k, v in kwargs.iteritems():
             setattr(self, k, v)
         self.save()
+    
+    def save_as_new_object(self):
+        self.pk, self.id = None, None
+        self.save()
 
 
 class CourseObject(TimestampedModel):
@@ -81,6 +85,36 @@ class Experiment(CourseObject):
         }
         return json.dumps(experiment_dict)
     
+    def copy(self, new_name):
+        original_exp = Experiment.objects.get(pk=self.pk)
+        # Copies Experiment
+        self.name = new_name
+        self.tracks_finalized = False
+        self.save_as_new_object()
+        
+        # Copies Tracks
+        track_id_mapping = {}
+        for track in original_exp.tracks.all():
+            track_id = track.id
+            track.experiment = self
+            track.save_as_new_object()
+            track_id_mapping[track_id] = track
+            # Copies TrackProbabilityWeights, if any
+            for track_probability in original_exp.track_probabilites.all():
+                track_probability.track = track
+                track.proability.save_as_new_object()
+        
+        # Copies InterventionPoints
+        for intervention_point in original_exp.intervention_points.all():
+            orig_ip_id = intervention_point.id
+            intervention_point.experiment = self
+            intervention_point.save_as_new_object()
+            # Copies InterventionPointUrls, if any
+            for ip_url in InterventionPointUrl.objects.filter(intervention_point_id=orig_ip_id):
+                ip_url.track = track_id_mapping[ip_url.track.id]
+                ip_url.intervention_point = intervention_point
+                ip_url.save_as_new_object()
+    
     @classmethod
     def get_placeholder_course_experiment(cls, course_id):
         """ Gets or creates a single experiment for the course.  Placeholder
@@ -97,6 +131,8 @@ class Track(CourseObject):
         unique_together = (('experiment', 'name'),)
     
     def set_weighting(self, new_weighting):
+        if new_weighting is None:
+            new_weighting = 0
         try:
             self.weight.update(weighting=new_weighting)
         except TrackProbabilityWeight.DoesNotExist:
