@@ -19,7 +19,12 @@ class TimestampedModel(models.Model):
             setattr(self, k, v)
         self.save()
     
-    def save_as_new_object(self):
+    def save_as_new_object(self, **kwargs):
+        """ Saves a new object based on the original, applying updates in
+            kwargs.  Note that this operates in-place; do not use this if
+            other memory references to this object exist """
+        for k, v in kwargs.iteritems():
+            setattr(self, k, v)
         self.pk, self.id = None, None
         self.save()
 
@@ -87,33 +92,30 @@ class Experiment(CourseObject):
     
     def copy(self, new_name):
         original_exp = Experiment.objects.get(pk=self.pk)
-        # Copies Experiment
-        self.name = new_name
-        self.tracks_finalized = False
-        self.save_as_new_object()
+        # Copy Experiment
+        self.save_as_new_object(name=new_name, tracks_finalized=False)
         
-        # Copies Tracks
+        # Copy Tracks
         track_id_mapping = {}
         for track in original_exp.tracks.all():
-            track_id = track.id
-            track.experiment = self
-            track.save_as_new_object()
-            track_id_mapping[track_id] = track
-            # Copies TrackProbabilityWeights, if any
-            for track_probability in original_exp.track_probabilites.all():
-                track_probability.track = track
-                track.proability.save_as_new_object()
+            original_track_id = track.id
+            track.save_as_new_object(experiment=self)
+            track_id_mapping[original_track_id] = track
+            # Copy TrackProbabilityWeight, if any
+            try:
+                weight = TrackProbabilityWeight.objects.get(track_id=original_track_id)
+                weight.save_as_new_object(track=track)
+            except TrackProbabilityWeight.DoesNotExist:
+                pass
         
-        # Copies InterventionPoints
+        # Copy InterventionPoints
         for intervention_point in original_exp.intervention_points.all():
             orig_ip_id = intervention_point.id
-            intervention_point.experiment = self
-            intervention_point.save_as_new_object()
-            # Copies InterventionPointUrls, if any
+            intervention_point.save_as_new_object(experiment=self)
+            # Copy InterventionPointUrls, if any
             for ip_url in InterventionPointUrl.objects.filter(intervention_point_id=orig_ip_id):
-                ip_url.track = track_id_mapping[ip_url.track.id]
-                ip_url.intervention_point = intervention_point
-                ip_url.save_as_new_object()
+                ip_url.save_as_new_object(track=track_id_mapping[ip_url.track.id],
+                                          intervention_point=intervention_point)
     
     @classmethod
     def get_placeholder_course_experiment(cls, course_id):
