@@ -1,5 +1,8 @@
-angular.module('ABToolExperiment', []).controller(
-        'experimentController', function($scope, $window, $http) {
+var controller = function($scope, $window, $http) {
+    /**
+     * Angular controller (attached to angular module at bottom of file)
+     */
+    
     // Use x-www-form-urlencoded Content-Type
     $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded;charset=utf-8";
     
@@ -156,4 +159,83 @@ angular.module('ABToolExperiment', []).controller(
         }
     }
     
-});
+    $scope.trackNameChanged = function(track) {
+        /**
+         * Check a new name for a track and if it is valid, set the track name.
+         * Don't allow changing a track name to a name that is currently or was
+         * originally used by a different track (the backend requires track
+         * name uniqueness by experiment).
+         */
+        console.log(track.newName);
+        if (track.newName == "") {
+            track.newName = track.name;
+        }
+        var i, len;
+        for (i = 0, len = $scope.experiment.tracks.length; i < len; i ++) {
+            var otherTrack = $scope.experiment.tracks[i];
+            if (otherTrack == track) {
+                continue;
+            }
+            if (otherTrack.name == track.newName) {
+                alert("Invalid Name: There is another track with that name");
+                track.newName = track.name;
+                return;
+            } else if (otherTrack.originalName == track.newName) {
+                alert("Invalid Name: There was already another track with that name");
+                track.newName = track.name;
+                return;
+            }
+        }
+        track.name = track.newName;
+    };
+}
+
+
+contenteditable = function() {
+    /**
+     * Directive to allow ng-model to work with contenteditable attribute
+     * (attached to angular module at bottom of file)
+     */
+    var linkFunction = function(scope, element, attrs, ngModel) {
+        if (!ngModel) {
+            return; // do nothing if no ng-model
+        }
+        
+        // when model changes, update view
+        ngModel.$render = function() {
+            element.html(ngModel.$viewValue || "");
+        };
+        
+        setView = function() {
+            ngModel.$setViewValue(element.html());
+        };
+        
+        // when view changes, update model
+        element.on('blur', function() {
+            scope.$apply(setView);
+        });
+        
+        element.on('keydown', function($event) {
+            // handle [Enter] and [Esc] key presses from within the trackname
+            if ($event.keyCode == 13) {
+                // [Enter] key saves
+                element.blur();
+            } else if ($event.keyCode == 27) {
+                // [Esc] key saves
+                element.blur();
+            }
+        });
+        
+        // initialize
+        setView();
+    };
+    
+    return {require: '?ngModel', link: linkFunction};
+}
+
+/**
+ * Angular module configuration
+ */
+angular.module('ABToolExperiment', []).
+    controller('experimentController', controller).
+    directive('contenteditable', contenteditable);

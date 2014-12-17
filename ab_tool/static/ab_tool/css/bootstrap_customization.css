@@ -22,3 +22,25 @@ body.lti {
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
   display: none !important;
 }
+
+.editable {
+    color: #0000EE;
+    text-decoration: underline;
+    display: inline-block;
+    min-width: 10em;
+    min-height: 1em;
+    text-align: left;
+}
+
+.editable:hover {
+    color: #EE0000;
+}
+
+.editable:focus {
+    color: black;
+    text-decoration: none;
+    outline-color: blue;
+    outline-style: solid;
+    outline-width: 2px;
+    background-color: white !important;
+}

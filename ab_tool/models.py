@@ -75,7 +75,8 @@ class Experiment(CourseObject):
             "name": self.name,
             "notes": self.notes,
             "uniformRandom": bool(self.assignment_method == self.UNIFORM_RANDOM),
-            "tracks": [{"id": t.id, "weighting": t.get_weighting(), "name": t.name,
+            "tracks": [{"id": t.id, "weighting": t.get_weighting(),
+                        "name": t.name, "originalName" : t.name,
                         "deleteURL": reverse('ab_testing_tool_delete_track', args=(t.id,))}
                        for t in self.tracks.all()],
         }

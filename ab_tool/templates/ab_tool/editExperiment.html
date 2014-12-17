@@ -53,7 +53,12 @@
                                         ng-cloak value="{{uniformPercent()}}">%
                                 </label>
                                 <label class="control-label">
-                                    <span data-track="name" title="Edit track name" ng-cloak>Track "{{track.name}}"</span>
+                                    <!-- TODO: disable undo function from changing data inside unselected contenteditable spans -->
+                                    Track&nbsp<span data-track="name" title="Edit track name"
+                                        ng-cloak ng-model="track.newName"
+                                        ng-change="trackNameChanged(track)"
+                                        class="editable"
+                                        contenteditable="true"></span>
                                 </label>
                             </li>
                         <!-- End Angular loop over tracks -->
@@ -162,7 +167,8 @@
     <script type="text/javascript">
     
     window.initialExperiment = {"name": "", "notes": "", "uniformRandom": true,
-        "tracks": [{"id": null, "name": "A"}, {"id": null, "name": "B"}]};
+        "tracks": [{"id": null, "name": "A", "newName": "A"},
+                   {"id": null, "name": "B", "newName": "B"}]};
     window.modifiedExperiment = JSON.parse(JSON.stringify(window.initialExperiment));
     
     window.submitURL = "{% url 'ab_testing_tool_submit_create_experiment' %}";
