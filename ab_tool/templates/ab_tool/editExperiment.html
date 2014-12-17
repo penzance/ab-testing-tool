@@ -53,12 +53,15 @@
                                         ng-cloak value="{{uniformPercent()}}">%
                                 </label>
                                 <label class="control-label">
-                                    <!-- TODO: disable undo function from changing data inside unselected contenteditable spans -->
-                                    Track&nbsp<span data-track="name" title="Edit track name"
+                                    <a data-track="name" title="Edit track name"
+                                        ng-cloak ng-click="editTrackName(track)"
+                                        ng-hide="track.editing">Track {{track.name}}</a>
+                                    <label ng-show="track.editing">Track
+                                    <input data-track="name" title="Edit track name"
                                         ng-cloak ng-model="track.newName"
-                                        ng-change="trackNameChanged(track)"
-                                        class="editable"
-                                        contenteditable="true"></span>
+                                        ng-keypress="trackNameKeypress($event, track)"
+                                        ng-blur="trackNameChanged(track)"></input>
+                                    </label>
                                 </label>
                             </li>
                         <!-- End Angular loop over tracks -->

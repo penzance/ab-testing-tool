@@ -17,28 +17,20 @@ var controller = function($scope, $window, $http) {
          * (the fields in the new track form are bound to the variables
          * $scope.newTrackName and $scope.newTrackWeighting)
          */
-        // Do nothing if newTrackName is empty
-        if (!$scope.newTrackName) {
-            return;
-        }
-        
-        var i, len;
-        // Don't add new track if name is the same as an existing track
-        for (i = 0, len = $scope.experiment.tracks.length; i < len; i++) {
-            if ($scope.experiment.tracks[i]["name"] == $scope.newTrackName) {
-                $window.alert("There is already a track with that name");
-                return;
-            }
-        }
-        
         // Don't include value from hidden weight field if uniformRandom is true
         if ($scope.experiment.uniformRandom) {
             $scope.newTrackWeighting = null;
         }
+        var newTrack = {id: null, name: $scope.newTrackName, editing: false,
+                weighting: $scope.newTrackWeighting, newName: $scope.newTrackName};
+        
+        // Do nothing if newTrackName is empty or conflicts
+        if (!$scope.newTrackName || !$scope.isTrackOK(newTrack)) {
+            return;
+        }
         
         // Add the new track
-        $scope.experiment.tracks.push({id: null, name: $scope.newTrackName,
-            weighting: $scope.newTrackWeighting});
+        $scope.experiment.tracks.push(newTrack);
         // Clear the new track form
         $scope.newTrackName = null;
         $scope.newTrackWeighting = null;
@@ -159,17 +151,47 @@ var controller = function($scope, $window, $http) {
         }
     }
     
-    $scope.trackNameChanged = function(track) {
+    $scope.editTrackName = function(track) {
         /**
-         * Check a new name for a track and if it is valid, set the track name.
+         * Set editing to true for the given track and false on all others
+         */
+        var i, len;
+        for (i = 0, len = $scope.experiment.tracks.length; i < len; i ++) {
+            $scope.experiment.tracks[i].editing = ($scope.experiment.tracks[i] == track);
+        }
+    }
+    
+    $scope.trackNameKeypress = function(event, track) {
+        /**
+         * handle [Enter] and [Esc] key presses from within the trackname edit box
+         */
+        if (event.keyCode == 13) {
+            // [Enter] key saves
+            $scope.trackNameChanged(track)
+            event.preventDefault();
+        } else if ($event.keyCode == 27) {
+            // [Esc] key cancels
+            $scope.cancelTrackNameChange(track)
+            event.preventDefault();
+        }
+    }
+    
+    $scope.cancelTrackNameChange = function(track) {
+        /**
+         * Cancel edits to a track name.
+         */
+        track.newName = track.name;
+        track.editing = false;
+    }
+    
+    $scope.isTrackOK = function(track) {
+        /**
+         * Check a new name for a track, returning true if OK and raising
+         * an error and returning false if it is not.
          * Don't allow changing a track name to a name that is currently or was
          * originally used by a different track (the backend requires track
          * name uniqueness by experiment).
          */
-        console.log(track.newName);
-        if (track.newName == "") {
-            track.newName = track.name;
-        }
         var i, len;
         for (i = 0, len = $scope.experiment.tracks.length; i < len; i ++) {
             var otherTrack = $scope.experiment.tracks[i];
@@ -178,64 +200,32 @@ var controller = function($scope, $window, $http) {
             }
             if (otherTrack.name == track.newName) {
                 alert("Invalid Name: There is another track with that name");
-                track.newName = track.name;
-                return;
+                return false;
             } else if (otherTrack.originalName == track.newName) {
                 alert("Invalid Name: There was already another track with that name");
-                track.newName = track.name;
-                return;
+                return false;
             }
         }
-        track.name = track.newName;
-    };
-}
-
-
-contenteditable = function() {
-    /**
-     * Directive to allow ng-model to work with contenteditable attribute
-     * (attached to angular module at bottom of file)
-     */
-    var linkFunction = function(scope, element, attrs, ngModel) {
-        if (!ngModel) {
-            return; // do nothing if no ng-model
-        }
-        
-        // when model changes, update view
-        ngModel.$render = function() {
-            element.html(ngModel.$viewValue || "");
-        };
-        
-        setView = function() {
-            ngModel.$setViewValue(element.html());
-        };
-        
-        // when view changes, update model
-        element.on('blur', function() {
-            scope.$apply(setView);
-        });
-        
-        element.on('keydown', function($event) {
-            // handle [Enter] and [Esc] key presses from within the trackname
-            if ($event.keyCode == 13) {
-                // [Enter] key saves
-                element.blur();
-            } else if ($event.keyCode == 27) {
-                // [Esc] key saves
-                element.blur();
-            }
-        });
-        
-        // initialize
-        setView();
-    };
+        return true;
+    }
     
-    return {require: '?ngModel', link: linkFunction};
+    $scope.trackNameChanged = function(track) {
+        /**
+         * If new name is valid, set the track name and unset track editing.
+         */
+        if (track.newName == "" || !$scope.isTrackOK(track)) {
+            $scope.cancelTrackNameChange(track);
+        } else {
+            track.name = track.newName;
+            track.editing = false;
+        }
+    };
 }
+
+
 
 /**
  * Angular module configuration
  */
 angular.module('ABToolExperiment', []).
-    controller('experimentController', controller).
-    directive('contenteditable', contenteditable);
+    controller('experimentController', controller);
