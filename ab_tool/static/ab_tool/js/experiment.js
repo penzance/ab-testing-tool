@@ -151,7 +151,7 @@ var controller = function($scope, $window, $http) {
         }
     }
     
-    $scope.editTrackName = function(track) {
+    $scope.editTrackName = function(track, element) {
         /**
          * Set editing to true for the given track and false on all others
          */
@@ -169,7 +169,7 @@ var controller = function($scope, $window, $http) {
             // [Enter] key saves
             $scope.trackNameChanged(track)
             event.preventDefault();
-        } else if ($event.keyCode == 27) {
+        } else if (event.keyCode == 27) {
             // [Esc] key cancels
             $scope.cancelTrackNameChange(track)
             event.preventDefault();
