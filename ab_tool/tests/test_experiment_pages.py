@@ -213,8 +213,8 @@ class TestExperimentPages(SessionTestCase):
         self.assertError(response, UNAUTHORIZED_ACCESS)
     
     def test_submit_edit_started_experiment_changes_name_and_notes(self):
-        """ Tests that submit_edit_started_experiment changes an Experiment's 
-            name and notes """
+        """ Tests that submit_edit_experiment changes an Experiment's 
+            name and notes even if the experiment has already been started """
         experiment = self.create_test_experiment(name="old_name", notes="old_notes",
                                                  tracks_finalized=True)
         experiment_id = experiment.id
@@ -223,7 +223,7 @@ class TestExperimentPages(SessionTestCase):
                 "name": "new_name", "notes": "new_notes"
         }
         response = self.client.post(
-            reverse("ab_testing_tool_submit_edit_started_experiment", args=(experiment_id,)),
+            reverse("ab_testing_tool_submit_edit_experiment", args=(experiment_id,)),
             follow=True, content_type="application/json", data=json.dumps(experiment)
         )
         self.assertOkay(response)
@@ -233,7 +233,8 @@ class TestExperimentPages(SessionTestCase):
         self.assertEquals(experiment.notes, "new_notes")
     
     def test_submit_edit_started_experiment_does_not_change_tracks(self):
-        """ Tests that submit_edit_started_experiment doesn't change tracks """
+        """ Tests that submit_edit_experiment doesn't change tracks for
+            an experiment that has already been started """
         experiment = self.create_test_experiment(name="old_name", tracks_finalized=True,
                 assignment_method=Experiment.WEIGHTED_PROBABILITY_RANDOM)
         experiment_id = experiment.id
@@ -246,7 +247,7 @@ class TestExperimentPages(SessionTestCase):
                            {"id": None, "weighting": None, "name": "C"}]
         }
         response = self.client.post(
-            reverse("ab_testing_tool_submit_edit_started_experiment", args=(experiment_id,)),
+            reverse("ab_testing_tool_submit_edit_experiment", args=(experiment_id,)),
             follow=True, content_type="application/json", data=json.dumps(experiment)
         )
         self.assertOkay(response)
@@ -254,40 +255,6 @@ class TestExperimentPages(SessionTestCase):
         experiment = Experiment.objects.get(id=experiment_id)
         self.assertEquals(experiment.assignment_method, Experiment.WEIGHTED_PROBABILITY_RANDOM)
         self.assertEquals(experiment.tracks.count(), no_tracks)
-    
-    def test_submit_edit_started_experiment_unauthorized(self):
-        """ Tests submit_edit_started_experiment when unauthorized"""
-        self.set_roles([])
-        experiment = self.create_test_experiment(name="old_name")
-        experiment_id = experiment.id
-        data = {"name": "new_name", "notes": ""}
-        response = self.client.post(
-            reverse("ab_testing_tool_submit_edit_started_experiment", args=(experiment_id,)),
-            content_type="application/json", data=json.dumps(data), follow=True
-        )
-        self.assertTemplateUsed(response, "ab_tool/not_authorized.html")
-    
-    def test_submit_edit_started_experiment_nonexistent(self):
-        """ Tests that submit_edit_started_experiment method raises error for non-existent Experiment """
-        experiment_id = NONEXISTENT_EXPERIMENT_ID
-        data = {"name": "new_name", "notes": ""}
-        response = self.client.post(
-            reverse("ab_testing_tool_submit_edit_started_experiment", args=(experiment_id,)),
-            content_type="application/json", data=json.dumps(data)
-        )
-        self.assertEquals(response.status_code, 404)
-    
-    def test_submit_edit_started_experiment_wrong_course(self):
-        """ Tests that submit_edit_started_experiment method raises error for existent Experiment but
-            for wrong course"""
-        experiment = self.create_test_experiment(name="old_name",
-                                       course_id=TEST_OTHER_COURSE_ID)
-        data = {"name": "new_name", "notes": ""}
-        response = self.client.post(
-            reverse("ab_testing_tool_submit_edit_started_experiment", args=(experiment.id,)),
-            content_type="application/json", data=json.dumps(data)
-        )
-        self.assertError(response, UNAUTHORIZED_ACCESS)
     
     def test_delete_experiment(self):
         """ Tests that delete_experiment method properly deletes a experiment when authorized"""

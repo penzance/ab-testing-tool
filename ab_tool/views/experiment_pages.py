@@ -90,12 +90,15 @@ def submit_edit_experiment(request, experiment_id):
     """
     course_id = get_lti_param(request, "custom_canvas_course_id")
     experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
-    experiment.assert_not_finalized()
     experiment_dict = json.loads(request.body)
     
     # Unpack data from experiment_dict and update experiment
     name = experiment_dict["name"]
     notes = experiment_dict["notes"]
+    if experiment.tracks_finalized:
+        # Only allow updating name and notes for started experiments
+        experiment.update(name=name, notes=notes)
+        return HttpResponse("success")
     uniform_random = experiment_dict["uniformRandom"]
     old_tracks = [i for i in experiment_dict["tracks"] if i["id"] is not None]
     new_tracks = [i for i in experiment_dict["tracks"] if i["id"] is None]
@@ -117,24 +120,6 @@ def submit_edit_experiment(request, experiment_id):
         track = experiment.new_track(track_dict["name"])
         if not uniform_random:
             track.set_weighting(track_dict["weighting"])
-    return HttpResponse("success")
-
-
-@lti_role_required(ADMINS)
-def submit_edit_started_experiment(request, experiment_id):
-    """ Expects a post parameter 'experiment' to be json of the form:
-            {"name": name(str),
-             "notes": notes(str),
-            }
-    """
-    course_id = get_lti_param(request, "custom_canvas_course_id")
-    experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
-    experiment_dict = json.loads(request.body)
-    
-    # Unpack data from experiment_dict and update experiment
-    name = experiment_dict["name"]
-    notes = experiment_dict["notes"]
-    experiment.update(name=name, notes=notes)
     return HttpResponse("success")
 
 
