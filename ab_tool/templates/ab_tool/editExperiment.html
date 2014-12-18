@@ -39,24 +39,24 @@
                     <ul id="expWeights" class="list-unstyled">
                         <!-- Angular loop over tracks -->
                             <li ng-cloak class="expTrack" ng-repeat="track in experiment.tracks">
-                                <a data-track="delete" ng-show="experiment.tracks.length > 2"
+                                <a data-track="delete" ng-if="experiment.tracks.length > 2"
                                     ng-cloak ng-click="deleteTrack(track)">X</a>
                                 <!-- Show different weighting if uniformRandom is set -->
-                                <label ng-hide="experiment.uniformRandom">
+                                <label ng-if="!experiment.uniformRandom">
                                     <input type="number" min="0" max="100" step="1"
                                         data-track="value" data-trackindex="1"
                                         maxlength="2" size="2"
                                         ng-pattern="/^\d+$/" ng-model="track.weighting"> %
                                 </label>
-                                <label ng-show="experiment.uniformRandom">
+                                <label ng-if="experiment.uniformRandom">
                                     <input type="text" disabled="disabled" size="2"
                                         ng-cloak value="{{uniformPercent()}}">%
                                 </label>
                                 <label class="control-label">
                                     <a data-track="name" title="Edit track name"
                                         ng-cloak ng-click="editTrackName(track)"
-                                        ng-hide="track.editing">Track {{track.name}}</a>
-                                    <label ng-show="track.editing">Track
+                                        ng-if="!track.editing">Track {{track.name}}</a>
+                                    <label ng-if="track.editing">Track
                                     <input data-track="name" title="Edit track name"
                                         ng-cloak ng-model="track.newName"
                                         ng-keypress="trackNameKeypress($event, track)"
@@ -71,7 +71,7 @@
                 
                 <div class="form-group col-md-8">
                     <!-- Hide weighting if uniformRandom is set -->
-                    <label ng-hide="experiment.uniformRandom">
+                    <label ng-if="!experiment.uniformRandom">
                         <input type="number" min="0" max="100" step="1"
                                 data-track="value" data-trackindex="1"
                                 maxlength="2" size="2" placeholder="0"
@@ -138,8 +138,8 @@
                 <div ng-repeat="track in experiment.tracks">
                     <dt ng-cloak>Track "{{track.name}}":</dt>
                         <!-- Show different weighting if uniformRandom is set -->
-                        <dd ng-cloak ng-hide="experiment.uniformRandom">{{track.weighting}}%</dd>
-                        <dd ng-cloak ng-show="experiment.uniformRandom">{{uniformPercent()}}%</dd>
+                        <dd ng-cloak ng-if="!experiment.uniformRandom">{{track.weighting}}%</dd>
+                        <dd ng-cloak ng-if="experiment.uniformRandom">{{uniformPercent()}}%</dd>
                 </div>
             <!-- End Angular loop over tracks -->
             <dt>Notes:</dt><dd>{{experiment.notes}}</dd>
