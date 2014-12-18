@@ -143,8 +143,10 @@ class SessionTestCase(TestCase):
                 course_id=course_id, weighting=weighting, track=track,
                 experiment=experiment)
     
-    def create_test_intervention_point(self, course_id=TEST_COURSE_ID, name="testip"):
-        experiment = Experiment.get_placeholder_course_experiment(course_id)
+    def create_test_intervention_point(self, course_id=TEST_COURSE_ID, name="testip",
+                                       experiment=None):
+        if not experiment:
+            experiment = Experiment.get_placeholder_course_experiment(course_id)
         return InterventionPoint.objects.create(name=name, course_id=course_id,
                                                 experiment=experiment)
 

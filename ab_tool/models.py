@@ -18,6 +18,15 @@ class TimestampedModel(models.Model):
         for k, v in kwargs.iteritems():
             setattr(self, k, v)
         self.save()
+    
+    def save_as_new_object(self, **kwargs):
+        """ Saves a new object based on the original, applying updates in
+            kwargs.  Note that this operates in-place; do not use this if
+            other memory references to this object exist """
+        for k, v in kwargs.iteritems():
+            setattr(self, k, v)
+        self.pk, self.id = None, None
+        self.save()
 
 
 class CourseObject(TimestampedModel):
@@ -81,6 +90,34 @@ class Experiment(CourseObject):
         }
         return json.dumps(experiment_dict)
     
+    def copy(self, new_name):
+        tracks = self.tracks.all()
+        intervention_points = self.intervention_points.all()
+        # Copy Experiment
+        self.save_as_new_object(name=new_name, tracks_finalized=False)
+        
+        # Copy Tracks
+        track_id_mapping = {}
+        for track in tracks:
+            original_track_id = track.id
+            track.save_as_new_object(experiment=self)
+            track_id_mapping[original_track_id] = track
+            # Copy TrackProbabilityWeight, if any
+            try:
+                weight = TrackProbabilityWeight.objects.get(track_id=original_track_id)
+                weight.save_as_new_object(track=track)
+            except TrackProbabilityWeight.DoesNotExist:
+                pass
+        
+        # Copy InterventionPoints
+        for intervention_point in intervention_points:
+            orig_ip_id = intervention_point.id
+            intervention_point.save_as_new_object(experiment=self)
+            # Copy InterventionPointUrls, if any
+            for ip_url in InterventionPointUrl.objects.filter(intervention_point_id=orig_ip_id):
+                ip_url.save_as_new_object(track=track_id_mapping[ip_url.track.id],
+                                          intervention_point=intervention_point)
+    
     @classmethod
     def get_placeholder_course_experiment(cls, course_id):
         """ Gets or creates a single experiment for the course.  Placeholder
@@ -97,6 +134,8 @@ class Track(CourseObject):
         unique_together = (('experiment', 'name'),)
     
     def set_weighting(self, new_weighting):
+        if new_weighting is None:
+            new_weighting = 0
         try:
             self.weight.update(weighting=new_weighting)
         except TrackProbabilityWeight.DoesNotExist:

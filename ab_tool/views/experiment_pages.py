@@ -4,12 +4,12 @@ from django_auth_lti.decorators import lti_role_required
 from django.core.urlresolvers import reverse
 
 from ab_tool.constants import ADMINS
-from ab_tool.models import Track, Experiment
+from ab_tool.models import (Track, Experiment)
 from ab_tool.canvas import get_lti_param, CanvasModules
 from ab_tool.exceptions import (NO_TRACKS_FOR_EXPERIMENT,
     INTERVENTION_POINTS_ARE_INSTALLED)
 from django.http.response import HttpResponse
-from ab_tool.controllers import (post_param, get_missing_track_weights,
+from ab_tool.controllers import (get_missing_track_weights,
     get_incomplete_intervention_points)
 
 
@@ -116,6 +116,18 @@ def submit_edit_experiment(request, experiment_id):
         track = experiment.new_track(track_dict["name"])
         if not uniform_random:
             track.set_weighting(track_dict["weighting"])
+    return redirect(reverse("ab_testing_tool_index"))
+
+
+@lti_role_required(ADMINS)
+def copy_experiment(request, experiment_id):
+    course_id = get_lti_param(request, "custom_canvas_course_id")
+    experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
+    new_name = "%s_copy" % experiment.name
+    num_experiments = Experiment.objects.filter(
+            course_id=course_id, name__startswith=new_name).count()
+    new_name = "%s%s" % (new_name, num_experiments + 1)
+    experiment.copy(new_name)
     return redirect(reverse("ab_testing_tool_index"))
 
 

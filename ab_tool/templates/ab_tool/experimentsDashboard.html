@@ -53,6 +53,8 @@
                             {% endif %}
                             <a type="button" class="btn btn-primary btn-xs" href="#createIntervention_{{experiment.id}}" id="add_intervention_point_button" data-toggle="modal">
                                 Add an Intervention Point </a>
+                            <a type="button" class="btn btn-primary btn-xs" href="{% url 'ab_testing_tool_copy_experiment' experiment.id %}" id="copy_experiment_button">
+                                Copy Experiment </a>
                             {% if experiment.tracks_finalized %}
                             <a type="button" class="btn btn-primary btn-xs" id="download_students_button" href="{% url 'ab_testing_tool_download_data' experiment.id %}">
                                 Download Students </a>
