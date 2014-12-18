@@ -319,7 +319,7 @@ class TestExperimentPages(SessionTestCase):
         self.assertOkay(response)
         self.assertEqual(Experiment.objects.count(), num_experiments + 1)
     
-    def test_copy_expeirment_unauthorized(self):
+    def test_copy_experiment_unauthorized(self):
         """ Tests that copy_experiment fails when unauthorized """
         self.set_roles([])
         experiment = self.create_test_experiment()

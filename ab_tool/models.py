@@ -91,13 +91,14 @@ class Experiment(CourseObject):
         return json.dumps(experiment_dict)
     
     def copy(self, new_name):
-        original_exp = Experiment.objects.get(pk=self.pk)
+        tracks = self.tracks.all()
+        intervention_points = self.intervention_points.all()
         # Copy Experiment
         self.save_as_new_object(name=new_name, tracks_finalized=False)
         
         # Copy Tracks
         track_id_mapping = {}
-        for track in original_exp.tracks.all():
+        for track in tracks:
             original_track_id = track.id
             track.save_as_new_object(experiment=self)
             track_id_mapping[original_track_id] = track
@@ -109,7 +110,7 @@ class Experiment(CourseObject):
                 pass
         
         # Copy InterventionPoints
-        for intervention_point in original_exp.intervention_points.all():
+        for intervention_point in intervention_points:
             orig_ip_id = intervention_point.id
             intervention_point.save_as_new_object(experiment=self)
             # Copy InterventionPointUrls, if any
