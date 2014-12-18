@@ -151,7 +151,7 @@ var controller = function($scope, $window, $http) {
         }
     }
     
-    $scope.editTrackName = function(track, element) {
+    $scope.editTrackName = function(track) {
         /**
          * Set editing to true for the given track and false on all others
          */
