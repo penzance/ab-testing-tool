@@ -189,28 +189,108 @@ main {
   display: inline-block;
   width: 100%;
 }
-label.block {
+.float-left {
+  float: left;
+}
+.block {
   display: block;
+}
+label {
+  color: #333333;
+  font-size: 1em;
+  font-family: "HelveticaNeue-Bold", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  margin-bottom: 1em;
+  display: inline-block;
+}
+fieldset {
+  width: 100%;
+  margin: 0;
+  padding: 1em 0;
+  border-width: 0px 0px 1px 0px;
+}
+fieldset.fieldset-btn {
+  border: 0;
+  text-align: right;
 }
 .form-control {
   display: block;
   height: 1em;
-  padding: 1em;
+  padding: 0.55em 1%;
   font-size: 1em;
   line-height: 1em;
   color: #000;
   vertical-align: middle;
   background-color: transparent;
   background-image: none;
-  border: 1px solid solid;
+  border: solid 1px #d2d2d2;
   border-radius: 5px;
+  box-shadow: none;
+  width: 98%;
 }
 .form-control[disabled], .form-control[readonly], fieldset[disabled] .form-control {
   cursor: not-allowed;
   background-color: gray;
 }
-textarea .form-control {
+textarea.form-control {
   height: auto;
+}
+.input-group-right {
+  display: block;
+  height: 1em;
+  padding: 0.55em 1%;
+  font-size: 1em;
+  line-height: 1em;
+  color: #000;
+  vertical-align: middle;
+  background-color: transparent;
+  background-image: none;
+  border: solid 1px #d2d2d2;
+  border-radius: 5px;
+  box-shadow: none;
+  width: 98%;
+  width: 3.544776119402985%;
+  border-right: 0;
+  border-bottom-right-radius: 0;
+  border-top-right-radius: 0;
+  text-align: center;
+}
+.input-group-right[disabled], .input-group-right[readonly], fieldset[disabled] .input-group-right {
+  cursor: not-allowed;
+  background-color: gray;
+}
+.input-group-right  + span {
+  display: block;
+  height: 1em;
+  padding: 0.55em 1%;
+  font-size: 1em;
+  line-height: 1em;
+  color: #000;
+  vertical-align: middle;
+  background-color: transparent;
+  background-image: none;
+  border: solid 1px #d2d2d2;
+  border-radius: 5px;
+  box-shadow: none;
+  width: 98%;
+  width: 2.6119402985074625%;
+  display: inline-block;
+  border-bottom-left-radius: 0;
+  border-top-left-radius: 0;
+  text-align: center;
+  float: left;
+}
+.input-group-right  + span[disabled], .input-group-right  + span[readonly], fieldset[disabled] .input-group-right  + span {
+  cursor: not-allowed;
+  background-color: gray;
+}
+.form-group {
+  width: 60%;
+  float: left;
+  margin-right: 2%;
+}
+.form-group-description {
+  width: 38%;
+  float: left;
 }
 .panel {
   display: inline-block;
@@ -274,10 +354,12 @@ ul, ol, dl {
 .list-withfloats {
   display: inline-block;
   width: 100%;
+  margin-bottom: 1em;
 }
 .list-withfloats li {
   display: inline-block;
   width: 100%;
+  margin-bottom: 0.5em;
 }
 .list-dashboard-totals {
   display: table;
@@ -308,11 +390,51 @@ ul, ol, dl {
   display: inline-block;
   text-align: center;
 }
+.btn.disabled, .btn[disabled], fieldset[disabled] .btn {
+  cursor: not-allowed;
+  pointer-events: none;
+  opacity: 0.65;
+  filter: alpha(opacity=65);
+}
 .btn-icon {
   text-decoration: none;
 }
 .btn-icon .fa {
   padding-right: 0.5em;
+}
+.btn-submit {
+  height: 1em;
+  padding: 0.55em 1%;
+  border-radius: 5px;
+  background-color: #cecece;
+  border: solid 1px #c3c3c3;
+  margin-left: 0.5em;
+  color: #525252;
+}
+.btn-submit-primary {
+  height: 1em;
+  padding: 0.55em 1%;
+  border-radius: 5px;
+  background-color: #cecece;
+  border: solid 1px #c3c3c3;
+  margin-left: 0.5em;
+  color: #525252;
+  background-color: #3e67a2;
+  color: #fafafa;
+}
+/* link look and feel but with the padding
+and spacing to match a btn-submit */
+.btn-link {
+  height: 1em;
+  padding: 0.55em 1%;
+  border-radius: 5px;
+  background-color: #cecece;
+  border: solid 1px #c3c3c3;
+  margin-left: 0.5em;
+  color: #525252;
+  background-color: transparent;
+  border: 0;
+  color: #3e67a2;
 }
 .btn-icon-only {
   padding: 0.5em;
@@ -496,4 +618,65 @@ a:hover {
 }
 /***********************************************************************************
 					EXP DASHBOARD (END)
+/**********************************************************************************/
+/***********************************************************************************
+					NEW EXPERIMENT FORM (START)
+/**********************************************************************************/
+#exp-track-newWeight {
+  margin-left: 2.3em;
+}
+#exp-track-newName {
+  width: 20%;
+  margin-left: 1em;
+}
+.btn.disabled {
+  color: #9e9d9d;
+}
+/***********************************************************************************
+					NEW EXPERIMENT FORM (END)
+/**********************************************************************************/
+/***********************************************************************************
+					modal (start)
+/**********************************************************************************/
+.modal-screen {
+  background: #717174;
+  position: absolute;
+  width: 100%;
+  overflow: hidden;
+  height: 100%;
+  top: 0;
+  left: 0;
+  opacity: .9;
+  z-index: 9999;
+}
+.modal-screen iframe {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 0;
+  margin: 0;
+  opacity: 0;
+}
+/* this class gets added with js when the popup is open to hide
+	scrollbars, so that the user is not able to scroll the dialog out of view */
+body.blocked {
+  overflow: hidden;
+}
+#dialog {
+  background: #fff;
+  position: absolute;
+  width: 250px;
+  top: 20%;
+  left: 50%;
+  margin-left: -125px;
+  -o-box-shadow: 0 0 8px #111;
+  -moz-box-shadow: 0 0 8px #111;
+  -webkit-box-shadow: 0 0 8px #111;
+  box-shadow: 0 0 8px #111;
+  z-index: 10000;
+}
+/***********************************************************************************
+					modal (END)
 /**********************************************************************************/
