@@ -97,6 +97,8 @@ class Track(CourseObject):
         unique_together = (('experiment', 'name'),)
     
     def set_weighting(self, new_weighting):
+        if new_weighting is None:
+            new_weighting = 0
         try:
             self.weight.update(weighting=new_weighting)
         except TrackProbabilityWeight.DoesNotExist:
