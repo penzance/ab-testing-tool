@@ -395,9 +395,9 @@ hr {
   height: 50px;
   overflow: scroll;
 }
-/*@media (min-width: 768px) {
+@media (min-width: 768px) {
   .modal-dialog {
-    width: 600px;
+    width: 60%; /* ((768 / 1280) * 100) */
     margin: 30px auto;
   }
   .modal-content {
@@ -412,7 +412,7 @@ hr {
   .modal-lg {
     width: 900px;
   }
-}*/
+}
 .tooltip {
   position: absolute;
   z-index: 1070;

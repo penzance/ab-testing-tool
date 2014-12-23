@@ -422,6 +422,9 @@ ul, ol, dl {
   background-color: #3e67a2;
   color: #fafafa;
 }
+button.btn-submit-primary {
+  height: auto;
+}
 /* link look and feel but with the padding
 and spacing to match a btn-submit */
 .btn-link {
@@ -622,12 +625,18 @@ a:hover {
 /***********************************************************************************
 					NEW EXPERIMENT FORM (START)
 /**********************************************************************************/
-#exp-track-newWeight {
+.input-newWeight {
   margin-left: 2.3em;
 }
-#exp-track-newName {
+.input-newTrackName {
   width: 20%;
   margin-left: 1em;
+  /*margin for when uniform random is selected*/
+
+}
+.input-newTrackName-uniformrandom {
+  width: 20%;
+  margin-left: 5.5%;
 }
 .btn.disabled {
   color: #9e9d9d;
