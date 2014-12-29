@@ -220,7 +220,7 @@ class TestExperimentPages(SessionTestCase):
         experiment_id = experiment.id
         num_experiments = Experiment.objects.count()
         experiment = {
-                "name": "new_name", "notes": "new_notes"
+                "name": "new_name", "notes": "new_notes", "tracks": [],
         }
         response = self.client.post(
             reverse("ab_testing_tool_submit_edit_experiment", args=(experiment_id,)),
@@ -298,7 +298,7 @@ class TestExperimentPages(SessionTestCase):
         second_num_experiments = Experiment.objects.count()
         self.assertEqual(first_num_experiments, second_num_experiments)
         self.assertEquals(response.status_code, 404)
-
+    
     def test_delete_experiment_wrong_course(self):
         """ Tests that delete_experiment method raises error for existent Experiment but for
             wrong course """

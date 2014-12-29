@@ -97,6 +97,7 @@ def submit_edit_experiment(request, experiment_id):
     notes = experiment_dict["notes"]
     if experiment.tracks_finalized:
         # Only allow updating name, notes, and track names for started experiments
+        experiment.update(name=name, notes=notes)
         existing_tracks = [i for i in experiment_dict["tracks"] if i["id"] is not None]
         for track_dict in existing_tracks:
             track = Track.get_or_404_check_course(track_dict["id"], course_id)
