@@ -64,6 +64,13 @@
                             <a type="button" class="btn btn-primary btn-xs disabled" id="download_intervention_point_interactions_button">
                                 Download Interactions </a>
                             {% endif %}
+                            {% if experiment.id in deletable_experiment_ids %}
+                            <a type="button" class="btn btn-primary btn-xs" href="#delete_modal{{experiment.id}}" data-toggle="modal" id="delete_experiment_button">
+                                Delete Experiment </a>
+                            {% else %}
+                            <a type="button" class="btn btn-primary btn-xs disabled" id="delete_experiment_button">
+                                Delete Experiment </a>
+                            {% endif %}
                         </div>
                     </div>
                     <ul class="list-group">

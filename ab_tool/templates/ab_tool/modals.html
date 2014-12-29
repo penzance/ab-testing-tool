@@ -176,3 +176,27 @@
 </div>
 <!-- END Modal code for Finalize Tracks confirmation box-->
 {% endfor %}
+
+
+{% for experiment in experiments %}
+<!-- START Modal code for Delete Experiment confirmation box-->
+<div id="delete_modal{{experiment.id}}" class="modal fade" role="dialog" aria-labelledby="delete_modal{{experiment.id}}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Delete Experiment Confirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this experiment?</p>
+                <p class="text-warning">Are you sure you want to delete experiment "{{experiment.name}}"?  This will also delete all intervention points for this experiment.</p>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-lg btn-primary" data-dismiss="modal"> Close </a>
+                <a class="btn btn-lg btn-danger"  href="{% url 'ab_testing_tool_delete_experiment' experiment.id %}"> Yes, Delete Experiment </a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END Modal code for Delete Experiment confirmation box-->
+{% endfor %}
