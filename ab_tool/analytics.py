@@ -16,7 +16,7 @@ def log_intervention_point_interaction(course_id, student, intervention_point,
             intervention_point=intervention_point,
             experiment=experiment,
             track=track,
-            intervention_point_url=intervention_point_url
+            url=intervention_point_url.url
     )
 
 
@@ -56,7 +56,7 @@ def get_intervention_point_interactions_csv(experiment, file_title):
         for i in InterventionPointInteraction.objects.filter(experiment=experiment):
             row = [i.student.student_id, i.student.lis_person_sourcedid,
                    i.experiment.name, i.track.name,
-                   i.intervention_point.name, i.intervention_point_url.url, i.created_on]
+                   i.intervention_point.name, i.url, i.created_on]
             yield writer.writerow(row)
     response = StreamingHttpResponse(csv_file_generator(), content_type="text/csv")
     response['Content-Disposition'] = ("attachment; filename=%s" % file_title)
