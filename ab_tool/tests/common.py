@@ -122,9 +122,10 @@ class SessionTestCase(TestCase):
                             "non-deterministic")
     
     def create_test_experiment(self, course_id=TEST_COURSE_ID, name="testexperiment",
-                               assignment_method=Experiment.UNIFORM_RANDOM):
+                               assignment_method=Experiment.UNIFORM_RANDOM, **kwargs):
         return Experiment.objects.create(name=name, course_id=course_id,
-                                         assignment_method=assignment_method)
+                                         assignment_method=assignment_method,
+                                         **kwargs)
     
     def create_test_track(self, course_id=TEST_COURSE_ID, name="testtrack", experiment=None):
         if not experiment:

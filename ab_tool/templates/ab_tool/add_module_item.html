@@ -13,7 +13,7 @@
         <br>
         <select name="intervention_point_id">
         {% for intervention_point in intervention_points %}
-            <option value="{{intervention_point.id}}">Intervention Point <span>"{{intervention_point.name}}"</span></option>
+            <option value="{{intervention_point.id}}">Experiment "{{intervention_point.experiment.name}}", Intervention Point <span>"{{intervention_point.name}}"</span></option>
         {%endfor %}
         </select>
     <input type="hidden" value="{{content_return_url}}" name="content_return_url">

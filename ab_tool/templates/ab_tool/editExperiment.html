@@ -33,26 +33,29 @@
                         class="form-control" ng-model="experiment.name" placeholder="Experiment Name">
                 </div>
                 
-                {% verbatim %}
                 <div class="form-group col-md-8" id="expStructure">
                     <label>Experiment structure</label><br>
                     <ul id="expWeights" class="list-unstyled">
                         <!-- Angular loop over tracks -->
                             <li ng-cloak class="expTrack" ng-repeat="track in experiment.tracks">
-                                <a data-track="delete" ng-if="experiment.tracks.length > 2"
-                                    ng-cloak ng-click="deleteTrack(track)">X</a>
+                                {% if not started %}
+                                    <a data-track="delete" ng-if="experiment.tracks.length > 2"
+                                        ng-cloak ng-click="deleteTrack(track)">X</a>
+                                {% endif %}
                                 <!-- Show different weighting if uniformRandom is set -->
                                 <label ng-if="!experiment.uniformRandom">
                                     <input type="number" min="0" max="100" step="1"
                                         data-track="value" data-trackindex="1"
                                         maxlength="2" size="2"
-                                        ng-pattern="/^\d+$/" ng-model="track.weighting"> %
+                                        ng-pattern="/^\d+$/" ng-model="track.weighting"
+                                        {%if started %}disabled="disabled"{% endif %}> %
                                 </label>
                                 <label ng-if="experiment.uniformRandom">
                                     <input type="text" disabled="disabled" size="2"
-                                        ng-cloak value="{{uniformPercent()}}">%
+                                        {% verbatim %}ng-cloak value="{{uniformPercent()}}">%{% endverbatim %}
                                 </label>
                                 <label class="control-label">
+                                {% verbatim %}
                                     <a data-track="name" title="Edit track name"
                                         ng-cloak ng-click="editTrackName(track)"
                                         ng-if="!track.editing">Track {{track.name}}</a>
@@ -62,28 +65,35 @@
                                         ng-keypress="trackNameKeypress($event, track)"
                                         ng-blur="trackNameChanged(track)">
                                     </label>
+                                {% endverbatim %}
                                 </label>
                             </li>
                         <!-- End Angular loop over tracks -->
                     </ul>
                 </div>
-                {% endverbatim %}
                 
-                <div class="form-group col-md-8">
-                    <!-- Hide weighting if uniformRandom is set -->
-                    <label ng-if="!experiment.uniformRandom">
-                        <input type="number" min="0" max="100" step="1"
-                                data-track="value" data-trackindex="1"
-                                maxlength="2" size="2" placeholder="0"
-                                ng-pattern="/^\d+$/" ng-model="newTrackWeighting"> %
-                    </label>
-                    <input type="text" name="newTrackName" id="newTrackName" placeholder="Enter track name" ng-model="newTrackName">
-                    <a ng-click="addTrack()" class="btn btn-default btn-xs" id="addTrack">Add Track</a>
-                </div>
+                {% if not started %}
+                    <div class="form-group col-md-8">
+                        <!-- Hide weighting if uniformRandom is set -->
+                        <label ng-if="!experiment.uniformRandom">
+                            <input type="number" min="0" max="100" step="1"
+                                    data-track="value" data-trackindex="1"
+                                    maxlength="2" size="2" placeholder="0"
+                                    ng-pattern="/^\d+$/" ng-model="newTrackWeighting"> %
+                        </label>
+                        <input type="text" name="newTrackName" id="newTrackName" placeholder="Enter track name" ng-model="newTrackName">
+                        <a ng-click="addTrack()" class="btn btn-default btn-xs" id="addTrack">Add Track</a>
+                    </div>
+                {% endif %}
                 
                 <div class="panel panel-default col-md-8">
                     <div class="panel-body">
-                        <label><input type="checkbox" name="uniformRandom" ng-model="experiment.uniformRandom"> Give each track equal weighting (uniform random)</label>
+                        <label>
+                            <input type="checkbox" name="uniformRandom"
+                                ng-model="experiment.uniformRandom"
+                                {%if started %}disabled="disabled"{% endif %}>
+                            Give each track equal weighting (uniform random)
+                        </label>
                     </div>
                 </div>
                 
@@ -166,28 +176,21 @@
 
 {% block javascript %}
 {{ block.super }}
-{% if create %}
-    <script type="text/javascript">
-    
-    window.initialExperiment = {"name": "", "notes": "", "uniformRandom": true,
+<script type="text/javascript">
+    {% if create %}
+        window.initialExperiment = {"name": "", "notes": "", "uniformRandom": true,
         "tracks": [{"id": null, "name": "A", "newName": "A"},
                    {"id": null, "name": "B", "newName": "B"}]};
-    window.modifiedExperiment = JSON.parse(JSON.stringify(window.initialExperiment));
+        window.modifiedExperiment = JSON.parse(JSON.stringify(window.initialExperiment));
+        
+        window.submitURL = "{% url 'ab_testing_tool_submit_create_experiment' %}";
+    {% else %}
+        window.initialExperiment = JSON.parse("{{ experiment.to_json | escapejs}}");
+        window.modifiedExperiment = JSON.parse("{{ experiment.to_json | escapejs}}");
+        
+        window.submitURL = "{% url 'ab_testing_tool_submit_edit_experiment' experiment.id %}";
+    {% endif %}
     
-    window.submitURL = "{% url 'ab_testing_tool_submit_create_experiment' %}";
-    
-    </script>
-{% else %}
-    <script type="text/javascript">
-    
-    window.initialExperiment = JSON.parse("{{ experiment.to_json | escapejs}}");
-    window.modifiedExperiment = JSON.parse("{{ experiment.to_json | escapejs}}");
-    
-    window.submitURL = "{% url 'ab_testing_tool_submit_edit_experiment' experiment.id %}";
-    
-    </script>
-{% endif %}
-<script type="text/javascript">
     window.parentPage = "{% url 'ab_testing_tool_index' %}";
 </script>
 

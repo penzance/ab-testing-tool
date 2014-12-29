@@ -157,9 +157,11 @@ class TestMainPages(SessionTestCase):
                                          track=track, experiment=experiment)
         intervention_point = self.create_test_intervention_point(course_id=TEST_COURSE_ID)
         InterventionPointInteraction.objects.create(course_id=TEST_COURSE_ID, student=student,
-                    intervention_point=intervention_point, experiment=experiment)
+                    intervention_point=intervention_point, experiment=experiment,
+                    track=track, url="http://example.com")
         InterventionPointInteraction.objects.create(course_id=TEST_COURSE_ID, student=student,
-                    intervention_point=intervention_point, experiment=experiment)
+                    intervention_point=intervention_point, experiment=experiment,
+                    track=track, url="http://example.com")
         response = self.client.get(reverse("ab_testing_tool_download_intervention_point_interactions", args=(experiment.id,)))
         self.assertEqual(response._headers["content-type"],
                          ('Content-Type', 'text/csv'))
@@ -177,10 +179,12 @@ class TestMainPages(SessionTestCase):
                                          track=track, experiment=experiment2)
         intervention_point1 = self.create_test_intervention_point(course_id=TEST_COURSE_ID)
         InterventionPointInteraction.objects.create(course_id=TEST_COURSE_ID, student=student1,
-                    intervention_point=intervention_point1, experiment=experiment1)
+                    intervention_point=intervention_point1, experiment=experiment1,
+                    track=track, url="http://example.com")
         intervention_point2 = self.create_test_intervention_point(course_id=TEST_OTHER_COURSE_ID)
         InterventionPointInteraction.objects.create(course_id=TEST_OTHER_COURSE_ID, student=student2,
-                    intervention_point=intervention_point2, experiment=experiment2)
+                    intervention_point=intervention_point2, experiment=experiment2,
+                    track=track, url="http://example.com")
         response = self.client.get(reverse("ab_testing_tool_download_intervention_point_interactions", args=(experiment1.id,)))
         self.assertEqual(response._headers["content-type"],
                          ('Content-Type', 'text/csv'))

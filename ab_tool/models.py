@@ -98,6 +98,8 @@ class Track(CourseObject):
         unique_together = (('experiment', 'name'),)
     
     def set_weighting(self, new_weighting):
+        if new_weighting is None:
+            new_weighting = 0
         try:
             self.weight.update(weighting=new_weighting)
         except TrackProbabilityWeight.DoesNotExist:
@@ -190,4 +192,4 @@ class InterventionPointInteraction(CourseObject):
     intervention_point = models.ForeignKey(InterventionPoint)
     experiment = models.ForeignKey(Experiment, related_name="intervention_point_interactions")
     track = models.ForeignKey(Track)
-    intervention_point_url = models.ForeignKey(InterventionPointUrl)
+    url = models.URLField(max_length=2048)
