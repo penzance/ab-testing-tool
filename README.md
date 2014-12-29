@@ -101,10 +101,12 @@ All commands here should be run from the ab-testing-tool directory
 
 * Update the code via `git pull`.
 
-* Run the tool via `python manage.py runserver`.
+* Update the database with `python manage.py migrate`
 
-* If you get an error about the database, delete your local database and create
-  a new one with `rm ab_testing_tool/db.sqlite3` and then `python manage.py syncdb`.
+* If you get an error during migrations, delete your local database and create
+  a new one with `rm ab_testing_tool/db.sqlite3` and then `python manage.py migrate`.
+
+* Run the tool via `python manage.py runserver`.
 
 * If you get an import error, update requirements with 
   `sudo pip install -r ab_testing_tool/requirements/local.txt`
