@@ -208,9 +208,9 @@ class InterventionPointUrl(TimestampedModel):
 
 class ExperimentStudent(CourseObject):
     """ This model stores which track a student is in for a given experiment
-        within a given course.  A real-world can be represented by multiple
-        ExperimentStudent objects, and will have a separate object for each
-        experiment they are in. """
+        within a given course.  A real-world student can be represented by
+        multiple ExperimentStudent objects, and will have a separate object for
+        each experiment they are in. """
     student_id = models.CharField(max_length=128, db_index=True)
     lis_person_sourcedid = models.CharField(max_length=128, db_index=True, null=True)
     experiment = models.ForeignKey(Experiment, related_name="students")
