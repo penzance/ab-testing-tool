@@ -1,7 +1,7 @@
 import logging
 import traceback
-from canvas_sdk.methods import modules
 from canvas_sdk import RequestContext
+from canvas_sdk.methods import modules
 from django.conf import settings
 
 from ab_tool.exceptions import (MISSING_LTI_PARAM, MISSING_LTI_LAUNCH,
@@ -14,6 +14,7 @@ from django_canvas_oauth.exceptions import NewTokenNeeded
 
 
 logger = logging.getLogger(__name__)
+
 
 class CanvasModules(object):
     

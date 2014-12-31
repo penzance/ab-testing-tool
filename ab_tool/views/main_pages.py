@@ -11,7 +11,7 @@ from ab_tool.canvas import get_lti_param, CanvasModules
 from ab_tool.controllers import post_param
 from ab_tool.models import (InterventionPoint, Experiment)
 from ab_tool.constants import ADMINS
-from ab_tool.analytics import (get_student_list_csv,
+from ab_tool.spreadsheets import (get_student_list_csv,
     get_intervention_point_interactions_csv)
 
 

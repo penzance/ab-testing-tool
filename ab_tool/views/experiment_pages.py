@@ -164,3 +164,4 @@ def finalize_tracks(request, experiment_id):
     experiment.tracks_finalized = True
     experiment.save()
     return redirect(reverse("ab_testing_tool_index"))
+

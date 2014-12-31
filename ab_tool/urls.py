@@ -38,5 +38,4 @@ urlpatterns = patterns('',
     url(r'^delete_track/(?P<track_id>\d+)$', delete_track, name='ab_testing_tool_delete_track'),
     url(r'^finalize_tracks/(?P<experiment_id>\d+)$', finalize_tracks, name='ab_testing_tool_finalize_tracks'),
     url(r'^copy_experiment/(?P<experiment_id>\d+)$', copy_experiment, name='ab_testing_tool_copy_experiment'),
-
 )
