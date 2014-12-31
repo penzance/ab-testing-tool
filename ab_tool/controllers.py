@@ -6,7 +6,7 @@ from random import choice
 from ab_tool.models import (TrackProbabilityWeight, Experiment, ExperimentStudent)
 from ab_tool.exceptions import (BAD_STAGE_ID, missing_param_error,
     INPUT_NOT_ALLOWED, NO_TRACKS_FOR_EXPERIMENT, TRACK_WEIGHTS_NOT_SET,
-    CSV_UPLOAD_NEEDED)
+    CSV_UPLOAD_NEEDED, NoValidCredentials)
 
 
 def assign_track_and_create_student(experiment, student_id, lis_person_sourcedid):

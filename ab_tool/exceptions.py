@@ -1,6 +1,8 @@
 from error_middleware.exceptions import (Renderable500, Renderable400,
     Renderable403, Renderable404)
 
+class NoValidCredentials(Exception): pass
+
 NO_SDK_RESPONSE = Renderable500("Canvas SDK returned an error")
 
 MISSING_LTI_LAUNCH = Renderable400("LTI_LAUNCH not in session")
@@ -25,6 +27,7 @@ NO_TRACKS_FOR_EXPERIMENT = Renderable404("No tracks have been configured for thi
 CSV_UPLOAD_NEEDED = Renderable404("New CSV upload needed. If you are a student, notify your course instructors regarding this page before returning here.")
 TRACK_WEIGHTS_NOT_SET = Renderable404("Missing track configuration. If you are a student, notify your course instructors regarding this page before returning here.")
 INPUT_NOT_ALLOWED = Renderable404("Input does not follow requirements")
+INVALID_FILE_TYPE = Renderable404("File type must be csv, xls, or xlsx")
 
 CSV_ERROR = Renderable500("There was a problem preparing the CSV file for download")
 

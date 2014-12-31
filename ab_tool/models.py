@@ -1,9 +1,11 @@
+from datetime import timedelta
 from django.db import models
 from django.shortcuts import get_object_or_404
 from ab_tool.exceptions import (UNAUTHORIZED_ACCESS,
     EXPERIMENT_TRACKS_ALREADY_FINALIZED)
 import json
 from django.core.urlresolvers import reverse
+from django.utils import timezone
 
 
 class TimestampedModel(models.Model):
@@ -229,3 +231,66 @@ class InterventionPointInteraction(CourseObject):
     experiment = models.ForeignKey(Experiment, related_name="intervention_point_interactions")
     track = models.ForeignKey(Track)
     url = models.URLField(max_length=2048)
+
+
+class Course(TimestampedModel):
+    course_id = models.CharField(max_length=128, unique=True)
+    last_emailed = models.DateTimeField(null=True)
+    canvas_url = models.URLField(max_length=2048)
+    
+    COURSE_ACTIVE_DAYS = 356
+    NOTIFICATION_FREQUENCY_HOURS = 24
+    
+    @classmethod
+    def get_notification_courses(cls):
+        return [c for c in cls.objects.all() if c.can_notify()]
+    
+    @classmethod
+    def store_credential(cls, course_id, canvas_url, email, oauth_token):
+        course = cls.objects.get_or_create(
+                course_id=course_id, defaults={"canvas_url": canvas_url})[0]
+        credential, created = CourseCredentials.objects.get_or_create(
+                course=course, email=email, defaults={"token": oauth_token})
+        if not created:
+            credential.update(token=oauth_token)
+    
+    def can_notify(self):
+        """ Returns a boolean as to whether or not a notification can be sent
+            if all of the following are true:
+              * The course was created in the last year
+              * A notification has not already been sent within the
+                minimum amount of time to wait between notifications,
+              * There is at least one started experiment with CSV upload
+                for that course.
+            
+            TODO: change the logic for course expiration to be dynamic """
+        expiration = self.created_on + timedelta(days=self.COURSE_ACTIVE_DAYS)
+        if timezone.now() > expiration:
+            return False
+        wait_time = timedelta(hours=self.NOTIFICATION_FREQUENCY_HOURS)
+        if self.last_emailed is not None and timezone.now() < self.last_emailed + wait_time:
+            return False
+        return self.experiments_to_check().count() > 0
+    
+    def experiments_to_check(self):
+        """ TODO: Include intent-to-treat experiments when that is supported """
+        return Experiment.objects.filter(
+                course_id=self.course_id, tracks_finalized=True,
+                assignment_method=Experiment.CSV_UPLOAD
+        )
+    
+    def get_emails(self):
+        return [credential.email for credential in self.credentials.all()]
+    
+    def notification_sent(self):
+        self.update(last_emailed=timezone.now())
+
+
+class CourseCredentials(TimestampedModel):
+    """ Stores oauth tokens and emails for people in the course """
+    course = models.ForeignKey(Course, related_name="credentials")
+    email = models.EmailField(max_length=2048)
+    token = models.CharField(max_length=128)
+    
+    class Meta:
+        unique_together = (('course', 'email'),)

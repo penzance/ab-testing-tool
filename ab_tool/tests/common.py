@@ -19,6 +19,7 @@ TEST_COURSE_ID = "12345"
 TEST_OTHER_COURSE_ID = "5555555"
 TEST_DOMAIN = "example.com"
 TEST_STUDENT_ID = "70707707"
+TEST_EMAIL = "test@example.com"
 
 NONEXISTENT_STAGE_ID = 12345678987654321 #111111111^2
 NONEXISTENT_TRACK_ID = 31415926535897932 #pi
@@ -54,6 +55,7 @@ class SessionTestCase(TestCase):
         lti_launch["custom_canvas_user_login_id"] = TEST_STUDENT_ID
         lti_launch["lis_person_sourcedid"] = TEST_STUDENT_ID
         lti_launch["context_title"] = "Course title"
+        lti_launch["lis_person_contact_email_primary"] = TEST_EMAIL
         session = self.client.session
         session["LTI_LAUNCH"] = lti_launch
         session.save()

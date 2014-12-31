@@ -1,3 +1,4 @@
+import csv
 import xlsxwriter
 import StringIO
 import xlrd
@@ -5,7 +6,8 @@ from django.http.response import HttpResponse
 
 from ab_tool.models import (ExperimentStudent, InterventionPointInteraction)
 from ab_tool.controllers import streamed_csv_response
-from ab_tool.canvas import get_unsorted_students
+from ab_tool.canvas import get_unassigned_students
+from ab_tool.exceptions import INVALID_FILE_TYPE
 
 
 def get_student_list_csv(experiment, file_title):
@@ -36,7 +38,7 @@ def get_track_selection_xlsx(request, experiment, file_title="test.xlsx"):
     worksheet.set_column(0, 3, 20)
     headers = ["Student ID", "LIS Person Sourcedid", "Experiment", "Assigned Track"]
     worksheet.write_row(0, 0, headers)
-    students = get_unsorted_students(request, experiment)
+    students = get_unassigned_students(request, experiment)
     # Row offsets of +1 below are to account for header
     for i, student in enumerate(students):
         row = [student["student_id"], student["lis_person_sourcedid"], experiment.name, ""]
@@ -57,12 +59,25 @@ def get_track_selection_csv(request, experiment, file_title="test.xlsx"):
     def row_generator():
         yield ["Student ID", "LIS Person Sourcedid", "Experiment", "Assigned Track"]
         # Write data to CSV file
-        for s in get_unsorted_students(request, experiment):
+        for s in get_unassigned_students(request, experiment):
             yield [s["student_id"], s["lis_person_sourcedid"], experiment.name, ""]
     return streamed_csv_response(row_generator(), file_title)
 
 
-def parse_track_selection_xlsx(input_excel):
-    workbook = xlrd.open_workbook(file_contents=input_excel.read())
-    worksheet = workbook.sheet_by_index(0)
-    # http://www.youlikeprogramming.com/2012/03/examples-reading-excel-xls-documents-using-pythons-xlrd/
+def parse_uploaded_file(experiment, input_spreadsheet, filename):
+    users = {}
+    if filename.endswith('.csv'):
+        csvreader = csv.reader(input_spreadsheet.split("\n"))
+        for row in csvreader:
+            if row[2] == experiment:
+                users[row[0]] = row[3]
+        return users
+    elif filename.endswith('.xlsx') or filename.endswith('.xls'):
+        book = xlrd.open_workbook(file_contents=input_spreadsheet.read())
+        sheet = book.sheet_by_index(0)
+        for row in range(sheet.nrows):
+            if sheet.cell_value(row, 2) == experiment:
+                users[sheet.cell_value(row, 0)] = sheet.cell_value(row, 3)
+        return users
+    else:
+        raise INVALID_FILE_TYPE
