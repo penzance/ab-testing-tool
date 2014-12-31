@@ -178,6 +178,3 @@ def track_selection_csv(request, experiment_id):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
     return get_track_selection_csv(request, experiment, "track_selection.csv")
-
-def test(request):
-    return HttpResponse(str(get_enrollments(request)))

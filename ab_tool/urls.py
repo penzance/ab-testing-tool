@@ -41,5 +41,4 @@ urlpatterns = patterns('',
     url(r'^copy_experiment/(?P<experiment_id>\d+)$', copy_experiment, name='ab_testing_tool_copy_experiment'),
     url(r'^track_selection_xlsx/(?P<experiment_id>\d+)$', track_selection_xlsx, name='ab_testing_tool_track_selection_xlsx'),
     url(r'^track_selection_csv/(?P<experiment_id>\d+)$', track_selection_csv, name='ab_testing_tool_track_selection_csv'),
-    url(r'^test$', test),
 )
