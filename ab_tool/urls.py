@@ -10,8 +10,7 @@ from ab_tool.views.intervention_point_pages import (submit_create_intervention_p
     submit_edit_intervention_point, modules_page_edit_intervention_point)
 from ab_tool.views.experiment_pages import (create_experiment, submit_create_experiment,
     edit_experiment, submit_edit_experiment, delete_experiment, finalize_tracks,
-    copy_experiment, delete_track, track_selection_xlsx, track_selection_csv,
-    test)
+    copy_experiment, delete_track, track_selection_xlsx, track_selection_csv)
 
 urlpatterns = patterns('',
     url(r'^$', render_control_panel, name='ab_testing_tool_index'),
