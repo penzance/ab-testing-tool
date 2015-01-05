@@ -26,6 +26,7 @@ def submit_create_experiment(request):
             {"name": name(str),
              "notes": notes(str),
              "uniformRandom": True/False,
+             "csvUpload": True/False,
              "tracks": [{"id": None # This is none for all because all tracks are new
                          "weighting": track_weighting(int),
                          "name": track_name(str),
@@ -40,7 +41,10 @@ def submit_create_experiment(request):
     notes = experiment_dict["notes"]
     uniform_random = experiment_dict["uniformRandom"]
     tracks = experiment_dict["tracks"]
-    if uniform_random:
+    csv_upload = experiment_dict["csvUplaod"]
+    if csv_upload:
+        assignment_method = Experiment.CSV_UPLOAD
+    elif uniform_random:
         assignment_method = Experiment.UNIFORM_RANDOM
     else:
         assignment_method = Experiment.WEIGHTED_PROBABILITY_RANDOM
@@ -52,7 +56,7 @@ def submit_create_experiment(request):
     # Update existing tracks
     for track_dict in tracks:
         track = experiment.new_track(track_dict["name"])
-        if not uniform_random:
+        if not uniform_random and not csv_upload:
             track.set_weighting(track_dict["weighting"])
     return HttpResponse("success")
 
@@ -83,6 +87,7 @@ def submit_edit_experiment(request, experiment_id):
             {"name": name(str),
              "notes": notes(str),
              "uniformRandom": True/False,
+             "csvUpload": True/False,
              "tracks": [{"id": track_id(int), # this is None if track is new
                          "weighting": track_weighting(int),
                          "name": track_name(str),
@@ -101,8 +106,11 @@ def submit_edit_experiment(request, experiment_id):
         experiment.update(name=name, notes=notes)
         return HttpResponse("success")
     uniform_random = experiment_dict["uniformRandom"]
+    csv_upload = experiment_dict["csvUplaod"]
     old_tracks = [i for i in experiment_dict["tracks"] if i["id"] is not None]
     new_tracks = [i for i in experiment_dict["tracks"] if i["id"] is None]
+    if csv_upload:
+        assignment_method = Experiment.CSV_UPLOAD
     if uniform_random:
         assignment_method = Experiment.UNIFORM_RANDOM
     else:
@@ -113,13 +121,13 @@ def submit_edit_experiment(request, experiment_id):
     for track_dict in old_tracks:
         track = Track.get_or_404_check_course(track_dict["id"], course_id)
         track.update(name=track_dict["name"])
-        if not uniform_random:
+        if not uniform_random and not csv_upload:
             track.set_weighting(track_dict["weighting"])
     
     # Create new tracks
     for track_dict in new_tracks:
         track = experiment.new_track(track_dict["name"])
-        if not uniform_random:
+        if not uniform_random and not csv_upload:
             track.set_weighting(track_dict["weighting"])
     return HttpResponse("success")
 

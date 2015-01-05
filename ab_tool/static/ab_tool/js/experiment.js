@@ -28,8 +28,9 @@ angular.module('ABToolExperiment', []).controller(
             }
         }
         
-        // Don't include value from hidden weight field if uniformRandom is true
-        if ($scope.experiment.uniformRandom) {
+        // Don't include value from hidden weight field if uniformRandom or
+        // csvUplaod is true
+        if ($scope.experiment.uniformRandom || $scope.experiment.csvUpload) {
             $scope.newTrackWeighting = null;
         }
         
@@ -123,6 +124,7 @@ angular.module('ABToolExperiment', []).controller(
         if (orig.name != curr.name) { return true; }
         if (orig.notes != curr.notes) { return true; }
         if (orig.uniformRandom != curr.uniformRandom) { return true; }
+        if (orig.csvUpload != curr.csvUpload) { return true; }
         var origNumTracks = orig.tracks.length;
         var currNumTracks = curr.tracks.length;
         for (var j = 0; j < currNumTracks; j++) {

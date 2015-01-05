@@ -86,6 +86,7 @@ class Experiment(CourseObject):
             "name": self.name,
             "notes": self.notes,
             "uniformRandom": bool(self.assignment_method == self.UNIFORM_RANDOM),
+            "csvUpload": bool(self.assignment_method == self.CSV_UPLOAD),
             "tracks": [{"id": t.id, "weighting": t.get_weighting(), "name": t.name,
                         "deleteURL": reverse('ab_testing_tool_delete_track', args=(t.id,))}
                        for t in self.tracks.all()],

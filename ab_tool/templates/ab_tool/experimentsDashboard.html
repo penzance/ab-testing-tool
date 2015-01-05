@@ -35,6 +35,9 @@
                             {% if experiment.assignment_method == experiment.UNIFORM_RANDOM %}
                                 <small>Students assigned according to uniform random distribution</small>
                             {% endif %}
+                            {% if experiment.assignment_method == experiment.CSV_UPLOAD %}
+                                <small>Students assigned via spreadsheet upload</small>
+                            {% endif %}
                             <p>
                                 <small>
                                 {{experiment.tracks.count}} Tracks | {{experiment.intervention_points.count}} Intervention Points
@@ -44,12 +47,16 @@
                             </p>
                         </div>
                         <div class="pull-right">
-                            {% if not experiment.tracks_finalized %}
+                            {% if not experiment.tracks_finalized and experiment.id not in experiments_with_unassigned_students %}
                             <a type="button" class="btn btn-primary btn-xs" href="#finalize_modal{{experiment.id}}" data-toggle="modal">
                                 Start Experiment </a>
                             {% else %}
                             <a type="button" class="btn btn-primary btn-xs disabled">
                                 Start Experiment </a>
+                            {% endif %}
+                            {% if experiment.id in experiments_with_unassigned_students %}
+                            <a type="button" class="btn btn-primary btn-xs" href="#upload_modal{{experiment.id}}" data-toggle="modal">
+                                Assign Tracks</a>
                             {% endif %}
                             <a type="button" class="btn btn-primary btn-xs" href="#createIntervention_{{experiment.id}}" id="add_intervention_point_button" data-toggle="modal">
                                 Add an Intervention Point </a>

@@ -10,7 +10,7 @@ from ab_tool.exceptions import (MISSING_LTI_PARAM, MISSING_LTI_LAUNCH,
 from requests.exceptions import RequestException
 from django_canvas_oauth import get_token
 from ab_tool.controllers import intervention_point_url
-from ab_tool.models import InterventionPoint, Course
+from ab_tool.models import InterventionPoint, Course, Experiment
 from django_canvas_oauth.exceptions import NewTokenNeeded
 
 
@@ -81,6 +81,12 @@ class CanvasModules(object):
                           if item["type"] == "ExternalTool"]
             installed_intervention_point_urls.extend(intervention_point_urls)
         return installed_intervention_point_urls
+
+
+def experiments_with_unnasigned_students(reqest):
+    return [experiment.id for experiment in
+            Experiment.objects.filter(assignment_method=Experiment.CSV_UPLOAD)
+            if get_unassigned_students(request, experiment)]
 
 
 def get_unassigned_students(request, experiment):
