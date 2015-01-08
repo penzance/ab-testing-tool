@@ -79,7 +79,7 @@ class Experiment(CourseObject):
                         "weighting": t.get_weighting(),
                         "name": t.name,
                         # originalName stores the track name in the database for collision comparison
-                        "originalName": t.name,
+                        "databaseName": t.name,
                         # newName and editing are used to hold temporary values for track name editing
                         "newName" : t.name,
                         "editing": False,

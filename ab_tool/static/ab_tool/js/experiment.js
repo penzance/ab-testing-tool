@@ -201,7 +201,7 @@ var controller = function($scope, $window, $http) {
             if (otherTrack.name == track.newName) {
                 alert("Invalid Name: There is another track with that name");
                 return false;
-            } else if (otherTrack.originalName == track.newName) {
+            } else if (otherTrack.databaseName == track.newName) {
                 alert("Invalid Name: There was already another track with that name");
                 return false;
             }
