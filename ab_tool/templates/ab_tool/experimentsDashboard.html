@@ -11,7 +11,7 @@
 
 <header>
     <div>
-        <h1><!--a href="{% url 'ab_testing_tool_index' %}"-->A/B Testing Dashboard<!--/a--></h1>
+        <h1>A/B Testing Dashboard</h1>
     </div>
 </header>
 <main>
@@ -91,8 +91,11 @@
                             <i class="fa fa-trash"></i><span>Delete</span>
                         </a>
                     </div>
-                    
+                    {% if experiment.intervention_points.count == 0 %}
+                    <div class="panel-noInterventions">
+                    {% else %}
                     <div class="panel-body">
+                    {% endif %}
                         <ul class='intervention-points'>
                             {% for intervention_point in experiment.intervention_points.all %}
                                 <li>
@@ -112,10 +115,16 @@
                                 {% empty %}
                                 <li class="list-group-item">
                                     No intervention points currently exist for this experiment. Click on "Add an Intervention Point" to get started.
+
+                                    <a href="#createIntervention_{{experiment.id}}" id="add_intervention_point_button" data-toggle="modal" class="btn btn-icon btn-no-ip">
+                                        <i class="fa fa-plus"></i>Add Intervention Point
+                                    </a>
+
                                 </li>
                             {% endfor %}
                         </ul>
                     </div>
+                    {% if experiment.intervention_points.count != 0 %}
                     <div class="panel-footer">
                         <ul>
                             <li>
@@ -148,65 +157,9 @@
                             {% endif %}
                         </ul>
                     </div>
+                    {% endif %}
                 </div>
             </div><!-- exp (end) -->
-
-
-            <!--div class="panel panel-default">
-                <!-- Default panel contents >
-                <div class="panel-heading lti-inline-block">
-                    <div class="pull-left">
-                        <h3><a href="{% url 'ab_testing_tool_edit_experiment' experiment.id %}" id="experiment_{{experiment.id}}">Experiment "{{experiment.name}}"</a></h3>
-                        {% if experiment.assignment_method == experiment.WEIGHTED_PROBABILITY_RANDOM %}
-                            <small>Students assigned according to weighted probability random distribution</small>
-                        {% endif %}
-                        {% if experiment.assignment_method == experiment.UNIFORM_RANDOM %}
-                            <small>Students assigned according to uniform random distribution</small>
-                        {% endif %}
-                        <p>
-                            <small>
-                            {{experiment.tracks.count}} Tracks | {{experiment.intervention_points.count}} Intervention Points
-                            <br/>
-                            Last modified: {{experiment.updated_on}}
-                            </small>
-                        </p>
-                    </div>
-                    <div class="pull-right">
-                        {% if not experiment.tracks_finalized %}
-                        <a type="button" class="btn btn-primary btn-xs" href="#finalize_modal{{experiment.id}}" data-toggle="modal">
-                            Start Experiment </a>
-                        {% else %}
-                        <a type="button" class="btn btn-primary btn-xs disabled">
-                            Start Experiment </a>
-                        {% endif %}
-                        <a type="button" class="btn btn-primary btn-xs" href="#createIntervention_{{experiment.id}}" id="add_intervention_point_button" data-toggle="modal">
-                            Add an Intervention Point </a>
-                        {% if experiment.tracks_finalized %}
-                        <a type="button" class="btn btn-primary btn-xs" id="download_students_button" href="{% url 'ab_testing_tool_download_data' experiment.id %}">
-                            Download Students </a>
-                        <a type="button" class="btn btn-primary btn-xs" id="download_intervention_point_interactions_button" href="{% url 'ab_testing_tool_download_intervention_point_interactions' experiment.id %}">
-                            Download Interactions </a>
-                        {% else %}
-                        <a type="button" class="btn btn-primary btn-xs disabled" id="download_students_button">
-                            Download Students </a>
-                        <a type="button" class="btn btn-primary btn-xs disabled" id="download_intervention_point_interactions_button">
-                            Download Interactions </a>
-                        {% endif %}
-                    </div>
-                </div>
-                <ul class="list-group">
-                    {% for intervention_point in experiment.intervention_points.all %}
-                    <li class="list-group-item">
-                        <a data-toggle="modal" href="#editIntervention_{{intervention_point.id}}">Intervention Point "{{intervention_point.name}}"</a><br>
-                       <i>{{intervention_point.is_missing_urls|yesno:"URLs missing,complete"}}</i> | Last modified: {{intervention_point.updated_on}}
-                    </li>
-                    {% empty %}
-                    <li class="list-group-item">
-                        No intervention points currently exist for this experiment. Click on "Add an Intervention Point" to get started.
-                    </li>
-                    {% endfor %}
-                </ul>
-            </div-->
         
         {% empty %}
         <div class="well">
@@ -226,9 +179,19 @@
 
 {% block javascript %}
 {{ block.super }}
+<script src="{% static 'ab_tool/js/jquery.dropdown.js' %}" type="text/javascript"></script>
+
 <script type="text/javascript">
 $(document).ready(function(){
     $('.addIntervention').modal('show');
+
+    $('select').selectmenu({
+        format: function(text){
+            var pattern = /([\s\S]+)\-\- ([\s\S]+)/;
+            var replacement = '<span class="option-title">$1</span><span class="option-description">$2</span>';
+            return text.replace(pattern, replacement);
+        }
+    });
 });
 </script>
 {% endblock %}

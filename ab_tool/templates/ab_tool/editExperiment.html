@@ -11,31 +11,22 @@
 
 <div class="container">
     <header>
-        <div class="row lti-header">
+        <div>
             {% if create %}
-                <h1>
-                    <!--a href="{% url 'ab_testing_tool_create_experiment' %}"-->
-                    A/B Testing<!--/a-->
-                </h1>
+                <h1>A/B Testing</h1>
             {% else %}
-                <h1><!--a href="{% url 'ab_testing_tool_edit_experiment' experiment.id %}"-->
-                    Edit Experiment "{{experiment.name}}"<!--/a-->
-                </h1>
+                <h1>Edit Experiment "{{experiment.name}}"</h1>
             {% endif %}
             {% if create %}
                 <h2>
-                    <a href="{% url 'ab_testing_tool_index' %}">
-                        All Experiments
-                    </a>
-                    <i class="fa fa-chevron-right"></i> 
+                    <a href="{% url 'ab_testing_tool_index' %}">All Experiments</a>
+                    <span class="lti-breadcrumb"><i class="fa fa-chevron-right"></i></span>
                     <span>New Experiment</span>
                 </h2>
             {% else %}
                 <h2>
-                    <a href="{% url 'ab_testing_tool_index' %}">
-                        All Experiments
-                    </a>
-                    <i class="fa fa-chevron-right"></i> 
+                    <a href="{% url 'ab_testing_tool_index' %}">All Experiments</a>
+                    <span class="lti-breadcrumb"><i class="fa fa-chevron-right"></i></span>
                     <span>Editing Experiment {{experiment.name}}</span>
                 </h2>
             {% endif %}

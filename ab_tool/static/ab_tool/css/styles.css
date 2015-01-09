@@ -185,12 +185,22 @@ table {
 td, th {
   padding: 0;
 }
+body.lti-ab-tool {
+  width: 98%;
+  margin: 0 1%;
+}
+.lti-breadcrumb {
+  font-size: 0.75em;
+}
 main {
   display: inline-block;
   width: 100%;
 }
 .float-left {
   float: left;
+}
+.float-right {
+  float: right;
 }
 .block {
   display: block;
@@ -220,7 +230,7 @@ fieldset.fieldset-btn {
   line-height: 1em;
   color: #000;
   vertical-align: middle;
-  background-color: transparent;
+  background-color: #ffffff;
   background-image: none;
   border: solid 1px #d2d2d2;
   border-radius: 5px;
@@ -242,7 +252,7 @@ textarea.form-control {
   line-height: 1em;
   color: #000;
   vertical-align: middle;
-  background-color: transparent;
+  background-color: #ffffff;
   background-image: none;
   border: solid 1px #d2d2d2;
   border-radius: 5px;
@@ -266,7 +276,7 @@ textarea.form-control {
   line-height: 1em;
   color: #000;
   vertical-align: middle;
-  background-color: transparent;
+  background-color: #ffffff;
   background-image: none;
   border: solid 1px #d2d2d2;
   border-radius: 5px;
@@ -291,6 +301,67 @@ textarea.form-control {
 .form-group-description {
   width: 38%;
   float: left;
+}
+/****** show hide helper text based on modal window or 	******
+******* screen size 									*****/
+.form-group .fa-question-circle {
+  /* hide the question icon from forms */
+
+  display: none;
+}
+.modal .fa-question-circle {
+  /* show the questioin icon for help on all modal windows */
+
+  display: inline-block;
+}
+.modal .form-group {
+  width: 100%;
+}
+.modal .form-control {
+  display: inline-block;
+  width: 95%;
+}
+.modal .form-group-inline-left {
+  width: 70.833333333333%;
+  float: left;
+  margin-right: 2%;
+}
+.form-group-inline-left .form-control {
+  width: 94%;
+}
+.modal .form-group-inline-right {
+  width: 26.916667%;
+  float: left;
+}
+.modal .form-group-inline-right  > div {
+  position: relative;
+  display: inline-block;
+  width: 90%;
+}
+.modal .form-group-inline-right .fa-question-circle {
+  margin-top: 0.55em;
+  float: right;
+}
+.modal .form-group-description {
+  display: none;
+}
+@media (max-width: 768px) {
+  .form-group {
+    width: 99%;
+    margin-right: 0;
+  }
+  .form-group-description {
+    display: none;
+  }
+  .form-control {
+    display: inline-block;
+    width: 95%;
+  }
+  .form-group .fa-question-circle {
+    /* hide the question icon from forms */
+  
+    display: inline-block;
+  }
 }
 .panel {
   display: inline-block;
@@ -324,6 +395,12 @@ textarea.form-control {
   background-color: #fcfefd;
   border: solid 1px #ececeb;
   margin-left: 3.076923076923%;
+}
+.panel-noInterventions {
+  background-color: #fcfefd;
+  border: solid 1px #ececeb;
+  width: 93.846153846154%;
+  margin: 0 3.076923076923% 1em 3.076923076923%;
 }
 ul, ol, dl {
   margin: 0;
@@ -369,6 +446,7 @@ ul, ol, dl {
   float: left;
   border: solid 0.0625em #ececeb;
   background-color: #fcfefd;
+  line-height: 2.19em;
 }
 .list-dashboard-totals dt {
   display: table-row-group;
@@ -487,8 +565,29 @@ and spacing to match a btn-submit */
   padding: 0.4375em 0.3125em;
   background-color: #eaeaea;
 }
+body {
+  font-size: 0.9375em;
+  line-height: 1.25em;
+  color: #333333;
+}
+h1,
+h2,
+h3,
+h4 {
+  font-weight: normal;
+  margin: 0.5em 0;
+}
+h1 {
+  font-size: 2.1875em;
+}
+h2 {
+  font-size: 1.8em;
+}
+p {
+  margin: 0 0 1em 0;
+}
 a {
-  color: #1363d5;
+  color: #3e67a2;
 }
 a:hover {
   color: #525252;
@@ -536,6 +635,21 @@ a:hover {
   font-size: 0.875em;
 }
 .btn-ip-options:hover {
+  background-color: #525252;
+  color: #eaeaea;
+}
+.btn-no-ip {
+  border: 0px;
+  border-radius: 24px;
+  background-color: #eaeaea;
+  color: #525252;
+  width: 20%;
+  padding: 0.6875em 3%;
+  margin: 0.75em auto;
+  text-align: center;
+  display: block;
+}
+.btn-no-ip:hover {
   background-color: #525252;
   color: #eaeaea;
 }
