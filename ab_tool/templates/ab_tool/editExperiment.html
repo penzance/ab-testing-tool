@@ -179,10 +179,11 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
         {% if create %}
-            <button type="button" id="createNow" class="btn btn-submit-primary" ng-click="submit()">Submit Create</button>
+            <button type="button" id="createNow" class="btn btn-submit-primary" ng-if="!submitting" ng-click="submit()">Submit Create</button>
         {% else %}
-            <button type="button" id="createNow" class="btn btn-submit-primary" ng-click="submit()">Submit Update</button>
+            <button type="button" id="createNow" class="btn btn-submit-primary" ng-if="!submitting" ng-click="submit()">Submit Update</button>
         {% endif %}
+        <button enabled="false" type="button" class="btn btn-submit-primary" ng-if="submitting">Please wait...</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->

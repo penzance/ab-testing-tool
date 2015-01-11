@@ -4,6 +4,7 @@ angular.module('ABToolExperiment', []).controller(
     $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded;charset=utf-8";
     
     $scope.experiment = $window.modifiedExperiment;
+    $scope.submitting = false;
     
     $scope.newTrackName = null;
     $scope.newTrackWeighting = null;
@@ -56,11 +57,13 @@ angular.module('ABToolExperiment', []).controller(
          */
         // Payload has to be encoded using JQuery's $.param to submit properly
         //var payload = $.param({"experiment": JSON.stringify($scope.experiment)});
+        $scope.submitting = true;
         $http.post($window.submitURL, $scope.experiment).
           success(function(data, status, headers, config) {
               $window.location = $window.parentPage;
           }).
           error(function(data, status, headers, config) {
+              $scope.submitting = false;
               $window.alert("An error occured submitting this form")
           });
     }
