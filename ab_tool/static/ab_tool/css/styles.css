@@ -740,7 +740,11 @@ a:hover {
 					NEW EXPERIMENT FORM (START)
 /**********************************************************************************/
 .input-newWeight {
+  width: 3em;
   margin-left: 2.3em;
+}
+.input-trackWeight {
+  width: 3em;
 }
 .input-newTrackName {
   width: 20%;
