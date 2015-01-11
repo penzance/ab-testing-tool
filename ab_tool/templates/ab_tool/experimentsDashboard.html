@@ -22,16 +22,16 @@
     <div class="dashboard">
         <div class="dashboard-totals">
             <dl class="list list-dashboard-totals">
-                <dt>Experiments</dt>
-                <dd>5</dd>
-            </dl>
-            <dl class="list list-dashboard-totals">    
-                <dt>Intervention Points</dt>
-                <dd>20</dd>
+                <dt>Experiment{% if experiments|length != 1 %}s{% endif %}</dt>
+                <dd>{{experiments|length}}</dd>
             </dl>
             <dl class="list list-dashboard-totals">
-                <dt>Tracks</dt>
-                <dd>100+</dd>
+                <dt>Intervention Point{% if intervention_points|length != 1 %}s{% endif %}</dt>
+                <dd>{{intervention_points|length}}</dd>
+            </dl>
+            <dl class="list list-dashboard-totals">
+                <dt>Uninstalled Intervention Point{% if uninstalled_intervention_points|length != 1 %}s{% endif %}</dt>
+                <dd>{{uninstalled_intervention_points|length}}</dd>
             </dl>
         </div>
         <a href="#" class="btn btn-dashboard btn-modules">
@@ -54,25 +54,22 @@
                         <h3 class="panel-title panel-title-experiment">Experiment "{{experiment.name}}"</h3>
                         
                         {% if not experiment.tracks_finalized %}
-                            <a href="#finalize_modal{{experiment.id}}" class="btn btn-icon btn-experiment-start">
+                            <a data-toggle="modal" href="#finalize_modal{{experiment.id}}" class="btn btn-icon btn-experiment-start">
+                                <i class="fa fa-play-circle"></i>Start Experiment
+                            </a>
                         {% else %}
-                            <a href="#" class="btn btn-icon btn-experiment-start disable">
                         {% endif %}
-                            <i class="fa fa-play-circle"></i>Start Experiment
-                        </a>
                         
-
                         <dl class="list list-horizontal">
                             <dt class="list-item-title">Sort by:</dt>
                             {% if experiment.assignment_method == experiment.WEIGHTED_PROBABILITY_RANDOM %}
                                 <dd>Weighted probability random distribution</dd>
-                            {% endif %}<!-- could we do an else here? -->
-                            {% if experiment.assignment_method == experiment.UNIFORM_RANDOM %}
+                            {% elif experiment.assignment_method == experiment.UNIFORM_RANDOM %}
                                 <dd>Uniform random distribution</dd>
                             {% endif %}
                             <dt class="list-item-title">Tracks:</dt>
                             <dd>{{experiment.tracks.count}}</dd>
-                            <dt class="list-item-title">Intervention Points</dt>
+                            <dt class="list-item-title">Intervention Points:</dt>
                             <dd>{{experiment.intervention_points.count}}</dd>
                             <dt class="list-item-title">Last modified:</dt>
                             <dd>{{experiment.updated_on}}</dd>
@@ -99,7 +96,8 @@
                         <ul class='intervention-points'>
                             {% for intervention_point in experiment.intervention_points.all %}
                                 <li>
-                                    <a href="#" class="btn btn-icon-only ip-btn-delete">
+                                    <a href="{% url 'ab_testing_tool_delete_intervention_point' intervention_point.id %}"
+                                        class="btn btn-icon-only ip-btn-delete">
                                         <i class="fa fa-trash"></i><span>Delete</span>
                                     </a>
                                     <a data-toggle="modal" href="#editIntervention_{{intervention_point.id}}">
@@ -145,12 +143,12 @@
                                 </li>
                             {% else %}
                                 <li>
-                                    <a href="#" class="btn btn-icon btn-ip-options disable">
+                                    <a href="href="{% url 'ab_testing_tool_download_data' experiment.id %}" class="btn btn-icon btn-ip-options disabled">
                                         <i class="fa fa-download"></i>Download Students
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#" class="btn btn-icon btn-ip-options disable">
+                                    <a href="{% url 'ab_testing_tool_download_intervention_point_interactions' experiment.id %}f" class="btn btn-icon btn-ip-options disabled">
                                         <i class="fa fa-download"></i>Download Interactions
                                     </a>
                                 </li>
