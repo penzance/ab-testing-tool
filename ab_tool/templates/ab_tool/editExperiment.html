@@ -11,111 +11,136 @@
 
 <div class="container">
     <header>
-        <div class="row lti-header">
+        <div>
             {% if create %}
-                <h1><a href="{% url 'ab_testing_tool_create_experiment' %}">Create New Experiment</a></h1>
+                <h1>A/B Testing</h1>
             {% else %}
-                <h1><a href="{% url 'ab_testing_tool_edit_experiment' experiment.id %}">Edit Experiment "{{experiment.name}}"</a></h1>
+                <h1>Edit Experiment "{{experiment.name}}"</h1>
+            {% endif %}
+            {% if create %}
+                <h2>
+                    <a href="{% url 'ab_testing_tool_index' %}">All Experiments</a>
+                    <span class="lti-breadcrumb"><i class="fa fa-chevron-right"></i></span>
+                    <span>New Experiment</span>
+                </h2>
+            {% else %}
+                <h2>
+                    <a href="{% url 'ab_testing_tool_index' %}">All Experiments</a>
+                    <span class="lti-breadcrumb"><i class="fa fa-chevron-right"></i></span>
+                    <span>Editing Experiment {{experiment.name}}</span>
+                </h2>
             {% endif %}
         </div>
     </header>
     <main>
-        <div class="row row-lti col-md-8">
-            {% if create %}
-                <h3><a href="{% url 'ab_testing_tool_index' %}">All Experiments</a> &rsaquo; <span>New Experiment</span></h3>
-            {% else %}
-                <h3><a href="{% url 'ab_testing_tool_index' %}">All Experiments</a> &rsaquo; <span>Editing Experiment {{experiment.name}}</span></h3>
-            {% endif %}
-            <form class="form-horizontal" role="form">
-                <div class="form-group col-md-8">
-                    <label for="experimentName">Name:</label>
-                    <input type="text" name="experimentName" id="experimentName"
-                        class="form-control" ng-model="experiment.name" placeholder="Experiment Name">
+        <p>Pellentesque mattis sit amet felis elementum vulputate. Pellentesque ac ipsum volutpat, ornare dolor quis, interdum ex. Cras consectetur mattis sapien, non fringilla eros convallis pretium. Vivamus volutpat neque sed leo porta auctor. Read our documentation wiki for more detail info.</p>
+            
+        <form role="form">
+            <fieldset>
+                <div class="form-group">
+                    <legend class="sr-only">Name of experiment</legend>
+                    <label for="experimentName">Name:</label> <i class="fa fa-asterisk"></i>
+                    <input type="text" class="block form-control" name="experimentName" id="experimentName" ng-model="experiment.name" placeholder="Enter experiment name">
                 </div>
-                
-                <div class="form-group col-md-8" id="expStructure">
-                    <label>Experiment structure</label><br>
-                    <ul id="expWeights" class="list-unstyled">
-                        <!-- Angular loop over tracks -->
-                            <li ng-cloak class="expTrack" ng-repeat="track in experiment.tracks">
-                                {% if not started %}
-                                    <a data-track="delete" ng-show="experiment.tracks.length > 2"
-                                        ng-cloak ng-click="deleteTrack(track)">X</a>
-                                {% endif %}
-                                <!-- Show different weighting if uniformRandom is set -->
-                                <label ng-hide="experiment.uniformRandom">
-                                    <input type="number" min="0" max="100" step="1"
-                                        data-track="value" data-trackindex="1"
-                                        maxlength="2" size="2"
-                                        ng-pattern="/^\d+$/" ng-model="track.weighting"
-                                        {%if started %}disabled="disabled"{% endif %}> %
-                                </label>
-                                <label ng-show="experiment.uniformRandom">
-                                    <input type="text" disabled="disabled" size="2"
-                                        {% verbatim %}ng-cloak value="{{uniformPercent()}}">%{% endverbatim %}
-                                </label>
-                                <label class="control-label">
-                                    {% verbatim %}
-                                        <span data-track="name" title="Edit track name" ng-cloak>
-                                            Track "{{track.name}}"
-                                        </span>
-                                    {% endverbatim %}
-                                </label>
-                            </li>
-                        <!-- End Angular loop over tracks -->
-                    </ul>
+                <div class="form-group-description">
+                    <p>A descriptive name for this experiment. This will help you organize your experiments</p>
                 </div>
-                
-                {% if not started %}
-                    <div class="form-group col-md-8">
-                        <!-- Hide weighting if uniformRandom is set -->
-                        <label ng-hide="experiment.uniformRandom">
-                            <input type="number" min="0" max="100" step="1"
+            </fieldset>
+
+            <fieldset>
+                <div class="form-group">
+                    <legend class="sr-only">Students "grouping/segmentation"</legend>
+                    <label>Experiment Structure:</label> <i class="fa fa-asterisk"></i>
+                    <ul id="expWeights" class="list-withfloats">
+                        <!-- Angular loop over tracks (start) -->
+                        <li ng-cloak ng-repeat="track in experiment.tracks">
+                            
+                            {% if not started %}
+                                <a data-track="delete" ng-show="experiment.tracks.length > 2"
+                                    ng-cloak ng-click="deleteTrack(track)" class="btn btn-icon-only ip-btn-delete">
+                                    <i class="fa fa-trash"></i><span>Delete</span>
+                                </a>
+                                <!-- show disabled delete icons for UI consistency -->
+                                <a ng-show="experiment.tracks.length < 3"
+                                    ng-cloak class="btn btn-icon-only ip-btn-delete disabled">
+                                    <i class="fa fa-trash"></i><span>Delete</span>
+                                </a>
+                            {% endif %}
+                            <!-- Show different weighting if uniformRandom is set -->
+                            <div ng-hide="experiment.uniformRandom">
+                                <input type="number" min="0" max="100" step="1"
                                     data-track="value" data-trackindex="1"
-                                    maxlength="2" size="2" placeholder="0"
-                                    ng-pattern="/^\d+$/" ng-model="newTrackWeighting"> %
-                        </label>
-                        <input type="text" name="newTrackName" id="newTrackName" placeholder="Enter track name" ng-model="newTrackName">
-                        <a ng-click="addTrack()" class="btn btn-default btn-xs" id="addTrack">Add Track</a>
-                    </div>
-                {% endif %}
-                
-                <div class="panel panel-default col-md-8">
-                    <div class="panel-body">
-                        <label>
-                            <input type="checkbox" name="uniformRandom"
-                                ng-model="experiment.uniformRandom"
-                                {%if started %}disabled="disabled"{% endif %}>
-                            Give each track equal weighting (uniform random)
-                        </label>
-                    </div>
+                                    maxlength="2" size="2"
+                                    ng-pattern="/^\d+$/" ng-model="track.weighting"
+                                    {%if started %}disabled="disabled"{% endif %} class="input-trackWeight input-group-right float-left"><span> % </span>
+                            </div>
+                            <div ng-show="experiment.uniformRandom">
+                                <input type="text" disabled="disabled" size="2"
+                                    {% verbatim %}ng-cloak value="{{uniformPercent()}}" class="input-group-right float-left"><span> % </span>{% endverbatim %}
+                            </div>
+                            
+                            {% verbatim %}
+                                <a href="#" class="btn btn-link" data-track="name" title="Edit {{track.name}}" ng-cloak>
+                                    Track "{{track.name}}"
+                                </a>
+                            {% endverbatim %}
+                        </li>
+                        <!-- Angular loop over tracks (end) -->
+                        {% if not started %}
+                        <li>
+                            <!-- Hide weighting if uniformRandom is set -->
+                            <div ng-hide="experiment.uniformRandom">
+                                <input type="number" min="0" max="100" step="1"
+                                        data-track="value" data-trackindex="1"
+                                        maxlength="2" size="2" placeholder="0"
+                                        ng-pattern="/^\d+$/" ng-model="newTrackWeighting"
+                                        class="input-newWeight input-group-right float-left">
+                                        <span> % </span>
+                                <input type="text" name="newTrackName" id="newTrackName" placeholder="Enter track name" class="input-newTrackName form-control float-left" ng-model="newTrackName">
+                            </div>
+                            <div ng-show="experiment.uniformRandom">
+                                <input type="text" name="newTrackName" id="newTrackName" placeholder="Enter track name" class="input-newTrackName-uniformrandom form-control float-left" ng-model="newTrackName">
+                            </div>
+                            <a ng-click="addTrack()" class="btn btn-submit" id="addTrack"><i class="fa fa-plus"></i>Add Track</a>    
+                        </li>
+                        {% endif %}
+                    </ul>
+
+                    <input type="checkbox" id="uniformRandom" name="uniformRandom"
+                        ng-model="experiment.uniformRandom"
+                        {%if started %}disabled="disabled"{% endif %}>
+                    <label for="uniformRandom">Give each track equal weighting (uniform random)</label>
+
                 </div>
-                
-                <!-- Disabled until project phase 2
-                    <div class="form-group col-md-8">
-                        <label class="control-label">Sort type:</label>
-                        <ul class="list-unstyled">
-                            <li><input type="radio" name="sort" value="sortAt_start" checked> Sort upon student's course registration</li>
-                            <li><input type="radio" name="sort" value="sortAt_tool"> Sort upon student encountering first intervention</li>
-                        </ul>
-                    </div>
-                -->
-                
-                <div class="form-group col-md-8">
-                    <label class="control-label" for="experimentNotes">Notes</label>
-                    <textarea name="experimentNotes" id="experimentNotes" placeholder="Additional notes about experiment..." class="form-control" ng-model="experiment.notes"></textarea>
+                <div class="form-group-description">
+                    <p>A descriptive name for this experiment. This will help you organize your experiments</p>
                 </div>
-                
-                <div class="form-group col-md-8">
-                    <a id="update-cancel" ng-click="cancel()">Cancel</a>
+            </fieldset>
+            <fieldset>
+                <div class="form-group">
+                    <legend class="sr-only">Notes about your experiment</legend>
+                    <label class="block" for="experimentNotes">Notes</label>
+                    <textarea name="experimentNotes" rows="8" id="experimentNotes" placeholder="Additional notes about experiment..." class="form-control" ng-model="experiment.notes"></textarea>
+                </div>
+                <div class="form-group-description">
+                    <p>A descriptive name for this experiment. This will help you organize your experiments</p>
+                </div>
+            </fieldset>
+            <fieldset class="fieldset-btn">
+                <div class="form-group">
+                    <a href="#" id="update-cancel" ng-click="cancel()" class="btn btn-link">Cancel</a>
                     {% if create %}
-                        <button class="btn btn-primary" id="create-confirm" data-toggle="modal" data-target="#confirmSubmit">Create</button>
+                        <button class="btn btn-submit-primary" id="create-confirm" data-toggle="modal" data-target="#confirmSubmit">Create</button>
                     {% else %}
-                        <button class="btn btn-primary" id="update-confirm" data-toggle="modal" data-target="#confirmSubmit">Update</button>
+                        <button class="btn btn-submit-primary" id="update-confirm" data-toggle="modal" data-target="#confirmSubmit">Update</button>
                     {% endif %}
                 </div>
-            </form>
-        </div>
+                <div class="form-group-description">
+                    <!--empty-->
+                </div>
+            </fieldset>
+        </form>
+        
     </main>
 </div>
 
@@ -152,11 +177,11 @@
         
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
         {% if create %}
-            <button type="button" id="createNow" class="btn btn-primary" ng-click="submit()">Submit Create</button>
+            <button type="button" id="createNow" class="btn btn-submit-primary" ng-click="submit()">Submit Create</button>
         {% else %}
-            <button type="button" id="createNow" class="btn btn-primary" ng-click="submit()">Submit Update</button>
+            <button type="button" id="createNow" class="btn btn-submit-primary" ng-click="submit()">Submit Update</button>
         {% endif %}
       </div>
     </div><!-- /.modal-content -->
@@ -187,7 +212,7 @@
     window.parentPage = "{% url 'ab_testing_tool_index' %}";
 </script>
 
-<script src="{% static "ab_tool/js/angular-1.2.27.min.js" %}"></script>
-<script src="{% static "ab_tool/js/experiment.js" %}"></script>
+<script src="{% static 'ab_tool/js/angular-1.2.27.min.js' %}"></script>
+<script src="{% static 'ab_tool/js/experiment.js' %}"></script>
 
 {% endblock %}
