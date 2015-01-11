@@ -1,5 +1,5 @@
 /* Typography */
-/*body.lti {
+body.lti {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 
 }
@@ -16,7 +16,7 @@
 .lti-inline-block {
   display: inline-block;
   width: 100%;
-}*/
+}
 
 
 /* FOR ANGULAR validation of track weight*/
