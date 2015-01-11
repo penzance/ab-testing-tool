@@ -8,96 +8,174 @@
 
 {% block content %}
 
-<div class="container">
-    <header>
-        <div class="row lti-header">
-            <h1><a href="{% url 'ab_testing_tool_index' %}">A/B Testing Dashboard</a></h1>
+
+<header>
+    <div>
+        <h1>A/B Testing Dashboard</h1>
+    </div>
+</header>
+<main>
+    
+    <p>
+        Welcome to the A/B Testing dashboard. Manage your A/B Testing Experiments here. More information is available at our <a href="#">documentation wiki</a>.
+    </p>
+    <div class="dashboard">
+        <div class="dashboard-totals">
+            <dl class="list list-dashboard-totals">
+                <dt>Experiment{% if experiments|length != 1 %}s{% endif %}</dt>
+                <dd>{{experiments|length}}</dd>
+            </dl>
+            <dl class="list list-dashboard-totals">
+                <dt>Intervention Point{% if intervention_points|length != 1 %}s{% endif %}</dt>
+                <dd>{{intervention_points|length}}</dd>
+            </dl>
+            <dl class="list list-dashboard-totals">
+                <dt>Uninstalled Intervention Point{% if uninstalled_intervention_points|length != 1 %}s{% endif %}</dt>
+                <dd>{{uninstalled_intervention_points|length}}</dd>
+            </dl>
         </div>
-    </header>
-    <main>
-        <div class="row row-lti col-md-8">
-            <p>
-                Welcome to the A/B Testing dashboard. Manage your A/B Testing Experiments here. More information is available at our <a href="#">documentation wiki</a>.
-            </p>
-        </div>
-        <div class="row row-lti col-md-8">
-        
-            <h2><a href="{% url 'ab_testing_tool_create_experiment' %}">Add an Experiment</a></h2>
-            {% for experiment in experiments %}
-                <div class="panel panel-default">
-                    <!-- Default panel contents -->
-                    <div class="panel-heading lti-inline-block">
-                        <div class="pull-left">
-                            <h3><a href="{% url 'ab_testing_tool_edit_experiment' experiment.id %}" id="experiment_{{experiment.id}}">Experiment "{{experiment.name}}"</a></h3>
+        <a href="#" class="btn btn-dashboard btn-modules">
+            <i class="fa fa-search"></i>
+            Modules
+        </a>
+        <a href="{% url 'ab_testing_tool_create_experiment' %}" class="btn btn-dashboard btn-newExperiment">
+            <i class="fa fa-plus"></i>
+            New Experiment
+        </a>
+    </div>
+    
+    <div class="row row-lti col-md-8">
+    
+        <!--h2><a href="{% url 'ab_testing_tool_create_experiment' %}">Add an Experiment</a></h2-->
+        {% for experiment in experiments %}
+            <div class="panel panel-experiment"><!-- exp (start) -->
+                <div class="panel-wrapper"> 
+                    <div class="panel-heading">
+                        <h3 class="panel-title panel-title-experiment">Experiment "{{experiment.name}}"</h3>
+                        
+                        {% if not experiment.tracks_finalized %}
+                            <a data-toggle="modal" href="#finalize_modal{{experiment.id}}" class="btn btn-icon btn-experiment-start">
+                                <i class="fa fa-play-circle"></i>Start Experiment
+                            </a>
+                        {% else %}
+                        {% endif %}
+                        
+                        <dl class="list list-horizontal">
+                            <dt class="list-item-title">Sort by:</dt>
                             {% if experiment.assignment_method == experiment.WEIGHTED_PROBABILITY_RANDOM %}
-                                <small>Students assigned according to weighted probability random distribution</small>
+                                <dd>Weighted probability random distribution</dd>
+                            {% elif experiment.assignment_method == experiment.UNIFORM_RANDOM %}
+                                <dd>Uniform random distribution</dd>
                             {% endif %}
-                            {% if experiment.assignment_method == experiment.UNIFORM_RANDOM %}
-                                <small>Students assigned according to uniform random distribution</small>
-                            {% endif %}
-                            <p>
-                                <small>
-                                {{experiment.tracks.count}} Tracks | {{experiment.intervention_points.count}} Intervention Points
-                                <br/>
-                                Last modified: {{experiment.updated_on}}
-                                </small>
-                            </p>
-                        </div>
-                        <div class="pull-right">
-                            {% if not experiment.tracks_finalized %}
-                            <a type="button" class="btn btn-primary btn-xs" href="#finalize_modal{{experiment.id}}" data-toggle="modal">
-                                Start Experiment </a>
-                            {% else %}
-                            <a type="button" class="btn btn-primary btn-xs disabled">
-                                Start Experiment </a>
-                            {% endif %}
-                            <a type="button" class="btn btn-primary btn-xs" href="#createIntervention_{{experiment.id}}" id="add_intervention_point_button" data-toggle="modal">
-                                Add an Intervention Point </a>
-                            {% if experiment.tracks_finalized %}
-                            <a type="button" class="btn btn-primary btn-xs" id="download_students_button" href="{% url 'ab_testing_tool_download_data' experiment.id %}">
-                                Download Track Assignments </a>
-                            <a type="button" class="btn btn-primary btn-xs" id="download_intervention_point_interactions_button" href="{% url 'ab_testing_tool_download_intervention_point_interactions' experiment.id %}">
-                                Download Interactions </a>
-                            {% else %}
-                            <a type="button" class="btn btn-primary btn-xs disabled" id="download_students_button">
-                                Download Track Assignments </a>
-                            <a type="button" class="btn btn-primary btn-xs disabled" id="download_intervention_point_interactions_button">
-                                Download Interactions </a>
-                            {% endif %}
-                            {% if experiment.id in deletable_experiment_ids %}
-                            <a type="button" class="btn btn-primary btn-xs" href="#delete_modal{{experiment.id}}" data-toggle="modal" id="delete_experiment_button">
-                                Delete Experiment </a>
-                            {% else %}
-                            <a type="button" class="btn btn-primary btn-xs disabled" id="delete_experiment_button">
-                                Delete Experiment </a>
-                            {% endif %}
-                        </div>
+                            <dt class="list-item-title">Tracks:</dt>
+                            <dd>{{experiment.tracks.count}}</dd>
+                            <dt class="list-item-title">Intervention Points:</dt>
+                            <dd>{{experiment.intervention_points.count}}</dd>
+                            <dt class="list-item-title">Last modified:</dt>
+                            <dd>{{experiment.updated_on}}</dd>
+                        </dl>
+                        
                     </div>
-                    <ul class="list-group">
-                        {% for intervention_point in experiment.intervention_points.all %}
-                        <li class="list-group-item">
-                            <a data-toggle="modal" href="#editIntervention_{{intervention_point.id}}">Intervention Point "{{intervention_point.name}}"</a><br>
-                           <i>{{intervention_point.is_missing_urls|yesno:"URLs missing,complete"}}</i> | Last modified: {{intervention_point.updated_on}}
-                        </li>
-                        {% empty %}
-                        <li class="list-group-item">
-                            No intervention points currently exist for this experiment. Click on "Add an Intervention Point" to get started.
-                        </li>
-                        {% endfor %}
-                    </ul>
+                    <div class="exp-edit">
+                        <div class="arrow-left"></div>
+                        <a href="{% url 'ab_testing_tool_edit_experiment' experiment.id %}" id="experiment_{{experiment.id}}" class="btn btn-icon-only exp-btn-global">
+                            <i class="fa fa-pencil"></i><span>Edit</span>
+                        </a>
+                    </div>
+                    <div class="exp-delete">
+                        <div class="arrow-right"></div>
+                        {% if experiment.id in deletable_experiment_ids %}
+                            <a href="#delete_modal{{experiment.id}}" data-toggle="modal" class="btn btn-icon-only exp-btn-global">
+                                <i class="fa fa-trash"></i><span>Delete</span>
+                            </a>
+                        {% else %}
+                           <a href="#" class="btn btn-icon-only exp-btn-global disabled">
+                                <i class="fa fa-trash"></i><span>Delete</span>
+                            </a>
+                        {% endif %}
+                    </div>
+                    {% if experiment.intervention_points.count == 0 %}
+                    <div class="panel-noInterventions">
+                    {% else %}
+                    <div class="panel-body">
+                    {% endif %}
+                        <ul class='intervention-points'>
+                            {% for intervention_point in experiment.intervention_points.all %}
+                                <li>
+                                    <a href="{% url 'ab_testing_tool_delete_intervention_point' intervention_point.id %}"
+                                        class="btn btn-icon-only ip-btn-delete">
+                                        <i class="fa fa-trash"></i><span>Delete</span>
+                                    </a>
+                                    <a data-toggle="modal" href="#editIntervention_{{intervention_point.id}}">
+                                        Intervention Point "{{intervention_point.name}}"
+                                    </a><br>
+                                    <span class="label">
+                                        {{intervention_point.is_missing_urls|yesno:"URLs missing,complete"}}
+                                    </span> 
+                                    <span class="date">
+                                        Last modified {{intervention_point.updated_on}}
+                                    </span>
+                                </li>
+                                {% empty %}
+                                <li class="list-group-item">
+                                    No intervention points currently exist for this experiment. Click on "Add an Intervention Point" to get started.
+
+                                    <a href="#createIntervention_{{experiment.id}}" id="add_intervention_point_button" data-toggle="modal" class="btn btn-icon btn-no-ip">
+                                        <i class="fa fa-plus"></i>Add Intervention Point
+                                    </a>
+
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% if experiment.intervention_points.count != 0 %}
+                    <div class="panel-footer">
+                        <ul>
+                            <li>
+                                <a href="#createIntervention_{{experiment.id}}" id="add_intervention_point_button" data-toggle="modal" class="btn btn-icon btn-ip-options">
+                                    <i class="fa fa-plus"></i>Add Intervention Point
+                                </a>
+                            </li>
+                            {% if experiment.tracks_finalized %}
+                                <li>
+                                    <a id="download_students_button" href="{% url 'ab_testing_tool_download_data' experiment.id %}" class="btn btn-icon btn-ip-options">
+                                        <i class="fa fa-download"></i>Download Students
+                                    </a>
+                                </li>
+                                <li>
+                                    <a id="download_intervention_point_interactions_button" href="{% url 'ab_testing_tool_download_intervention_point_interactions' experiment.id %}" class="btn btn-icon btn-ip-options">
+                                        <i class="fa fa-download"></i>Download Interactions
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li>
+                                    <a href="href="{% url 'ab_testing_tool_download_data' experiment.id %}" class="btn btn-icon btn-ip-options disabled">
+                                        <i class="fa fa-download"></i>Download Students
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'ab_testing_tool_download_intervention_point_interactions' experiment.id %}f" class="btn btn-icon btn-ip-options disabled">
+                                        <i class="fa fa-download"></i>Download Interactions
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    {% endif %}
                 </div>
-            
-            {% empty %}
-            <div class="well">
-            <div class="container">
-            <h3>No experiments currently exist for this course. Click on "Add an Experiment" to get started.</h3>
-            <h4><a title="Create an experiment" href="{% url 'ab_testing_tool_create_experiment' %}">Create an experiment</a></h4>
-            </div>
-            </div>
-            {% endfor %}
+            </div><!-- exp (end) -->
+        
+        {% empty %}
+        <div class="well">
+        <div class="container">
+        <h3>No experiments currently exist for this course. Click on "Add an Experiment" to get started.</h3>
+        <h4><a title="Create an experiment" href="{% url 'ab_testing_tool_create_experiment' %}">Create an experiment</a></h4>
         </div>
-    </main>
-</div>
+        </div>
+        {% endfor %}
+    </div>
+</main>
+
 
 {% include "ab_tool/modals.html" %}
 
@@ -105,9 +183,19 @@
 
 {% block javascript %}
 {{ block.super }}
+<script src="{% static 'ab_tool/js/jquery.dropdown.js' %}" type="text/javascript"></script>
+
 <script type="text/javascript">
 $(document).ready(function(){
     $('.addIntervention').modal('show');
+
+    $('select').selectmenu({
+        format: function(text){
+            var pattern = /([\s\S]+)\-\- ([\s\S]+)/;
+            var replacement = '<span class="option-title">$1</span><span class="option-description">$2</span>';
+            return text.replace(pattern, replacement);
+        }
+    });
 });
 </script>
 {% endblock %}
