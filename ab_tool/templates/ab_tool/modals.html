@@ -10,39 +10,70 @@
         <form class="form-horizontal" role="form" method="post" name="intervention_point_creation_form"
             action="{% url 'ab_testing_tool_submit_create_intervention_point' experiment.id %}">
             <div class="modal-body">
-                <div class="form-group col-sm-12">
-                    <label for="interventionName">Name:</label>
-                    <input type="text" name="name" id="interventionName" class="form-control" placeholder="Enter Intervention Name">
-                </div>
+                
+                <p>Excitavit hic ardor milites per municipia plurima, quae isdem conterminant, dispositos et castella, sed quisque serpentes latius pro viribus repellere moliens, nunc globis confertos, aliquotiens et dispersos multitudine superabatur ingenti.</p>
+
+                <fieldset>
+                    <legend class="sr-only">Name of intervention point</legend>
+
+                    <div class="form-group">
+                        <label for="interventionName">Name:</label> <i class="fa fa-asterisk"></i>
+                        <input type="text" name="name" id="interventionName" class="form-control" placeholder="Enter Intervention Name">
+                    </div>
+                    <div class="form-group-description">
+                        <p>A descriptive name for this track. This will help you blah blah blah</p>
+                    </div>
+
+                </fieldset>
                 
                 {% for track in experiment.tracks.all %}
-                <div class="form-group">
-                    <div class="col-sm-8">
-                        <label for="track_{{track.id}}">Track "{{track.name}}":</label>
+                <fieldset>
+                    <legend class="sr-only">Tracks for experiment</legend>
+
+                    <div class="form-group-inline-left">
+                        <label for="intervention_point_url_{{track.id}}">Track "{{track.name}}":</label>
                         <input type="url" name="intervention_point_url_{{track.id}}"
                             id="intervention_point_url_{{track.id}}" class="form-control"
                             value="">
+                        <a href="#"><i class="fa fa-question-circle"></i></a>
                     </div>
-                    <div class="col-sm-4">
-                        <label for="is_canvas_page_for_track_{{track.id}}">Open:</label>
-                        <select name="is_canvas_page_for_track_{{track.id}}"
-                            id="is_canvas_page_for_track_{{track.id}}">
-                            <option selected="selected" value="canvasPage">Canvas URL</option>
-                            <option value="externalPage">External URL in Canvas</option>
-                            <option value="newTab">In new tab</option>
-                        </select>
+                    <div class="form-group-description">
+                        <p>A descriptive name for this track. This will help you blah blah blah</p>
                     </div>
-                </div>
+
+                    <div class="form-group-inline-right">
+                        <label for="is_canvas_page_for_track_{{track.id}}">Open in:</label>
+                        <div class="custom-dropdown">
+                            <select name="is_canvas_page_for_track_{{track.id}}"
+                                id="is_canvas_page_for_track_{{track.id}}">
+                                <option selected="selected" value="canvasPage">Canvas URL -- Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean feugiat eu est et volutpat. Donec dictum ultrices finibus.</option>
+                                <option value="externalPage">External URL in Canvas -- Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean feugiat eu est et volutpat. Donec dictum ultrices finibus.</option>
+                                <option value="newTab">In new tab -- Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean feugiat eu est et volutpat. Donec dictum ultrices finibus.</option>
+                            </select>
+                        </div>
+                        <a href="#"><i class="fa fa-question-circle"></i></a>
+                    </div>
+                    <div class="form-group-description">
+                        <p>A descriptive name for this track. This will help you blah blah blah</p>
+                    </div>
+
+                </fieldset>
                 {% endfor %}
-                
-                <div class="form-group col-sm-12">
-                    <label class="control-label" for="interventionNotes">Notes</label>
-                    <textarea name="notes" id="interventionNotes" class="form-control"></textarea>
-                </div>
+
+                <fieldset>
+                    <legend class="sr-only">Notes about your experiment</legend>
+
+                    <div class="form-group">
+                        <label for="interventionNotes">Notes</label>
+                        <textarea name="notes" id="interventionNotes" class="form-control"></textarea>
+                    </div>
+
+                </fieldset>
             </div>
             <div class="modal-footer">
-                <a class="" data-dismiss="modal">Cancel</a>
-                <input type="submit" class="btn btn-primary" value="Save">
+                <a class="btn btn-link" data-dismiss="modal">Cancel</a>
+                <!--input type="submit" class="btn btn-submit-primary" value="Save"-->
+                <button type="submit" class="btn btn-submit-primary">Create</button>
             </div>
         </form>
     </div>
@@ -64,43 +95,79 @@
         <form method="post" class="form-horizontal" name="intervention_point_form"
             action="{% url 'ab_testing_tool_submit_edit_intervention_point' intervention_point.id %}">
             <div class="modal-body">
-                <div class="form-group col-sm-12">
-                    <label for="interventionName">Name:</label>
-                    <input type="text" name="name" id="intervention_{{intervention_point.id}}"
-                        class="form-control" value="{{intervention_point.name}}">
-                </div>
-                
-                    {% for track_url in intervention_point.track_urls %}
+                <p>Excitavit hic ardor milites per municipia plurima, quae isdem conterminant, dispositos et castella, sed quisque serpentes latius pro viribus repellere moliens, nunc globis confertos, aliquotiens et dispersos multitudine superabatur ingenti.</p>
+
+                <fieldset>
+                    <legend class="sr-only">Name of experiment</legend>
+                    
                     <div class="form-group">
-                        <div class="col-sm-8">
-                            <label for="track_{{track_url.track.id}}">Track "{{track_url.track.name}}":</label>
-                            <input type="url" name="intervention_point_url_{{track_url.track.id}}"
-                                id="intervention_point_url_{{track_url.track.id}}" class="form-control"
-                                value="{{track_url.url}}">
-                        </div>
-                        <div class="col-sm-4">
-                            <label for="is_canvas_page_for_track_{{track_url.track.id}}">Open:</label>
+                        <label for="intervention_{{intervention_point.id}}">Name:</label>
+                        <input type="text" name="name" id="intervention_{{intervention_point.id}}"
+                            class="form-control" value="{{intervention_point.name}}">
+                        <a href="#"><i class="fa fa-question-circle"></i></a>
+                    </div>
+                    <div class="form-group-description">
+                        <p>A descriptive name for this track. This will help you blah blah blah</p>
+                    </div>
+
+                </fieldset>
+
+                {% for track_url in intervention_point.track_urls %}
+                <fieldset>
+                    <legend class="sr-only">Tracks for experiment</legend>
+
+                    <div class="form-group-inline-left">
+                        <label for="intervention_point_url_{{track_url.track.id}}">Track "{{track_url.track.name}}":</label>
+                        <input type="url" name="intervention_point_url_{{track_url.track.id}}"
+                            id="intervention_point_url_{{track_url.track.id}}" class="form-control"
+                            value="{{track_url.url}}">
+                        <a href="#"><i class="fa fa-question-circle"></i></a>
+                    </div>
+                    <div class="form-group-description">
+                        <p>A descriptive name for this track. This will help you blah blah blah</p>
+                    </div>
+
+                    <div class="form-group-inline-right">
+                        <label for="is_canvas_page_for_track_{{track_url.track.id}}">Open in:</label>
+                        <div class="custom-dropdown">
                             <select name="is_canvas_page_for_track_{{track_url.track.id}}"
                                 id="is_canvas_page_for_track_{{track_url.track.id}}">
                                 <option {% if track_url.open_as_tab %}selected="selected"{% endif %}
-                                    value="newTab">In new tab</option>
+                                    value="newTab">
+                                    In new tab -- Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean feugiat eu est et volutpat. Donec dictum ultrices finibus.
+                                </option>
                                 <option {% if not track_url.open_as_tab and not track_url.is_canvas_page %}selected="selected"{% endif %}
-                                    value="externalPage">External URL in Canvas</option>
+                                    value="externalPage">
+                                    External URL in Canvas -- Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean feugiat eu est et volutpat. Donec dictum ultrices finibus.
+                                </option>
                                 <option {% if not track_url.open_as_tab and track_url.is_canvas_page %}selected="selected"{% endif %}
-                                    value="canvasPage">Canvas URL</option>
+                                    value="canvasPage">
+                                    Canvas URL -- Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean feugiat eu est et volutpat. Donec dictum ultrices finibus.
+                                </option>
                             </select>
                         </div>
+                        <a href="#"><i class="fa fa-question-circle"></i></a>
                     </div>
-                    {% endfor %}
+                    <div class="form-group-description">
+                        <p>A descriptive name for this track. This will help you blah blah blah</p>
+                    </div>
+
+                </fieldset>
+                {% endfor %}
                 
-                <div class="form-group col-sm-12">
-                    <label class="control-label" for="interventionPointNotes">Notes</label>
-                    <textarea name="notes" id="interventonPointNotes" class="form-control">{{ intervention_point.notes }}</textarea>
-                </div>
+                <fieldset>
+                    <legend class="sr-only">Notes about your experiment</legend>
+                
+                    <div class="form-group">
+                        <label for="interventionPointNotes">Notes</label>
+                        <textarea name="notes" id="interventonPointNotes" class="form-control">{{ intervention_point.notes }}</textarea>
+                    </div>
+
+                </fieldset>
             </div>
             <div class="modal-footer">
-                <a class="" data-dismiss="modal">Cancel</a>
-                <input type="submit" class="btn btn-primary" value="Save">
+                <a class="btn btn-link" data-dismiss="modal">Cancel</a>
+                <button type="submit" class="btn btn-submit-primary">Update</button>
             </div>
         </form>
     </div>
@@ -168,8 +235,8 @@
                 <p class="text-warning">Starting an experiment cannot be undone. Once started, the experiment assignment method and number of tracks cannot be changed. Students will be assigned to tracks when they first visit an intervention point in this experiment.</p>
             </div>
             <div class="modal-footer">
-                <a class="btn btn-lg btn-primary" data-dismiss="modal"> Close </a>
-                <a class="btn btn-lg btn-danger"  href="{% url 'ab_testing_tool_finalize_tracks' experiment.id %}"> Yes, Start Experiment </a>
+                <a class="btn btn-lg btn-submit-primary" data-dismiss="modal"> Close </a>
+                <a class="btn btn-lg btn-submit" href="{% url 'ab_testing_tool_finalize_tracks' experiment.id %}"> Yes, Start Experiment </a>
             </div>
         </div>
     </div>
