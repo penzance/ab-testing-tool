@@ -130,9 +130,9 @@
                 <div class="form-group">
                     <a href="#" id="update-cancel" ng-click="cancel()" class="btn btn-link">Cancel</a>
                     {% if create %}
-                        <button class="btn btn-submit-primary" id="create-confirm" data-toggle="modal" data-target="#confirmSubmit">Create</button>
+                        <button class="btn btn-submit-primary" id="create-confirm" ng-click="showConfirmation()">Create</button>
                     {% else %}
-                        <button class="btn btn-submit-primary" id="update-confirm" data-toggle="modal" data-target="#confirmSubmit">Update</button>
+                        <button class="btn btn-submit-primary" id="update-confirm" ng-click="showConfirmation()">Update</button>
                     {% endif %}
                 </div>
                 <div class="form-group-description">

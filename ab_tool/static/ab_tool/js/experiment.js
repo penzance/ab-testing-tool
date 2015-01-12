@@ -51,6 +51,40 @@ angular.module('ABToolExperiment', []).controller(
         return Math.round(100 / $scope.experiment.tracks.length);
     }
     
+    $scope.percentsTotal100 = function() {
+        /**
+         * Returns a boolean as to whether or not the tracks add up to 100.
+         * If the return is false, raises an alert.
+         */
+        if ($scope.experiment.uniformRandom) {
+            // If uniformRandom is true, the actual track weights are ignored.
+            return true;
+        }
+        var i, len, sum;
+        for (i = 0, sum = 0, len = $scope.experiment.tracks.length; i < len; i++) {
+            var weighting = $scope.experiment.tracks[i].weighting;
+            if (weighting) {
+                sum += weighting;
+            } else {
+                $scope.experiment.tracks[i].weighting = 0
+            }
+        }
+        if (sum != 100) {
+            // TODO: replace with better error display
+            alert("Your track weightings add up to " + sum + "%.  This needs to be 100%.");
+        }
+        return (sum == 100);
+    }
+    
+    $scope.showConfirmation = function() {
+        /**
+         * If the form validates, display the confirmation modal to the user
+         */
+        if ($scope.percentsTotal100()) {
+            $("#confirmSubmit").modal('show');
+        }
+    }
+    
     $scope.submit = function() {
         /**
          * Submits form contents to the backend and redirects to window.parentPage
