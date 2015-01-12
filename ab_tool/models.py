@@ -75,7 +75,14 @@ class Experiment(CourseObject):
             "name": self.name,
             "notes": self.notes,
             "uniformRandom": bool(self.assignment_method == self.UNIFORM_RANDOM),
-            "tracks": [{"id": t.id, "weighting": t.get_weighting(), "name": t.name,
+            "tracks": [{"id": t.id,
+                        "weighting": t.get_weighting(),
+                        "name": t.name,
+                        # databaseName stores the track name in the database for collision comparison
+                        "databaseName": t.name,
+                        # newName and editing are used to hold temporary values for track name editing
+                        "newName" : t.name,
+                        "editing": False,
                         "deleteURL": reverse('ab_testing_tool_delete_track', args=(t.id,))}
                        for t in self.tracks.all()],
         }
