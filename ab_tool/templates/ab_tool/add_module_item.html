@@ -8,6 +8,7 @@
 </head>
 <body>
 <div class="container">
+    {% if intervention_points %}
     <form method="POST" action="{% url 'ab_testing_tool_submit_selection' %}">
         <h4> To install a new Intervention Point, select one from list of uninstalled intervention points below:</h4>
         <br>
@@ -21,6 +22,9 @@
     <input type="submit" value="Add From List" class="btn btn-large btn-primary submit">
     </form>
     <br>
+    {% else %}
+    <h4> There are no uninstalled intervention points at this time.  Go to the A/B Testing Tool dashboard to create them.
+    {% endif %}
 <!--
     <h4> Or, create a new Intervention Point:</h4>
     <br>

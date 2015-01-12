@@ -19,7 +19,7 @@ class TestInterventionPointPages(SessionTestCase):
         intervention_point = self.create_test_intervention_point()
         response = self.client.get(reverse("ab_testing_tool_deploy_intervention_point",
                                            args=(intervention_point.id,)))
-        self.assertRedirects(response, reverse("ab_testing_tool_modules_page_edit_intervention_point",
+        self.assertRedirects(response, reverse("ab_testing_tool_modules_page_view_intervention_point",
                                                args=(intervention_point.id,)))
     
     def test_deploy_intervention_point_student_not_finalized(self):

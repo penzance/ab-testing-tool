@@ -7,7 +7,9 @@ from ab_tool.views.selection_pages import (resource_selection, submit_selection,
     submit_selection_new_intervention_point)
 from ab_tool.views.intervention_point_pages import (submit_create_intervention_point,
     delete_intervention_point, deploy_intervention_point,
-    submit_edit_intervention_point, modules_page_edit_intervention_point)
+    submit_edit_intervention_point, modules_page_edit_intervention_point,
+    modules_page_view_intervention_point,
+    submit_edit_intervention_point_from_modules)
 from ab_tool.views.experiment_pages import (create_experiment, submit_create_experiment,
     edit_experiment, submit_edit_experiment, delete_experiment, finalize_tracks,
     delete_track)
@@ -25,8 +27,10 @@ urlpatterns = patterns('',
     url(r'^submit_selection_new_intervention_point$', submit_selection_new_intervention_point, name="ab_testing_tool_submit_selection_new_intervention_point"),
     
     url(r'^submit_create_intervention_point/(?P<experiment_id>\d+)$', submit_create_intervention_point, name='ab_testing_tool_submit_create_intervention_point'),
+    url(r'^modules_page_view_intervention_point/(?P<intervention_point_id>\d+)$', modules_page_view_intervention_point, name='ab_testing_tool_modules_page_view_intervention_point'),
     url(r'^modules_page_edit_intervention_point/(?P<intervention_point_id>\d+)$', modules_page_edit_intervention_point, name='ab_testing_tool_modules_page_edit_intervention_point'),
     url(r'^submit_edit_intervention_point/(?P<intervention_point_id>\d+)$', submit_edit_intervention_point, name='ab_testing_tool_submit_edit_intervention_point'),
+    url(r'^submit_edit_intervention_point_from_modules/(?P<intervention_point_id>\d+)$', submit_edit_intervention_point_from_modules, name='ab_testing_tool_submit_edit_intervention_point_from_modules'),
     url(r'^intervention_point/(?P<intervention_point_id>\d+)$', deploy_intervention_point, name='ab_testing_tool_deploy_intervention_point'),
     url(r'^delete_intervention_point/(?P<intervention_point_id>\d+)$', delete_intervention_point, name='ab_testing_tool_delete_intervention_point'),
     
