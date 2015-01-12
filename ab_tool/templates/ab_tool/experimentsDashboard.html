@@ -84,9 +84,15 @@
                     </div>
                     <div class="exp-delete">
                         <div class="arrow-right"></div>
-                        <a href="#" class="btn btn-icon-only exp-btn-global">
-                            <i class="fa fa-trash"></i><span>Delete</span>
-                        </a>
+                        {% if experiment.id in deletable_experiment_ids %}
+                            <a href="#delete_modal{{experiment.id}}" data-toggle="modal" class="btn btn-icon-only exp-btn-global">
+                                <i class="fa fa-trash"></i><span>Delete</span>
+                            </a>
+                        {% else %}
+                           <a href="#" class="btn btn-icon-only exp-btn-global disabled">
+                                <i class="fa fa-trash"></i><span>Delete</span>
+                            </a>
+                        {% endif %}
                     </div>
                     {% if experiment.intervention_points.count == 0 %}
                     <div class="panel-noInterventions">

@@ -138,9 +138,9 @@
                 <div class="form-group">
                     <a href="#" id="update-cancel" ng-click="cancel()" class="btn btn-link">Cancel</a>
                     {% if create %}
-                        <button class="btn btn-submit-primary" id="create-confirm" data-toggle="modal" data-target="#confirmSubmit">Create</button>
+                        <button class="btn btn-submit-primary" id="create-confirm" ng-click="showConfirmation()">Create</button>
                     {% else %}
-                        <button class="btn btn-submit-primary" id="update-confirm" data-toggle="modal" data-target="#confirmSubmit">Update</button>
+                        <button class="btn btn-submit-primary" id="update-confirm" ng-click="showConfirmation()">Update</button>
                     {% endif %}
                 </div>
                 <div class="form-group-description">
@@ -187,10 +187,11 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
         {% if create %}
-            <button type="button" id="createNow" class="btn btn-submit-primary" ng-click="submit()">Submit Create</button>
+            <button type="button" id="createNow" class="btn btn-submit-primary" ng-if="!submitting" ng-click="submit()">Submit Create</button>
         {% else %}
-            <button type="button" id="createNow" class="btn btn-submit-primary" ng-click="submit()">Submit Update</button>
+            <button type="button" id="createNow" class="btn btn-submit-primary" ng-if="!submitting" ng-click="submit()">Submit Update</button>
         {% endif %}
+        <button enabled="false" type="button" class="btn btn-submit-primary" ng-if="submitting">Please wait...</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
