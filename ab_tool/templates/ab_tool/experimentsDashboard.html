@@ -54,18 +54,18 @@
                         <h3 class="panel-title panel-title-experiment">Experiment "{{experiment.name}}"</h3>
                         
                         {% if not experiment.tracks_finalized %}
-                            <a data-toggle="modal" href="#finalize_modal{{experiment.id}}" class="btn btn-icon btn-experiment-start">
-                                <i class="fa fa-play-circle"></i>Start Experiment
-                            </a>
+                            <a href="#finalize_modal{{experiment.id}}" data-toggle="modal" class="btn btn-icon btn-experiment-start"><i class="fa fa-play-circle"></i>Start Experiment
                         {% else %}
-                        {% endif %}
+                            <a href="#" class="btn btn-icon btn-experiment-start disabled">Experiment started
+                        {% endif %}   
+                            </a>
                         
                         <dl class="list list-horizontal">
                             <dt class="list-item-title">Sort by:</dt>
                             {% if experiment.assignment_method == experiment.WEIGHTED_PROBABILITY_RANDOM %}
-                                <dd>Weighted probability random distribution</dd>
+                                <dd>Weighted random</dd>
                             {% elif experiment.assignment_method == experiment.UNIFORM_RANDOM %}
-                                <dd>Uniform random distribution</dd>
+                                <dd>Uniform random</dd>
                             {% endif %}
                             <dt class="list-item-title">Tracks:</dt>
                             <dd>{{experiment.tracks.count}}</dd>
@@ -76,13 +76,13 @@
                         </dl>
                         
                     </div>
-                    <div class="exp-edit">
+                    <div class="exp-edit" data-toggle="tooltip" data-placement="right" title="Edit experiment">
                         <div class="arrow-left"></div>
                         <a href="{% url 'ab_testing_tool_edit_experiment' experiment.id %}" id="experiment_{{experiment.id}}" class="btn btn-icon-only exp-btn-global">
                             <i class="fa fa-pencil"></i><span>Edit</span>
                         </a>
                     </div>
-                    <div class="exp-delete">
+                    <div class="exp-delete" data-toggle="tooltip" data-placement="left" title="Delete experiment">
                         <div class="arrow-right"></div>
                         {% if experiment.id in deletable_experiment_ids %}
                             <a href="#delete_modal{{experiment.id}}" data-toggle="modal" class="btn btn-icon-only exp-btn-global">
@@ -118,7 +118,7 @@
                                 </li>
                                 {% empty %}
                                 <li class="list-group-item">
-                                    No intervention points currently exist for this experiment. Click on "Add an Intervention Point" to get started.
+                                    No intervention points currently exist for this experiment. Click on "Add Intervention Point" to get started.
 
                                     <a href="#createIntervention_{{experiment.id}}" id="add_intervention_point_button" data-toggle="modal" class="btn btn-icon btn-no-ip">
                                         <i class="fa fa-plus"></i>Add Intervention Point
@@ -149,7 +149,7 @@
                                 </li>
                             {% else %}
                                 <li>
-                                    <a href="href="{% url 'ab_testing_tool_download_data' experiment.id %}" class="btn btn-icon btn-ip-options disabled">
+                                    <a href="{% url 'ab_testing_tool_download_data' experiment.id %}" class="btn btn-icon btn-ip-options disabled">
                                         <i class="fa fa-download"></i>Download Students
                                     </a>
                                 </li>
@@ -196,6 +196,8 @@ $(document).ready(function(){
             return text.replace(pattern, replacement);
         }
     });
+
+    $('[data-toggle="tooltip"]').tooltip();
 });
 </script>
 {% endblock %}
