@@ -5,7 +5,7 @@
 }
 
 /*select button styles*/
-.custom-select { float:left; text-decoration:none; text-align:left; cursor:pointer; position:relative; background:#fff url(../images/button-silver.gif) left center repeat-x; border:1px solid #b3b3b3; /*font-size:1.3em; font-weight:bold;*/ overflow:visible; -moz-border-radius:7px; -webkit-border-radius:7px; border-radius:7px; width: 100%;/*width:180px; text-shadow:1px 1px 0 #fff;RM*/ }
+.custom-select { float:left; text-decoration:none; text-align:left; cursor:pointer; position:relative; background:#fff; border:1px solid #b3b3b3; /*font-size:1.3em; font-weight:bold;*/ overflow:visible; -moz-border-radius:7px; -webkit-border-radius:7px; border-radius:7px; width: 100%;/*width:180px; text-shadow:1px 1px 0 #fff;RM*/ }
 .custom-select:hover,.custom-select:focus,.custom-select-open { background-position:right center; border-color:#999; }
 /*status text*/
 .custom-select-status { float:left; /*line-height:2;*/ color:#444; padding: .4em 4%;/*padding:.2em 8px;*/width: 77%; overflow: hidden; height: 0.75em; }
@@ -29,7 +29,7 @@
 /*li styles*/
 .custom-select-menu li { padding:0; margin:0; list-style:none; clear:both; }
 .custom-select-menu li a { text-decoration:none; color:#555; display:block; cursor: pointer; padding:.5em 5px; /*text-shadow:1px 1px 0 #f9f9f9;*/ }
-.custom-select-menu li.hover-focus { background:#e6e6e6 url(../images/button-silver.gif) right center repeat-x; color:#444; }
+.custom-select-menu li.hover-focus { background:#e6e6e6; color:#444; }
 .custom-select-menu li.selected { background:#eaeaea;}/*RM*/
 .custom-select-menu li.selected a { }/*RM*/
 
@@ -44,7 +44,7 @@
 
 /*custom icons for both button and li's in the gift wrap menu */
 #giftwrap-button .custom-select-status,
-#giftwrap-menu li a { background-image:url(../images/select-icons.gif); background-repeat: no-repeat; padding-left: 40px; }
+#giftwrap-menu li a { padding-left: 40px; }
 .purple-bubbles .custom-select-status,
 li.purple-bubbles a { background-position: 5px 3px; }
 .yellow-swirl .custom-select-status,
@@ -59,6 +59,16 @@ li.green-blobs a { background-position: 5px -197px; }
 
 
 /*album menu hierarchy*/
+/* original
+#album-button span.option-description,
+#album-button span.option-date { display: none;}
+#album-menu li a { line-height: 1.2; padding: .4em 8px; }
+#album-menu li a span { display: block; }
+#album-menu li a span.option-title { font-weight: bold; color:#000000; }
+#album-menu li.selected a span.option-title { color:#000; }
+#album-menu li a span.option-description {  text-shadow: none; }
+#album-menu li a span.option-date { font-size: .8em; font-style: italic; text-shadow: none; padding: .2em 0; }
+end original*/
 .custom-select span.option-description{ display: none;}
 .custom-select-menu li a { line-height: 1.2; padding: .4em 8px; }
 .custom-select-menu li a span { display: block; }

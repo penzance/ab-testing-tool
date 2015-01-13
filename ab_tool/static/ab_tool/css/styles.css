@@ -218,6 +218,9 @@ fieldset {
   padding: 1em 0;
   border-width: 0px 0px 1px 0px;
 }
+.fieldset-noborder {
+  border: 0;
+}
 fieldset.fieldset-btn {
   border: 0;
   text-align: right;
@@ -301,9 +304,14 @@ textarea.form-control {
 .form-group-description {
   width: 38%;
   float: left;
+  font-family: Georgia, Times, serif;
+  font-size: 0.875em;
 }
 /****** show hide helper text based on modal window or 	******
 ******* screen size 									*****/
+.form-group .fa-asterisk {
+  color: #a51c30;
+}
 .form-group .fa-question-circle {
   /* hide the question icon from forms */
 
@@ -375,7 +383,7 @@ textarea.form-control {
 .panel-heading {
   width: 93.846153846154%;
   display: inline-block;
-  padding: 0.625em 3.076923076923% 1em 3.076923076923%;
+  padding: 1em 3.076923076923%;
 }
 .panel-heading dl {
   padding-top: 0.625em;
@@ -618,10 +626,15 @@ a:hover {
   width: 23%;
   padding: 0.5em 0;
   font-size: 0.875em;
+  text-transform: uppercase;
 }
 .btn-experiment-start:hover {
   background-color: #525252;
   color: #f7f7f7;
+}
+.btn-experiment-start.disabled {
+  background-color: #959595;
+  color: #f7f7f7 !important;
 }
 .btn-ip-options {
   border: 0px;
@@ -706,11 +719,19 @@ a:hover {
   left: -14px;
   width: 2em;
 }
+.exp-edit a:hover {
+  background-color: #3e67a2;
+  color: #f7f7f7;
+}
 .exp-delete {
   position: absolute;
   right: -14px;
   top: 29px;
   width: 2em;
+}
+.exp-delete a:hover {
+  background-color: #a51c30;
+  color: #f7f7f7;
 }
 .exp-btn-global {
   border-radius: 0;
@@ -740,11 +761,7 @@ a:hover {
 					NEW EXPERIMENT FORM (START)
 /**********************************************************************************/
 .input-newWeight {
-  width: 3em;
-  margin-left: 2.3em;
-}
-.input-trackWeight {
-  width: 3em;
+  margin-left: 2.25em;
 }
 .input-newTrackName {
   width: 20%;
@@ -754,7 +771,7 @@ a:hover {
 }
 .input-newTrackName-uniformrandom {
   width: 20%;
-  margin-left: 5.5%;
+  margin-left: 5.25%;
 }
 .btn.disabled {
   color: #9e9d9d;
@@ -803,6 +820,30 @@ body.blocked {
   -webkit-box-shadow: 0 0 8px #111;
   box-shadow: 0 0 8px #111;
   z-index: 10000;
+}
+#expSummary {
+  width: 80%;
+  margin: 0 auto;
+  display: block;
+  border: 0;
+}
+#expSummary dt {
+  width: 30%;
+  text-align: right;
+  display: inline-block;
+  margin: 0;
+  letter-spacing: 0.035em;
+  float: left;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 1.2em;
+}
+#expSummary dd {
+  width: 55%;
+  text-align: left;
+  display: inline-block;
+  margin-left: 1%;
+  clear: both;
+  padding: 0 0 1em 0;
 }
 /***********************************************************************************
 					modal (END)
