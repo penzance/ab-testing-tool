@@ -111,7 +111,8 @@ class Track(CourseObject):
         except TrackProbabilityWeight.DoesNotExist:
             TrackProbabilityWeight.objects.create(
                     track=self, weighting=new_weighting,
-                    experiment=self.experiment
+                    experiment=self.experiment,
+                    course_id=self.course_id,
         )
     
     def get_weighting(self):
