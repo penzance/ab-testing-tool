@@ -97,12 +97,9 @@
                                         ng-pattern="/^\d+$/" ng-model="newTrackWeighting"
                                         class="input-newWeight input-group-right float-left">
                                         <span> % </span>
-                                <input type="text" name="newTrackName" id="newTrackName" placeholder="Enter track name" class="input-newTrackName form-control float-left" ng-model="newTrackName">
                             </div>
-                            <div ng-if="experiment.uniformRandom">
-                                <input type="text" name="newTrackName" id="newTrackName" placeholder="Enter track name" class="input-newTrackName-uniformrandom form-control float-left" ng-model="newTrackName">
-                            </div>
-                            <a ng-click="addTrack()" class="btn btn-submit" id="addTrack"><i class="fa fa-plus"></i>Add Track</a>    
+                            <input type="text" name="newTrackName" id="newTrackName" placeholder="Enter track name" class="input-newTrackName form-control float-left" ng-model="newTrackName">
+                            <a href="#" ng-click="addTrack()" class="btn btn-submit" id="addTrack"><i class="fa fa-plus"></i>Add Track</a>    
                         </li>
                         {% endif %}
                     </ul>

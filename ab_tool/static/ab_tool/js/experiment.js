@@ -59,7 +59,7 @@ var controller = function($scope, $window, $http) {
         for (i = 0, sum = 0, len = $scope.experiment.tracks.length; i < len; i++) {
             var weighting = $scope.experiment.tracks[i].weighting;
             if (weighting) {
-                sum += weighting;
+                sum += int(weighting);
             } else {
                 $scope.experiment.tracks[i].weighting = 0
             }
