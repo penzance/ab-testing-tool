@@ -49,7 +49,7 @@
         <!--h2><a href="{% url 'ab_testing_tool_create_experiment' %}">Add an Experiment</a></h2-->
         {% for experiment in experiments %}
             <div class="panel panel-experiment"><!-- exp (start) -->
-                <div class="panel-wrapper"> 
+                <div class="panel-wrapper">
                     <div class="panel-heading">
                         <h3 class="panel-title panel-title-experiment">Experiment "{{experiment.name}}"</h3>
                         
@@ -57,7 +57,7 @@
                             <a href="#finalize_modal{{experiment.id}}" data-toggle="modal" class="btn btn-icon btn-experiment-start"><i class="fa fa-play-circle"></i>Start Experiment
                         {% else %}
                             <a href="#" class="btn btn-icon btn-experiment-start disabled">Experiment started
-                        {% endif %}   
+                        {% endif %}
                             </a>
                         
                         <dl class="list list-horizontal">
@@ -102,16 +102,18 @@
                         <ul class='intervention-points'>
                             {% for intervention_point in experiment.intervention_points.all %}
                                 <li>
+                                    {% if intervention_point in uninstalled_intervention_points %}
                                     <a href="{% url 'ab_testing_tool_delete_intervention_point' intervention_point.id %}"
                                         class="btn btn-icon-only ip-btn-delete">
                                         <i class="fa fa-trash"></i><span>Delete</span>
                                     </a>
+                                    {% endif %}
                                     <a data-toggle="modal" href="#editIntervention_{{intervention_point.id}}">
                                         Intervention Point "{{intervention_point.name}}"
                                     </a><br>
                                     <span class="label">
-                                        {{intervention_point.is_missing_urls|yesno:"URLs missing,complete"}}
-                                    </span> 
+                                        {{intervention_point.is_missing_urls|yesno:"URLs missing,complete"}} {% if intervention_point not in uninstalled_intervention_points %} + installed {% endif%}
+                                    </span>
                                     <span class="date">
                                         Last modified {{intervention_point.updated_on}}
                                     </span>
