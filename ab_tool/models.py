@@ -66,6 +66,9 @@ class Experiment(CourseObject):
         return Track.objects.create(course_id=self.course_id, experiment=self,
                                     name=track_name)
     
+    def get_incomplete_intervention_point_names(self):
+        return [point.name for point in self.intervention_points.all() if point.is_missing_urls()]
+    
     def to_json(self):
         """ Converts the experiment and its associated tracks to json,
             in the form expected by the editExperiment.html template and

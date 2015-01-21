@@ -1,3 +1,47 @@
+<!-- START Modal code for Modules Installations modal (to see where intervention points are installed-->
+<div id="modules_installations" class="modal fade" role="dialog" aria-labelledby="modules_installations" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Modules Installations</h4>
+            </div>
+            <div class="modal-body">
+                <p class="text-warning">See where A/B intervention points are installed in your modules.</p>
+                <div class="list-group ">
+                    {% for m in modules %}
+                        <h4><a class="list-group-item" id="module_{{m.id}}"> <strong>Module: {{m.name}}</strong></a></h4>
+                        <div id="module_items_{{m.id}}" style="display: none">
+                                <ul class="list-group">
+                                    {% for i in m.module_items %}
+                                        {% if i.is_intervention_point %}
+                                            <a class="list-group-item active">{{i.title}} | <i> Intervention Point</i></a>
+                                        {% else %}
+                                            <p class="list-group-item">{{i.title|default:"[ Item not titled]"}}</p>
+                                        {% endif %}
+                                    {% empty %}
+                                        <p>No items found in this module.</p>
+                                    {% endfor %}
+                                </ul>
+                        </div>
+                    {% empty %}
+                        <p>No modules found.</p>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-lg btn-submit-primary" data-dismiss="modal"> Close </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
 <!-- START Modal code for create intervention-->
 {% for experiment in experiments %}
 <div class="modal fade" id="createIntervention_{{experiment.id}}" tabindex="-1" role="dialog" aria-labelledby="addIntervention" aria-hidden="true">
@@ -174,9 +218,9 @@
 <!-- END Modal code for edit intervention-->
 
 
-{% if incomplete_intervention_points %}
+{% for experiment in experiments %}
 <!-- START Modal code for incomplete_intervention_points confirmation box-->
-<div id="incomplete_intervention_points_modal" class="modal fade" role="dialog" aria-labelledby="incomplete_intervention_points_modal" aria-hidden="true">
+<div id="incomplete_intervention_points_modal{{experiment.id}}" class="modal fade" role="dialog" aria-labelledby="incomplete_intervention_points_modal{{experiment.id}}" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -185,38 +229,16 @@
             </div>
             <div class="modal-body">
                 <p>Complete your intervention points by filling in the URLs fields for all tracks.</p>
-                <p class="text-warning">These following intervention points are incomplete: {{ incomplete_intervention_points|join:", " }} </p>
+                <p class="text-warning">These following intervention points are incomplete: {{ experiment.get_incomplete_intervention_point_names|join:", " }} </p>
             </div>
             <div class="modal-footer">
-                <a class="btn btn-lg btn-primary" data-dismiss="modal"> Close </a>
+                <a class="btn btn-lg btn-submit" data-dismiss="modal"> Close </a>
             </div>
         </div>
     </div>
 </div>
 <!-- END Modal code for incomplete_intervention_points confirmation box-->
-{% endif %}
-
-{% if missing_track_weights %}
-<!-- START Modal code for missing_track_weights confirmation box-->
-<div id="missing_track_weights_modal" class="modal fade" role="dialog" aria-labelledby="missing_track_weights" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title">Some Tracks Are Missing Weights</h4>
-            </div>
-            <div class="modal-body">
-                <p>Complete your track weights by filling out weights for all tracks.</p>
-                <p class="text-warning">These following tracks are missing weights: {{ missing_track_weights|join:", " }} </p>
-            </div>
-            <div class="modal-footer">
-                <a class="btn btn-lg btn-primary" data-dismiss="modal"> Close </a>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- END Modal code for missing_track_weights confirmation box-->
-{% endif %}
+{% endfor %}
 
 {% for experiment in experiments %}
 <!-- START Modal code for Finalize Tracks confirmation box-->
