@@ -96,11 +96,16 @@ def submit_edit_experiment(request, experiment_id):
     name = experiment_dict["name"]
     notes = experiment_dict["notes"]
     if experiment.tracks_finalized:
-        # Only allow updating name and notes for started experiments
+        # Only allow updating name, notes, and track names for started experiments
         experiment.update(name=name, notes=notes)
+        existing_tracks = [i for i in experiment_dict["tracks"] if i["id"] is not None]
+        for track_dict in existing_tracks:
+            track = Track.get_or_404_check_course(track_dict["id"], course_id)
+            track.update(name=track_dict["name"])
         return HttpResponse("success")
+    
     uniform_random = experiment_dict["uniformRandom"]
-    old_tracks = [i for i in experiment_dict["tracks"] if i["id"] is not None]
+    existing_tracks = [i for i in experiment_dict["tracks"] if i["id"] is not None]
     new_tracks = [i for i in experiment_dict["tracks"] if i["id"] is None]
     if uniform_random:
         assignment_method = Experiment.UNIFORM_RANDOM
@@ -109,7 +114,7 @@ def submit_edit_experiment(request, experiment_id):
     experiment.update(name=name, notes=notes, assignment_method=assignment_method)
     
     # Update existing tracks
-    for track_dict in old_tracks:
+    for track_dict in existing_tracks:
         track = Track.get_or_404_check_course(track_dict["id"], course_id)
         track.update(name=track_dict["name"])
         if not uniform_random:
