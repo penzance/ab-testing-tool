@@ -581,6 +581,17 @@ and spacing to match a btn-submit */
   padding: 0.4375em 0.3125em;
   background-color: #eaeaea;
 }
+.infoBlock {
+  width: 90%;
+  display: inline-block;
+  margin: 0 0 1em 1.4925373134328357%;
+  width: 87.01492537313433%;
+  padding: 1.5em 5%;
+}
+.infoBlock-empty {
+  background: #f7f7f7;
+  color: #636363;
+}
 body {
   font-size: 0.9375em;
   line-height: 1.25em;
