@@ -9,7 +9,7 @@
 <div class="container">
     <header>
         <div class="row lti-header">
-            <h1><a onclick="history.go(-1);">Modules</a> &rsaquo; <span> Editing Intervention Point "{{intervention_point.name}}"</span></h1>
+            <h1><span> Editing Intervention Point "{{intervention_point.name}}"</span></h1>
         </div>
     </header>
 
@@ -17,7 +17,7 @@
         <div class="row row-lti col-md-8">
 
             <form class="form-horizontal" role="form" method="post" class="form-horizontal" name="intervention_point_form"
-            action="{% url 'ab_testing_tool_submit_edit_intervention_point' intervention_point.id %}">
+            action="{% url 'ab_testing_tool_submit_edit_intervention_point_from_modules' intervention_point.id %}">
             <div>
                 <div class="form-group col-sm-12">
                     <label for="interventionName">Name:</label>
@@ -54,7 +54,7 @@
                     <textarea name="notes" id="interventonPointNotes" class="form-control">{{ intervention_point.notes }}</textarea>
                 </div>
                 <div class="form-group col-md-8">
-                    <a id="update-cancel" onclick="history.go(-1);">Cancel</a>
+                    <a id="update-cancel" href="{% url 'ab_testing_tool_modules_page_view_intervention_point' intervention_point.id %}">Cancel</a>
                     <input type="submit" class="btn btn-primary" value="Save">
             </form>
         </div>

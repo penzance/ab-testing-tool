@@ -6,14 +6,18 @@
 
   <link href="{% static "favicon.ico" %}" rel="icon" type="image/x-icon">
   {% block stylesheet %}
-    <link rel="stylesheet" href="{% static 'ab_tool/css/bootstrap.min.css' %}" type="text/css"/>
+    <!--link rel="stylesheet" href="{% static 'ab_tool/css/bootstrap.min.css' %}" type="text/css"/-->
     <link rel="stylesheet" href="{% static 'ab_tool/css/bootstrap_customization.css' %}" type="text/css"/>
+    <link rel="stylesheet" href="{% static 'ab_tool/css/tooltipModal.css' %}" type="text/css"/>
+    <link rel="stylesheet" href="{% static 'ab_tool/css/styles.css' %}" type="text/css"/>
+    <link rel="stylesheet" href="{% static 'ab_tool/css/jqueryDropdown.css' %}" type="text/css"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'ab_tool/css/font-awesome-4.2.0/css/font-awesome.min.css' %}">
     {% block fonts %}
     {% endblock fonts %}
  {% endblock stylesheet %}
   <title>{% block page_title %}{% endblock page_title %}</title>
 </head>
-{% block bodytag %}<body class="lti">{% endblock bodytag %}
+{% block bodytag %}<body class="lti-ab-tool">{% endblock bodytag %}
 
   {% block navbar %}
   {% endblock navbar %}
@@ -63,8 +67,8 @@
 
 
   {% block javascript %}
-    <script src="{% static "ab_tool/js/jquery-1.10.1.min.js" %}"></script>
-    <script src="{% static "ab_tool/js/bootstrap.min.js" %}"></script>
+    <script src="{% static 'ab_tool/js/jquery-1.10.1.min.js' %}"></script>
+    <script src="{% static 'ab_tool/js/tooltipModal.js' %}"></script>
   {% endblock javascript %}
 </body>
 </html>
