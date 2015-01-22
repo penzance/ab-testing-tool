@@ -10,7 +10,7 @@ from ab_tool.exceptions import (MISSING_LTI_PARAM, MISSING_LTI_LAUNCH,
 from requests.exceptions import RequestException
 from django_canvas_oauth import get_token
 from ab_tool.controllers import intervention_point_url
-from ab_tool.models import InterventionPoint, ExperimentStudent
+from ab_tool.models import InterventionPoint, Experiment, ExperimentStudent
 from django_canvas_oauth.exceptions import NewTokenNeeded
 
 
@@ -34,13 +34,20 @@ class CanvasModules(object):
     def get_uninstalled_intervention_points(self):
         """ Returns the list of InterventionPoint objects that have been created for the
             current course but not installed in any of that course's modules """
-        
         installed_intervention_point_urls = self._get_installed_intervention_point_urls()
         intervention_points = [intervention_point for intervention_point in
                                InterventionPoint.objects.filter(course_id=self.course_id)
                                if intervention_point_url(self.request, intervention_point.id)
                                not in installed_intervention_point_urls]
         return intervention_points
+    
+    def get_deletable_experiment_ids(self):
+        """ Returns list of experiment ids for experiments that can be deleted
+            (they have tracks_finalzed == False and no installed intervention
+            points """
+        return [e.id for e in Experiment.objects.filter(course_id=self.course_id)
+                if not e.tracks_finalized
+                and not self.experiment_has_installed_intervention(e)]
     
     def intervention_point_is_installed(self, intervention_point):
         return (intervention_point_url(self.request, intervention_point.id) in
