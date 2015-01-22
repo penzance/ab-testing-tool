@@ -90,7 +90,7 @@ class CanvasModules(object):
         return installed_intervention_point_urls
 
 
-def experiments_with_unnasigned_students(reqest):
+def experiments_with_unnasigned_students(request):
     return [experiment.id for experiment in
             Experiment.objects.filter(assignment_method=Experiment.CSV_UPLOAD)
             if get_unassigned_students(request, experiment)]

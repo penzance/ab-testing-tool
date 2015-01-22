@@ -41,7 +41,7 @@ def submit_create_experiment(request):
     notes = experiment_dict["notes"]
     uniform_random = experiment_dict["uniformRandom"]
     tracks = experiment_dict["tracks"]
-    csv_upload = experiment_dict["csvUplaod"]
+    csv_upload = experiment_dict["csvUpload"]
     if csv_upload:
         assignment_method = Experiment.CSV_UPLOAD
     elif uniform_random:
@@ -111,7 +111,7 @@ def submit_edit_experiment(request, experiment_id):
         return HttpResponse("success")
     
     uniform_random = experiment_dict["uniformRandom"]
-    csv_upload = experiment_dict["csvUplaod"]
+    csv_upload = experiment_dict["csvUpload"]
     existing_tracks = [i for i in experiment_dict["tracks"] if i["id"] is not None]
     new_tracks = [i for i in experiment_dict["tracks"] if i["id"] is None]
     if csv_upload:

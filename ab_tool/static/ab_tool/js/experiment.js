@@ -12,6 +12,8 @@ var controller = function($scope, $window, $http) {
     $scope.newTrackName = null;
     $scope.newTrackWeighting = null;
     
+    $scope.error = "name";
+    
     $scope.addTrack = function() {
         /**
          * Add a new track based on the inputs in the new track form
