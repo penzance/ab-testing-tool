@@ -61,8 +61,3 @@ def get_track_selection_csv(request, experiment, file_title="test.xlsx"):
             yield [s["student_id"], s["lis_person_sourcedid"], experiment.name, ""]
     return streamed_csv_response(row_generator(), file_title)
 
-
-def parse_track_selection_xlsx(input_excel):
-    workbook = xlrd.open_workbook(file_contents=input_excel.read())
-    worksheet = workbook.sheet_by_index(0)
-    # http://www.youlikeprogramming.com/2012/03/examples-reading-excel-xls-documents-using-pythons-xlrd/

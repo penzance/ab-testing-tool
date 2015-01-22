@@ -101,9 +101,7 @@ def get_unsorted_students(request, experiment):
     except RequestException as exception:
         handle_canvas_error(exception)
     existing_student_ids = set(s.id for s in experiment.students.all())
-    # TODO: check that this mapping is correct and delete third entry when ready
-    return [{"student_id": i["login_id"], "lis_person_sourcedid": i["sis_user_id"],
-             "unused": i["sis_login_id"]}
+    return [{"student_id": i["sis_user_id"], "lis_person_sourcedid": i["sis_user_id"]}
             for i in enrollments if i["login_id"] not in existing_student_ids]
 
 
