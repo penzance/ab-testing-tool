@@ -35,10 +35,10 @@ describe("Tests for experimentController", function() {
             expect($scope.experiment.name).toBe("");
         });
         
-//        it("test submit", function() {
-//            $scope.submit();
-//            expect($scope.experiment.name).toBe("");
-//        });
+        it("test submit", function() {
+            $scope.submit();
+            expect($scope.submitting).toBe(true);
+        });
     });
     
 
