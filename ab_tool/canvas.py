@@ -102,7 +102,7 @@ def get_unsorted_students(request, experiment):
         handle_canvas_error(exception)
     existing_student_ids = set(s.id for s in experiment.students.all())
     return [{"student_id": i["sis_user_id"], "lis_person_sourcedid": i["sis_user_id"]}
-            for i in enrollments if i["login_id"] not in existing_student_ids]
+            for i in enrollments if i["sis_user_id"] not in existing_student_ids]
 
 
 def list_module_items(request_context, course_id, module_id):
