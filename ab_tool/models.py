@@ -77,6 +77,9 @@ class Experiment(CourseObject):
         return Track.objects.create(course_id=self.course_id, experiment=self,
                                     name=track_name)
     
+    def get_incomplete_intervention_point_names(self):
+        return [point.name for point in self.intervention_points.all() if point.is_missing_urls()]
+    
     def to_json(self):
         """ Converts the experiment and its associated tracks to json,
             in the form expected by the editExperiment.html template and
@@ -87,7 +90,14 @@ class Experiment(CourseObject):
             "notes": self.notes,
             "uniformRandom": bool(self.assignment_method == self.UNIFORM_RANDOM),
             "csvUpload": bool(self.assignment_method == self.CSV_UPLOAD),
-            "tracks": [{"id": t.id, "weighting": t.get_weighting(), "name": t.name,
+            "tracks": [{"id": t.id,
+                        "weighting": t.get_weighting(),
+                        "name": t.name,
+                        # databaseName stores the track name in the database for collision comparison
+                        "databaseName": t.name,
+                        # newName and editing are used to hold temporary values for track name editing
+                        "newName" : t.name,
+                        "editing": False,
                         "deleteURL": reverse('ab_testing_tool_delete_track', args=(t.id,))}
                        for t in self.tracks.all()],
         }
@@ -144,7 +154,8 @@ class Track(CourseObject):
         except TrackProbabilityWeight.DoesNotExist:
             TrackProbabilityWeight.objects.create(
                     track=self, weighting=new_weighting,
-                    experiment=self.experiment
+                    experiment=self.experiment,
+                    course_id=self.course_id,
         )
     
     def get_weighting(self):

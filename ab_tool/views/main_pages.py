@@ -34,6 +34,7 @@ def render_control_panel(request):
         "canvas_url": get_lti_param(request, "launch_presentation_return_url"),
         "experiments": experiments,
         "experiments_with_unassigned_students": experiments_with_unnasigned_students(request),
+        "deletable_experiment_ids": canvas_modules.get_deletable_experiment_ids(),
     }
     return render_to_response("ab_tool/experimentsDashboard.html", context)
 
