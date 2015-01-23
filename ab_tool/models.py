@@ -17,7 +17,7 @@ class TimestampedModel(models.Model):
         """ Helper method to update objects """
         for k, v in kwargs.iteritems():
             setattr(self, k, v)
-        self.save()
+        self.save(update_fields=kwargs.keys())
 
 
 class CourseObject(TimestampedModel):
