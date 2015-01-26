@@ -67,7 +67,7 @@
                     </div>
 
                 </fieldset>
-                
+
                 {% for track in experiment.tracks.all %}
                 <fieldset>
                     <legend class="sr-only">Tracks for experiment</legend>
@@ -140,7 +140,7 @@
 
                 <fieldset>
                     <legend class="sr-only">Name of experiment</legend>
-                    
+
                     <div class="form-group">
                         <label for="intervention_{{intervention_point.id}}">Name:</label>
                         <input type="text" name="name" id="intervention_{{intervention_point.id}}"
@@ -173,7 +173,7 @@
                         <div class="custom-dropdown">
                             <select name="is_canvas_page_for_track_{{track_url.track.id}}"
                                 id="is_canvas_page_for_track_{{track_url.track.id}}">
-                                <option {% if track_url.open_as_tab %}selected="selected"{% endif %}
+                                <option {% if not track_url.open_as_tab and track_url.is_canvas_page  %}selected="selected"{% endif %}
                                     value="newTab">
                                     Canvas URL -- Learners in this track are redirected to this Canvas page.
                                 </option>
@@ -181,7 +181,7 @@
                                     value="externalPage">
                                     External URL in Canvas -- Learners in this track view this page within Canvas.
                                 </option>
-                                <option {% if not track_url.open_as_tab and track_url.is_canvas_page %}selected="selected"{% endif %}
+                                <option {% if track_url.open_as_tab %}selected="selected"{% endif %}
                                     value="canvasPage">
                                     In new tab -- Learners in this track open this page in a new tab.
                                 </option>
@@ -195,10 +195,10 @@
 
                 </fieldset>
                 {% endfor %}
-                
+
                 <fieldset class="fieldset-noborder">
                     <legend class="sr-only">Notes about your experiment</legend>
-                
+
                     <div class="form-group">
                         <label for="interventionPointNotes">Notes</label>
                         <textarea name="notes" id="interventonPointNotes" class="form-control">{{ intervention_point.notes }}</textarea>
