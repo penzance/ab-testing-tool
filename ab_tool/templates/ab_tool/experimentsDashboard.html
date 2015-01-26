@@ -15,7 +15,7 @@
     </div>
 </header>
 <main>
-    
+
     <p>
         Welcome to the A/B Testing dashboard. Manage your A/B Testing Experiments here. More information is available at our <a href="#">documentation wiki</a>.
     </p>
@@ -43,16 +43,16 @@
             New Experiment
         </a>
     </div>
-    
+
     <div class="row row-lti col-md-8">
-    
+
         <!--h2><a href="{% url 'ab_testing_tool_create_experiment' %}">Add an Experiment</a></h2-->
         {% for experiment in experiments %}
             <div class="panel panel-experiment"><!-- exp (start) -->
                 <div class="panel-wrapper">
                     <div class="panel-heading">
                         <h3 class="panel-title panel-title-experiment">Experiment "{{experiment.name}}"</h3>
-                        
+
                         {% if experiment.get_incomplete_intervention_point_names %}
                             <a href="#incomplete_intervention_points_modal{{experiment.id}}" data-toggle="modal" class="btn btn-icon btn-experiment-start"><i class="fa fa-play-circle"></i>Start Experiment
                         {% elif not experiment.tracks_finalized %}
@@ -61,7 +61,7 @@
                             <a href="#" class="btn btn-icon btn-experiment-start disabled">Experiment started
                         {% endif %}
                             </a>
-                        
+
                         <dl class="list list-horizontal">
                             <dt class="list-item-title">Sort by:</dt>
                             {% if experiment.assignment_method == experiment.WEIGHTED_PROBABILITY_RANDOM %}
@@ -76,7 +76,7 @@
                             <dt class="list-item-title">Last modified:</dt>
                             <dd>{{experiment.updated_on}}</dd>
                         </dl>
-                        
+
                     </div>
                     <div class="exp-edit" data-toggle="tooltip" data-placement="right" title="Edit experiment">
                         <div class="arrow-left"></div>
@@ -114,11 +114,13 @@
                                         Intervention Point "{{intervention_point.name}}"
                                     </a><br>
                                     <span class="label">
-                                        {{intervention_point.is_missing_urls|yesno:"URLs missing,complete"}}
+                                        {{intervention_point.is_missing_urls|yesno:"URLs missing,URLs complete"}}
                                     </span>
+                                    {% if intervention_point not in uninstalled_intervention_points %}
                                     <span class="label">
-                                        {% if intervention_point not in uninstalled_intervention_points %} Installed {% endif%}
+                                         Installed
                                     </span>
+                                    {% endif%}
                                     <span class="date">
                                         Last modified {{intervention_point.updated_on}}
                                     </span>
@@ -171,7 +173,7 @@
                     {% endif %}
                 </div>
             </div><!-- exp (end) -->
-        
+
         {% empty %}
         <div class="well">
         <div class="container">
