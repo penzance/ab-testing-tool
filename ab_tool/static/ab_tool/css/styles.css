@@ -205,6 +205,14 @@ main {
 .block {
   display: block;
 }
+.text-error {
+  color: #a51c30;
+}
+.error {
+  border: solid 1px #b03535;
+  box-shadow: 0 0 3px #d45252;
+  color: #a51c30;
+}
 label {
   color: #333333;
   font-size: 1em;
@@ -244,15 +252,10 @@ fieldset.fieldset-btn {
   cursor: not-allowed;
   background-color: gray;
 }
-.form-control:focus {
-  border: 0;
-  box-shadow: 0;
-  color: #000;
-}
-.error {
+.form-control.has-error {
   border: solid 1px #b03535;
   box-shadow: 0 0 3px #d45252;
-  color: #d45252;
+  color: #a51c30;
 }
 textarea.form-control {
   height: auto;
@@ -281,10 +284,10 @@ textarea.form-control {
   cursor: not-allowed;
   background-color: gray;
 }
-.input-group-right:focus {
-  border: 0;
-  box-shadow: 0;
-  color: #000;
+.input-group-right.has-error {
+  border: solid 1px #b03535;
+  box-shadow: 0 0 3px #d45252;
+  color: #a51c30;
 }
 .input-group-right  + span {
   display: block;
@@ -311,21 +314,21 @@ textarea.form-control {
   cursor: not-allowed;
   background-color: gray;
 }
-.input-group-right  + span:focus {
-  border: 0;
-  box-shadow: 0;
-  color: #000;
+.input-group-right  + span.has-error {
+  border: solid 1px #b03535;
+  box-shadow: 0 0 3px #d45252;
+  color: #a51c30;
 }
 .input-group-right.has-error {
   border: solid 1px #b03535;
   box-shadow: 0 0 3px #d45252;
-  color: #d45252;
+  color: #a51c30;
   border-right: 0;
 }
 .input-group-right.has-error + span {
   border: solid 1px #b03535;
   box-shadow: 0 0 3px #d45252;
-  color: #d45252;
+  color: #a51c30;
   border-left: 0;
 }
 .form-group {
@@ -421,6 +424,25 @@ textarea.form-control {
     display: inline-block;
   }
 }
+/**** error experiment form (start) ***/
+.error-experiment-name {
+  padding: 1em;
+  background-color: #feeeee;
+  color: #a51c30;
+  width: 60%;
+  display: inline-block;
+  float: left;
+}
+.arrow-error {
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-bottom: 0px solid transparent;
+  border-right: 13px solid #feeeee;
+  margin-top: 3em;
+  float: left;
+}
+/**** error experiment form (end) ***/
 .panel {
   display: inline-block;
   border-width: 0;

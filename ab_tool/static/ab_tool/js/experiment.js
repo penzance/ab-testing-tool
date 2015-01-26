@@ -12,6 +12,9 @@ var controller = function($scope, $window, $http) {
     $scope.newTrackName = null;
     $scope.newTrackWeighting = null;
     
+    $scope.errorName = null;
+    $scope.errorLocation = null;
+
     $scope.addTrack = function() {
         /**
          * Add a new track based on the inputs in the new track form
@@ -71,9 +74,13 @@ var controller = function($scope, $window, $http) {
         if (sum != 100) {
             // TODO: replace with better error display
             //add an error class to every input field with the track fieldset
-            $('.input-group-right').addClass('has-error');
+            //$('.input-group-right').addClass('has-error');
             //alert("Your track weightings add up to " + sum + "%.  This needs to be 100%.");
+            $scope.errorLocation = "trackweights";
+        }else{
+            $scope.errorLocation = null;
         }
+        
         return (sum == 100);
     }
     
@@ -83,9 +90,11 @@ var controller = function($scope, $window, $http) {
          */
 
         if ($scope.experiment.name == ''){
-            $('#experimentName').addClass('error');
+            $scope.errorName = "emptyName";
             return false;
         }
+
+        $scope.errorName = null;
 
         if ($scope.percentsTotal100()) {
             $("#confirmSubmit").modal('show');

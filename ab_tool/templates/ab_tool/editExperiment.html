@@ -32,18 +32,32 @@
             <fieldset>
                 <div class="form-group">
                     <legend class="sr-only">Name of experiment</legend>
-                    <label for="experimentName">Name:</label> <i class="fa fa-asterisk"></i>
-                    <input type="text" class="block form-control" name="experimentName" id="experimentName" ng-model="experiment.name" placeholder="Enter experiment name">
+                    <label for="experimentName"
+                            ng-class="errorName == 'emptyName' ? 'text-error' : ''">Name:</label> <i class="fa fa-asterisk"></i>
+                    <input type="text" 
+                            class="block form-control" 
+                            name="experimentName" 
+                            id="experimentName" 
+                            ng-model="experiment.name" 
+                            placeholder="Enter experiment name"
+                            ng-class="errorName == 'emptyName' ? 'has-error' : ''">
                 </div>
                 <div class="form-group-description">
-                    <!--no description-->
+                    <div ng-if="errorName">
+                        <div class="arrow-error"></div>
+                        <div class="error-experiment-name">
+                                <h3>This field is required</h3>
+                        </div>
+                    </div>
                 </div>
             </fieldset>
 
             <fieldset>
                 <div class="form-group">
                     <legend class="sr-only">Students "grouping/segmentation"</legend>
-                    <label>Experiment Structure:</label> <i class="fa fa-asterisk"></i>
+                    <label ng-class="errorLocation == 'trackweights' ? 'text-error' : ''">
+                        Experiment Structure:
+                    </label> <i class="fa fa-asterisk"></i>
                     <ul id="expWeights" class="list-withfloats">
                         <!-- Angular loop over tracks (start) -->
                         <li ng-cloak ng-repeat="track in experiment.tracks">
@@ -65,7 +79,9 @@
                                     data-track="value" data-trackindex="1"
                                     maxlength="2" size="2"
                                     ng-pattern="/^\d+$/" ng-model="track.weighting"
-                                    {%if started %}disabled="disabled"{% endif %} class="input-trackWeight input-group-right float-left"><span> % </span>
+                                    {%if started %}disabled="disabled"{% endif %} 
+                                    class="input-trackWeight input-group-right float-left"
+                                    ng-class="errorLocation == 'trackweights' ? 'has-error' : ''"><span> % </span>
                             </div>
                             <div ng-if="experiment.uniformRandom">
                                 <input type="text" disabled="disabled" size="2"
@@ -111,15 +127,32 @@
 
                 </div>
                 <div class="form-group-description">
-                    <p>
-                        Manage the tracks in this experiment and the probability that a learner will be 
-                        sorted into each track. Tracks may have explicit weightings (weighted random) or 
-                        be weighted equally (uniform random).
-                    </p>
-                    <p>
-                        <em>Note: As these are probabilities, the actual proportion of students in each 
-                        track may differ from the probabilities specified.</em>
-                    </p>
+                    <div ng-if="errorLocation">
+                        <div class="arrow-error"></div>
+                        <div class="error-experiment-name">
+                                <h3>This field is required</h3>
+                                <p>
+                                    Manage the tracks in this experiment and the probability that a learner will be 
+                                    sorted into each track. Tracks may have explicit weightings (weighted random) or 
+                                    be weighted equally (uniform random).
+                                </p>
+                                <p>
+                                    <em>Note: As these are probabilities, the actual proportion of students in each 
+                                    track may differ from the probabilities specified.</em>
+                                </p>
+                        </div>
+                    </div>
+                    <div ng-if="!errorLocation">
+                        <p>
+                            Manage the tracks in this experiment and the probability that a learner will be 
+                            sorted into each track. Tracks may have explicit weightings (weighted random) or 
+                            be weighted equally (uniform random).
+                        </p>
+                        <p>
+                            <em>Note: As these are probabilities, the actual proportion of students in each 
+                            track may differ from the probabilities specified.</em>
+                        </p>
+                    </div>
                 </div>
             </fieldset>
             <fieldset class="fieldset-noborder">
