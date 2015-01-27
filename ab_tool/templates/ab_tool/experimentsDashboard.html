@@ -53,10 +53,12 @@
                     <div class="panel-heading">
                         <h3 class="panel-title panel-title-experiment">Experiment "{{experiment.name}}"</h3>
                         
-                        {% if experiment.id in experiments_with_unassigned_students %}
-                            <a href="#upload_modal{{experiment.id}}" class="btn btn-icon btn-experiment-start" data-toggle="modal">Assign Tracks
+                        {% if experiment.id in experiments_with_unassigned_students and experiment.tracks_finalized %}
+                            <a href="#upload_modal{{experiment.id}}" class="btn btn-icon btn-track-upload" data-toggle="modal">Assign Tracks (Urgent!)
                         {% elif experiment.get_incomplete_intervention_point_names %}
                             <a href="#incomplete_intervention_points_modal{{experiment.id}}" data-toggle="modal" class="btn btn-icon btn-experiment-start"><i class="fa fa-play-circle"></i>Start Experiment
+                        {% elif experiment.id in experiments_with_unassigned_students %}
+                            <a href="#upload_modal{{experiment.id}}" class="btn btn-icon btn-experiment-start" data-toggle="modal"><i class="fa fa-play-circle"></i>Start Experiment
                         {% elif not experiment.tracks_finalized %}
                             <a href="#finalize_modal{{experiment.id}}" data-toggle="modal" class="btn btn-icon btn-experiment-start"><i class="fa fa-play-circle"></i>Start Experiment
                         {% else %}
