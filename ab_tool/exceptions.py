@@ -14,6 +14,8 @@ DELETING_INSTALLED_STAGE = Renderable400("Deleting an installed Intervention Poi
 
 UNAUTHORIZED_ACCESS = Renderable403("You do not have access to this course.")
 
+FILE_TOO_LARGE = Renderable403("Files over 10MB are not allowed for upload")
+
 MISSING_RETURN_TYPES_PARAM = Renderable400("Invalid ext_content_return_types")
 
 MISSING_RETURN_URL = Renderable400("No ext_content_return_url")

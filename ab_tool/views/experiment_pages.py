@@ -3,15 +3,16 @@ from django.shortcuts import render_to_response, redirect
 from django_auth_lti.decorators import lti_role_required
 from django.core.urlresolvers import reverse
 
-from ab_tool.constants import ADMINS
+from ab_tool.constants import ADMINS, MAX_FILE_UPLOAD_SIZE
 from ab_tool.models import (Track, Experiment)
-from ab_tool.canvas import get_lti_param, CanvasModules
+from ab_tool.canvas import get_lti_param, CanvasModules, get_unassigned_students
 from ab_tool.exceptions import (NO_TRACKS_FOR_EXPERIMENT,
-    INTERVENTION_POINTS_ARE_INSTALLED)
+    INTERVENTION_POINTS_ARE_INSTALLED, FILE_TOO_LARGE)
 from django.http.response import HttpResponse
 from ab_tool.controllers import (get_missing_track_weights,
     get_incomplete_intervention_points)
-from ab_tool.spreadsheets import get_track_selection_xlsx, get_track_selection_csv
+from ab_tool.spreadsheets import get_track_selection_xlsx, get_track_selection_csv,\
+    parse_uploaded_file
 
 
 @lti_role_required(ADMINS)
@@ -191,3 +192,20 @@ def track_selection_csv(request, experiment_id):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
     return get_track_selection_csv(request, experiment, "track_selection.csv")
+
+@lti_role_required(ADMINS)
+def upload_track_assignments(request, experiment_id):
+    course_id = get_lti_param(request, "custom_canvas_course_id")
+    experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
+    uploaded_file = request.FILES["track_assignments"]
+    if uploaded_file.size > MAX_FILE_UPLOAD_SIZE:
+        raise FILE_TOO_LARGE
+    uploaded_text = uploaded_file.read()
+    unassigned_students = get_unassigned_students(request, experiment)
+    students, errors = parse_uploaded_file(
+            experiment, unassigned_students, uploaded_text, uploaded_file.name
+    )
+    print students, errors
+#     if not experiment.tracks_finalized:
+#         experiment.update(tracks_finalized=True)
+    return redirect(reverse("ab_testing_tool_index"))
