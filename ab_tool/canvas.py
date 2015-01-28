@@ -2,6 +2,7 @@ import logging
 import traceback
 from canvas_sdk import RequestContext
 from canvas_sdk.methods import modules
+from canvas_sdk.methods.courses import list_users_in_course_users
 from django.conf import settings
 
 from ab_tool.exceptions import (MISSING_LTI_PARAM, MISSING_LTI_LAUNCH,
@@ -9,11 +10,12 @@ from ab_tool.exceptions import (MISSING_LTI_PARAM, MISSING_LTI_LAUNCH,
 from requests.exceptions import RequestException
 from django_canvas_oauth import get_token
 from ab_tool.controllers import intervention_point_url
-from ab_tool.models import InterventionPoint, Experiment
+from ab_tool.models import InterventionPoint, Experiment, ExperimentStudent
 from django_canvas_oauth.exceptions import NewTokenNeeded
 
 
 logger = logging.getLogger(__name__)
+
 
 
 class CanvasModules(object):
@@ -88,6 +90,19 @@ class CanvasModules(object):
                           if item["type"] == "ExternalTool"]
             installed_intervention_point_urls.extend(intervention_point_urls)
         return installed_intervention_point_urls
+
+
+def get_unsorted_students(request, experiment):
+    request_context = get_canvas_request_context(request)
+    course_id = get_lti_param(request, "custom_canvas_course_id")
+    try:
+        enrollments = list_users_in_course_users(
+                request_context, course_id, None, enrollment_type="student").json()
+    except RequestException as exception:
+        handle_canvas_error(exception)
+    existing_student_ids = set(s.id for s in experiment.students.all())
+    return [{"student_id": i["sis_user_id"], "lis_person_sourcedid": i["sis_user_id"]}
+            for i in enrollments if i["sis_user_id"] not in existing_student_ids]
 
 
 def list_module_items(request_context, course_id, module_id):

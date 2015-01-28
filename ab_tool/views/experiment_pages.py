@@ -11,6 +11,7 @@ from ab_tool.exceptions import (NO_TRACKS_FOR_EXPERIMENT,
 from django.http.response import HttpResponse
 from ab_tool.controllers import (get_missing_track_weights,
     get_incomplete_intervention_points)
+from ab_tool.spreadsheets import get_track_selection_xlsx, get_track_selection_csv
 
 
 @lti_role_required(ADMINS)
@@ -170,3 +171,15 @@ def finalize_tracks(request, experiment_id):
     experiment.save()
     return redirect(reverse("ab_testing_tool_index"))
 
+
+@lti_role_required(ADMINS)
+def track_selection_xlsx(request, experiment_id):
+    course_id = get_lti_param(request, "custom_canvas_course_id")
+    experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
+    return get_track_selection_xlsx(request, experiment, "track_selection.xlsx")
+
+@lti_role_required(ADMINS)
+def track_selection_csv(request, experiment_id):
+    course_id = get_lti_param(request, "custom_canvas_course_id")
+    experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
+    return get_track_selection_csv(request, experiment, "track_selection.csv")
