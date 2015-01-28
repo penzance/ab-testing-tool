@@ -67,8 +67,8 @@ def get_track_selection_csv(request, experiment, file_title="test.xlsx"):
 def parse_uploaded_file(experiment, unassigned_students, input_spreadsheet, filename):
     students = {}
     errors = []
-    track_names = set([i.name for i in experiment.tracks.all()])
-    student_ids = set([i["student_id"] for i in unassigned_students])
+    track_names = {track.name: track for track in experiment.tracks.all()}
+    student_ids = set([student["student_id"] for student in unassigned_students])
     if filename.endswith('.csv'):
         # Slice off row 1 to skip headers
         csvreader = csv.reader(input_spreadsheet.split("\n")[1:])
@@ -86,12 +86,14 @@ def parse_uploaded_file(experiment, unassigned_students, input_spreadsheet, file
     return students, errors
 
 
-def parse_row(row, row_number, experiment, track_names, student_ids, students, errors):
-    if row[2] != experiment.name:
-        errors.append("Row %s: wrong experiment name '%s'" % (row_number, row[2]))
-    elif row[3] not in track_names:
+def parse_row(row, row_number, experiment, tracks, student_ids, students, errors):
+    if len(row) < 4 or row[3] == "" or row[3] is None:
+        errors.append("Row %s: missing track name" % (row_number))
+    elif row[3] not in tracks:
         errors.append("Row %s: invalid track name '%s'" % (row_number, row[3]))
+    elif row[2] != experiment.name:
+        errors.append("Row %s: wrong experiment name '%s'" % (row_number, row[2]))
     elif row[0] not in student_ids:
         errors.append("Row %s: student '%s' not available for assignment" % (row_number, row[0]))
     else:
-        students[row[0]] = row[3]
+        students[row[0]] = tracks[row[3]]

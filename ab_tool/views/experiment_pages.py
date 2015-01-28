@@ -4,7 +4,7 @@ from django_auth_lti.decorators import lti_role_required
 from django.core.urlresolvers import reverse
 
 from ab_tool.constants import ADMINS, MAX_FILE_UPLOAD_SIZE
-from ab_tool.models import (Track, Experiment)
+from ab_tool.models import (Track, Experiment, ExperimentStudent)
 from ab_tool.canvas import get_lti_param, CanvasModules, get_unassigned_students
 from ab_tool.exceptions import (NO_TRACKS_FOR_EXPERIMENT,
     INTERVENTION_POINTS_ARE_INSTALLED, FILE_TOO_LARGE)
@@ -205,7 +205,15 @@ def upload_track_assignments(request, experiment_id):
     students, errors = parse_uploaded_file(
             experiment, unassigned_students, uploaded_text, uploaded_file.name
     )
-    print students, errors
-#     if not experiment.tracks_finalized:
-#         experiment.update(tracks_finalized=True)
+    if errors:
+        return render_to_response("ab_tool/spreadsheetErrors.html", {"errors": errors})
+    
+    for student_id, track in students.items():
+        ExperimentStudent.objects.create(
+            student_id=student_id, course_id=experiment.course_id,
+            track=track, lis_person_sourcedid=None,
+            experiment=experiment
+        )
+    if not experiment.tracks_finalized:
+        experiment.update(tracks_finalized=True)
     return redirect(reverse("ab_testing_tool_index"))

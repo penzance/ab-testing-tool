@@ -1,0 +1,17 @@
+
+{% extends "ab_tool/base_lti.html" %}
+{% load static %}
+
+{% block stylesheet %}
+{{ block.super }}
+{% endblock %}
+
+{% block content %}
+
+<a href="{% url "ab_testing_tool_index" %}">Back to dashboard</a>
+
+<h2>You have the following errors in your spreadsheet:</h2>
+{% for error in errors %}
+    <p>{{ error }}</p>
+{% endfor %}
+{% endblock %}

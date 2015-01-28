@@ -132,7 +132,7 @@ def get_unassigned_students_with_context(request_context, experiment):
                 request_context, experiment.course_id, None, enrollment_type="student").json()
     except RequestException as exception:
         handle_canvas_error(exception)
-    existing_student_ids = set(s.id for s in experiment.students.all())
+    existing_student_ids = set(s.student_id for s in experiment.students.all())
     return [{"student_id": i["sis_user_id"], "lis_person_sourcedid": i["sis_user_id"]}
             for i in enrollments if i["sis_user_id"] not in existing_student_ids]
 
