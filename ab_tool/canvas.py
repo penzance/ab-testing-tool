@@ -70,6 +70,7 @@ class CanvasModules(object):
                 item["is_intervention_point"] = is_intervention_point
                 if is_intervention_point:
                     item["database_name"] = intervention_point_urls[item["external_url"]].name
+                    item["experiment_name"] = intervention_point_urls[item["external_url"]].experiment.name
         return self.modules
     
     def _all_intervention_point_urls(self):
