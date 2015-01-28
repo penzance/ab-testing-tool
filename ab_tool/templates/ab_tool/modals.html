@@ -8,16 +8,15 @@
             </div>
             <div class="modal-body">
                 <p class="text-warning">See where A/B intervention points are installed in your modules.</p>
-                <div class="list-group ">
                     {% for m in modules %}
-                        <h4><a class="list-group-item" id="module_{{m.id}}"> <strong>Module: {{m.name}}</strong></a></h4>
+                        <h4><a class="" id="module_{{m.id}}"> <strong>Module: {{m.name}}</strong></a></h4>
                         <div id="module_items_{{m.id}}" style="display: none">
-                                <ul class="list-group">
+                                <ul>
                                     {% for i in m.module_items %}
                                         {% if i.is_intervention_point %}
-                                            <a class="list-group-item active">{{i.title}} | <i> Intervention Point</i></a>
+                                            <p class="active">{{i.title}} | <i> Intervention Point</i></p>
                                         {% else %}
-                                            <p class="list-group-item">{{i.title|default:"[ Item not titled]"}}</p>
+                                            <p>{{i.title|default:"[ Item not titled]"}}</p>
                                         {% endif %}
                                     {% empty %}
                                         <p>No items found in this module.</p>
@@ -27,7 +26,6 @@
                     {% empty %}
                         <p>No modules found.</p>
                     {% endfor %}
-                </div>
             </div>
             <div class="modal-footer">
                 <a class="btn btn-lg btn-submit-primary" data-dismiss="modal"> Close </a>
@@ -54,10 +52,10 @@
         <form class="form-horizontal" role="form" method="post" name="intervention_point_creation_form"
             action="{% url 'ab_testing_tool_submit_create_intervention_point' experiment.id %}">
             <div class="modal-body">
-
+                
                 <fieldset>
                     <legend class="sr-only">Name of intervention point</legend>
-
+                    
                     <div class="form-group">
                         <label for="interventionName">Name:</label> <i class="fa fa-asterisk"></i>
                         <input type="text" name="name" id="interventionName" class="form-control" placeholder="Enter Intervention Name">
@@ -65,13 +63,13 @@
                     <div class="form-group-description">
                         <p>A descriptive name for this track. This will help you blah blah blah</p>
                     </div>
-
+                
                 </fieldset>
-
+                
                 {% for track in experiment.tracks.all %}
                 <fieldset>
                     <legend class="sr-only">Tracks for experiment</legend>
-
+                    
                     <div class="form-group-inline-left">
                         <label for="intervention_point_url_{{track.id}}">Track "{{track.name}}":</label>
                         <input type="url" name="intervention_point_url_{{track.id}}"
@@ -82,7 +80,7 @@
                     <div class="form-group-description">
                         <p>A descriptive name for this track. This will help you blah blah blah</p>
                     </div>
-
+                    
                     <div class="form-group-inline-right">
                         <label for="is_canvas_page_for_track_{{track.id}}">Open</label>
                         <div class="custom-dropdown">
@@ -98,7 +96,7 @@
                     <div class="form-group-description">
                         <p>A descriptive name for this track. This will help you blah blah blah</p>
                     </div>
-
+                
                 </fieldset>
                 {% endfor %}
 
@@ -192,13 +190,13 @@
                     <div class="form-group-description">
                         <p>A descriptive name for this track. This will help you blah blah blah</p>
                     </div>
-
+                
                 </fieldset>
                 {% endfor %}
-
+                
                 <fieldset class="fieldset-noborder">
                     <legend class="sr-only">Notes about your experiment</legend>
-
+                    
                     <div class="form-group">
                         <label for="interventionPointNotes">Notes</label>
                         <textarea name="notes" id="interventonPointNotes" class="form-control">{{ intervention_point.notes }}</textarea>
