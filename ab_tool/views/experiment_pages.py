@@ -33,7 +33,7 @@ def submit_create_experiment(request):
     """
     course_id = get_lti_param(request, "custom_canvas_course_id")
     experiment_dict = json.loads(request.body)
-
+    
     # Unpack data from experiment_dict and update experiment
     name = experiment_dict["name"]
     notes = experiment_dict["notes"]
@@ -47,7 +47,7 @@ def submit_create_experiment(request):
             name=name, course_id=course_id, notes=notes,
             assignment_method=assignment_method
     )
-
+    
     # Update existing tracks
     for track_dict in tracks:
         track = experiment.new_track(track_dict["name"])
@@ -91,7 +91,7 @@ def submit_edit_experiment(request, experiment_id):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
     experiment_dict = json.loads(request.body)
-
+    
     # Unpack data from experiment_dict and update experiment
     name = experiment_dict["name"]
     notes = experiment_dict["notes"]
@@ -103,7 +103,7 @@ def submit_edit_experiment(request, experiment_id):
             track = Track.get_or_404_check_course(track_dict["id"], course_id)
             track.update(name=track_dict["name"])
         return HttpResponse("success")
-
+    
     uniform_random = experiment_dict["uniformRandom"]
     existing_tracks = [i for i in experiment_dict["tracks"] if i["id"] is not None]
     new_tracks = [i for i in experiment_dict["tracks"] if i["id"] is None]
@@ -112,14 +112,14 @@ def submit_edit_experiment(request, experiment_id):
     else:
         assignment_method = Experiment.WEIGHTED_PROBABILITY_RANDOM
     experiment.update(name=name, notes=notes, assignment_method=assignment_method)
-
+    
     # Update existing tracks
     for track_dict in existing_tracks:
         track = Track.get_or_404_check_course(track_dict["id"], course_id)
         track.update(name=track_dict["name"])
         if not uniform_random:
             track.set_weighting(track_dict["weighting"])
-
+    
     # Create new tracks
     for track_dict in new_tracks:
         track = experiment.new_track(track_dict["name"])
