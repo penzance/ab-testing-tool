@@ -88,7 +88,7 @@
                         <div class="custom-dropdown">
                             <select name="is_canvas_page_for_track_{{track.id}}"
                                 id="is_canvas_page_for_track_{{track.id}}">
-                                <option selected="selected" value="canvasPage">Canvas URL -- Learners in this track are redirected to this Canvas page.</option>
+                                <option value="canvasPage">Canvas URL -- Learners in this track are redirected to this Canvas page.</option>
                                 <option value="externalPage">External URL in Canvas -- Learners in this track view this page within Canvas.</option>
                                 <option value="newTab">In new tab -- Learners in this track open this page in a new tab.</option>
                             </select>
@@ -173,16 +173,17 @@
                         <div class="custom-dropdown">
                             <select name="is_canvas_page_for_track_{{track_url.track.id}}"
                                 id="is_canvas_page_for_track_{{track_url.track.id}}">
-                                <option {% if track_url.open_as_tab %}selected="selected"{% endif %}
-                                    value="newTab">
+                                
+                                <option {% if not track_url.open_as_tab and track_url.is_canvas_page %}selected="selected"{% endif %}
+                                    value="canvasPage">
                                     Canvas URL -- Learners in this track are redirected to this Canvas page.
                                 </option>
                                 <option {% if not track_url.open_as_tab and not track_url.is_canvas_page %}selected="selected"{% endif %}
                                     value="externalPage">
                                     External URL in Canvas -- Learners in this track view this page within Canvas.
                                 </option>
-                                <option {% if not track_url.open_as_tab and track_url.is_canvas_page %}selected="selected"{% endif %}
-                                    value="canvasPage">
+                                <option {% if track_url.open_as_tab %}selected="selected"{% endif %}
+                                    value="newTab">
                                     In new tab -- Learners in this track open this page in a new tab.
                                 </option>
                             </select>

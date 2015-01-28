@@ -12,6 +12,9 @@ var controller = function($scope, $window, $http) {
     $scope.newTrackName = null;
     $scope.newTrackWeighting = null;
     
+    $scope.nameError = null;
+    $scope.weightingError = null;
+
     $scope.addTrack = function() {
         /**
          * Add a new track based on the inputs in the new track form
@@ -51,12 +54,16 @@ var controller = function($scope, $window, $http) {
          * Returns a boolean as to whether or not the tracks add up to 100.
          * If the return is false, raises an alert.
          */
+        //set a resuable len
+        var len = $scope.experiment.tracks.length;
+
         if ($scope.experiment.uniformRandom) {
             // If uniformRandom is true, the actual track weights are ignored.
             return true;
         }
-        var i, len, sum;
-        for (i = 0, sum = 0, len = $scope.experiment.tracks.length; i < len; i++) {
+        
+        for (var i = 0, sum = 0; i < len; i++) {
+
             var weighting = $scope.experiment.tracks[i].weighting;
             if (weighting) {
                 sum += parseInt(weighting);
@@ -66,8 +73,15 @@ var controller = function($scope, $window, $http) {
         }
         if (sum != 100) {
             // TODO: replace with better error display
-            alert("Your track weightings add up to " + sum + "%.  This needs to be 100%.");
+            //add an error class to every input field with the track fieldset
+            //$('.input-group-right').addClass('has-error');
+            //alert("Your track weightings add up to " + sum + "%.  This needs to be 100%.");
+            $scope.weightingError = "The weights need to add up to 100%.  "
+                + "They currently add up to " + sum + "%.";
+        }else{
+            $scope.weightingError = null;
         }
+        
         return (sum == 100);
     }
     
@@ -75,6 +89,14 @@ var controller = function($scope, $window, $http) {
         /**
          * If the form validates, display the confirmation modal to the user
          */
+
+        if ($scope.experiment.name == ''){
+            $scope.nameError = true;
+            return false;
+        }
+        
+        $scope.nameError = false;
+        
         if ($scope.percentsTotal100()) {
             $("#confirmSubmit").modal('show');
         }
