@@ -7,7 +7,7 @@ from ab_tool.constants import ADMINS
 from ab_tool.models import Track, Experiment
 from ab_tool.canvas import get_lti_param, CanvasModules
 from ab_tool.exceptions import (NO_TRACKS_FOR_EXPERIMENT,
-    INTERVENTION_POINTS_ARE_INSTALLED)
+    INTERVENTION_POINTS_ARE_INSTALLED, MISSING_NAME_PARAM)
 from django.http.response import HttpResponse
 from ab_tool.controllers import (get_missing_track_weights,
     get_incomplete_intervention_points)
@@ -36,6 +36,8 @@ def submit_create_experiment(request):
     
     # Unpack data from experiment_dict and update experiment
     name = experiment_dict["name"]
+    if not name:
+        raise MISSING_NAME_PARAM
     notes = experiment_dict["notes"]
     uniform_random = experiment_dict["uniformRandom"]
     tracks = experiment_dict["tracks"]
@@ -94,6 +96,8 @@ def submit_edit_experiment(request, experiment_id):
     
     # Unpack data from experiment_dict and update experiment
     name = experiment_dict["name"]
+    if not name:
+        raise MISSING_NAME_PARAM
     notes = experiment_dict["notes"]
     if experiment.tracks_finalized:
         # Only allow updating name, notes, and track names for started experiments

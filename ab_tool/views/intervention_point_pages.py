@@ -9,7 +9,7 @@ from ab_tool.models import (InterventionPoint, Track, InterventionPointUrl,
 from ab_tool.canvas import get_lti_param, CanvasModules
 from ab_tool.controllers import (format_url, post_param, assign_track_and_create_student)
 from ab_tool.exceptions import (DELETING_INSTALLED_STAGE,
-    EXPERIMENT_TRACKS_NOT_FINALIZED, NO_URL_FOR_TRACK)
+    EXPERIMENT_TRACKS_NOT_FINALIZED, NO_URL_FOR_TRACK, MISSING_NAME_PARAM)
 from ab_tool.analytics import log_intervention_point_interaction
 
 
@@ -79,6 +79,8 @@ def submit_create_intervention_point(request, experiment_id):
         TODO: use Django forms library to save instead of getting individual POST params """
     course_id = get_lti_param(request, "custom_canvas_course_id")
     name = post_param(request, "name")
+    if not name:
+        raise MISSING_NAME_PARAM
     notes = post_param(request, "notes")
     experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
     intervention_point = InterventionPoint.objects.create(
@@ -153,6 +155,8 @@ def edit_intervention_point_common(request, intervention_point_id):
     intervention_point = InterventionPoint.get_or_404_check_course(
             intervention_point_id, course_id)
     name = post_param(request, "name")
+    if not name:
+        raise MISSING_NAME_PARAM
     notes = post_param(request, "notes")
     intervention_point.update(name=name, notes=notes)
     # InterventionPointUrl creation
