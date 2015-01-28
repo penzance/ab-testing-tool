@@ -127,14 +127,16 @@ def get_unassigned_students_with_stored_credentials(course_object, experiment):
 
 
 def get_unassigned_students_with_context(request_context, experiment):
+    """ Returns a list of sis_user_ids because that is the unique
+        identifier the ab_tool users for students """
     try:
         enrollments = list_users_in_course_users(
                 request_context, experiment.course_id, None, enrollment_type="student").json()
     except RequestException as exception:
         handle_canvas_error(exception)
     existing_student_ids = set(s.student_id for s in experiment.students.all())
-    return [{"student_id": i["sis_user_id"], "lis_person_sourcedid": i["sis_user_id"]}
-            for i in enrollments if i["sis_user_id"] not in existing_student_ids]
+    return [i["sis_user_id"] for i in enrollments
+            if i["sis_user_id"] not in existing_student_ids]
 
 
 def list_module_items(request_context, course_id, module_id):

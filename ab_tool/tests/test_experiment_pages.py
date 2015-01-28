@@ -77,6 +77,7 @@ class TestExperimentPages(SessionTestCase):
         num_experiments = Experiment.objects.count()
         experiment = {
                 "name": "experiment", "notes": "hi", "uniformRandom": True,
+                "csvUpload": False,
                 "tracks": [{"id": None, "weighting": None, "name": "A"}]
         }
         response = self.client.post(
@@ -92,6 +93,7 @@ class TestExperimentPages(SessionTestCase):
         num_experiments = Experiment.objects.count()
         experiment = {
                 "name": "experiment", "notes": "hi", "uniformRandom": False,
+                "csvUpload": False,
                 "tracks": [{"id": None, "weighting": 100, "name": "A"}]
         }
         response = self.client.post(
@@ -121,6 +123,7 @@ class TestExperimentPages(SessionTestCase):
         num_experiments = Experiment.objects.count()
         experiment = {
                 "name": "new_name", "notes": "hi", "uniformRandom": True,
+                "csvUpload": False,
                 "tracks": [{"id": None, "weighting": None, "name": "A"}]
         }
         response = self.client.post(
@@ -141,6 +144,7 @@ class TestExperimentPages(SessionTestCase):
         no_track_weights = experiment.track_probabilites.count()
         experiment = {
                 "name": "new_name", "notes": "hi", "uniformRandom": False,
+                "csvUpload": False,
                 "tracks": [{"id": None, "weighting": 20, "name": "A"},
                            {"id": None, "weighting": 80, "name": "B"}]
         }
@@ -164,6 +168,7 @@ class TestExperimentPages(SessionTestCase):
         no_tracks = experiment.tracks.count()
         experiment = {
                 "name": "new_name", "notes": "hi", "uniformRandom": True,
+                "csvUpload": False,
                 "tracks": [{"id": None, "weighting": None, "name": "A"},
                            {"id": None, "weighting": None, "name": "B"},
                            {"id": None, "weighting": None, "name": "C"}]
@@ -242,6 +247,7 @@ class TestExperimentPages(SessionTestCase):
         no_tracks = experiment.tracks.count()
         experiment = {
                 "name": "new_name", "notes": "hi", "uniformRandom": True,
+                "csvUpload": False,
                 "tracks": [{"id": None, "weighting": None, "name": "A"},
                            {"id": None, "weighting": None, "name": "B"},
                            {"id": None, "weighting": None, "name": "C"}]
