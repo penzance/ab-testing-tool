@@ -7,10 +7,10 @@ from ab_tool.constants import ADMINS
 from ab_tool.models import Track, Experiment
 from ab_tool.canvas import get_lti_param, CanvasModules
 from ab_tool.exceptions import (NO_TRACKS_FOR_EXPERIMENT,
-    INTERVENTION_POINTS_ARE_INSTALLED, MISSING_NAME_PARAM)
+    INTERVENTION_POINTS_ARE_INSTALLED)
 from django.http.response import HttpResponse
 from ab_tool.controllers import (get_missing_track_weights,
-    get_incomplete_intervention_points)
+    get_incomplete_intervention_points, validate_weighting, validate_name)
 
 
 @lti_role_required(ADMINS)
@@ -36,25 +36,23 @@ def submit_create_experiment(request):
     
     # Unpack data from experiment_dict and update experiment
     name = experiment_dict["name"]
-    if not name:
-        raise MISSING_NAME_PARAM
     notes = experiment_dict["notes"]
-    uniform_random = experiment_dict["uniformRandom"]
+    uniform_random = bool(experiment_dict["uniformRandom"])
     tracks = experiment_dict["tracks"]
     if uniform_random:
         assignment_method = Experiment.UNIFORM_RANDOM
     else:
         assignment_method = Experiment.WEIGHTED_PROBABILITY_RANDOM
     experiment = Experiment.objects.create(
-            name=name, course_id=course_id, notes=notes,
+            name=validate_name(name), course_id=course_id, notes=notes,
             assignment_method=assignment_method
     )
     
     # Update existing tracks
     for track_dict in tracks:
-        track = experiment.new_track(track_dict["name"])
+        track = experiment.new_track(validate_name(track_dict["name"]))
         if not uniform_random:
-            track.set_weighting(track_dict["weighting"])
+            track.set_weighting(validate_weighting(track_dict["weighting"]))
     return HttpResponse("success")
 
 
@@ -96,8 +94,6 @@ def submit_edit_experiment(request, experiment_id):
     
     # Unpack data from experiment_dict and update experiment
     name = experiment_dict["name"]
-    if not name:
-        raise MISSING_NAME_PARAM
     notes = experiment_dict["notes"]
     if experiment.tracks_finalized:
         # Only allow updating name, notes, and track names for started experiments
@@ -105,30 +101,30 @@ def submit_edit_experiment(request, experiment_id):
         existing_tracks = [i for i in experiment_dict["tracks"] if i["id"] is not None]
         for track_dict in existing_tracks:
             track = Track.get_or_404_check_course(track_dict["id"], course_id)
-            track.update(name=track_dict["name"])
+            track.update(name=validate_name(track_dict["name"]))
         return HttpResponse("success")
     
-    uniform_random = experiment_dict["uniformRandom"]
+    uniform_random = bool(experiment_dict["uniformRandom"])
     existing_tracks = [i for i in experiment_dict["tracks"] if i["id"] is not None]
     new_tracks = [i for i in experiment_dict["tracks"] if i["id"] is None]
     if uniform_random:
         assignment_method = Experiment.UNIFORM_RANDOM
     else:
         assignment_method = Experiment.WEIGHTED_PROBABILITY_RANDOM
-    experiment.update(name=name, notes=notes, assignment_method=assignment_method)
+    experiment.update(name=validate_name(name), notes=notes, assignment_method=assignment_method)
     
     # Update existing tracks
     for track_dict in existing_tracks:
         track = Track.get_or_404_check_course(track_dict["id"], course_id)
-        track.update(name=track_dict["name"])
+        track.update(name=validate_name(track_dict["name"]))
         if not uniform_random:
-            track.set_weighting(track_dict["weighting"])
+            track.set_weighting(validate_weighting(track_dict["weighting"]))
     
     # Create new tracks
     for track_dict in new_tracks:
-        track = experiment.new_track(track_dict["name"])
+        track = experiment.new_track(validate_name(track_dict["name"]))
         if not uniform_random:
-            track.set_weighting(track_dict["weighting"])
+            track.set_weighting(validate_weighting(track_dict["weighting"]))
     return HttpResponse("success")
 
 

@@ -1,7 +1,7 @@
-from django.db import models
+from django.db import models, IntegrityError
 from django.shortcuts import get_object_or_404
 from ab_tool.exceptions import (UNAUTHORIZED_ACCESS,
-    EXPERIMENT_TRACKS_ALREADY_FINALIZED)
+    EXPERIMENT_TRACKS_ALREADY_FINALIZED, DATABASE_ERROR)
 import json
 from django.core.urlresolvers import reverse
 
@@ -17,8 +17,17 @@ class TimestampedModel(models.Model):
         """ Helper method to update objects """
         for k, v in kwargs.iteritems():
             setattr(self, k, v)
-        self.save(update_fields=kwargs.keys())
-
+        try:
+            self.save(update_fields=kwargs.keys())
+        except IntegrityError as e:
+            raise DATABASE_ERROR(e.__cause__)
+    
+    # Override for objects.create
+    def save(self, *args, **kwargs):
+        try:
+            super(TimestampedModel, self).save(*args, **kwargs) 
+        except IntegrityError as e:
+            raise DATABASE_ERROR(e.__cause__)
 
 class CourseObject(TimestampedModel):
     course_id = models.CharField(max_length=128, db_index=True)

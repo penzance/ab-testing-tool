@@ -7,9 +7,10 @@ from ab_tool.constants import (ADMINS, STAGE_URL_TAG,
 from ab_tool.models import (InterventionPoint, Track, InterventionPointUrl,
      ExperimentStudent, Experiment)
 from ab_tool.canvas import get_lti_param, CanvasModules
-from ab_tool.controllers import (format_url, post_param, assign_track_and_create_student)
+from ab_tool.controllers import (validate_url, post_param, assign_track_and_create_student,
+    validate_name)
 from ab_tool.exceptions import (DELETING_INSTALLED_STAGE,
-    EXPERIMENT_TRACKS_NOT_FINALIZED, NO_URL_FOR_TRACK, MISSING_NAME_PARAM)
+    EXPERIMENT_TRACKS_NOT_FINALIZED, NO_URL_FOR_TRACK)
 from ab_tool.analytics import log_intervention_point_interaction
 
 
@@ -79,12 +80,10 @@ def submit_create_intervention_point(request, experiment_id):
         TODO: use Django forms library to save instead of getting individual POST params """
     course_id = get_lti_param(request, "custom_canvas_course_id")
     name = post_param(request, "name")
-    if not name:
-        raise MISSING_NAME_PARAM
     notes = post_param(request, "notes")
     experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
     intervention_point = InterventionPoint.objects.create(
-            name=name, notes=notes, course_id=course_id, experiment=experiment)
+            name=validate_name(name), notes=notes, course_id=course_id, experiment=experiment)
     intervention_pointurls = [(k,v) for (k,v) in request.POST.iteritems()
                               if STAGE_URL_TAG in k and v]
     for (k,v) in intervention_pointurls:
@@ -94,7 +93,7 @@ def submit_create_intervention_point(request, experiment_id):
         is_canvas_page = bool(is_canvas == "canvas_url")
         open_as_tab = bool(as_tab == "true")
         InterventionPointUrl.objects.create(
-                url=format_url(v), intervention_point_id=intervention_point.id,
+                url=validate_url(v), intervention_point_id=intervention_point.id,
                 track_id=track_id, is_canvas_page=is_canvas_page, open_as_tab=open_as_tab
         )
     return redirect(reverse("ab_testing_tool_index"))
@@ -155,10 +154,8 @@ def edit_intervention_point_common(request, intervention_point_id):
     intervention_point = InterventionPoint.get_or_404_check_course(
             intervention_point_id, course_id)
     name = post_param(request, "name")
-    if not name:
-        raise MISSING_NAME_PARAM
     notes = post_param(request, "notes")
-    intervention_point.update(name=name, notes=notes)
+    intervention_point.update(name=validate_name(name), notes=notes)
     # InterventionPointUrl creation
     intervention_pointurls = [(k,v) for (k,v) in request.POST.iteritems() if STAGE_URL_TAG in k and v]
     for (k,v) in intervention_pointurls:
@@ -170,9 +167,9 @@ def edit_intervention_point_common(request, intervention_point_id):
         open_as_tab = bool(deploy_option == "newTab")
         try:
             intervention_point_url = InterventionPointUrl.objects.get(intervention_point__pk=intervention_point_id, track__pk=track_id)
-            intervention_point_url.update(url=format_url(v), is_canvas_page=is_canvas_page, open_as_tab=open_as_tab)
+            intervention_point_url.update(url=validate_url(v), is_canvas_page=is_canvas_page, open_as_tab=open_as_tab)
         except InterventionPointUrl.DoesNotExist:
-            InterventionPointUrl.objects.create(url=format_url(v), intervention_point_id=intervention_point_id, track_id=track_id,
+            InterventionPointUrl.objects.create(url=validate_url(v), intervention_point_id=intervention_point_id, track_id=track_id,
                                     is_canvas_page=is_canvas_page, open_as_tab=open_as_tab)
 
 
