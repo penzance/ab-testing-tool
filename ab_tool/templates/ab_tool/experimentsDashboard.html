@@ -175,12 +175,9 @@
             </div><!-- exp (end) -->
 
         {% empty %}
-        <div class="well">
-        <div class="container">
-        <h3>No experiments currently exist for this course. Click on "Add an Experiment" to get started.</h3>
-        <h4><a title="Create an experiment" href="{% url 'ab_testing_tool_create_experiment' %}">Create an experiment</a></h4>
-        </div>
-        </div>
+            <div class="infoBlock infoBlock-empty">
+                <h3>No experiments currently exist for this course. Click on "New Experiment" to get started.</h3>
+            </div>
         {% endfor %}
     </div>
 </main>
