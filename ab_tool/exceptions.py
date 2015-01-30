@@ -1,5 +1,6 @@
 from error_middleware.exceptions import (Renderable500, Renderable400,
     Renderable403, Renderable404)
+from django.conf import settings
 
 class NoValidCredentials(Exception): pass
 
@@ -14,7 +15,11 @@ DELETING_INSTALLED_STAGE = Renderable400("Deleting an installed Intervention Poi
 
 UNAUTHORIZED_ACCESS = Renderable403("You do not have access to this course.")
 
-FILE_TOO_LARGE = Renderable403("Files over 10MB are not allowed for upload")
+if hasattr(settings, 'MAX_FILE_UPLOAD_SIZE'):
+    FILE_TOO_LARGE = Renderable403("Files over %sMB are not allowed for upload" %
+                                   (int(settings.MAX_FILE_UPLOAD_SIZE) / 1024 / 1024))
+else:
+    FILE_TOO_LARGE = Renderable403("File is too large for upload")
 
 MISSING_RETURN_TYPES_PARAM = Renderable400("Invalid ext_content_return_types")
 

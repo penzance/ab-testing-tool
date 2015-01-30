@@ -2,8 +2,9 @@ import json
 from django.shortcuts import render_to_response, redirect
 from django_auth_lti.decorators import lti_role_required
 from django.core.urlresolvers import reverse
+from django.conf import settings
 
-from ab_tool.constants import ADMINS, MAX_FILE_UPLOAD_SIZE
+from ab_tool.constants import ADMINS
 from ab_tool.models import (Track, Experiment, ExperimentStudent)
 from ab_tool.canvas import get_lti_param, CanvasModules, get_unassigned_students
 from ab_tool.exceptions import (NO_TRACKS_FOR_EXPERIMENT,
@@ -198,7 +199,8 @@ def upload_track_assignments(request, experiment_id):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
     uploaded_file = request.FILES["track_assignments"]
-    if uploaded_file.size > MAX_FILE_UPLOAD_SIZE:
+    if (hasattr(settings, 'MAX_FILE_UPLOAD_SIZE')
+        and uploaded_file.size > int(settings.MAX_FILE_UPLOAD_SIZE)):
         raise FILE_TOO_LARGE
     uploaded_text = uploaded_file.read()
     unassigned_students = get_unassigned_students(request, experiment)
