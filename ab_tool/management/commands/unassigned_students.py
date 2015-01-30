@@ -1,4 +1,5 @@
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
+from django.core.mail import send_mail
 
 from ab_tool.canvas import get_unassigned_students_with_stored_credentials
 from ab_tool.exceptions import NoValidCredentials
