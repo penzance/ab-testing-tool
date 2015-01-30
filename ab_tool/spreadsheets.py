@@ -65,6 +65,10 @@ def get_track_selection_csv(request, experiment, file_title="test.xlsx"):
 
 
 def parse_uploaded_file(experiment, unassigned_students, input_spreadsheet, filename):
+    """ This function parses an uploaded spreadsheet of student track assignments.
+        It returns a dictionary `students`, mapping sis_ids to track
+        names as well as a list of errors (in string form) encountered while
+        parsing the spreadsheet.  If errors is empty, no errors were encountered. """
     students = {}
     errors = []
     track_names = {track.name: track for track in experiment.tracks.all()}
@@ -88,6 +92,11 @@ def parse_uploaded_file(experiment, unassigned_students, input_spreadsheet, file
 
 
 def parse_row(row, row_number, experiment, tracks, unassigned_students, students, errors):
+    """ The arguments `students` and `errors` are each data structures
+        from `parse_uploaded_file` indented to be modified by this function.
+        If an error is encountered in parsing the row, a string representing the
+        error is appended to the list `errors`.  If there are no errors,
+        an entry (sis_id -> track_name) should be added to the `students` dict """
     if len(row) < 4 or row[3] == "" or row[3] is None:
         errors.append("Row %s: missing track name" % (row_number))
     elif row[3] not in tracks:

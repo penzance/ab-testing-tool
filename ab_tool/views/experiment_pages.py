@@ -209,6 +209,7 @@ def upload_track_assignments(request, experiment_id):
         return render_to_response("ab_tool/spreadsheetErrors.html", {"errors": errors})
     
     for student_id, track in students.items():
+        # lis_person_sourcedid is not returned by SDK, so we set it to None
         ExperimentStudent.objects.create(
             student_id=student_id, course_id=experiment.course_id,
             track=track, lis_person_sourcedid=None,
