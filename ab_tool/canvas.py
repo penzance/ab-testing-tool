@@ -161,6 +161,7 @@ def get_lti_param(request, key):
 
 
 def get_canvas_request_context(request):
+    """ This method creates the needed RequestContext for communication with the Canvas API """
     # For local development, allow defining COURSE_OAUTH_TOKEN in secure settings
     if "COURSE_OAUTH_TOKEN" in settings.SECURE_SETTINGS:
         oauth_token = settings.SECURE_SETTINGS["COURSE_OAUTH_TOKEN"]

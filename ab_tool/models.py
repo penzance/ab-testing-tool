@@ -247,7 +247,7 @@ class InterventionPointInteraction(CourseObject):
 class Course(TimestampedModel):
     course_id = models.CharField(max_length=128, unique=True)
     last_emailed = models.DateTimeField(null=True)
-    canvas_url = models.URLField(max_length=2048)
+    canvas_url = models.URLField(max_length=2048) #Base URL for Canvas SDK
     
     COURSE_ACTIVE_DAYS = 365
     NOTIFICATION_FREQUENCY_HOURS = 24
