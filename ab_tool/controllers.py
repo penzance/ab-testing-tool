@@ -1,12 +1,14 @@
 import csv
 from django.http.response import StreamingHttpResponse
 from django.core.urlresolvers import reverse
+from django.core.mail import send_mail
 from random import choice
 
 from ab_tool.models import (TrackProbabilityWeight, Experiment, ExperimentStudent)
 from ab_tool.exceptions import (BAD_STAGE_ID, missing_param_error,
     INPUT_NOT_ALLOWED, NO_TRACKS_FOR_EXPERIMENT, TRACK_WEIGHTS_NOT_SET,
-    CSV_UPLOAD_NEEDED, NoValidCredentials)
+    CSV_UPLOAD_NEEDED)
+from ab_tool.constants import FROM_EMAIL_ADDRESS
 
 
 def assign_track_and_create_student(experiment, student_id, lis_person_sourcedid):
@@ -109,3 +111,13 @@ def streamed_csv_response(row_generator, file_title):
     response = StreamingHttpResponse(csv_file_generator, content_type="text/csv")
     response['Content-Disposition'] = ("attachment; filename=%s" % file_title)
     return response
+
+
+def send_email_notification(course, email):
+    if course.can_notify():
+        subject, message = email
+        message += ("\n\nCourse Id: %s\nCanvas URL: %s" %
+                    (course.course_id, course.get_canvas_domain()))
+        send_mail(subject, message, FROM_EMAIL_ADDRESS,
+                  course.get_emails(), fail_silently=False)
+        course.notification_sent()

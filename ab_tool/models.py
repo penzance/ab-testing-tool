@@ -1,3 +1,4 @@
+from urlparse import urlparse
 from datetime import timedelta
 from django.db import models
 from django.shortcuts import get_object_or_404
@@ -296,6 +297,10 @@ class Course(TimestampedModel):
     
     def notification_sent(self):
         self.update(last_emailed=timezone.now())
+    
+    def get_canvas_domain(self):
+        parsed_uri = urlparse(self.canvas_url)
+        return '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
 
 
 class CourseCredentials(TimestampedModel):
