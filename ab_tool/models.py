@@ -20,11 +20,11 @@ class TimestampedModel(models.Model):
             self.save(update_fields=kwargs.keys())
     
     # Override for objects.create
-#     def save(self, *args, **kwargs):
-#         try:
-#             super(TimestampedModel, self).save(*args, **kwargs)
-#         except IntegrityError as e:
-#             raise DATABASE_ERROR(e.message)
+    def save(self, *args, **kwargs):
+        try:
+            super(TimestampedModel, self).save(*args, **kwargs)
+        except IntegrityError as e:
+            raise DATABASE_ERROR(e.message)
 
 class CourseObject(TimestampedModel):
     course_id = models.CharField(max_length=128, db_index=True)
