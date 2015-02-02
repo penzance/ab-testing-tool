@@ -170,3 +170,9 @@ SESSION_COOKIE_HTTPONLY = True
 
 MAX_FILE_UPLOAD_SIZE = 10 * 1024 * 1024 # 10 MB
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = SECURE_SETTINGS.get('email_host', 'mailhost.harvard.edu')
+EMAIL_HOST_USER = SECURE_SETTINGS.get('email_host_user', '')
+EMAIL_HOST_PASSWORD = SECURE_SETTINGS.get('email_host_password', '')
+EMAIL_USE_TLS = SECURE_SETTINGS.get('email_use_tls', False)
+EMAIL_PORT = SECURE_SETTINGS.get('email_port', 25)
