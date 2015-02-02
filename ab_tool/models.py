@@ -249,7 +249,7 @@ class Course(TimestampedModel):
     last_emailed = models.DateTimeField(null=True)
     canvas_url = models.URLField(max_length=2048)
     
-    COURSE_ACTIVE_DAYS = 356
+    COURSE_ACTIVE_DAYS = 365
     NOTIFICATION_FREQUENCY_HOURS = 24
     
     @classmethod
@@ -258,6 +258,7 @@ class Course(TimestampedModel):
     
     @classmethod
     def store_credential(cls, course_id, canvas_url, email, oauth_token):
+        """ Gets and stores a credential per user of the course. """
         course = cls.objects.get_or_create(
                 course_id=course_id, defaults={"canvas_url": canvas_url})[0]
         credential, created = CourseCredentials.objects.get_or_create(

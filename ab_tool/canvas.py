@@ -112,6 +112,7 @@ def get_unassigned_students_with_stored_credentials(course_object, experiment):
         raise UNAUTHORIZED_ACCESS
     for credential in course_object.credentials.all():
         try:
+            # Creates custom RequestContext with one of the CourseCredentials for the Course
             request_context = RequestContext(credential.token, course_object.canvas_url)
             return get_unassigned_students_with_context(request_context, experiment)
         except NewTokenNeeded:
@@ -169,6 +170,7 @@ def get_canvas_request_context(request):
     canvas_url = "https://%s/api" % (canvas_domain)
     email = get_lti_param(request, "lis_person_contact_email_primary")
     course_id = get_lti_param(request, "custom_canvas_course_id")
+    # This stores a credential to be added to list of CourseCredentials for the Course
     Course.store_credential(course_id, canvas_url, email, oauth_token)
     return RequestContext(oauth_token, canvas_url)
 
