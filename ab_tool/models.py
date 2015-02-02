@@ -17,17 +17,14 @@ class TimestampedModel(models.Model):
         """ Helper method to update objects """
         for k, v in kwargs.iteritems():
             setattr(self, k, v)
-        try:
             self.save(update_fields=kwargs.keys())
-        except IntegrityError as e:
-            raise DATABASE_ERROR(e.__cause__)
     
     # Override for objects.create
-    def save(self, *args, **kwargs):
-        try:
-            super(TimestampedModel, self).save(*args, **kwargs) 
-        except IntegrityError as e:
-            raise DATABASE_ERROR(e.__cause__)
+#     def save(self, *args, **kwargs):
+#         try:
+#             super(TimestampedModel, self).save(*args, **kwargs)
+#         except IntegrityError as e:
+#             raise DATABASE_ERROR(e.message)
 
 class CourseObject(TimestampedModel):
     course_id = models.CharField(max_length=128, db_index=True)

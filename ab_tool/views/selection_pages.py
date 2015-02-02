@@ -51,12 +51,12 @@ def submit_selection(request):
 @lti_role_required(ADMINS)
 def submit_selection_new_intervention_point(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    name = post_param(request, "name")
+    name = validate_name(post_param(request, "name"))
     notes = post_param(request, "notes")
     experiment_id = post_param(request, "experiment")
     experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
     intervention_point = InterventionPoint.objects.create(
-            name=validate_name(name), notes=notes, course_id=course_id, experiment=experiment)
+            name=name, notes=notes, course_id=course_id, experiment=experiment)
     intervention_pointurls = [(k,v) for (k,v) in request.POST.iteritems() if STAGE_URL_TAG in k and v]
     for (k,v) in intervention_pointurls:
         _, track_id = k.split(STAGE_URL_TAG)

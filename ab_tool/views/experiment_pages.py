@@ -35,7 +35,7 @@ def submit_create_experiment(request):
     experiment_dict = json.loads(request.body)
     
     # Unpack data from experiment_dict and update experiment
-    name = experiment_dict["name"]
+    name = validate_name(experiment_dict["name"])
     notes = experiment_dict["notes"]
     uniform_random = bool(experiment_dict["uniformRandom"])
     tracks = experiment_dict["tracks"]
@@ -44,7 +44,7 @@ def submit_create_experiment(request):
     else:
         assignment_method = Experiment.WEIGHTED_PROBABILITY_RANDOM
     experiment = Experiment.objects.create(
-            name=validate_name(name), course_id=course_id, notes=notes,
+            name=name, course_id=course_id, notes=notes,
             assignment_method=assignment_method
     )
     
@@ -93,7 +93,7 @@ def submit_edit_experiment(request, experiment_id):
     experiment_dict = json.loads(request.body)
     
     # Unpack data from experiment_dict and update experiment
-    name = experiment_dict["name"]
+    name = validate_name(experiment_dict["name"])
     notes = experiment_dict["notes"]
     if experiment.tracks_finalized:
         # Only allow updating name, notes, and track names for started experiments
@@ -111,7 +111,7 @@ def submit_edit_experiment(request, experiment_id):
         assignment_method = Experiment.UNIFORM_RANDOM
     else:
         assignment_method = Experiment.WEIGHTED_PROBABILITY_RANDOM
-    experiment.update(name=validate_name(name), notes=notes, assignment_method=assignment_method)
+    experiment.update(name=name, notes=notes, assignment_method=assignment_method)
     
     # Update existing tracks
     for track_dict in existing_tracks:

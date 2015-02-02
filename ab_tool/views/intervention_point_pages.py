@@ -79,11 +79,11 @@ def submit_create_intervention_point(request, experiment_id):
     """ Note: request will always be POST because Canvas fetches pages within iframe by POST
         TODO: use Django forms library to save instead of getting individual POST params """
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    name = post_param(request, "name")
+    name = validate_name(post_param(request, "name"))
     notes = post_param(request, "notes")
     experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
     intervention_point = InterventionPoint.objects.create(
-            name=validate_name(name), notes=notes, course_id=course_id, experiment=experiment)
+            name=name, notes=notes, course_id=course_id, experiment=experiment)
     intervention_pointurls = [(k,v) for (k,v) in request.POST.iteritems()
                               if STAGE_URL_TAG in k and v]
     for (k,v) in intervention_pointurls:
@@ -153,9 +153,9 @@ def edit_intervention_point_common(request, intervention_point_id):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     intervention_point = InterventionPoint.get_or_404_check_course(
             intervention_point_id, course_id)
-    name = post_param(request, "name")
+    name = validate_name(post_param(request, "name"))
     notes = post_param(request, "notes")
-    intervention_point.update(name=validate_name(name), notes=notes)
+    intervention_point.update(name=name, notes=notes)
     # InterventionPointUrl creation
     intervention_pointurls = [(k,v) for (k,v) in request.POST.iteritems() if STAGE_URL_TAG in k and v]
     for (k,v) in intervention_pointurls:

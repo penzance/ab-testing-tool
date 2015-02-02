@@ -1,6 +1,11 @@
 from error_middleware.exceptions import (Renderable500, Renderable400,
     Renderable403, Renderable404)
 
+import logging
+import traceback
+
+logger = logging.getLogger(__name__)
+
 NO_SDK_RESPONSE = Renderable500("Canvas SDK returned an error")
 
 MISSING_LTI_LAUNCH = Renderable400("LTI_LAUNCH not in session")

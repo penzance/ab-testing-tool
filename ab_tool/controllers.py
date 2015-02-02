@@ -55,15 +55,17 @@ def intervention_point_url(request, intervention_point_id):
 def validate_name(name):
     if not name:
         raise MISSING_NAME_PARAM
+    return name
 
 
 def validate_weighting(weight):
-    if not 0 <= weight <=100: 
+    if not 0 <= weight <=100:
         raise INCORRECT_WEIGHTING_PARAM
+    return weight
 
 
 def validate_url(url):
-    validator = URLValidator(verify_exists=False)
+    validator = URLValidator()
     """ Adds "http://" to the beginning of a url if it isn't there """
     if not url.startswith("http://") and not url.startswith("https://"):
         url = "http://%s" % url
