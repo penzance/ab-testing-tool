@@ -206,6 +206,9 @@ main {
   width: 97%;
   margin: 0 1.5%;
 }
+.text-center {
+  text-align: center;
+}
 .block {
   display: block;
 }
@@ -579,7 +582,8 @@ ul, ol, dl {
   padding-right: 0.5em;
 }
 .btn-submit {
-  height: 1em;
+  /*height: 1em;*/
+
   padding: 0.45em 2%;
   border-radius: 5px;
   background-color: #cecece;
@@ -588,7 +592,8 @@ ul, ol, dl {
   color: #525252;
 }
 .btn-submit-primary {
-  height: 1em;
+  /*height: 1em;*/
+
   padding: 0.45em 2%;
   border-radius: 5px;
   background-color: #cecece;
@@ -608,7 +613,8 @@ button.btn-submit-primary {
 /* link look and feel but with the padding
 and spacing to match a btn-submit */
 .btn-link {
-  height: 1em;
+  /*height: 1em;*/
+
   padding: 0.45em 2%;
   border-radius: 5px;
   background-color: #cecece;
