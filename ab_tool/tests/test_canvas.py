@@ -10,7 +10,7 @@ from ab_tool.controllers import intervention_point_url
 from canvas_sdk.exceptions import CanvasAPIError
 
 class TestCanvas(SessionTestCase):
-    def mock_request_exception(self):
+    def mock_api_exception(self):
         exception = CanvasAPIError()
         exception.response = MagicMock()
         return exception
@@ -20,7 +20,7 @@ class TestCanvas(SessionTestCase):
         exception.response = MagicMock()
         exception.status_code = 401
         return exception
-
+    
     def get_canvas_modules(self, list_modules_return=[], list_items_return=[]):
         with patch(LIST_MODULES, return_value=APIReturn(list_modules_return)):
             with patch(LIST_ITEMS, return_value=APIReturn(list_items_return)):
@@ -56,7 +56,7 @@ class TestCanvas(SessionTestCase):
     def test_list_module_items_error(self):
         """ Tests that list_module_items correctly catches RequestExceptions """
         request_context = get_canvas_request_context(self.request)
-        with patch(LIST_ITEMS, side_effect=self.mock_request_exception()):
+        with patch(LIST_ITEMS, side_effect=self.mock_api_exception()):
             self.assertRaisesSpecific(NO_SDK_RESPONSE, list_module_items,
                                       request_context, TEST_COURSE_ID, 0)
     
@@ -78,7 +78,7 @@ class TestCanvas(SessionTestCase):
     def test_list_modules_error(self):
         """ Tests that list_modules correctly catches RequestExceptions """
         request_context = get_canvas_request_context(self.request)
-        with patch(LIST_MODULES, side_effect=self.mock_request_exception()):
+        with patch(LIST_MODULES, side_effect=self.mock_api_exception()):
             self.assertRaisesSpecific(NO_SDK_RESPONSE, list_modules,
                                       request_context, TEST_COURSE_ID)
     
