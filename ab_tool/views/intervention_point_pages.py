@@ -3,7 +3,7 @@ from django.core.urlresolvers import reverse
 from django_auth_lti.decorators import lti_role_required
 
 from ab_tool.constants import (ADMINS, STAGE_URL_TAG,
-    DEPLOY_OPTION_TAG, AS_TAB_TAG)
+    DEPLOY_OPTION_TAG)
 from ab_tool.models import (InterventionPoint, Track, InterventionPointUrl,
      ExperimentStudent, Experiment)
 from ab_tool.canvas import get_lti_param, CanvasModules
@@ -88,10 +88,9 @@ def submit_create_intervention_point(request, experiment_id):
                               if STAGE_URL_TAG in k and v]
     for (k,v) in intervention_pointurls:
         _, track_id = k.split(STAGE_URL_TAG)
-        is_canvas = post_param(request, DEPLOY_OPTION_TAG + track_id)
-        as_tab = request.POST.get(AS_TAB_TAG + track_id, None)
-        is_canvas_page = bool(is_canvas == "canvas_url")
-        open_as_tab = bool(as_tab == "true")
+        deploy_option = post_param(request, DEPLOY_OPTION_TAG + track_id)
+        is_canvas_page = bool(deploy_option == "canvasPage")
+        open_as_tab = bool(deploy_option == "newTab")
         InterventionPointUrl.objects.create(
                 url=validate_url(v), intervention_point_id=intervention_point.id,
                 track_id=track_id, is_canvas_page=is_canvas_page, open_as_tab=open_as_tab
