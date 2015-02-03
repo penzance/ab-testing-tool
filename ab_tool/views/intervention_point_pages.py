@@ -81,11 +81,13 @@ def submit_create_intervention_point(request, experiment_id):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     name = validate_name(post_param(request, "name"))
     notes = post_param(request, "notes")
+    intervention_pointurls = [(k,v) for (k,v) in request.POST.iteritems()
+                              if STAGE_URL_TAG in k and v]
+    for (k,v) in intervention_pointurls:
+        validate_url(v) # Validates URLs using backend rules before any InterventionPointUrl object creation
     experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
     intervention_point = InterventionPoint.objects.create(
             name=name, notes=notes, course_id=course_id, experiment=experiment)
-    intervention_pointurls = [(k,v) for (k,v) in request.POST.iteritems()
-                              if STAGE_URL_TAG in k and v]
     for (k,v) in intervention_pointurls:
         _, track_id = k.split(STAGE_URL_TAG)
         deploy_option = post_param(request, DEPLOY_OPTION_TAG + track_id)
@@ -155,8 +157,9 @@ def edit_intervention_point_common(request, intervention_point_id):
     name = validate_name(post_param(request, "name"))
     notes = post_param(request, "notes")
     intervention_point.update(name=name, notes=notes)
-    # InterventionPointUrl creation
     intervention_pointurls = [(k,v) for (k,v) in request.POST.iteritems() if STAGE_URL_TAG in k and v]
+    for (k,v) in intervention_pointurls:
+        validate_url(v) # Validates URLs using backend rules before any InterventionPointUrl object creation
     for (k,v) in intervention_pointurls:
         _, track_id = k.split(STAGE_URL_TAG)
         # This is a search for the joint unique index of InterventionPointUrl, so it
@@ -165,6 +168,7 @@ def edit_intervention_point_common(request, intervention_point_id):
         is_canvas_page = bool(deploy_option == "canvasPage")
         open_as_tab = bool(deploy_option == "newTab")
         try:
+            # InterventionPointUrl creation
             intervention_point_url = InterventionPointUrl.objects.get(intervention_point__pk=intervention_point_id, track__pk=track_id)
             intervention_point_url.update(url=validate_url(v), is_canvas_page=is_canvas_page, open_as_tab=open_as_tab)
         except InterventionPointUrl.DoesNotExist:
