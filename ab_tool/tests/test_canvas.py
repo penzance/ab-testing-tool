@@ -157,3 +157,4 @@ class TestCanvas(SessionTestCase):
         urls = self.get_canvas_modules()._all_intervention_point_urls()
         self.assertEqual(len(urls), 1)
         self.assertEqual({intervention_point_url(self.request, intervention_point.id): intervention_point}, urls)
+    
