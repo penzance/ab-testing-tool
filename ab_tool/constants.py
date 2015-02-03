@@ -8,9 +8,6 @@ DEPLOY_OPTION_TAG = 'is_canvas_page_for_track_'
 AS_TAB_TAG = 'open_as_tab_for_track_'
 
 
-# TODO: change this to actual email address
-FROM_EMAIL_ADDRESS = "no-reply@example.com"
-
 ASSIGN_STUDENTS_MESSAGE = ("Missing Student Track Assignments",
 """ New students have joined your canvas course.
 This course has at least one experiment in the A/B Testing Tool that needs you

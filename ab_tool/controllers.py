@@ -1,4 +1,5 @@
 import csv
+from django.conf import settings
 from django.http.response import StreamingHttpResponse
 from django.core.urlresolvers import reverse
 from django.core.mail import send_mail
@@ -8,7 +9,6 @@ from ab_tool.models import (TrackProbabilityWeight, Experiment, ExperimentStuden
 from ab_tool.exceptions import (BAD_STAGE_ID, missing_param_error,
     INPUT_NOT_ALLOWED, NO_TRACKS_FOR_EXPERIMENT, TRACK_WEIGHTS_NOT_SET,
     CSV_UPLOAD_NEEDED)
-from ab_tool.constants import FROM_EMAIL_ADDRESS
 
 
 def assign_track_and_create_student(experiment, student_id, lis_person_sourcedid):
@@ -118,6 +118,6 @@ def send_email_notification(course, email):
         subject, message = email
         message += ("\n\nCourse Id: %s\nCanvas URL: %s" %
                     (course.course_id, course.get_canvas_domain()))
-        send_mail(subject, message, FROM_EMAIL_ADDRESS,
+        send_mail(subject, message, settings.SERVER_EMAIL,
                   course.get_emails(), fail_silently=False)
         course.notification_sent()
