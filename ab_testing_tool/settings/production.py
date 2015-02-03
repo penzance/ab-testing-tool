@@ -26,6 +26,11 @@ LOGGING = {
             'formatter': 'verbose',
             'level': 'DEBUG',
         },
+       'mail_admins': {
+            'level': 'ERROR',
+            'class': 'django.utils.log.AdminEmailHandler',
+            'filters': ['special']
+        }
      },
     'loggers': {
         'django.request': {
@@ -39,7 +44,7 @@ LOGGING = {
             'level': 'DEBUG'
         },
         'ab_tool': {
-            'handlers': ['console'],
+            'handlers': ['console', "mail_admins"],
             'propagate': True,
             'level': 'DEBUG',
         },

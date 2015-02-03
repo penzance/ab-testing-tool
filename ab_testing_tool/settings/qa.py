@@ -35,6 +35,11 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'simple',
         },
+        'mail_admins': {
+            'level': 'ERROR',
+            'class': 'django.utils.log.AdminEmailHandler',
+            'filters': ['special']
+        }
     },
     'loggers': {
         'django.request': {
@@ -48,7 +53,7 @@ LOGGING = {
             'level': 'DEBUG'
         },
         'ab_tool': {
-            'handlers': ['console', 'logfile'],
+            'handlers': ['console', 'logfile', 'mail_admins'],
             'propagate': True,
             'level': 'DEBUG',
         },
