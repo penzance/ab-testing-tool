@@ -5,20 +5,20 @@ from ab_tool.canvas import (get_lti_param, list_modules,
 from ab_tool.exceptions import (MISSING_LTI_LAUNCH, MISSING_LTI_PARAM,
     NO_SDK_RESPONSE)
 from mock import patch, MagicMock
-from requests.exceptions import RequestException
 from django_canvas_oauth.exceptions import NewTokenNeeded
 from ab_tool.controllers import intervention_point_url
+from canvas_sdk.exceptions import CanvasAPIError
 
 class TestCanvas(SessionTestCase):
     def mock_request_exception(self):
-        exception = RequestException()
+        exception = CanvasAPIError()
         exception.response = MagicMock()
         return exception
     
     def mock_unauthorized_exception(self):
-        exception = RequestException()
+        exception = CanvasAPIError()
         exception.response = MagicMock()
-        exception.response.status_code = 401
+        exception.status_code = 401
         return exception
 
     def get_canvas_modules(self, list_modules_return=[], list_items_return=[]):
