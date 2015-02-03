@@ -202,6 +202,10 @@ main {
 .float-right {
   float: right;
 }
+.container-modal {
+  width: 97%;
+  margin: 0 1.5%;
+}
 .block {
   display: block;
 }
@@ -403,6 +407,11 @@ textarea.form-control {
   margin-top: 0.55em;
   float: right;
 }
+.custom-dropdown {
+  position: relative;
+  display: inline-block;
+  width: 90%;
+}
 .modal .form-group-description {
   display: none;
 }
@@ -571,7 +580,7 @@ ul, ol, dl {
 }
 .btn-submit {
   height: 1em;
-  padding: 0.55em 1%;
+  padding: 0.45em 2%;
   border-radius: 5px;
   background-color: #cecece;
   border: solid 1px #c3c3c3;
@@ -580,7 +589,7 @@ ul, ol, dl {
 }
 .btn-submit-primary {
   height: 1em;
-  padding: 0.55em 1%;
+  padding: 0.45em 2%;
   border-radius: 5px;
   background-color: #cecece;
   border: solid 1px #c3c3c3;
@@ -600,7 +609,7 @@ button.btn-submit-primary {
 and spacing to match a btn-submit */
 .btn-link {
   height: 1em;
-  padding: 0.55em 1%;
+  padding: 0.45em 2%;
   border-radius: 5px;
   background-color: #cecece;
   border: solid 1px #c3c3c3;
