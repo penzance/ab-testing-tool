@@ -213,7 +213,7 @@ class TestExperimentPages(SessionTestCase):
         self.assertError(response, UNAUTHORIZED_ACCESS)
     
     def test_submit_edit_started_experiment_changes_name_and_notes(self):
-        """ Tests that submit_edit_experiment changes an Experiment's 
+        """ Tests that submit_edit_experiment changes an Experiment's
             name and notes even if the experiment has already been started """
         experiment = self.create_test_experiment(name="old_name", notes="old_notes",
                                                  tracks_finalized=True)
@@ -367,3 +367,14 @@ class TestExperimentPages(SessionTestCase):
         self.client.get(reverse("ab_testing_tool_finalize_tracks", args=(experiment.id,)),
                                    follow=True)
         self.assertFalse(experiment.tracks_finalized)
+    
+    def test_delete_track(self):
+        """ Tests that delete_track method properly deletes a track of an experiment when authorized"""
+        experiment = self.create_test_experiment()
+        track = self.create_test_track(experiment=experiment)
+        self.assertEqual(experiment.tracks.count(), 1)
+        response = self.client.get(reverse("ab_testing_tool_delete_experiment", args=(experiment.id,)),
+                                   follow=True)
+        second_num_experiments = Experiment.objects.count()
+        self.assertOkay(response)
+        self.assertEqual(first_num_experiments, second_num_experiments)
