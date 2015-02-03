@@ -4,6 +4,7 @@ from ab_tool.exceptions import (UNAUTHORIZED_ACCESS,
     EXPERIMENT_TRACKS_ALREADY_FINALIZED, DATABASE_ERROR)
 import json
 from django.core.urlresolvers import reverse
+from ab_tool.constants import NAME_CHAR_LIMIT, URL_CHAR_LIMIT, NOTES_CHAR_LIMIT
 
 
 class TimestampedModel(models.Model):
@@ -55,8 +56,8 @@ class Experiment(CourseObject):
         (REVERSE_API, "reverse_api"),
     )
     
-    name = models.CharField(max_length=256)
-    notes = models.CharField(max_length=1024)
+    name = models.CharField(max_length=NAME_CHAR_LIMIT)
+    notes = models.CharField(max_length=NOTES_CHAR_LIMIT)
     tracks_finalized = models.BooleanField(default=False)
     assignment_method = models.IntegerField(max_length=1, default=1,
                                             choices=ASSIGNMENT_ENUM_TYPES,)
@@ -106,7 +107,7 @@ class Experiment(CourseObject):
 
 
 class Track(CourseObject):
-    name = models.CharField(max_length=256)
+    name = models.CharField(max_length=NAME_CHAR_LIMIT)
     experiment = models.ForeignKey(Experiment, related_name="tracks")
     
     class Meta:
@@ -140,8 +141,8 @@ class TrackProbabilityWeight(CourseObject):
 
 class InterventionPoint(CourseObject):
     """ This model stores the configuration of an intervention point"""
-    name = models.CharField(max_length=256)
-    notes = models.CharField(max_length=1024)
+    name = models.CharField(max_length=NAME_CHAR_LIMIT)
+    notes = models.CharField(max_length=NOTES_CHAR_LIMIT)
     experiment = models.ForeignKey(Experiment, related_name="intervention_points")
     tracks = models.ManyToManyField(Track, through="InterventionPointUrl")
     
@@ -176,7 +177,7 @@ class InterventionPoint(CourseObject):
 
 class InterventionPointUrl(TimestampedModel):
     """ This model stores the URL of a single intervention """
-    url = models.URLField(max_length=2048)
+    url = models.URLField(max_length=URL_CHAR_LIMIT)
     track = models.ForeignKey(Track)
     intervention_point = models.ForeignKey(InterventionPoint)
     open_as_tab = models.BooleanField(default=False)
@@ -208,4 +209,4 @@ class InterventionPointInteraction(CourseObject):
     intervention_point = models.ForeignKey(InterventionPoint)
     experiment = models.ForeignKey(Experiment, related_name="intervention_point_interactions")
     track = models.ForeignKey(Track)
-    url = models.URLField(max_length=2048)
+    url = models.URLField(max_length=URL_CHAR_LIMIT)

@@ -35,6 +35,9 @@ MISSING_NAME_PARAM = Renderable400("Names are required. Please go back and submi
 INCORRECT_WEIGHTING_PARAM = Renderable400("Weights (between 0 and 100) are required if you are randomizing with weights. Please go back and submit weights for all tracks.")
 INVALID_URL_PARAM = Renderable400("One of your URL inputs is invalid.")
 
+PARAM_LENGTH_EXCEEDS_LIMIT = Renderable400("There are length limitations. At least one of your inputs is too long.")
+
+
 def DATABASE_ERROR(error_message):
     return Renderable400("%s" % error_message)
 

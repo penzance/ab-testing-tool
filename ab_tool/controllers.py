@@ -7,7 +7,8 @@ from ab_tool.models import (TrackProbabilityWeight, Experiment, ExperimentStuden
 from ab_tool.exceptions import (BAD_STAGE_ID, missing_param_error,
     INPUT_NOT_ALLOWED, NO_TRACKS_FOR_EXPERIMENT, TRACK_WEIGHTS_NOT_SET,
     CSV_UPLOAD_NEEDED, INVALID_URL_PARAM, INCORRECT_WEIGHTING_PARAM,
-    MISSING_NAME_PARAM)
+    MISSING_NAME_PARAM, PARAM_LENGTH_EXCEEDS_LIMIT)
+from ab_tool.constants import (NAME_CHAR_LIMIT, URL_CHAR_LIMIT)
 
 
 def assign_track_and_create_student(experiment, student_id, lis_person_sourcedid):
@@ -55,6 +56,8 @@ def intervention_point_url(request, intervention_point_id):
 def validate_name(name):
     if not name:
         raise MISSING_NAME_PARAM
+    if len(name) > NAME_CHAR_LIMIT:
+        raise PARAM_LENGTH_EXCEEDS_LIMIT
     return name
 
 
@@ -71,6 +74,8 @@ def validate_url(url):
         url = "http://%s" % url
     try:
         validator(url)
+        if len(url) > URL_CHAR_LIMIT:
+            raise PARAM_LENGTH_EXCEEDS_LIMIT
         return url
     except ValidationError:
         raise INVALID_URL_PARAM

@@ -39,6 +39,11 @@ def submit_create_experiment(request):
     notes = experiment_dict["notes"]
     uniform_random = bool(experiment_dict["uniformRandom"])
     tracks = experiment_dict["tracks"]
+    # Validates using backend rules before any object creation
+    for track_dict in tracks:
+        validate_name(track_dict["name"])
+        if not uniform_random:
+            validate_weighting(track_dict["weighting"])
     if uniform_random:
         assignment_method = Experiment.UNIFORM_RANDOM
     else:
