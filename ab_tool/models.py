@@ -18,7 +18,7 @@ class TimestampedModel(models.Model):
         """ Helper method to update objects """
         for k, v in kwargs.iteritems():
             setattr(self, k, v)
-            self.save(update_fields=kwargs.keys())
+        self.save(update_fields=kwargs.keys())
     
     # Override for objects.create
     def save(self, *args, **kwargs):
