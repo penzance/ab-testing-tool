@@ -9,13 +9,13 @@ AS_TAB_TAG = 'open_as_tab_for_track_'
 
 
 ASSIGN_STUDENTS_MESSAGE = ("Missing Student Track Assignments",
-""" New students have joined your canvas course.
+""" New learners have joined your course.
 This course has at least one experiment in the A/B Testing Tool that needs you
-to assign tracks to these students.  Please log in to canvas to fix this.
+to assign tracks to these students. Please log in to canvas to fix this.
 Until you do, these students will be unable to access some of the canvas content
 for this course. """)
 
 NO_CREDENTIALS_MESSAGE = ("Missing Canvas Credentials",
-""" The Canvas A/B Testing tool has no valid credentials
-to access the canvas SDK on your behalf.  Please go to the A/B Testing Tool control
-panel for your course and log in with canvas. """)
+""" The A/B Testing Tool does not have permission to access
+data from Canvas on your behalf. Please go to the A/B Testing Tool dashboard
+for your course and log in to the tool to grant it access to your account. """)
