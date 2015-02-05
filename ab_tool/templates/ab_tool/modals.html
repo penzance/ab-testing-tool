@@ -14,7 +14,7 @@
                                 <ul>
                                     {% for i in m.module_items %}
                                         {% if i.is_intervention_point %}
-                                            <a class="active">{{i.title}} | <i> Intervention Point</i></a>
+                                            <p class="active"><i> Intervention Point</i> {{i.database_name}} <i>from Experiment</i> {{i.experiment_name}}| <i>displayed to student as</i>: {{i.title}}</p>
                                         {% else %}
                                             <p>{{i.title|default:"[ Item not titled]"}}</p>
                                         {% endif %}
