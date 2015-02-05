@@ -213,7 +213,7 @@ class TestExperimentPages(SessionTestCase):
         self.assertError(response, UNAUTHORIZED_ACCESS)
     
     def test_submit_edit_started_experiment_changes_name_and_notes(self):
-        """ Tests that submit_edit_experiment changes an Experiment's 
+        """ Tests that submit_edit_experiment changes an Experiment's
             name and notes even if the experiment has already been started """
         experiment = self.create_test_experiment(name="old_name", notes="old_notes",
                                                  tracks_finalized=True)

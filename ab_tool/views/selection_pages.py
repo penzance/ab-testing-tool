@@ -4,7 +4,8 @@ from django_auth_lti.decorators import lti_role_required
 
 from ab_tool.models import (Track, InterventionPointUrl, InterventionPoint,
     Experiment)
-from ab_tool.controllers import (intervention_point_url, post_param)
+from ab_tool.controllers import (intervention_point_url, post_param,
+    validate_name)
 from ab_tool.constants import STAGE_URL_TAG, ADMINS
 from ab_tool.canvas import get_lti_param, CanvasModules
 from ab_tool.exceptions import (MISSING_RETURN_TYPES_PARAM,
@@ -50,7 +51,7 @@ def submit_selection(request):
 @lti_role_required(ADMINS)
 def submit_selection_new_intervention_point(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    name = post_param(request, "name")
+    name = validate_name(post_param(request, "name"))
     notes = post_param(request, "notes")
     experiment_id = post_param(request, "experiment")
     experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
