@@ -168,4 +168,3 @@ class TestCanvas(SessionTestCase):
         module_item = modules[0]["module_items"][0]
         self.assertEqual(module_item["is_intervention_point"], True)
         self.assertEqual(module_item["database_name"], "test_database_name")
-
