@@ -44,8 +44,7 @@ when installing lxml, refer to this: http://stackoverflow.com/a/22322645/2812260
 * Edit the new ab_testing_tool/settings/secure.py and fill in values requested there.
   The minimum needed for local setup is as follows:
   Add a line to the dictionary containing the access token from Canvas styled like this:
-  `"COURSE_OAUTH_TOKEN": "asdlkjf234aADKUEJskjdf2l3a6k7sjdf",`.
-  Replace `{{ secure_settings.admins_tuple }}` with `None`.
+  `"course_oauth_token": "asdlkjf234aADKUEJskjdf2l3a6k7sjdf",`.
   Replace `'{{ secure_settings.lti_key }}': '{{ secure_settings.lti_secret }}'`
   with `"test": "secret"`.
 
