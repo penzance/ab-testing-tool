@@ -684,6 +684,12 @@ and spacing to match a btn-submit */
   background: #f7f7f7;
   color: #636363;
 }
+.text-success {
+  color: #3c763d;
+}
+.text-warning {
+  color: #8a6d3b;
+}
 body {
   font-size: 0.9375em;
   line-height: 1.25em;
@@ -814,6 +820,32 @@ a:hover {
   font-size: 0.875em;
   color: #505151;
   font-style: italic;
+}
+.ip-status {
+  width: 11%;
+}
+.missing-url {
+  font-size: 1.2em;
+  float: right;
+  display: inline-block;
+  text-align: center;
+  color: #8a6d3b;
+}
+.missing-url span {
+  font-size: 0.65em !important;
+  display: block;
+}
+.ip-installed {
+  font-size: 1.2em;
+  float: right;
+  display: inline-block;
+  text-align: center;
+  color: #8a6d3b;
+  color: #3c763d;
+}
+.ip-installed span {
+  font-size: 0.65em !important;
+  display: block;
 }
 .ip-btn-delete {
   color: #a51c30;
