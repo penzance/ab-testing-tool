@@ -67,7 +67,7 @@ def validate_weighting(weight):
     return weight
 
 
-def validate_url(url):
+def validate_format_url(url):
     validator = URLValidator()
     """ Adds "http://" to the beginning of a url if it isn't there """
     if not url.startswith("http://") and not url.startswith("https://"):

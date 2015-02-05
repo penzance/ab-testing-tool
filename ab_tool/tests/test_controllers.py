@@ -1,7 +1,7 @@
 from mock import MagicMock
 
 from ab_tool.controllers import (intervention_point_url,
-    validate_url, post_param, format_weighting,
+    validate_format_url, post_param, format_weighting,
     assign_track_and_create_student)
 from ab_tool.tests.common import (SessionTestCase, TEST_STUDENT_ID)
 from ab_tool.exceptions import (BAD_STAGE_ID, INPUT_NOT_ALLOWED,
@@ -81,19 +81,19 @@ class TestControllers(SessionTestCase):
         self.assertRaisesSpecific(BAD_STAGE_ID, intervention_point_url, self.request, "str")
     
     def test_format_url_passthrough(self):
-        """ Tests that validate_url doesn't change a proper http:// url """
+        """ Tests that validate_format_url doesn't change a proper http:// url """
         url = "http://example.com/http_stuff?thing=other_thing"
-        self.assertEqual(url, validate_url(url))
+        self.assertEqual(url, validate_format_url(url))
     
     def test_format_url_https_passthrough(self):
-        """ Tests that validate_url doesn't change a proper https:// url """
+        """ Tests that validate_format_url doesn't change a proper https:// url """
         url = "https://example.com/http_stuff?thing=other_thing"
-        self.assertEqual(url, validate_url(url))
+        self.assertEqual(url, validate_format_url(url))
     
     def test_format_url_adds_http(self):
-        """ Tests that validate_url adds http:// to a url missing it """
+        """ Tests that validate_format_url adds http:// to a url missing it """
         url = "www.example.com/http_stuff?thing=other_thing"
-        self.assertEqual("http://" + url, validate_url(url))
+        self.assertEqual("http://" + url, validate_format_url(url))
     
     def test_post_param_success(self):
         """ Test that post_param returns correct value when param is present """
