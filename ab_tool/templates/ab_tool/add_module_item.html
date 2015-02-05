@@ -10,9 +10,7 @@
 </head>
 <body>
 <div class="container-modal">
-
     <main>
-
         {% if intervention_points %}
         <form class="form-horizontal" method="POST" action="{% url 'ab_testing_tool_submit_selection' %}">
 
@@ -42,7 +40,6 @@
         {% endif %}
 
     </main>
-
 </div>
 <script src="{% static 'ab_tool/js/jquery-1.10.1.min.js' %}"></script>
 <script src="{% static 'ab_tool/js/edit_intervention_point.js' %}"></script>
