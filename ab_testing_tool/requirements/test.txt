@@ -4,4 +4,3 @@
 -r base.txt
  
 # below are requirements specific to the test environment
-gunicorn
