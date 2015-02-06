@@ -897,6 +897,33 @@ a:hover {
   border-bottom: 0px solid transparent;
   border-left: 14px solid #141414;
 }
+/********* Modules popup (START) ***********/
+.module-name {
+  background: #f7f7f7;
+  margin: 0;
+  padding: 0.55em 0.55em 0 0.55em;
+  border-width: 1px 1px 0px 1px;
+  border-color: #ececeb;
+  border-style: solid;
+}
+.list-modules {
+  background: #f7f7f7;
+  padding: 1.5em;
+  border-width: 0 1px 1px 1px;
+  border-color: #ececeb;
+  border-style: solid;
+}
+.list-modules li {
+  padding: 0.75em 1.5em;
+  border-bottom: solid 1px #ececeb;
+  border-left: solid 1px #ececeb;
+  border-right: solid 1px #ececeb;
+  background: #fcfefd;
+}
+.list-modules li:first-child {
+  border-top: solid 1px #ececeb;
+}
+/********* Modules popup (END) ***********/
 /***********************************************************************************
 					EXP DASHBOARD (END)
 /**********************************************************************************/
