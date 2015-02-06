@@ -158,3 +158,13 @@ class TestCanvas(SessionTestCase):
         self.assertEqual(len(urls), 1)
         self.assertEqual({intervention_point_url(self.request, intervention_point.id): intervention_point}, urls)
     
+    def test_get_modules_with_items(self):
+        """ Tests that get_modules_with_items returns with appropriate values """
+        intervention_point = self.create_test_intervention_point(name="test_database_name")
+        mock_item = {"type": "ExternalTool",
+                     "external_url": intervention_point_url(self.request, intervention_point.id)}
+        canvas_modules = self.get_canvas_modules(list_modules_return=[{"id": 0}], list_items_return=[mock_item])
+        modules = canvas_modules.get_modules_with_items()
+        module_item = modules[0]["module_items"][0]
+        self.assertEqual(module_item["is_intervention_point"], True)
+        self.assertEqual(module_item["database_name"], "test_database_name")

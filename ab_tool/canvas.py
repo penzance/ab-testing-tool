@@ -70,6 +70,7 @@ class CanvasModules(object):
                 item["is_intervention_point"] = is_intervention_point
                 if is_intervention_point:
                     item["database_name"] = intervention_point_urls[item["external_url"]].name
+                    item["experiment_name"] = intervention_point_urls[item["external_url"]].experiment.name
         return self.modules
     
     def _all_intervention_point_urls(self):
@@ -118,8 +119,8 @@ def get_lti_param(request, key):
 
 def get_canvas_request_context(request):
     # FOR LOCAL DEVLEOPEMENT PURPOSES. TODO: Remove if-block in production.
-    if "COURSE_OAUTH_TOKEN" in settings.SECURE_SETTINGS:
-        oauth_token = settings.SECURE_SETTINGS["COURSE_OAUTH_TOKEN"]
+    if "course_oauth_token" in settings.SECURE_SETTINGS:
+        oauth_token = settings.SECURE_SETTINGS["course_oauth_token"]
     else:
         oauth_token = get_token(request)
     canvas_domain = get_lti_param(request, "custom_canvas_api_domain")
