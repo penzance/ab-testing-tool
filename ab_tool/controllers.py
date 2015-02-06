@@ -75,7 +75,7 @@ def validate_format_url(url):
     try:
         validator(url)
         if len(url) > URL_CHAR_LIMIT:
-            raise PARAM_LENGTH_EXCEEDS_LIMIT
+            raise PARAM_LENGTH_EXCEEDS_LIMIT #the validator may already enforce length requirement
         return url
     except ValidationError:
         raise INVALID_URL_PARAM
