@@ -15,7 +15,7 @@
                             
                                 {% if i.is_intervention_point %}
                                 <li class="intervention-in-module">
-                                    <strong>Intervention Point:</strong> {{i.title}}
+                                    <strong>Intervention Point:</strong> {{i.database_name}}  |  <strong>Experiment:</strong> {{i.experiment_name}}  |  <strong>Displayed To Student As:</strong> {{i.title}}
                                 {% else %}
                                 <li>
                                     {{i.title|default:"[ Item not titled]"}}
