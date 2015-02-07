@@ -7,28 +7,31 @@
                 <h4 class="modal-title">Modules Installations</h4>
             </div>
             <div class="modal-body">
-                <p class="text-warning">See where A/B intervention points are installed in your modules.</p>
+                <p>See where A/B intervention points are installed in your modules.</p>
                     {% for m in modules %}
-                        <h4><a class="" id="module_{{m.id}}"> <strong>Module: {{m.name}}</strong></a></h4>
-                        <div id="module_items_{{m.id}}">
-                                <ul>
-                                    {% for i in m.module_items %}
-                                        {% if i.is_intervention_point %}
-                                            <p class="active"><i> Intervention Point</i> {{i.database_name}} <i>from Experiment</i> {{i.experiment_name}}| <i>displayed to student as</i>: {{i.title}}</p>
-                                        {% else %}
-                                            <p>{{i.title|default:"[ Item not titled]"}}</p>
-                                        {% endif %}
-                                    {% empty %}
-                                        <p>No items found in this module.</p>
-                                    {% endfor %}
-                                </ul>
-                        </div>
+                        <h3 class="module-name" id="module_{{m.id}}">Module: {{m.name}}</h3>
+                        <ul class="list-modules" id="module_items_{{m.id}}">
+                            {% for i in m.module_items %}
+                            
+                                {% if i.is_intervention_point %}
+                                <li class="intervention-in-module">
+                                    <strong>Intervention Point:</strong> {{i.title}}
+                                {% else %}
+                                <li>
+                                    {{i.title|default:"[ Item not titled]"}}
+                                {% endif %}
+
+                            {% empty %}
+                                No items found in this module.
+                            </li>
+                            {% endfor %}
+                        </ul>
                     {% empty %}
                         <p>No modules found.</p>
                     {% endfor %}
             </div>
             <div class="modal-footer">
-                <a class="btn btn-lg btn-submit-primary" data-dismiss="modal"> Close </a>
+                <a href="#" class="btn btn-lg btn-submit-primary" data-dismiss="modal"> Close </a>
             </div>
         </div>
     </div>
