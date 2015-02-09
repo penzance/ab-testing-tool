@@ -84,7 +84,11 @@ class Experiment(CourseObject):
                                   assignment_method=Experiment.CSV_UPLOAD)
     
     def get_course_notification(self):
-        return CourseNotification.objects.get_or_create(course_id=self.course_id)[0]
+        """ The CourseNotification object should exist, at the point at which
+            an experiment has been created under the same course, so this method
+            will raise an exception if the CourseNotification object doesn't
+            exist yet."""
+        return CourseNotification.objects.get(course_id=self.course_id)
     
     def assert_not_finalized(self):
         if self.tracks_finalized:
