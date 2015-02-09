@@ -1,11 +1,12 @@
 from datetime import timedelta
-from django.db import models
+from django.db import models, IntegrityError
 from django.shortcuts import get_object_or_404
 from ab_tool.exceptions import (UNAUTHORIZED_ACCESS,
-    EXPERIMENT_TRACKS_ALREADY_FINALIZED)
+    EXPERIMENT_TRACKS_ALREADY_FINALIZED, DATABASE_ERROR)
 import json
 from django.core.urlresolvers import reverse
 from django.utils import timezone
+from ab_tool.constants import NAME_CHAR_LIMIT, URL_CHAR_LIMIT, NOTES_CHAR_LIMIT
 
 
 class TimestampedModel(models.Model):
@@ -19,7 +20,7 @@ class TimestampedModel(models.Model):
         """ Helper method to update objects """
         for k, v in kwargs.iteritems():
             setattr(self, k, v)
-        self.save()
+        self.save(update_fields=kwargs.keys())
     
     def save_as_new_object(self, **kwargs):
         """ Saves a new object based on the original, applying updates in
@@ -29,7 +30,13 @@ class TimestampedModel(models.Model):
             setattr(self, k, v)
         self.pk, self.id = None, None
         self.save()
-
+    
+    # Override for objects.create
+    def save(self, *args, **kwargs):
+        try:
+            super(TimestampedModel, self).save(*args, **kwargs)
+        except IntegrityError as e:
+            raise DATABASE_ERROR(e.message)
 
 class CourseObject(TimestampedModel):
     course_id = models.CharField(max_length=128, db_index=True)
@@ -60,8 +67,8 @@ class Experiment(CourseObject):
         (REVERSE_API, "reverse_api"),
     )
     
-    name = models.CharField(max_length=256)
-    notes = models.CharField(max_length=1024)
+    name = models.CharField(max_length=NAME_CHAR_LIMIT)
+    notes = models.CharField(max_length=NOTES_CHAR_LIMIT)
     tracks_finalized = models.BooleanField(default=False)
     assignment_method = models.IntegerField(max_length=1, default=1,
                                             choices=ASSIGNMENT_ENUM_TYPES,)
@@ -139,7 +146,7 @@ class Experiment(CourseObject):
 
 
 class Track(CourseObject):
-    name = models.CharField(max_length=256)
+    name = models.CharField(max_length=NAME_CHAR_LIMIT)
     experiment = models.ForeignKey(Experiment, related_name="tracks")
     
     class Meta:
@@ -173,8 +180,8 @@ class TrackProbabilityWeight(CourseObject):
 
 class InterventionPoint(CourseObject):
     """ This model stores the configuration of an intervention point"""
-    name = models.CharField(max_length=256)
-    notes = models.CharField(max_length=1024)
+    name = models.CharField(max_length=NAME_CHAR_LIMIT)
+    notes = models.CharField(max_length=NOTES_CHAR_LIMIT)
     experiment = models.ForeignKey(Experiment, related_name="intervention_points")
     tracks = models.ManyToManyField(Track, through="InterventionPointUrl")
     
@@ -209,7 +216,7 @@ class InterventionPoint(CourseObject):
 
 class InterventionPointUrl(TimestampedModel):
     """ This model stores the URL of a single intervention """
-    url = models.URLField(max_length=2048)
+    url = models.URLField(max_length=URL_CHAR_LIMIT)
     track = models.ForeignKey(Track)
     intervention_point = models.ForeignKey(InterventionPoint)
     open_as_tab = models.BooleanField(default=False)
@@ -241,7 +248,7 @@ class InterventionPointInteraction(CourseObject):
     intervention_point = models.ForeignKey(InterventionPoint)
     experiment = models.ForeignKey(Experiment, related_name="intervention_point_interactions")
     track = models.ForeignKey(Track)
-    url = models.URLField(max_length=2048)
+    url = models.URLField(max_length=URL_CHAR_LIMIT)
 
 
 class Course(TimestampedModel):

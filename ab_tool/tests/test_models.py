@@ -2,6 +2,9 @@ from ab_tool.tests.common import SessionTestCase, TEST_COURSE_ID
 from ab_tool.models import (Track, InterventionPointUrl, Experiment,
     TrackProbabilityWeight, InterventionPoint)
 import json
+from django.db import IntegrityError
+from mock import patch
+from ab_tool.exceptions import DATABASE_ERROR
 
 
 class TestModels(SessionTestCase):
@@ -75,6 +78,9 @@ class TestModels(SessionTestCase):
         track = self.create_test_track()
         track.set_weighting(42)
         self.assertEqual(track.weight.weighting, 42)
+        track2 = self.create_test_track(name="track2")
+        track2.set_weighting(None)
+        self.assertEqual(track2.weight.weighting, 0)
     
     def test_track_set_weighting_existing_weight(self):
         """ Tests that set_weighting overrides existing weight for a track """
@@ -112,3 +118,16 @@ class TestModels(SessionTestCase):
         self.assertEqual(TrackProbabilityWeight.objects.count(), num_track_weights + 4)
         self.assertEqual(InterventionPoint.objects.count(), num_ips + 2)
         self.assertEqual(InterventionPointUrl.objects.count(), num_ip_urls + 8)
+    
+    @patch("django.db.models.Model.save", side_effect=IntegrityError("error"))
+    def test_object_update_raises_integrity_error(self, _mock1):
+        """ Tests that database error is raised. The patch creates a fake database conflict """
+        self.assertRaisesSpecific(DATABASE_ERROR("error"), self.create_test_track)
+        self.assertRaisesSpecific(DATABASE_ERROR("error"), self.create_test_track_weight)
+        self.assertRaisesSpecific(DATABASE_ERROR("error"), self.create_test_experiment)
+    
+    @patch("django.db.models.Model.save", return_value=None)
+    def test_object_save_doesnt_raise_error(self, _mock1):
+        """ Tests no database error is raised """
+        self.create_test_experiment()
+        self.assertEquals(_mock1.call_count, 1)

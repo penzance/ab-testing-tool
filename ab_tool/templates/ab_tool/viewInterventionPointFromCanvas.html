@@ -8,47 +8,44 @@
 
 <div class="container">
     <header>
-        <div class="row lti-header">
-            <h1>Intervention Point "{{intervention_point.name}}"</span></h1>
-            <h2><a href="{% url 'ab_testing_tool_modules_page_edit_intervention_point' intervention_point.id %}">Edit</a></h2>
-        </div>
+        <h1>Intervention Point "{{intervention_point.name}}"</span></h1>
     </header>
     
     <main>
-        <div class="row row-lti col-md-8">
+    <p>Below is a summary of your intervention point</p>
+        <dl id="expSummary" class="list list-horizontal">
+            <dt class="list-item-title">Name:</dt>
+            <dd>{{intervention_point.name}}</dd>
             
-            <div>
-                <div class="form-group col-sm-12">
-                    <label for="interventionName">Name:</label>
-                    <span id="intervention_{{intervention_point.id}}">
-                        {{intervention_point.name}}</span>
-                </div>
-                
-                {% for track_url in intervention_point.track_urls %}
-                    <div class="form-group">
-                            <div class="col-sm-8">
-                                <label for="intervention_point_url_{{track_url.track.id}}">Track "{{track_url.track.name}}":</label>
-                                <span type="url" name="intervention_point_url_{{track_url.track.id}}"
-                                    id="intervention_point_url_{{track_url.track.id}}">
-                                    {{track_url.url}}</span>
-                            </div>
-                            <div class="col-sm-4">
-                                <label for="is_canvas_page_for_track_{{track_url.track.id}}">Open:</label>
-                                <span name="is_canvas_page_for_track_{{track_url.track.id}}"
-                                    id="is_canvas_page_for_track_{{track_url.track.id}}">
-                                    {% if track_url.open_as_tab %}In new tab{% endif %}
-                                    {% if not track_url.open_as_tab and not track_url.is_canvas_page %}External URL in Canvas{% endif %}
-                                    {% if not track_url.open_as_tab and track_url.is_canvas_page %}Canvas URL{% endif %}
-                                </span>
-                            </div>
-                    </div>
-                {% endfor %}
-                
-                <div class="form-group col-sm-12">
-                    <label class="control-label" for="interventionPointNotes">Notes</label>
-                    <span name="notes" id="interventonPointNotes">{{ intervention_point.notes }}</span>
-                </div>
-        </div>
+        {% for track_url in intervention_point.track_urls %}
+            <dt class="list-item-title">Track "{{track_url.track.name}}":</dt>
+            <dd>
+                {{track_url.url}}<br>
+                <em>
+                    Open:
+                    {% if track_url.open_as_tab %}In new tab{% endif %}
+                    {% if not track_url.open_as_tab and not track_url.is_canvas_page %}External URL in Canvas{% endif %}
+                    {% if not track_url.open_as_tab and track_url.is_canvas_page %}Canvas URL{% endif %}
+                </em> 
+            </dd>
+            
+        {% endfor %}
+
+            <dt class="list-item-title">Notes:</dt>
+            <dd>
+                {% if intervention_point.notes == '' %}
+                    empty
+                {% else %}
+                    {{ intervention_point.notes }}
+                {% endif %}
+            </dd>
+        </dl>
+            
+        <a  class="btn btn-submit-primary" 
+            href="{% url 'ab_testing_tool_modules_page_edit_intervention_point' intervention_point.id %}">
+                Edit
+        </a> 
+        
     </main>
 </div>
 
