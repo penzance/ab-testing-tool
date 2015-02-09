@@ -1,8 +1,8 @@
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 
 from ab_tool.canvas import get_unassigned_students_with_stored_credentials
 from ab_tool.exceptions import NoValidCredentials
-from ab_tool.models import CourseNotification, Experiment
+from ab_tool.models import Experiment
 
 class Command(BaseCommand):
     args = ""
