@@ -1,21 +1,15 @@
-import logging
-import traceback
-from canvas_sdk import RequestContext
-from canvas_sdk.methods import modules
 from canvas_sdk.methods.courses import list_users_in_course_users
+from canvas_sdk.methods import modules
+from canvas_sdk import RequestContext
+from canvas_sdk.exceptions import CanvasAPIError
 from django.conf import settings
 
 from ab_tool.exceptions import (MISSING_LTI_PARAM, MISSING_LTI_LAUNCH,
     NO_SDK_RESPONSE)
-from requests.exceptions import RequestException
 from django_canvas_oauth import get_token
 from ab_tool.controllers import intervention_point_url
 from ab_tool.models import InterventionPoint, Experiment, ExperimentStudent
 from django_canvas_oauth.exceptions import NewTokenNeeded
-
-
-logger = logging.getLogger(__name__)
-
 
 
 class CanvasModules(object):
@@ -99,7 +93,7 @@ def get_unsorted_students(request, experiment):
     try:
         enrollments = list_users_in_course_users(
                 request_context, course_id, None, enrollment_type="student").json()
-    except RequestException as exception:
+    except CanvasAPIError as exception:
         handle_canvas_error(exception)
     existing_student_ids = set(s.id for s in experiment.students.all())
     return [{"student_id": i["sis_user_id"], "lis_person_sourcedid": i["sis_user_id"]}
@@ -110,14 +104,14 @@ def list_module_items(request_context, course_id, module_id):
     try:
         return modules.list_module_items(request_context, course_id, module_id,
                                          "content_details").json()
-    except RequestException as exception:
+    except CanvasAPIError as exception:
         handle_canvas_error(exception)
 
 def list_modules(request_context, course_id):
     try:
         return modules.list_modules(request_context, course_id,
                                     "content_details").json()
-    except RequestException as exception:
+    except CanvasAPIError as exception:
         handle_canvas_error(exception)
 
 
@@ -145,8 +139,6 @@ def get_canvas_request_context(request):
 
 
 def handle_canvas_error(exception):
-    if (hasattr(exception, "response") and exception.response.status_code == 401):
+    if exception.status_code == 401:
         raise NewTokenNeeded("Your canvas oauth token is invalid")
-    logger.error(repr(exception))
-    logger.error(traceback.format_exc())
     raise NO_SDK_RESPONSE
