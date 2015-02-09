@@ -9,7 +9,7 @@ from ab_tool.models import (TrackProbabilityWeight, Experiment, ExperimentStuden
 from ab_tool.exceptions import (BAD_STAGE_ID, missing_param_error,
     INPUT_NOT_ALLOWED, NO_TRACKS_FOR_EXPERIMENT, TRACK_WEIGHTS_NOT_SET,
     CSV_UPLOAD_NEEDED, INVALID_URL_PARAM, INCORRECT_WEIGHTING_PARAM,
-    MISSING_NAME_PARAM, PARAM_LENGTH_EXCEEDS_LIMIT)
+    MISSING_NAME_PARAM, PARAM_LENGTH_EXCEEDS_LIMIT, NoValidCredentials)
 from ab_tool.constants import (NAME_CHAR_LIMIT, URL_CHAR_LIMIT)
 
 
