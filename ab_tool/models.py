@@ -307,7 +307,9 @@ class CourseNotification(TimestampedModel):
     
     def get_canvas_domain(self):
         parsed_uri = urlparse(self.canvas_url)
-        return '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
+        return '{uri.scheme}://{uri.netloc}/courses/{course_id}'.format(
+                uri=parsed_uri, course_id=self.course_id
+        )
 
 
 class CourseCredential(TimestampedModel):

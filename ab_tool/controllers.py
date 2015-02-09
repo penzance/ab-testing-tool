@@ -141,8 +141,7 @@ def streamed_csv_response(row_generator, file_title):
 def send_email_notification(course_notification, email):
     if course_notification.can_notify():
         subject, message = email
-        message += ("\n\nCourse URL: %s/courses/%s" %
-                    (course_notification.get_canvas_domain()), course_notification.course_id)
+        message += "\n\nCourse URL: %s" % course_notification.get_canvas_domain()
         send_mail(subject, message, settings.SERVER_EMAIL,
                   course_notification.get_emails(), fail_silently=False)
         course_notification.notification_sent()
