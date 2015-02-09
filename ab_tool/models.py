@@ -77,6 +77,14 @@ class Experiment(CourseObject):
     class Meta:
         unique_together = (('course_id', 'name'),)
     
+    @classmethod
+    def get_all_started_csv(cls):
+        return cls.objects.filter(tracks_finalized=True,
+                                  assignment_method=Experiment.CSV_UPLOAD)
+    
+    def get_course_notification(self):
+        return CourseNotification.objects.get_or_create(course_id=self.course_id)[0]
+    
     def assert_not_finalized(self):
         if self.tracks_finalized:
             raise EXPERIMENT_TRACKS_ALREADY_FINALIZED
@@ -252,21 +260,17 @@ class InterventionPointInteraction(CourseObject):
     url = models.URLField(max_length=URL_CHAR_LIMIT)
 
 
-class Course(TimestampedModel):
+class CourseNotification(TimestampedModel):
     course_id = models.CharField(max_length=128, unique=True)
     last_emailed = models.DateTimeField(null=True)
     canvas_url = models.URLField(max_length=2048) #Base URL for Canvas SDK
-    
-    @classmethod
-    def get_notification_courses(cls):
-        return [c for c in cls.objects.all() if c.can_notify()]
     
     @classmethod
     def store_credential(cls, course_id, canvas_url, email, oauth_token):
         """ Gets and stores a credential per user of the course. """
         course = cls.objects.get_or_create(
                 course_id=course_id, defaults={"canvas_url": canvas_url})[0]
-        credential, created = CourseCredentials.objects.get_or_create(
+        credential, created = CourseCredential.objects.get_or_create(
                 course=course, email=email, defaults={"token": oauth_token})
         if not created:
             credential.update(token=oauth_token)
@@ -289,13 +293,6 @@ class Course(TimestampedModel):
             return False
         return self.experiments_to_check().count() > 0
     
-    def experiments_to_check(self):
-        """ TODO: Include intent-to-treat experiments when that is supported """
-        return Experiment.objects.filter(
-                course_id=self.course_id, tracks_finalized=True,
-                assignment_method=Experiment.CSV_UPLOAD
-        )
-    
     def get_emails(self):
         return [credential.email for credential in self.credentials.all()]
     
@@ -303,9 +300,9 @@ class Course(TimestampedModel):
         self.update(last_emailed=timezone.now())
 
 
-class CourseCredentials(TimestampedModel):
+class CourseCredential(TimestampedModel):
     """ Stores oauth tokens and emails for people in the course """
-    course = models.ForeignKey(Course, related_name="credentials")
+    course = models.ForeignKey(CourseNotification, related_name="credentials")
     email = models.EmailField(max_length=2048)
     token = models.CharField(max_length=128)
     
