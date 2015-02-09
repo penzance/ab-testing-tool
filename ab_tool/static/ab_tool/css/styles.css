@@ -202,6 +202,13 @@ main {
 .float-right {
   float: right;
 }
+.container-modal {
+  width: 97%;
+  margin: 0 1.5%;
+}
+.text-center {
+  text-align: center;
+}
 .block {
   display: block;
 }
@@ -403,6 +410,11 @@ textarea.form-control {
   margin-top: 0.55em;
   float: right;
 }
+.custom-dropdown {
+  position: relative;
+  display: inline-block;
+  width: 90%;
+}
 .modal .form-group-description {
   display: none;
 }
@@ -570,8 +582,9 @@ ul, ol, dl {
   padding-right: 0.5em;
 }
 .btn-submit {
-  height: 1em;
-  padding: 0.55em 1%;
+  /*height: 1em;*/
+
+  padding: 0.45em 2%;
   border-radius: 5px;
   background-color: #cecece;
   border: solid 1px #c3c3c3;
@@ -579,8 +592,9 @@ ul, ol, dl {
   color: #525252;
 }
 .btn-submit-primary {
-  height: 1em;
-  padding: 0.55em 1%;
+  /*height: 1em;*/
+
+  padding: 0.45em 2%;
   border-radius: 5px;
   background-color: #cecece;
   border: solid 1px #c3c3c3;
@@ -599,8 +613,9 @@ button.btn-submit-primary {
 /* link look and feel but with the padding
 and spacing to match a btn-submit */
 .btn-link {
-  height: 1em;
-  padding: 0.55em 1%;
+  /*height: 1em;*/
+
+  padding: 0.45em 2%;
   border-radius: 5px;
   background-color: #cecece;
   border: solid 1px #c3c3c3;
@@ -668,6 +683,12 @@ and spacing to match a btn-submit */
 .infoBlock-empty {
   background: #f7f7f7;
   color: #636363;
+}
+.text-success {
+  color: #3c763d;
+}
+.text-warning {
+  color: #8a6d3b;
 }
 body {
   font-size: 0.9375em;
@@ -800,6 +821,32 @@ a:hover {
   color: #505151;
   font-style: italic;
 }
+.ip-status {
+  width: 11%;
+}
+.missing-url {
+  font-size: 1.2em;
+  float: right;
+  display: inline-block;
+  text-align: center;
+  color: #8a6d3b;
+}
+.missing-url span {
+  font-size: 0.65em !important;
+  display: block;
+}
+.ip-installed {
+  font-size: 1.2em;
+  float: right;
+  display: inline-block;
+  text-align: center;
+  color: #8a6d3b;
+  color: #3c763d;
+}
+.ip-installed span {
+  font-size: 0.65em !important;
+  display: block;
+}
 .ip-btn-delete {
   color: #a51c30;
   float: left;
@@ -850,6 +897,33 @@ a:hover {
   border-bottom: 0px solid transparent;
   border-left: 14px solid #141414;
 }
+/********* Modules popup (START) ***********/
+.module-name {
+  background: #f7f7f7;
+  margin: 0;
+  padding: 0.55em 0.55em 0 0.55em;
+  border-width: 1px 1px 0px 1px;
+  border-color: #ececeb;
+  border-style: solid;
+}
+.list-modules {
+  background: #f7f7f7;
+  padding: 1.5em;
+  border-width: 0 1px 1px 1px;
+  border-color: #ececeb;
+  border-style: solid;
+}
+.list-modules li {
+  padding: 0.75em 1.5em;
+  border-bottom: solid 1px #ececeb;
+  border-left: solid 1px #ececeb;
+  border-right: solid 1px #ececeb;
+  background: #fcfefd;
+}
+.list-modules li:first-child {
+  border-top: solid 1px #ececeb;
+}
+/********* Modules popup (END) ***********/
 /***********************************************************************************
 					EXP DASHBOARD (END)
 /**********************************************************************************/

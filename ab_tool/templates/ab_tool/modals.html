@@ -7,30 +7,31 @@
                 <h4 class="modal-title">Modules Installations</h4>
             </div>
             <div class="modal-body">
-                <p class="text-warning">See where A/B intervention points are installed in your modules.</p>
-                <div class="list-group ">
+                <p>See where A/B intervention points are installed in your modules.</p>
                     {% for m in modules %}
-                        <h4><a class="list-group-item" id="module_{{m.id}}"> <strong>Module: {{m.name}}</strong></a></h4>
-                        <div id="module_items_{{m.id}}" style="display: none">
-                                <ul class="list-group">
-                                    {% for i in m.module_items %}
-                                        {% if i.is_intervention_point %}
-                                            <a class="list-group-item active">{{i.title}} | <i> Intervention Point</i></a>
-                                        {% else %}
-                                            <p class="list-group-item">{{i.title|default:"[ Item not titled]"}}</p>
-                                        {% endif %}
-                                    {% empty %}
-                                        <p>No items found in this module.</p>
-                                    {% endfor %}
-                                </ul>
-                        </div>
+                        <h3 class="module-name" id="module_{{m.id}}">Module: {{m.name}}</h3>
+                        <ul class="list-modules" id="module_items_{{m.id}}">
+                            {% for i in m.module_items %}
+                            
+                                {% if i.is_intervention_point %}
+                                <li class="intervention-in-module">
+                                    <strong>Intervention Point:</strong> {{i.database_name}}  |  <strong>Experiment:</strong> {{i.experiment_name}}  |  <strong>Displayed To Student As:</strong> {{i.title}}
+                                {% else %}
+                                <li>
+                                    {{i.title|default:"[ Item not titled]"}}
+                                {% endif %}
+
+                            {% empty %}
+                                No items found in this module.
+                            </li>
+                            {% endfor %}
+                        </ul>
                     {% empty %}
                         <p>No modules found.</p>
                     {% endfor %}
-                </div>
             </div>
             <div class="modal-footer">
-                <a class="btn btn-lg btn-submit-primary" data-dismiss="modal"> Close </a>
+                <a href="#" class="btn btn-lg btn-submit-primary" data-dismiss="modal"> Close </a>
             </div>
         </div>
     </div>
@@ -54,10 +55,8 @@
         <form class="form-horizontal" role="form" method="post" name="intervention_point_creation_form"
             action="{% url 'ab_testing_tool_submit_create_intervention_point' experiment.id %}">
             <div class="modal-body">
-
                 <fieldset>
                     <legend class="sr-only">Name of intervention point</legend>
-
                     <div class="form-group">
                         <label for="interventionName">Name:</label> <i class="fa fa-asterisk"></i>
                         <input type="text" name="name" id="interventionName" class="form-control" placeholder="Enter Intervention Name">
@@ -65,13 +64,11 @@
                     <div class="form-group-description">
                         <p>A descriptive name for this track. This will help you blah blah blah</p>
                     </div>
-
                 </fieldset>
-                
+
                 {% for track in experiment.tracks.all %}
                 <fieldset>
                     <legend class="sr-only">Tracks for experiment</legend>
-
                     <div class="form-group-inline-left">
                         <label for="intervention_point_url_{{track.id}}">Track "{{track.name}}":</label>
                         <input type="url" name="intervention_point_url_{{track.id}}"
@@ -98,7 +95,6 @@
                     <div class="form-group-description">
                         <p>A descriptive name for this track. This will help you blah blah blah</p>
                     </div>
-
                 </fieldset>
                 {% endfor %}
 
@@ -140,7 +136,7 @@
 
                 <fieldset>
                     <legend class="sr-only">Name of experiment</legend>
-                    
+
                     <div class="form-group">
                         <label for="intervention_{{intervention_point.id}}">Name:</label>
                         <input type="text" name="name" id="intervention_{{intervention_point.id}}"
@@ -173,7 +169,6 @@
                         <div class="custom-dropdown">
                             <select name="is_canvas_page_for_track_{{track_url.track.id}}"
                                 id="is_canvas_page_for_track_{{track_url.track.id}}">
-                                
                                 <option {% if not track_url.open_as_tab and track_url.is_canvas_page %}selected="selected"{% endif %}
                                     value="canvasPage">
                                     Canvas URL -- Learners in this track are redirected to this Canvas page.
@@ -199,7 +194,7 @@
                 
                 <fieldset class="fieldset-noborder">
                     <legend class="sr-only">Notes about your experiment</legend>
-                
+
                     <div class="form-group">
                         <label for="interventionPointNotes">Notes</label>
                         <textarea name="notes" id="interventonPointNotes" class="form-control">{{ intervention_point.notes }}</textarea>

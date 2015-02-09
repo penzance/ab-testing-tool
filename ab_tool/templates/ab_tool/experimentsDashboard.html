@@ -15,9 +15,9 @@
     </div>
 </header>
 <main>
-    
+
     <p>
-        Welcome to the A/B Testing dashboard. Manage your A/B Testing Experiments here. More information is available at our <a href="#">documentation wiki</a>.
+        Welcome to the A/B Testing dashboard. Manage your A/B Testing Experiments here. More information is available at our <a href="https://github.com/penzance/ab-testing-tool/wiki/Help">documentation wiki</a>.
     </p>
     <div class="dashboard">
         <div class="dashboard-totals">
@@ -43,16 +43,16 @@
             New Experiment
         </a>
     </div>
-    
+
     <div class="row row-lti col-md-8">
-    
+
         <!--h2><a href="{% url 'ab_testing_tool_create_experiment' %}">Add an Experiment</a></h2-->
         {% for experiment in experiments %}
             <div class="panel panel-experiment"><!-- exp (start) -->
                 <div class="panel-wrapper">
                     <div class="panel-heading">
                         <h3 class="panel-title panel-title-experiment">Experiment "{{experiment.name}}"</h3>
-                        
+
                         {% if experiment.get_incomplete_intervention_point_names %}
                             <a href="#incomplete_intervention_points_modal{{experiment.id}}" data-toggle="modal" class="btn btn-icon btn-experiment-start"><i class="fa fa-play-circle"></i>Start Experiment
                         {% elif not experiment.tracks_finalized %}
@@ -61,7 +61,7 @@
                             <a href="#" class="btn btn-icon btn-experiment-start disabled">Experiment started
                         {% endif %}
                             </a>
-                        
+
                         <dl class="list list-horizontal">
                             <dt class="list-item-title">Sort by:</dt>
                             {% if experiment.assignment_method == experiment.WEIGHTED_PROBABILITY_RANDOM %}
@@ -76,7 +76,7 @@
                             <dt class="list-item-title">Last modified:</dt>
                             <dd>{{experiment.updated_on}}</dd>
                         </dl>
-                        
+
                     </div>
                     <div class="exp-edit" data-toggle="tooltip" data-placement="right" title="Edit experiment">
                         <div class="arrow-left"></div>
@@ -105,21 +105,33 @@
                             {% for intervention_point in experiment.intervention_points.all %}
                                 <li>
                                     {% if intervention_point in uninstalled_intervention_points %}
-                                    <a href="{% url 'ab_testing_tool_delete_intervention_point' intervention_point.id %}"
-                                        class="btn btn-icon-only ip-btn-delete">
-                                        <i class="fa fa-trash"></i><span>Delete</span>
-                                    </a>
+                                        <a href="{% url 'ab_testing_tool_delete_intervention_point' intervention_point.id %}" 
+                                            data-toggle="tooltip" data-placement="top" 
+                                            title="Delete Intervention Point '{{intervention_point.name}}'"
+                                            class="btn btn-icon-only ip-btn-delete">
+                                            <i class="fa fa-trash"></i><span>Delete</span>
+                                        </a>
+                                    {% else %}
+                                        <a href="#" class="btn btn-icon-only ip-btn-delete disabled">
+                                            <i class="fa fa-trash"></i><span>Delete</span>
+                                        </a>
                                     {% endif %}
                                     <a data-toggle="modal" href="#editIntervention_{{intervention_point.id}}">
-                                        Intervention Point "{{intervention_point.name}}"
-                                    </a><br>
-                                    <span class="label">
-                                        {{intervention_point.is_missing_urls|yesno:"URLs missing,complete"}}
+                                        Intervention Point "{{intervention_point.name}}"</a>
+                                    
+                                    {% if intervention_point.is_missing_urls %}
+                                    <span class="ip-status missing-url">
+                                        <i class="fa fa-warning"></i>
+                                        <span>URLs missing</span>
                                     </span>
-                                    <span class="label">
-                                        {% if intervention_point not in uninstalled_intervention_points %} Installed {% endif%}
+                                    {% endif %}
+                                    {% if intervention_point not in uninstalled_intervention_points %} 
+                                    <span class="ip-status ip-installed">
+                                        <i class="fa fa-check"></i>
+                                        <span>Installed</span>
                                     </span>
-                                    <span class="date">
+                                    {% endif%}
+                                    <span class="date block">
                                         Last modified {{intervention_point.updated_on}}
                                     </span>
                                 </li>
@@ -176,7 +188,7 @@
                     {% endif %}
                 </div>
             </div><!-- exp (end) -->
-        
+
         {% empty %}
             <div class="infoBlock infoBlock-empty">
                 <h3>No experiments currently exist for this course. Click on "New Experiment" to get started.</h3>

@@ -1,11 +1,13 @@
 from mock import MagicMock
 
 from ab_tool.controllers import (intervention_point_url,
-    format_url, post_param, format_weighting,
-    assign_track_and_create_student)
+    validate_format_url, post_param, format_weighting,
+    assign_track_and_create_student, validate_name, validate_weighting)
 from ab_tool.tests.common import (SessionTestCase, TEST_STUDENT_ID)
 from ab_tool.exceptions import (BAD_STAGE_ID, INPUT_NOT_ALLOWED,
-    CSV_UPLOAD_NEEDED, NO_TRACKS_FOR_EXPERIMENT, TRACK_WEIGHTS_NOT_SET)
+    CSV_UPLOAD_NEEDED, NO_TRACKS_FOR_EXPERIMENT, TRACK_WEIGHTS_NOT_SET,
+    INVALID_URL_PARAM, MISSING_NAME_PARAM, PARAM_LENGTH_EXCEEDS_LIMIT,
+    INCORRECT_WEIGHTING_PARAM)
 from ab_tool.models import Experiment, ExperimentStudent
 
 
@@ -80,20 +82,27 @@ class TestControllers(SessionTestCase):
         self.assertRaisesSpecific(BAD_STAGE_ID, intervention_point_url, self.request, None)
         self.assertRaisesSpecific(BAD_STAGE_ID, intervention_point_url, self.request, "str")
     
-    def test_format_url_passthrough(self):
-        """ Tests that format_url doesn't change a proper http:// url """
+    def test_validate_format_url_passthrough(self):
+        """ Tests that validate_format_url doesn't change a proper http:// url """
         url = "http://example.com/http_stuff?thing=other_thing"
-        self.assertEqual(url, format_url(url))
+        self.assertEqual(url, validate_format_url(url))
     
-    def test_format_url_https_passthrough(self):
-        """ Tests that format_url doesn't change a proper https:// url """
+    def test_validate_format_url_https_passthrough(self):
+        """ Tests that validate_format_url doesn't change a proper https:// url """
         url = "https://example.com/http_stuff?thing=other_thing"
-        self.assertEqual(url, format_url(url))
+        self.assertEqual(url, validate_format_url(url))
     
-    def test_format_url_adds_http(self):
-        """ Tests that format_url adds http:// to a url missing it """
+    def test_validate_format_url_adds_http(self):
+        """ Tests that validate_format_url adds http:// to a url missing it """
         url = "www.example.com/http_stuff?thing=other_thing"
-        self.assertEqual("http://" + url, format_url(url))
+        self.assertEqual("http://" + url, validate_format_url(url))
+    
+    def test_validate_format_url_raises_error(self):
+        """ Tests that validate_format_url adds http:// to a url missing it """
+        url = "com"
+        self.assertRaisesSpecific(INVALID_URL_PARAM, validate_format_url, url)
+        url = "http://" + "a"*2046 + ".com"
+        self.assertRaisesSpecific(INVALID_URL_PARAM, validate_format_url, url)
     
     def test_post_param_success(self):
         """ Test that post_param returns correct value when param is present """
@@ -106,3 +115,17 @@ class TestControllers(SessionTestCase):
         request = MagicMock()
         request.POST = {}
         self.assertRaises(Exception, post_param, request, "param_name")
+    
+    def test_validate_name(self):
+        """ Test validate_name validates properly """
+        name = ""
+        self.assertRaisesSpecific(MISSING_NAME_PARAM, validate_name, name)
+        name = "a"*1000
+        self.assertRaisesSpecific(PARAM_LENGTH_EXCEEDS_LIMIT, validate_name, name)
+    
+    def test_validate_weighting(self):
+        """ Test validate_weighting validates properly """
+        weighting =-1
+        self.assertRaisesSpecific(INCORRECT_WEIGHTING_PARAM, validate_weighting, weighting)
+        weighting = 101
+        self.assertRaisesSpecific(INCORRECT_WEIGHTING_PARAM, validate_weighting, weighting)

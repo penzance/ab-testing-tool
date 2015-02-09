@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     {% load staticfiles %}
-    <link rel="stylesheet" href="{% static 'ab_tool/css/bootstrap.min.css' %}" type="text/css"/>
+    <link rel="stylesheet" href="{% static 'ab_tool/css/styles.css' %}" type="text/css"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'ab_tool/css/font-awesome-4.2.0/css/font-awesome.min.css' %}">
 </head>
 <body>
 
@@ -20,7 +21,7 @@ if (window.top.location == window.location) {
 <br>
 <p class="text-center"> To visit the URL, click the button below. </p>
 <br>
-<div class="text-center"><a target="_blank" href="{{url}}" class="btn btn-lg btn-primary">Open in New Tab</a></div>
+<div class="text-center"><a target="_blank" href="{{url}}" class="btn btn-submit-primary">Open in New Tab</a></div>
 </span>
 </body>
 </html>
