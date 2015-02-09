@@ -1,5 +1,6 @@
 from datetime import timedelta
 from django.db import models, IntegrityError
+from django.conf import settings
 from django.shortcuts import get_object_or_404
 from ab_tool.exceptions import (UNAUTHORIZED_ACCESS,
     EXPERIMENT_TRACKS_ALREADY_FINALIZED, DATABASE_ERROR)
@@ -256,9 +257,6 @@ class Course(TimestampedModel):
     last_emailed = models.DateTimeField(null=True)
     canvas_url = models.URLField(max_length=2048) #Base URL for Canvas SDK
     
-    COURSE_ACTIVE_DAYS = 365
-    NOTIFICATION_FREQUENCY_HOURS = 24
-    
     @classmethod
     def get_notification_courses(cls):
         return [c for c in cls.objects.all() if c.can_notify()]
@@ -283,10 +281,10 @@ class Course(TimestampedModel):
                 for that course.
             
             TODO: change the logic for course expiration to be dynamic """
-        expiration = self.created_on + timedelta(days=self.COURSE_ACTIVE_DAYS)
+        expiration = self.created_on + timedelta(days=settings.COURSE_ACTIVE_DAYS)
         if timezone.now() > expiration:
             return False
-        wait_time = timedelta(hours=self.NOTIFICATION_FREQUENCY_HOURS)
+        wait_time = timedelta(hours=settings.NOTIFICATION_FREQUENCY_HOURS)
         if self.last_emailed is not None and timezone.now() < self.last_emailed + wait_time:
             return False
         return self.experiments_to_check().count() > 0
