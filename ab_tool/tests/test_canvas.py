@@ -5,22 +5,22 @@ from ab_tool.canvas import (get_lti_param, list_modules,
 from ab_tool.exceptions import (MISSING_LTI_LAUNCH, MISSING_LTI_PARAM,
     NO_SDK_RESPONSE)
 from mock import patch, MagicMock
-from requests.exceptions import RequestException
 from django_canvas_oauth.exceptions import NewTokenNeeded
 from ab_tool.controllers import intervention_point_url
+from canvas_sdk.exceptions import CanvasAPIError
 
 class TestCanvas(SessionTestCase):
-    def mock_request_exception(self):
-        exception = RequestException()
+    def mock_api_exception(self):
+        exception = CanvasAPIError()
         exception.response = MagicMock()
         return exception
     
     def mock_unauthorized_exception(self):
-        exception = RequestException()
+        exception = CanvasAPIError()
         exception.response = MagicMock()
-        exception.response.status_code = 401
+        exception.status_code = 401
         return exception
-
+    
     def get_canvas_modules(self, list_modules_return=[], list_items_return=[]):
         with patch(LIST_MODULES, return_value=APIReturn(list_modules_return)):
             with patch(LIST_ITEMS, return_value=APIReturn(list_items_return)):
@@ -56,7 +56,7 @@ class TestCanvas(SessionTestCase):
     def test_list_module_items_error(self):
         """ Tests that list_module_items correctly catches RequestExceptions """
         request_context = get_canvas_request_context(self.request)
-        with patch(LIST_ITEMS, side_effect=self.mock_request_exception()):
+        with patch(LIST_ITEMS, side_effect=self.mock_api_exception()):
             self.assertRaisesSpecific(NO_SDK_RESPONSE, list_module_items,
                                       request_context, TEST_COURSE_ID, 0)
     
@@ -78,7 +78,7 @@ class TestCanvas(SessionTestCase):
     def test_list_modules_error(self):
         """ Tests that list_modules correctly catches RequestExceptions """
         request_context = get_canvas_request_context(self.request)
-        with patch(LIST_MODULES, side_effect=self.mock_request_exception()):
+        with patch(LIST_MODULES, side_effect=self.mock_api_exception()):
             self.assertRaisesSpecific(NO_SDK_RESPONSE, list_modules,
                                       request_context, TEST_COURSE_ID)
     
@@ -157,3 +157,14 @@ class TestCanvas(SessionTestCase):
         urls = self.get_canvas_modules()._all_intervention_point_urls()
         self.assertEqual(len(urls), 1)
         self.assertEqual({intervention_point_url(self.request, intervention_point.id): intervention_point}, urls)
+    
+    def test_get_modules_with_items(self):
+        """ Tests that get_modules_with_items returns with appropriate values """
+        intervention_point = self.create_test_intervention_point(name="test_database_name")
+        mock_item = {"type": "ExternalTool",
+                     "external_url": intervention_point_url(self.request, intervention_point.id)}
+        canvas_modules = self.get_canvas_modules(list_modules_return=[{"id": 0}], list_items_return=[mock_item])
+        modules = canvas_modules.get_modules_with_items()
+        module_item = modules[0]["module_items"][0]
+        self.assertEqual(module_item["is_intervention_point"], True)
+        self.assertEqual(module_item["database_name"], "test_database_name")

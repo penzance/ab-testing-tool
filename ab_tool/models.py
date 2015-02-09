@@ -1,12 +1,14 @@
 from urlparse import urlparse
 from datetime import timedelta
-from django.db import models
+from django.db import models, IntegrityError
+from django.conf import settings
 from django.shortcuts import get_object_or_404
 from ab_tool.exceptions import (UNAUTHORIZED_ACCESS,
-    EXPERIMENT_TRACKS_ALREADY_FINALIZED)
+    EXPERIMENT_TRACKS_ALREADY_FINALIZED, DATABASE_ERROR)
 import json
 from django.core.urlresolvers import reverse
 from django.utils import timezone
+from ab_tool.constants import NAME_CHAR_LIMIT, URL_CHAR_LIMIT, NOTES_CHAR_LIMIT
 
 
 class TimestampedModel(models.Model):
@@ -20,7 +22,7 @@ class TimestampedModel(models.Model):
         """ Helper method to update objects """
         for k, v in kwargs.iteritems():
             setattr(self, k, v)
-        self.save()
+        self.save(update_fields=kwargs.keys())
     
     def save_as_new_object(self, **kwargs):
         """ Saves a new object based on the original, applying updates in
@@ -30,7 +32,13 @@ class TimestampedModel(models.Model):
             setattr(self, k, v)
         self.pk, self.id = None, None
         self.save()
-
+    
+    # Override for objects.create
+    def save(self, *args, **kwargs):
+        try:
+            super(TimestampedModel, self).save(*args, **kwargs)
+        except IntegrityError as e:
+            raise DATABASE_ERROR(e.message)
 
 class CourseObject(TimestampedModel):
     course_id = models.CharField(max_length=128, db_index=True)
@@ -61,14 +69,22 @@ class Experiment(CourseObject):
         (REVERSE_API, "reverse_api"),
     )
     
-    name = models.CharField(max_length=256)
-    notes = models.CharField(max_length=1024)
+    name = models.CharField(max_length=NAME_CHAR_LIMIT)
+    notes = models.CharField(max_length=NOTES_CHAR_LIMIT)
     tracks_finalized = models.BooleanField(default=False)
     assignment_method = models.IntegerField(max_length=1, default=1,
                                             choices=ASSIGNMENT_ENUM_TYPES,)
     
     class Meta:
         unique_together = (('course_id', 'name'),)
+    
+    @classmethod
+    def get_all_started_csv(cls):
+        return cls.objects.filter(tracks_finalized=True,
+                                  assignment_method=Experiment.CSV_UPLOAD)
+    
+    def get_course_notification(self):
+        return CourseNotification.objects.get_or_create(course_id=self.course_id)[0]
     
     def assert_not_finalized(self):
         if self.tracks_finalized:
@@ -141,7 +157,7 @@ class Experiment(CourseObject):
 
 
 class Track(CourseObject):
-    name = models.CharField(max_length=256)
+    name = models.CharField(max_length=NAME_CHAR_LIMIT)
     experiment = models.ForeignKey(Experiment, related_name="tracks")
     
     class Meta:
@@ -175,8 +191,8 @@ class TrackProbabilityWeight(CourseObject):
 
 class InterventionPoint(CourseObject):
     """ This model stores the configuration of an intervention point"""
-    name = models.CharField(max_length=256)
-    notes = models.CharField(max_length=1024)
+    name = models.CharField(max_length=NAME_CHAR_LIMIT)
+    notes = models.CharField(max_length=NOTES_CHAR_LIMIT)
     experiment = models.ForeignKey(Experiment, related_name="intervention_points")
     tracks = models.ManyToManyField(Track, through="InterventionPointUrl")
     
@@ -211,7 +227,7 @@ class InterventionPoint(CourseObject):
 
 class InterventionPointUrl(TimestampedModel):
     """ This model stores the URL of a single intervention """
-    url = models.URLField(max_length=2048)
+    url = models.URLField(max_length=URL_CHAR_LIMIT)
     track = models.ForeignKey(Track)
     intervention_point = models.ForeignKey(InterventionPoint)
     open_as_tab = models.BooleanField(default=False)
@@ -243,26 +259,20 @@ class InterventionPointInteraction(CourseObject):
     intervention_point = models.ForeignKey(InterventionPoint)
     experiment = models.ForeignKey(Experiment, related_name="intervention_point_interactions")
     track = models.ForeignKey(Track)
-    url = models.URLField(max_length=2048)
+    url = models.URLField(max_length=URL_CHAR_LIMIT)
 
 
-class Course(TimestampedModel):
+class CourseNotification(TimestampedModel):
     course_id = models.CharField(max_length=128, unique=True)
     last_emailed = models.DateTimeField(null=True)
-    canvas_url = models.URLField(max_length=2048)
-    
-    COURSE_ACTIVE_DAYS = 356
-    NOTIFICATION_FREQUENCY_HOURS = 24
-    
-    @classmethod
-    def get_notification_courses(cls):
-        return [c for c in cls.objects.all() if c.can_notify()]
+    canvas_url = models.URLField(max_length=2048) #Base URL for Canvas SDK
     
     @classmethod
     def store_credential(cls, course_id, canvas_url, email, oauth_token):
+        """ Gets and stores a credential per user of the course. """
         course = cls.objects.get_or_create(
                 course_id=course_id, defaults={"canvas_url": canvas_url})[0]
-        credential, created = CourseCredentials.objects.get_or_create(
+        credential, created = CourseCredential.objects.get_or_create(
                 course=course, email=email, defaults={"token": oauth_token})
         if not created:
             credential.update(token=oauth_token)
@@ -277,20 +287,13 @@ class Course(TimestampedModel):
                 for that course.
             
             TODO: change the logic for course expiration to be dynamic """
-        expiration = self.created_on + timedelta(days=self.COURSE_ACTIVE_DAYS)
+        expiration = self.created_on + timedelta(days=settings.COURSE_ACTIVE_DAYS)
         if timezone.now() > expiration:
             return False
-        wait_time = timedelta(hours=self.NOTIFICATION_FREQUENCY_HOURS)
+        wait_time = timedelta(hours=settings.NOTIFICATION_FREQUENCY_HOURS)
         if self.last_emailed is not None and timezone.now() < self.last_emailed + wait_time:
             return False
         return self.experiments_to_check().count() > 0
-    
-    def experiments_to_check(self):
-        """ TODO: Include intent-to-treat experiments when that is supported """
-        return Experiment.objects.filter(
-                course_id=self.course_id, tracks_finalized=True,
-                assignment_method=Experiment.CSV_UPLOAD
-        )
     
     def get_emails(self):
         return [credential.email for credential in self.credentials.all()]
@@ -303,9 +306,9 @@ class Course(TimestampedModel):
         return '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
 
 
-class CourseCredentials(TimestampedModel):
+class CourseCredential(TimestampedModel):
     """ Stores oauth tokens and emails for people in the course """
-    course = models.ForeignKey(Course, related_name="credentials")
+    course = models.ForeignKey(CourseNotification, related_name="credentials")
     email = models.EmailField(max_length=2048)
     token = models.CharField(max_length=128)
     

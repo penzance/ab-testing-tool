@@ -126,11 +126,12 @@ $.fn.selectmenu = function(settings){
 				//position the menu under the button
 				.css({
 					top: button.height()//, top: button.offset().top + button.height(), RM
+					, right: 0
 					//left: button.offset().left
 				})
 				//send focus to the selected option
 				.find('.selected a').eq(0).focus();
-				console.log(button.width());	
+				
 				//add open class from button
 			button.addClass('custom-select-open');	
 		});
@@ -195,6 +196,7 @@ $.fn.selectmenu = function(settings){
 			//update the native select with the new selection
 			if(selectElement[0].selectedIndex != menu.find('a').index(this)){
 				changed = true;
+				//console.log('current: ' + selectElement[0].selectedIndex + ' next: ' + menu.find('a').index(this));
 			}
 			
 			selectElement[0].selectedIndex = menu.find('a').index(this);

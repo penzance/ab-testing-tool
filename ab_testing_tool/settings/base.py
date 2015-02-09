@@ -48,16 +48,16 @@ path.append(SITE_ROOT)
 
 ### End path stuff
 
-CLIENT_ID = SECURE_SETTINGS.get("CLIENT_ID")
-CLIENT_SECRET = SECURE_SETTINGS.get("CLIENT_SECRET")
+CLIENT_ID = SECURE_SETTINGS.get('client_id')
+CLIENT_SECRET = SECURE_SETTINGS.get('client_secret')
 
 # THESE ADDRESSES WILL RECEIVE EMAIL ABOUT CERTAIN ERRORS!
-ADMINS = SECURE_SETTINGS.get("ADMINS")
+ADMINS = ()
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = SECURE_SETTINGS.get('DJANGO_SECRET_KEY', 'changeme')
+SECRET_KEY = SECURE_SETTINGS.get('django_secret_key', 'changeme')
 
-LTI_OAUTH_CREDENTIALS = SECURE_SETTINGS.get('LTI_OAUTH_CREDENTIALS', None)
+LTI_OAUTH_CREDENTIALS = SECURE_SETTINGS.get('lti_oauth_credentials', None)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -168,6 +168,9 @@ SESSION_COOKIE_NAME = 'djsessionid'
 
 SESSION_COOKIE_HTTPONLY = True
 
+COURSE_ACTIVE_DAYS = 365
+NOTIFICATION_FREQUENCY_HOURS = 24
+
 MAX_FILE_UPLOAD_SIZE = 10 * 1024 * 1024 # 10 MB
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -177,3 +180,4 @@ EMAIL_HOST_PASSWORD = SECURE_SETTINGS.get('email_host_password', '')
 EMAIL_USE_TLS = SECURE_SETTINGS.get('email_use_tls', False)
 EMAIL_PORT = SECURE_SETTINGS.get('email_port', 25)
 SERVER_EMAIL = SECURE_SETTINGS.get('server_email', "root@localhost")
+

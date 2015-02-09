@@ -89,5 +89,16 @@ end original*/
     color: #5e5e5e;
 }
 
+#intervention_point_dd-menu{
+	width: 100%;
+}
+	/*show the title and description when installing IP on the Canvas side*/
+	#intervention_point_dd-button.custom-select span.option-description{
+		display: inline-block;
+	}
 
+/* special styles when showin a dropdown on the Canvas site for adding Intervention Points to a module */
+.container-modal .form-group-inline .custom-select-button-icon { width: 9%; }
+.container-modal .form-group-inline .custom-dropdown { width: 75%; float: left; }
+.container-modal .form-group-inline .btn-submit-primary { float:left; padding: 0.45em 2%; }
 

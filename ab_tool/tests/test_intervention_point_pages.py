@@ -225,8 +225,8 @@ class TestInterventionPointPages(SessionTestCase):
         data = {"name": "new_name",
                 STAGE_URL_TAG + str(track1.id): "http://example.com/new_page",
                 STAGE_URL_TAG + str(track2.id): "http://example.com/second_page",
-                DEPLOY_OPTION_TAG + str(track1.id): "non_canvas_url",
-                DEPLOY_OPTION_TAG + str(track2.id): "non_canvas_url",
+                DEPLOY_OPTION_TAG + str(track1.id): "canvasPage",
+                DEPLOY_OPTION_TAG + str(track2.id): "externalPage",
                 "notes": "hi",
                 "id": intervention_point_id}
         response = self.client.post(reverse("ab_testing_tool_submit_edit_intervention_point",
@@ -344,8 +344,47 @@ class TestInterventionPointPages(SessionTestCase):
         ret_val = [True]
         with patch("ab_tool.canvas.CanvasModules.intervention_point_is_installed",
                    return_value=ret_val):
-            response = self.client.get(reverse("ab_testing_tool_delete_intervention_point", args=(intervention_point.id,)),
-                                       follow=True)
+            response = self.client.get(reverse("ab_testing_tool_delete_intervention_point",
+                                               args=(intervention_point.id,)), follow=True)
             second_num_intervention_points = InterventionPoint.objects.count()
             self.assertNotEqual(first_num_intervention_points, second_num_intervention_points)
             self.assertError(response, DELETING_INSTALLED_STAGE)
+    
+    def test_modules_page_edit_intervention_point(self):
+        """ Tests modules_page_edit_intervention_point for admins redirects to editInterventionPointFromCanvas """
+        intervention_point = self.create_test_intervention_point()
+        response = self.client.get(reverse("ab_testing_tool_modules_page_edit_intervention_point",
+                                           args=(intervention_point.id,)))
+        self.assertOkay(response)
+        self.assertTemplateUsed(response, "ab_tool/editInterventionPointFromCanvas.html")
+    
+    def test_modules_page_view_intervention_point(self):
+        """ Tests that submit_edit_intervention_point does not change DB count
+            but does change InterventionPoint attribute, edits the existing
+            InterventionPointUrl, and creates a new InterventionPointUrl """
+        intervention_point = self.create_test_intervention_point(name="old_name")
+        intervention_point_id = intervention_point.id
+        track1 = self.create_test_track(name="track1")
+        self.create_test_track(name="track2")
+        InterventionPointUrl.objects.create(
+                intervention_point=intervention_point, url="http://www.example.com", track=track1)
+        response = self.client.post(reverse("ab_testing_tool_modules_page_view_intervention_point",
+                                            args=(intervention_point_id,)), follow=True)
+        self.assertOkay(response)
+        self.assertTemplateUsed(response, "ab_tool/viewInterventionPointFromCanvas.html")
+    
+    def test_submit_edit_intervention_point_from_modules(self):
+        """ Tests that test_submit_edit_intervention_point_from_modules does not change DB count
+            but does change InterventionPoint attribute """
+        intervention_point = self.create_test_intervention_point(name="old_name")
+        intervention_point_id = intervention_point.id
+        num_intervention_points = InterventionPoint.objects.count()
+        data = {"name": "new_name",
+                "notes": ""}
+        response = self.client.post(
+                reverse("ab_testing_tool_submit_edit_intervention_point_from_modules",
+                        args=(intervention_point_id,)), data, follow=True)
+        self.assertOkay(response)
+        self.assertEqual(num_intervention_points, InterventionPoint.objects.count())
+        intervention_point = InterventionPoint.objects.get(id=intervention_point_id)
+        self.assertEqual(intervention_point.name, "new_name")

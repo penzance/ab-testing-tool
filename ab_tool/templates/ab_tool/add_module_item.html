@@ -4,80 +4,62 @@
     {% load staticfiles %}
     <meta charset="utf-8" />
     <title>A/B Testing Tool</title>
-    <link rel="stylesheet" href="{% static 'ab_tool/css/bootstrap.min.css' %}" type="text/css"/>
+    <link rel="stylesheet" href="{% static 'ab_tool/css/styles.css' %}" type="text/css"/>
+    <link rel="stylesheet" href="{% static 'ab_tool/css/jqueryDropdown.css' %}" type="text/css"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'ab_tool/css/font-awesome-4.2.0/css/font-awesome.min.css' %}">
 </head>
 <body>
-<div class="container">
-    {% if intervention_points %}
-    <form method="POST" action="{% url 'ab_testing_tool_submit_selection' %}">
-        <h4> To install a new Intervention Point, select one from list of uninstalled intervention points below:</h4>
-        <br>
-        <select name="intervention_point_id">
-        {% for intervention_point in intervention_points %}
-            <option value="{{intervention_point.id}}">Experiment "{{intervention_point.experiment.name}}", Intervention Point <span>"{{intervention_point.name}}"</span></option>
-        {%endfor %}
-        </select>
-    <input type="hidden" value="{{content_return_url}}" name="content_return_url">
-    <br><br>
-    <input type="submit" value="Add From List" class="btn btn-large btn-primary submit">
-    </form>
-    <br>
-    {% else %}
-    <h4> There are no uninstalled intervention points at this time.  Go to the A/B Testing Tool dashboard to create them.
-    {% endif %}
-<!--
-    <h4> Or, create a new Intervention Point:</h4>
-    <br>
-    <form method="post" name="intervention_point_form" action="{% url 'ab_testing_tool_submit_selection_new_intervention_point' %}">
-            {% csrf_token %}
-            <input type="hidden" value="{{content_return_url}}" name="content_return_url">
-                <input type='hidden' name='id' value="{{ intervention_point.id }}">
-                <table class="table">
-                <tr>
-                    <td><label>Select Experiment</label></td>
-                    <td>
-                        <select name="experiment">
-                        {% for e in experiments %}
-                            <option value="{{e.id}}">Experiment <span>"{{e.name}}"</span></option>
-                        {%endfor %}
-                        </select>
-                    </td>
-                </tr>
+<div class="container-modal">
+    <main>
+        {% if intervention_points %}
+        <form class="form-horizontal" method="POST" action="{% url 'ab_testing_tool_submit_selection' %}">
 
-                <tr align="left">
-                    <td><label>Intervention Point Name</label></td>
-                    <td><input class="form-control"  type="text" name="name" value="{{ intervention_point.name }}"/></td>
-                </tr>
-                <tr id="all_the_tracks" style="display: none; visibility: hidden;">
-                    <td>
-                        {% for t in tracks %}
-                        <tr align="left" class="url_box">
-                            <td class="col-xs-3"><label>URL for Track "{{t.name}}" </label></td>
-                            <td class="col-xs-4"><input id="url_{{t.id}}" class="form-control url_box_input"  type="url"  name="intervention_point_url_{{t.id}}"/></td>
-                            <td class="col-xs-3">
-                                <input type="radio" name="is_canvas_page_for_track_{{t.id}}" value="non_canvas_url" checked="checked"> Non-Canvas Page
-                                <br>
-                                <input type="radio" name="is_canvas_page_for_track_{{t.id}}" value="canvas_url"> Canvas Page
-                            </td>
-                            <td class="col-xs-2"><input type="checkbox"  name="open_as_tab_for_track_{{t.id}}" value="true"> Open In New Tab</td>
-                            <td><a id="preview_{{t.id}}" target="_blank" href="" class="btn btn-xs btn-success preview-btn">Preview URL</a></td>
-                        </tr>
-                        {% endfor %}
-                    </td>
-                </tr>
-                <tr align="left">
-                    <td><label>Intervention Point Notes</label></td>
-                    <td><textarea name="notes" rows="3" cols="80" >{{ intervention_point.notes }}</textarea></td>
-                </tr>
-                <tr>
-                <td></td>
-                <td><input type="submit" name="submit" value="Submit Changes" class="btn btn-lg btn-success submit"></td>
-                </tr>
-                </table>
-    </form>
--->
+            <fieldset  class="fieldset-noborder">
+                <legend class="sr-only">Tracks for experiment</legend>
+
+                <div class="form-group-inline">
+                    <label for="intervention_point_dd"> To install a new Intervention Point, select one from list of uninstalled intervention points below:</label>
+                    <div class="custom-dropdown">
+                        <select id="intervention_point_dd" name="intervention_point_dd">
+                        {% for intervention_point in intervention_points %}
+                            <option value="{{intervention_point.id}}">Experiment "{{intervention_point.experiment.name}}" -- Intervention Point "{{intervention_point.name}}"</option>
+                        {%endfor %}
+                        </select>    
+                    </div>
+                    
+                    <button class="btn btn-submit-primary">Add From List</button>
+
+                    <input type="hidden" value="{{content_return_url}}" name="content_return_url">
+                    
+                </div>
+            </fieldset>
+        </form>
+        <br>
+        {% else %}
+        <h4> There are no uninstalled intervention points at this time.  Go to the A/B Testing Tool dashboard to create them.</h4>
+        {% endif %}
+
+    </main>
 </div>
 <script src="{% static 'ab_tool/js/jquery-1.10.1.min.js' %}"></script>
 <script src="{% static 'ab_tool/js/edit_intervention_point.js' %}"></script>
+<script src="{% static 'ab_tool/js/jquery.dropdown.js' %}" type="text/javascript"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){
+   
+    $('select').selectmenu({
+        format: function(text){
+            var pattern = /([\s\S]+)\-\- ([\s\S]+)/;
+            var replacement = '<span class="option-title">$1</span><span class="option-description">$2</span>';
+            return text.replace(pattern, replacement);
+        }
+    });
+
+});
+</script>
+
 </body>
 </html>
+
+

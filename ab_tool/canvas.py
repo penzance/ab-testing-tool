@@ -1,8 +1,7 @@
-import logging
-import traceback
-from canvas_sdk import RequestContext
-from canvas_sdk.methods import modules
 from canvas_sdk.methods.courses import list_users_in_course_users
+from canvas_sdk.methods import modules
+from canvas_sdk import RequestContext
+from canvas_sdk.exceptions import CanvasAPIError
 from django.conf import settings
 
 from ab_tool.exceptions import (MISSING_LTI_PARAM, MISSING_LTI_LAUNCH,
@@ -10,11 +9,8 @@ from ab_tool.exceptions import (MISSING_LTI_PARAM, MISSING_LTI_LAUNCH,
 from requests.exceptions import RequestException
 from django_canvas_oauth import get_token
 from ab_tool.controllers import intervention_point_url
-from ab_tool.models import InterventionPoint, Course, Experiment
+from ab_tool.models import InterventionPoint, Experiment, CourseNotification
 from django_canvas_oauth.exceptions import NewTokenNeeded
-
-
-logger = logging.getLogger(__name__)
 
 
 class CanvasModules(object):
@@ -71,6 +67,7 @@ class CanvasModules(object):
                 item["is_intervention_point"] = is_intervention_point
                 if is_intervention_point:
                     item["database_name"] = intervention_point_urls[item["external_url"]].name
+                    item["experiment_name"] = intervention_point_urls[item["external_url"]].experiment.name
         return self.modules
     
     def _all_intervention_point_urls(self):
@@ -118,6 +115,7 @@ def get_unassigned_students_with_stored_credentials(course_object, experiment):
         raise UNAUTHORIZED_ACCESS
     for credential in course_object.credentials.all():
         try:
+            # Creates custom RequestContext with one of the CourseCredentials for the CourseNotification
             request_context = RequestContext(credential.token, course_object.canvas_url)
             return get_unassigned_students_with_context(request_context, experiment)
         except NewTokenNeeded:
@@ -132,7 +130,7 @@ def get_unassigned_students_with_context(request_context, experiment):
     try:
         enrollments = list_users_in_course_users(
                 request_context, experiment.course_id, None, enrollment_type="student").json()
-    except RequestException as exception:
+    except CanvasAPIError as exception:
         handle_canvas_error(exception)
     existing_student_ids = set(s.student_id for s in experiment.students.all())
     return [i["sis_user_id"] for i in enrollments
@@ -143,7 +141,7 @@ def list_module_items(request_context, course_id, module_id):
     try:
         return modules.list_module_items(request_context, course_id, module_id,
                                          "content_details").json()
-    except RequestException as exception:
+    except CanvasAPIError as exception:
         handle_canvas_error(exception)
 
 
@@ -151,7 +149,7 @@ def list_modules(request_context, course_id):
     try:
         return modules.list_modules(request_context, course_id,
                                     "content_details").json()
-    except RequestException as exception:
+    except CanvasAPIError as exception:
         handle_canvas_error(exception)
 
 
@@ -168,22 +166,22 @@ def get_lti_param(request, key):
 
 
 def get_canvas_request_context(request):
+    """ This method creates the needed RequestContext for communication with the Canvas API """
     # For local development, allow defining COURSE_OAUTH_TOKEN in secure settings
-    if "COURSE_OAUTH_TOKEN" in settings.SECURE_SETTINGS:
-        oauth_token = settings.SECURE_SETTINGS["COURSE_OAUTH_TOKEN"]
+    if "course_oauth_token" in settings.SECURE_SETTINGS:
+        oauth_token = settings.SECURE_SETTINGS["course_oauth_token"]
     else:
         oauth_token = get_token(request)
     canvas_domain = get_lti_param(request, "custom_canvas_api_domain")
     canvas_url = "https://%s/api" % (canvas_domain)
     email = get_lti_param(request, "lis_person_contact_email_primary")
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    Course.store_credential(course_id, canvas_url, email, oauth_token)
+    # This stores a credential to be added to list of CourseCredentials for the CourseNotification
+    CourseNotification.store_credential(course_id, canvas_url, email, oauth_token)
     return RequestContext(oauth_token, canvas_url)
 
 
 def handle_canvas_error(exception):
-    if (hasattr(exception, "response") and exception.response.status_code == 401):
+    if exception.status_code == 401:
         raise NewTokenNeeded("Your canvas oauth token is invalid")
-    logger.error(repr(exception))
-    logger.error(traceback.format_exc())
     raise NO_SDK_RESPONSE

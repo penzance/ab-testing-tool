@@ -7,6 +7,9 @@ STAGE_URL_TAG = 'intervention_point_url_'
 DEPLOY_OPTION_TAG = 'is_canvas_page_for_track_'
 AS_TAB_TAG = 'open_as_tab_for_track_'
 
+NAME_CHAR_LIMIT = 256
+URL_CHAR_LIMIT = 2048
+NOTES_CHAR_LIMIT = 1024
 
 ASSIGN_STUDENTS_MESSAGE = ("Missing Student Track Assignments",
 """ New learners have joined your course.

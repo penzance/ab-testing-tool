@@ -11,9 +11,9 @@ from ab_tool.exceptions import (NO_TRACKS_FOR_EXPERIMENT,
     INTERVENTION_POINTS_ARE_INSTALLED, FILE_TOO_LARGE)
 from django.http.response import HttpResponse
 from ab_tool.controllers import (get_missing_track_weights,
-    get_incomplete_intervention_points)
-from ab_tool.spreadsheets import get_track_selection_xlsx, get_track_selection_csv,\
-    parse_uploaded_file
+    get_incomplete_intervention_points, validate_weighting, validate_name)
+from ab_tool.spreadsheets import (get_track_selection_xlsx, get_track_selection_csv,
+    parse_uploaded_file)
 
 
 @lti_role_required(ADMINS)
@@ -39,10 +39,16 @@ def submit_create_experiment(request):
     experiment_dict = json.loads(request.body)
     
     # Unpack data from experiment_dict and update experiment
-    name = experiment_dict["name"]
+    name = validate_name(experiment_dict["name"])
     notes = experiment_dict["notes"]
-    uniform_random = experiment_dict["uniformRandom"]
+    uniform_random = bool(experiment_dict["uniformRandom"])
     tracks = experiment_dict["tracks"]
+    # Validates using backend rules before any object creation
+    for track_dict in tracks:
+        validate_name(track_dict["name"])
+        if not uniform_random:
+            validate_weighting(track_dict["weighting"])
+    
     csv_upload = experiment_dict["csvUpload"]
     if csv_upload:
         assignment_method = Experiment.CSV_UPLOAD
@@ -57,7 +63,7 @@ def submit_create_experiment(request):
     
     # Update existing tracks
     for track_dict in tracks:
-        track = experiment.new_track(track_dict["name"])
+        track = experiment.new_track(validate_name(track_dict["name"]))
         if not uniform_random and not csv_upload:
             track.set_weighting(track_dict["weighting"])
     return HttpResponse("success")
@@ -101,7 +107,7 @@ def submit_edit_experiment(request, experiment_id):
     experiment_dict = json.loads(request.body)
     
     # Unpack data from experiment_dict and update experiment
-    name = experiment_dict["name"]
+    name = validate_name(experiment_dict["name"])
     notes = experiment_dict["notes"]
     if experiment.tracks_finalized:
         # Only allow updating name, notes, and track names for started experiments
@@ -109,7 +115,7 @@ def submit_edit_experiment(request, experiment_id):
         existing_tracks = [i for i in experiment_dict["tracks"] if i["id"] is not None]
         for track_dict in existing_tracks:
             track = Track.get_or_404_check_course(track_dict["id"], course_id)
-            track.update(name=track_dict["name"])
+            track.update(name=validate_name(track_dict["name"]))
         return HttpResponse("success")
     
     uniform_random = experiment_dict["uniformRandom"]
@@ -127,15 +133,15 @@ def submit_edit_experiment(request, experiment_id):
     # Update existing tracks
     for track_dict in existing_tracks:
         track = Track.get_or_404_check_course(track_dict["id"], course_id)
-        track.update(name=track_dict["name"])
+        track.update(name=validate_name(track_dict["name"]))
         if not uniform_random and not csv_upload:
-            track.set_weighting(track_dict["weighting"])
+            track.set_weighting(validate_weighting(track_dict["weighting"]))
     
     # Create new tracks
     for track_dict in new_tracks:
-        track = experiment.new_track(track_dict["name"])
+        track = experiment.new_track(validate_name(track_dict["name"]))
         if not uniform_random and not csv_upload:
-            track.set_weighting(track_dict["weighting"])
+            track.set_weighting(validate_weighting(track_dict["weighting"]))
     return HttpResponse("success")
 
 
@@ -173,10 +179,11 @@ def finalize_tracks(request, experiment_id):
     incomplete_intervention_points = get_incomplete_intervention_points(intervention_points)
     if incomplete_intervention_points:
         return HttpResponse("URLs missing for these tracks in these Intervention Points: %s"
-                            % incomplete_intervention_points)
+                            % ", ".join(incomplete_intervention_points))
     missing_track_weights = get_missing_track_weights(experiment, course_id)
     if missing_track_weights:
-        return HttpResponse("Track weightings missing for these tracks: %s" % missing_track_weights)
+        return HttpResponse("Track weightings missing for these tracks: %s"
+                            % ", ".join(missing_track_weights))
     experiment.tracks_finalized = True
     experiment.save()
     return redirect(reverse("ab_testing_tool_index"))

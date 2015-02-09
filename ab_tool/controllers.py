@@ -3,12 +3,16 @@ from django.conf import settings
 from django.http.response import StreamingHttpResponse
 from django.core.urlresolvers import reverse
 from django.core.mail import send_mail
+from django.core.validators import URLValidator
+from django.core.exceptions import ValidationError
 from random import choice
 
 from ab_tool.models import (TrackProbabilityWeight, Experiment, ExperimentStudent)
 from ab_tool.exceptions import (BAD_STAGE_ID, missing_param_error,
     INPUT_NOT_ALLOWED, NO_TRACKS_FOR_EXPERIMENT, TRACK_WEIGHTS_NOT_SET,
-    CSV_UPLOAD_NEEDED)
+    CSV_UPLOAD_NEEDED, INVALID_URL_PARAM, INCORRECT_WEIGHTING_PARAM,
+    MISSING_NAME_PARAM, PARAM_LENGTH_EXCEEDS_LIMIT, NoValidCredentials)
+from ab_tool.constants import (NAME_CHAR_LIMIT, URL_CHAR_LIMIT)
 
 
 def assign_track_and_create_student(experiment, student_id, lis_person_sourcedid):
@@ -53,11 +57,32 @@ def intervention_point_url(request, intervention_point_id):
     return request.build_absolute_uri(reverse("ab_testing_tool_deploy_intervention_point",
                                               args=(intervention_point_id,)))
 
-def format_url(url):
+def validate_name(name):
+    if not name:
+        raise MISSING_NAME_PARAM
+    if len(name) > NAME_CHAR_LIMIT:
+        raise PARAM_LENGTH_EXCEEDS_LIMIT
+    return name
+
+
+def validate_weighting(weight):
+    if not 0 <= weight <=100:
+        raise INCORRECT_WEIGHTING_PARAM
+    return weight
+
+
+def validate_format_url(url):
+    validator = URLValidator()
     """ Adds "http://" to the beginning of a url if it isn't there """
-    if url.startswith("http://") or url.startswith("https://"):
+    if not url.startswith("http://") and not url.startswith("https://"):
+        url = "http://%s" % url
+    try:
+        validator(url)
+        if len(url) > URL_CHAR_LIMIT:
+            raise PARAM_LENGTH_EXCEEDS_LIMIT #the validator may already enforce length requirement
         return url
-    return "http://%s" % url
+    except ValidationError:
+        raise INVALID_URL_PARAM
 
 
 def get_incomplete_intervention_points(intervention_point_list):

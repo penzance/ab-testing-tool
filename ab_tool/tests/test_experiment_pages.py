@@ -1,10 +1,13 @@
 from ab_tool.tests.common import (SessionTestCase, TEST_COURSE_ID,
-    TEST_OTHER_COURSE_ID, NONEXISTENT_TRACK_ID, NONEXISTENT_EXPERIMENT_ID)
+    TEST_OTHER_COURSE_ID, NONEXISTENT_TRACK_ID, NONEXISTENT_EXPERIMENT_ID,
+    APIReturn, LIST_MODULES)
 from django.core.urlresolvers import reverse
 from ab_tool.models import (Experiment, InterventionPointUrl)
 from ab_tool.exceptions import (EXPERIMENT_TRACKS_ALREADY_FINALIZED,
-    NO_TRACKS_FOR_EXPERIMENT, UNAUTHORIZED_ACCESS)
+    NO_TRACKS_FOR_EXPERIMENT, UNAUTHORIZED_ACCESS,
+    INTERVENTION_POINTS_ARE_INSTALLED)
 import json
+from mock import patch
 
 class TestExperimentPages(SessionTestCase):
     """ Tests related to Experiment and Experiment pages and methods """
@@ -218,24 +221,27 @@ class TestExperimentPages(SessionTestCase):
         self.assertError(response, UNAUTHORIZED_ACCESS)
     
     def test_submit_edit_started_experiment_changes_name_and_notes(self):
-        """ Tests that submit_edit_experiment changes an Experiment's 
-            name and notes even if the experiment has already been started """
+        """ Tests that submit_edit_experiment changes an Experiment's
+            name and notes and track names only if the experiment has already been started """
         experiment = self.create_test_experiment(name="old_name", notes="old_notes",
                                                  tracks_finalized=True)
         experiment_id = experiment.id
         num_experiments = Experiment.objects.count()
-        experiment = {
-                "name": "new_name", "notes": "new_notes", "tracks": [],
+        old_track = self.create_test_track(experiment=experiment, name="old_name_track")
+        experiment_json = {
+                "name": "new_name", "notes": "new_notes", "tracks": [{"id": old_track.id,
+                  "name": "new_track_name"}],
         }
         response = self.client.post(
             reverse("ab_testing_tool_submit_edit_experiment", args=(experiment_id,)),
-            follow=True, content_type="application/json", data=json.dumps(experiment)
+            follow=True, content_type="application/json", data=json.dumps(experiment_json)
         )
         self.assertOkay(response)
         self.assertEquals(num_experiments, Experiment.objects.count())
         experiment = Experiment.objects.get(id=experiment_id)
         self.assertEquals(experiment.name, "new_name")
         self.assertEquals(experiment.notes, "new_notes")
+        self.assertEquals(experiment.tracks.all()[0].name, "new_track_name")
     
     def test_submit_edit_started_experiment_does_not_change_tracks(self):
         """ Tests that submit_edit_experiment doesn't change tracks for
@@ -262,6 +268,37 @@ class TestExperimentPages(SessionTestCase):
         self.assertEquals(experiment.assignment_method, Experiment.WEIGHTED_PROBABILITY_RANDOM)
         self.assertEquals(experiment.tracks.count(), no_tracks)
     
+    def test_submit_edit_started_experiment_changes_existing_tracks(self):
+        """ Tests that submit_edit_experiment does change track objects for
+            an experiment that has not yet been started """
+        experiment = self.create_test_experiment(name="old_name", tracks_finalized=False,
+                assignment_method=Experiment.WEIGHTED_PROBABILITY_RANDOM)
+        track1 = self.create_test_track(experiment=experiment, name="A")
+        track2 = self.create_test_track(experiment=experiment, name="B")
+        self.create_test_track_weight(experiment=experiment, track=track1)
+        self.create_test_track_weight(experiment=experiment, track=track2)
+        track_count = experiment.tracks.count()
+        experiment_json = {
+                "name": "new_name", "notes": "hi", "uniformRandom": False,
+                "csvUpload": False,
+                "tracks": [{"id": track1.id, "weighting": 30, "name": "C"},
+                           {"id": track2.id, "weighting": 70, "name": "D"}]
+        }
+        response = self.client.post(
+            reverse("ab_testing_tool_submit_edit_experiment", args=(experiment.id,)),
+            follow=True, content_type="application/json", data=json.dumps(experiment_json)
+        )
+        self.assertOkay(response)
+        experiment = Experiment.objects.get(id=experiment.id)
+        self.assertEquals(experiment.assignment_method, Experiment.WEIGHTED_PROBABILITY_RANDOM)
+        self.assertEquals(experiment.tracks.count(), track_count)
+        track1 = experiment.tracks.get(id=track1.id)
+        track2 = experiment.tracks.get(id=track2.id)
+        self.assertEquals(track1.name, "C") #Checks name has changed
+        self.assertEquals(track2.name, "D")
+        self.assertEquals(track1.weight.weighting, 30) #Checks weighting has changed
+        self.assertEquals(track2.weight.weighting, 70)
+    
     def test_delete_experiment(self):
         """ Tests that delete_experiment method properly deletes a experiment when authorized"""
         first_num_experiments = Experiment.objects.count()
@@ -283,6 +320,21 @@ class TestExperimentPages(SessionTestCase):
         second_num_experiments = Experiment.objects.count()
         self.assertError(response, EXPERIMENT_TRACKS_ALREADY_FINALIZED)
         self.assertEqual(first_num_experiments, second_num_experiments)
+    
+    @patch(LIST_MODULES, return_value=APIReturn([{"id": 0}]))
+    def test_delete_experiment_has_installed_intervention_point(self, _mock1):
+        """ Tests that delete experiment doesn't work when there is an associated
+            intervention point is installed """
+        experiment = self.create_test_experiment()
+        first_num_experiments = Experiment.objects.count()
+        ret_val = [True]
+        with patch("ab_tool.canvas.CanvasModules.experiment_has_installed_intervention",
+                   return_value=ret_val):
+            response = self.client.get(reverse("ab_testing_tool_delete_experiment", args=(experiment.id,)),
+                                       follow=True)
+            second_num_experiments = Experiment.objects.count()
+            self.assertError(response, INTERVENTION_POINTS_ARE_INSTALLED)
+            self.assertEqual(first_num_experiments, second_num_experiments)
     
     def test_delete_experiment_unauthorized(self):
         """ Tests that delete_experiment method raises error when unauthorized """
@@ -403,3 +455,13 @@ class TestExperimentPages(SessionTestCase):
         url = reverse("ab_testing_tool_copy_experiment", args=(experiment.id,))
         response = self.client.get(url, follow=True)
         self.assertError(response, UNAUTHORIZED_ACCESS)
+    
+    def test_delete_track(self):
+        """ Tests that delete_track method properly deletes a track of an experiment when authorized"""
+        experiment = self.create_test_experiment()
+        track = self.create_test_track(experiment=experiment)
+        self.assertEqual(experiment.tracks.count(), 1)
+        response = self.client.get(reverse("ab_testing_tool_delete_track", args=(track.id,)),
+                                   follow=True)
+        self.assertEqual(experiment.tracks.count(), 0)
+        self.assertOkay(response)

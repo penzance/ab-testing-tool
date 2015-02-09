@@ -202,8 +202,23 @@ main {
 .float-right {
   float: right;
 }
+.container-modal {
+  width: 97%;
+  margin: 0 1.5%;
+}
+.text-center {
+  text-align: center;
+}
 .block {
   display: block;
+}
+.text-error {
+  color: #a51c30;
+}
+.error {
+  border: solid 1px #b03535;
+  box-shadow: 0 0 3px #d45252;
+  color: #a51c30;
 }
 label {
   color: #333333;
@@ -244,6 +259,11 @@ fieldset.fieldset-btn {
   cursor: not-allowed;
   background-color: gray;
 }
+.form-control.has-error {
+  border: solid 1px #b03535;
+  box-shadow: 0 0 3px #d45252;
+  color: #a51c30;
+}
 textarea.form-control {
   height: auto;
 }
@@ -271,6 +291,11 @@ textarea.form-control {
   cursor: not-allowed;
   background-color: gray;
 }
+.input-group-right.has-error {
+  border: solid 1px #b03535;
+  box-shadow: 0 0 3px #d45252;
+  color: #a51c30;
+}
 .input-group-right  + span {
   display: block;
   height: 1em;
@@ -295,6 +320,23 @@ textarea.form-control {
 .input-group-right  + span[disabled], .input-group-right  + span[readonly], fieldset[disabled] .input-group-right  + span {
   cursor: not-allowed;
   background-color: gray;
+}
+.input-group-right  + span.has-error {
+  border: solid 1px #b03535;
+  box-shadow: 0 0 3px #d45252;
+  color: #a51c30;
+}
+.input-group-right.has-error {
+  border: solid 1px #b03535;
+  box-shadow: 0 0 3px #d45252;
+  color: #a51c30;
+  border-right: 0;
+}
+.input-group-right.has-error + span {
+  border: solid 1px #b03535;
+  box-shadow: 0 0 3px #d45252;
+  color: #a51c30;
+  border-left: 0;
 }
 .form-group {
   width: 60%;
@@ -334,6 +376,11 @@ textarea.form-control {
   float: left;
   margin-right: 2%;
 }
+.form-horizontal .form-group-inline-left {
+  width: 70.833333333333%;
+  float: left;
+  margin-right: 2%;
+}
 .form-group-inline-left .form-control {
   width: 94%;
 }
@@ -349,6 +396,24 @@ textarea.form-control {
 .modal .form-group-inline-right .fa-question-circle {
   margin-top: 0.55em;
   float: right;
+}
+.form-horizontal .form-group-inline-right {
+  width: 26.916667%;
+  float: left;
+}
+.form-horizontal .form-group-inline-right  > div {
+  position: relative;
+  display: inline-block;
+  width: 90%;
+}
+.form-horizontal .form-group-inline-right .fa-question-circle {
+  margin-top: 0.55em;
+  float: right;
+}
+.custom-dropdown {
+  position: relative;
+  display: inline-block;
+  width: 90%;
 }
 .modal .form-group-description {
   display: none;
@@ -371,6 +436,25 @@ textarea.form-control {
     display: inline-block;
   }
 }
+/**** error experiment form (start) ***/
+.error-experiment-name {
+  padding: 1em;
+  background-color: #feeeee;
+  color: #a51c30;
+  width: 60%;
+  display: inline-block;
+  float: left;
+}
+.arrow-error {
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-bottom: 0px solid transparent;
+  border-right: 13px solid #feeeee;
+  margin-top: 3em;
+  float: left;
+}
+/**** error experiment form (end) ***/
 .panel {
   display: inline-block;
   border-width: 0;
@@ -483,6 +567,7 @@ ul, ol, dl {
 .btn {
   display: inline-block;
   text-align: center;
+  text-decoration: none;
 }
 .btn.disabled, .btn[disabled], fieldset[disabled] .btn {
   cursor: not-allowed;
@@ -497,8 +582,9 @@ ul, ol, dl {
   padding-right: 0.5em;
 }
 .btn-submit {
-  height: 1em;
-  padding: 0.55em 1%;
+  /*height: 1em;*/
+
+  padding: 0.45em 2%;
   border-radius: 5px;
   background-color: #cecece;
   border: solid 1px #c3c3c3;
@@ -506,8 +592,9 @@ ul, ol, dl {
   color: #525252;
 }
 .btn-submit-primary {
-  height: 1em;
-  padding: 0.55em 1%;
+  /*height: 1em;*/
+
+  padding: 0.45em 2%;
   border-radius: 5px;
   background-color: #cecece;
   border: solid 1px #c3c3c3;
@@ -516,14 +603,19 @@ ul, ol, dl {
   background-color: #3e67a2;
   color: #fafafa;
 }
+.btn-submit-primary:hover {
+  background-color: #525252;
+  color: #fafafa;
+}
 button.btn-submit-primary {
   height: auto;
 }
 /* link look and feel but with the padding
 and spacing to match a btn-submit */
 .btn-link {
-  height: 1em;
-  padding: 0.55em 1%;
+  /*height: 1em;*/
+
+  padding: 0.45em 2%;
   border-radius: 5px;
   background-color: #cecece;
   border: solid 1px #c3c3c3;
@@ -580,6 +672,23 @@ and spacing to match a btn-submit */
   display: inline-block;
   padding: 0.4375em 0.3125em;
   background-color: #eaeaea;
+}
+.infoBlock {
+  width: 90%;
+  display: inline-block;
+  margin: 0 0 1em 1.4925373134328357%;
+  width: 87.01492537313433%;
+  padding: 1.5em 5%;
+}
+.infoBlock-empty {
+  background: #f7f7f7;
+  color: #636363;
+}
+.text-success {
+  color: #3c763d;
+}
+.text-warning {
+  color: #8a6d3b;
 }
 body {
   font-size: 0.9375em;
@@ -729,6 +838,32 @@ a:hover {
   color: #505151;
   font-style: italic;
 }
+.ip-status {
+  width: 11%;
+}
+.missing-url {
+  font-size: 1.2em;
+  float: right;
+  display: inline-block;
+  text-align: center;
+  color: #8a6d3b;
+}
+.missing-url span {
+  font-size: 0.65em !important;
+  display: block;
+}
+.ip-installed {
+  font-size: 1.2em;
+  float: right;
+  display: inline-block;
+  text-align: center;
+  color: #8a6d3b;
+  color: #3c763d;
+}
+.ip-installed span {
+  font-size: 0.65em !important;
+  display: block;
+}
 .ip-btn-delete {
   color: #a51c30;
   float: left;
@@ -779,6 +914,33 @@ a:hover {
   border-bottom: 0px solid transparent;
   border-left: 14px solid #141414;
 }
+/********* Modules popup (START) ***********/
+.module-name {
+  background: #f7f7f7;
+  margin: 0;
+  padding: 0.55em 0.55em 0 0.55em;
+  border-width: 1px 1px 0px 1px;
+  border-color: #ececeb;
+  border-style: solid;
+}
+.list-modules {
+  background: #f7f7f7;
+  padding: 1.5em;
+  border-width: 0 1px 1px 1px;
+  border-color: #ececeb;
+  border-style: solid;
+}
+.list-modules li {
+  padding: 0.75em 1.5em;
+  border-bottom: solid 1px #ececeb;
+  border-left: solid 1px #ececeb;
+  border-right: solid 1px #ececeb;
+  background: #fcfefd;
+}
+.list-modules li:first-child {
+  border-top: solid 1px #ececeb;
+}
+/********* Modules popup (END) ***********/
 /***********************************************************************************
 					EXP DASHBOARD (END)
 /**********************************************************************************/

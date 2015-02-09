@@ -1,19 +1,13 @@
 SECURE_SETTINGS = {
-    'LTI_OAUTH_CREDENTIALS': {
+    'lti_oauth_credentials': {
         '{{ secure_settings.lti_key }}': '{{ secure_settings.lti_secret }}',
     },
-    
-    'CLIENT_ID': '{{ secure_settings.client_id }}',
-    'CLIENT_SECRET': '{{ secure_settings.client_secret }}',
-    
-    'ADMINS': (),
-    
-    'DJANGO_DB_USER': '{{ secure_settings.django_db_user }}',
-    'DJANGO_DB_PASS': '{{ secure_settings.django_db_pass }}',
-    
-    'CANVAS_TOKEN': '{{ secure_settings.canvas_token }}',
-    
-    'DJANGO_SECRET_KEY': '{{ secure_settings.django_secret_key }}',
+    'client_id': '{{ secure_settings.client_id }}',
+    'client_secret': '{{ secure_settings.client_secret }}',
+    'django_db_user': '{{ secure_settings.django_db_user }}',
+    'django_db_pass': '{{ secure_settings.django_db_pass }}',
+    'canvas_token': '{{ secure_settings.canvas_token }}',
+    'django_secret_key': '{{ secure_settings.django_secret_key }}',
     
     'email_host': '{{ secure_settings.email_host }}',
     'email_host_user': '{{ secure_settings.email_host_user }}',
