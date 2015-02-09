@@ -1,5 +1,6 @@
 from error_middleware.exceptions import (Renderable500, Renderable400,
     Renderable403, Renderable404)
+from django.conf import settings
 
 class NoValidCredentials(Exception): pass
 
@@ -13,6 +14,9 @@ BAD_STAGE_ID = Renderable400("Invalid intervention_point id")
 DELETING_INSTALLED_STAGE = Renderable400("Deleting an installed Intervention Point is not allowed")
 
 UNAUTHORIZED_ACCESS = Renderable403("You do not have access to this course.")
+
+FILE_TOO_LARGE = Renderable403("Files over %sMB are not allowed for upload" %
+                               (int(settings.MAX_FILE_UPLOAD_SIZE) / 1024 / 1024))
 
 MISSING_RETURN_TYPES_PARAM = Renderable400("Invalid ext_content_return_types")
 

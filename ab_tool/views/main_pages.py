@@ -7,7 +7,8 @@ from django.template.defaultfilters import slugify
 from django.template import loader
 from ims_lti_py.tool_config import ToolConfig
 
-from ab_tool.canvas import get_lti_param, CanvasModules
+from ab_tool.canvas import get_lti_param, CanvasModules,\
+    experiments_with_unnasigned_students
 from ab_tool.controllers import post_param
 from ab_tool.models import (InterventionPoint, Experiment)
 from ab_tool.constants import ADMINS
@@ -25,12 +26,14 @@ def render_control_panel(request):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     intervention_points = InterventionPoint.objects.filter(course_id=course_id)
     experiments = Experiment.objects.filter(course_id=course_id)
+    
     context = {
         "modules": canvas_modules.get_modules_with_items(),
         "intervention_points": intervention_points,
         "uninstalled_intervention_points": canvas_modules.get_uninstalled_intervention_points(),
         "canvas_url": get_lti_param(request, "launch_presentation_return_url"),
         "experiments": experiments,
+        "experiments_with_unassigned_students": experiments_with_unnasigned_students(request),
         "deletable_experiment_ids": canvas_modules.get_deletable_experiment_ids(),
     }
     return render_to_response("ab_tool/experimentsDashboard.html", context)

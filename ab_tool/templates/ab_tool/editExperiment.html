@@ -74,19 +74,21 @@
                                     <i class="fa fa-trash"></i><span>Delete</span>
                                 </a>
                             {% endif %}
-                            <!-- Show different weighting if uniformRandom is set -->
-                            <div ng-if="!experiment.uniformRandom" ng-cloak>
-                                <input type="" min="0" max="100" step="1"
-                                    data-track="value" data-trackindex="1"
-                                    maxlength="2" size="2"
-                                    ng-pattern="/^\d+$/" ng-model="track.weighting"
-                                    {%if started %}disabled="disabled"{% endif %} 
-                                    class="input-trackWeight input-group-right float-left"
-                                    ng-class="weightingError ? 'has-error' : ''"><span> % </span>
-                            </div>
-                            <div ng-if="experiment.uniformRandom" ng-cloak>
-                                <input type="text" disabled="disabled" size="2"
-                                    {% verbatim %}ng-cloak value="{{uniformPercent()}}" class="input-group-right float-left"><span> % </span>{% endverbatim %}
+                            <!-- Hide weighting if csvUpload is set -->
+                            <div ng-if="!experiment.csvUpload">
+                                <!-- Show different weighting if uniformRandom is set -->
+                                <div ng-if="!experiment.uniformRandom" ng-cloak>
+                                    <input type="" min="0" max="100" step="1"
+                                        data-track="value" data-trackindex="1"
+                                        maxlength="2" size="2"
+                                        ng-pattern="/^\d+$/" ng-model="track.weighting"
+                                        {%if started %}disabled="disabled"{% endif %} 
+                                        class="input-trackWeight input-group-right float-left"
+                                        ng-class="weightingError ? 'has-error' : ''"><span> % </span>
+                                </div>
+                                <div ng-if="experiment.uniformRandom" ng-cloak>
+                                    <input type="text" disabled="disabled" size="2"
+                                        {% verbatim %}ng-cloak value="{{uniformPercent()}}" class="input-group-right float-left"><span> % </span>{% endverbatim %}
                             </div>
                             
                             {% verbatim %}
@@ -106,8 +108,8 @@
                         <!-- Angular loop over tracks (end) -->
                         {% if not started %}
                         <li>
-                            <!-- Hide weighting if uniformRandom is set -->
-                            <div ng-if="!experiment.uniformRandom">
+                            <!-- Hide weighting if uniformRandom or csvUpload is set -->
+                            <div ng-hide="experiment.uniformRandom || experiment.csvUpload">
                                 <input type="" min="0" max="100" step="1"
                                         data-track="value" data-trackindex="1"
                                         maxlength="2" size="2" placeholder="0"
@@ -121,11 +123,15 @@
                         {% endif %}
                     </ul>
 
-                    <input type="checkbox" id="uniformRandom" name="uniformRandom"
-                        ng-model="experiment.uniformRandom"
+                    <input type="checkbox" name="csvUpload" id="csvUpload"
+                        ng-model="experiment.csvUpload"
                         {%if started %}disabled="disabled"{% endif %}>
-                    <label for="uniformRandom">Equally weight each track (uniform random)</label>
-
+                    <label for="csvUpload">Upload a spreadsheet of student track assignments</label>
+                    <br>
+                    <input type="checkbox" id="uniformRandom" name="uniformRandom"
+                        ng-model="experiment.uniformRandom" ng-if="!experiment.csvUpload"
+                        {%if started %}disabled="disabled"{% endif %}>
+                    <label for="uniformRandom" ng-if="!experiment.csvUpload">Equally weight each track (uniform random)</label>
                 </div>
                 <div class="form-group-description">
                     <div ng-if="weightingError" ng-cloak>
@@ -197,9 +203,12 @@
             <!-- Angular loop over tracks -->
                 <div ng-repeat="track in experiment.tracks">
                     <dt class="list-item-title" ng-cloak>Track "{{track.name}}":</dt>
+                    <!-- Hide weighting if csvUpload is set -->
+                    <div ng-cloak ng-if="!experiment.csvUpload">
                         <!-- Show different weighting if uniformRandom is set -->
                         <dd ng-cloak ng-if="!experiment.uniformRandom">{{track.weighting}}%</dd>
                         <dd ng-cloak ng-if="experiment.uniformRandom">{{uniformPercent()}}%</dd>
+                    </div>
                 </div>
             <!-- End Angular loop over tracks -->
             <dt class="list-item-title">Notes:</dt><dd>{{experiment.notes}}</dd>
@@ -229,7 +238,8 @@
 {{ block.super }}
 <script type="text/javascript">
     {% if create %}
-        window.initialExperiment = {"name": "", "notes": "", "uniformRandom": true,
+        window.initialExperiment = {"name": "", "notes": "",
+            "uniformRandom": true, "csvUpload": false,
             "tracks": [{"id": null, "name": "A", "newName": "A"},
                        {"id": null, "name": "B", "newName": "B"}]};
         window.modifiedExperiment = JSON.parse(JSON.stringify(window.initialExperiment));

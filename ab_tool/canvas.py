@@ -87,6 +87,12 @@ class CanvasModules(object):
         return installed_intervention_point_urls
 
 
+def experiments_with_unnasigned_students(request):
+    return [experiment.id for experiment in
+            Experiment.objects.filter(assignment_method=Experiment.CSV_UPLOAD)
+            if get_unassigned_students(request, experiment)]
+
+
 def get_unassigned_students(request, experiment):
     """ Gets the list of students that have not been assigned a track.
         This version of the function is for requests that have come through
@@ -119,14 +125,16 @@ def get_unassigned_students_with_stored_credentials(course_object, experiment):
 
 
 def get_unassigned_students_with_context(request_context, experiment):
+    """ Returns a list of sis_user_ids because that is the unique
+        identifier the ab_tool users for students """
     try:
         enrollments = list_users_in_course_users(
                 request_context, experiment.course_id, None, enrollment_type="student").json()
     except CanvasAPIError as exception:
         handle_canvas_error(exception)
-    existing_student_ids = set(s.id for s in experiment.students.all())
-    return [{"student_id": i["sis_user_id"], "lis_person_sourcedid": i["sis_user_id"]}
-            for i in enrollments if i["sis_user_id"] not in existing_student_ids]
+    existing_student_ids = set(s.student_id for s in experiment.students.all())
+    return [i["sis_user_id"] for i in enrollments
+            if i["sis_user_id"] not in existing_student_ids]
 
 
 def list_module_items(request_context, course_id, module_id):

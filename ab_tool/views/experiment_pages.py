@@ -2,16 +2,18 @@ import json
 from django.shortcuts import render_to_response, redirect
 from django_auth_lti.decorators import lti_role_required
 from django.core.urlresolvers import reverse
+from django.conf import settings
 
 from ab_tool.constants import ADMINS
-from ab_tool.models import (Track, Experiment)
-from ab_tool.canvas import get_lti_param, CanvasModules
+from ab_tool.models import (Track, Experiment, ExperimentStudent)
+from ab_tool.canvas import get_lti_param, CanvasModules, get_unassigned_students
 from ab_tool.exceptions import (NO_TRACKS_FOR_EXPERIMENT,
-    INTERVENTION_POINTS_ARE_INSTALLED)
+    INTERVENTION_POINTS_ARE_INSTALLED, FILE_TOO_LARGE)
 from django.http.response import HttpResponse
 from ab_tool.controllers import (get_missing_track_weights,
     get_incomplete_intervention_points, validate_weighting, validate_name)
-from ab_tool.spreadsheets import get_track_selection_xlsx, get_track_selection_csv
+from ab_tool.spreadsheets import (get_track_selection_xlsx, get_track_selection_csv,
+    parse_uploaded_file)
 
 
 @lti_role_required(ADMINS)
@@ -26,6 +28,7 @@ def submit_create_experiment(request):
             {"name": name(str),
              "notes": notes(str),
              "uniformRandom": True/False,
+             "csvUpload": True/False,
              "tracks": [{"id": None # This is none for all because all tracks are new
                          "weighting": track_weighting(int),
                          "name": track_name(str),
@@ -45,7 +48,11 @@ def submit_create_experiment(request):
         validate_name(track_dict["name"])
         if not uniform_random:
             validate_weighting(track_dict["weighting"])
-    if uniform_random:
+    
+    csv_upload = experiment_dict["csvUpload"]
+    if csv_upload:
+        assignment_method = Experiment.CSV_UPLOAD
+    elif uniform_random:
         assignment_method = Experiment.UNIFORM_RANDOM
     else:
         assignment_method = Experiment.WEIGHTED_PROBABILITY_RANDOM
@@ -57,8 +64,8 @@ def submit_create_experiment(request):
     # Update existing tracks
     for track_dict in tracks:
         track = experiment.new_track(validate_name(track_dict["name"]))
-        if not uniform_random:
-            track.set_weighting(validate_weighting(track_dict["weighting"]))
+        if not uniform_random and not csv_upload:
+            track.set_weighting(track_dict["weighting"])
     return HttpResponse("success")
 
 
@@ -88,6 +95,7 @@ def submit_edit_experiment(request, experiment_id):
             {"name": name(str),
              "notes": notes(str),
              "uniformRandom": True/False,
+             "csvUpload": True/False,
              "tracks": [{"id": track_id(int), # this is None if track is new
                          "weighting": track_weighting(int),
                          "name": track_name(str),
@@ -110,9 +118,12 @@ def submit_edit_experiment(request, experiment_id):
             track.update(name=validate_name(track_dict["name"]))
         return HttpResponse("success")
     
-    uniform_random = bool(experiment_dict["uniformRandom"])
+    uniform_random = experiment_dict["uniformRandom"]
+    csv_upload = experiment_dict["csvUpload"]
     existing_tracks = [i for i in experiment_dict["tracks"] if i["id"] is not None]
     new_tracks = [i for i in experiment_dict["tracks"] if i["id"] is None]
+    if csv_upload:
+        assignment_method = Experiment.CSV_UPLOAD
     if uniform_random:
         assignment_method = Experiment.UNIFORM_RANDOM
     else:
@@ -123,13 +134,13 @@ def submit_edit_experiment(request, experiment_id):
     for track_dict in existing_tracks:
         track = Track.get_or_404_check_course(track_dict["id"], course_id)
         track.update(name=validate_name(track_dict["name"]))
-        if not uniform_random:
+        if not uniform_random and not csv_upload:
             track.set_weighting(validate_weighting(track_dict["weighting"]))
     
     # Create new tracks
     for track_dict in new_tracks:
         track = experiment.new_track(validate_name(track_dict["name"]))
-        if not uniform_random:
+        if not uniform_random and not csv_upload:
             track.set_weighting(validate_weighting(track_dict["weighting"]))
     return HttpResponse("success")
 
@@ -189,3 +200,29 @@ def track_selection_csv(request, experiment_id):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
     return get_track_selection_csv(request, experiment, "track_selection.csv")
+
+@lti_role_required(ADMINS)
+def upload_track_assignments(request, experiment_id):
+    course_id = get_lti_param(request, "custom_canvas_course_id")
+    experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
+    uploaded_file = request.FILES["track_assignments"]
+    if (uploaded_file.size > int(settings.MAX_FILE_UPLOAD_SIZE)):
+        raise FILE_TOO_LARGE
+    uploaded_text = uploaded_file.read()
+    unassigned_students = get_unassigned_students(request, experiment)
+    students, errors = parse_uploaded_file(
+            experiment, unassigned_students, uploaded_text, uploaded_file.name
+    )
+    if errors:
+        return render_to_response("ab_tool/spreadsheetErrors.html", {"errors": errors})
+    
+    for student_id, track in students.items():
+        # lis_person_sourcedid is not returned by SDK, so we set it to None
+        ExperimentStudent.objects.create(
+            student_id=student_id, course_id=experiment.course_id,
+            track=track, lis_person_sourcedid=None,
+            experiment=experiment
+        )
+    if not experiment.tracks_finalized:
+        experiment.update(tracks_finalized=True)
+    return redirect(reverse("ab_testing_tool_index"))
