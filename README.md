@@ -112,4 +112,4 @@ All commands here should be run from the ab-testing-tool directory
   `sudo pip install -r ab_testing_tool/requirements/local.txt`
   (don't use sudo if using cygwin or virtualenv).
 
-* If a library has changed versions and secure.py needs updating, the library update can be done via `git pull[sudo] pip install -r ab_testing_tool/requirements/base.txt --upgrade`
+* If a library has changed versions and secure.py needs updating, the library update can be done via `[sudo] pip install -r ab_testing_tool/requirements/base.txt --upgrade`
