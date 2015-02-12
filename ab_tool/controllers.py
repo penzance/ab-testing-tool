@@ -5,7 +5,7 @@ from random import choice
 
 from ab_tool.models import (TrackProbabilityWeight, Experiment, ExperimentStudent)
 from ab_tool.exceptions import (BAD_STAGE_ID, missing_param_error,
-    INPUT_NOT_ALLOWED, NO_TRACKS_FOR_EXPERIMENT, TRACK_WEIGHTS_NOT_SET,
+    NO_TRACKS_FOR_EXPERIMENT, TRACK_WEIGHTS_NOT_SET,
     CSV_UPLOAD_NEEDED, INVALID_URL_PARAM, INCORRECT_WEIGHTING_PARAM,
     MISSING_NAME_PARAM, PARAM_LENGTH_EXCEEDS_LIMIT)
 from ab_tool.constants import (NAME_CHAR_LIMIT, URL_CHAR_LIMIT)
@@ -61,10 +61,12 @@ def validate_name(name):
     return name
 
 
-def validate_weighting(weight):
-    if not 0 <= weight <=100:
+def validate_weighting(weighting):
+    """ Track weights need to be an integer between 1 and 100 """
+    weighting = int(weighting)
+    if not 0 <= weighting <=100:
         raise INCORRECT_WEIGHTING_PARAM
-    return weight
+    return weighting
 
 
 def validate_format_url(url):
@@ -100,15 +102,6 @@ def get_missing_track_weights(experiment, course_id):
             missing_weights.append(track)
     return [track.name for track in missing_weights]
 
-
-def format_weighting(weighting):
-    """ Track weights need to be an integer between 1 and 1000, allowing
-        probability precision up to 0.001 """
-    weighting = int(weighting)
-    if 1 <= weighting <= 1000:
-        return weighting
-    else:
-        raise INPUT_NOT_ALLOWED
 
 def post_param(request, param_name):
     if param_name in request.POST:
