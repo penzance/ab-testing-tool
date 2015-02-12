@@ -111,3 +111,5 @@ All commands here should be run from the ab-testing-tool directory
 * If you get an import error, update requirements with 
   `sudo pip install -r ab_testing_tool/requirements/local.txt`
   (don't use sudo if using cygwin or virtualenv).
+
+* If a library has changed versions and secure.py needs updating, the library update can be done via `git pull[sudo] pip install -r ab_testing_tool/requirements/base.txt --upgrade`
