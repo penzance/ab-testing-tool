@@ -17,6 +17,9 @@ from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import NoSuchElementException
 import unittest, time, re
 
+# to run on Jenkins
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+
 class TestCourseLogin(unittest.TestCase):
     # setUp to run locally
     """
