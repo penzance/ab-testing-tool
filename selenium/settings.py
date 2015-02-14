@@ -11,3 +11,7 @@ canvas_base_url = "https://" + canvas_environment + "/courses/6284/"
 
 tool_server = "https://test.tlt.harvard.edu/ab-testing"
 #tool_server = "localhost:8000/ab-testing"
+
+import time
+
+timestamp = time.strftime("%c")
