@@ -29,7 +29,7 @@ class TestCourseLogin(unittest.TestCase):
     """
 
     # setUp to run on Jenkins
-        def setUp(self):
+    def setUp(self):
         self.driver = webdriver.Remote(
            command_executor='http://127.0.0.1:5555/wd/hub',
            desired_capabilities=DesiredCapabilities.FIREFOX)
