@@ -15,13 +15,24 @@ from selenium.common.exceptions import NoSuchElementException
 import unittest, time, re
 
 class add_experiment(unittest.TestCase):
+    # setUp to run locally
+    """
     def setUp(self):
         self.driver = webdriver.Firefox()
         self.driver.implicitly_wait(10)
         self.base_url = canvas_base_url
         self.verificationErrors = []
         self.accept_next_alert = True
-    
+    """
+
+    # setUp to run on Jenkins
+        def setUp(self):
+        self.driver = webdriver.Remote(
+           command_executor='http://127.0.0.1:5555/wd/hub',
+           desired_capabilities=DesiredCapabilities.FIREFOX)
+        self.driver.implicitly_wait(10)
+        self.base_url = canvas_base_url
+
     def test_course_login(self):
         driver = self.driver
             
