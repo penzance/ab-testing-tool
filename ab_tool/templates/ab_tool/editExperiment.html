@@ -192,17 +192,16 @@
         <h3>Review:</h3>
         {% verbatim %}
         <dl id="expSummary" class="list list-horizontal">
-            <dt class="list-item-title">Name:</dt>
-            <dd>{{experiment.name}}</dd>
+            <div><dt class="list-item-title">Name</dt><dd>{{experiment.name}}</dd></div>
             <!-- Angular loop over tracks -->
                 <div ng-repeat="track in experiment.tracks">
-                    <dt class="list-item-title" ng-cloak>Track "{{track.name}}":</dt>
+                    <dt class="list-item-title" ng-cloak>Track "{{track.name}}"</dt>
                         <!-- Show different weighting if uniformRandom is set -->
                         <dd ng-cloak ng-if="!experiment.uniformRandom">{{track.weighting}}%</dd>
                         <dd ng-cloak ng-if="experiment.uniformRandom">{{uniformPercent()}}%</dd>
                 </div>
             <!-- End Angular loop over tracks -->
-            <dt class="list-item-title">Notes:</dt><dd>{{experiment.notes}}</dd>
+            <div><dt class="list-item-title">Notes</dt><dd>{{experiment.notes}}</dd></div>
         </dl>
         {% endverbatim %}
         
