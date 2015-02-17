@@ -216,8 +216,6 @@ $(document).ready(function(){
             return text.replace(pattern, replacement);
         }
     });
-
-    //var $INTERVENTION_NAME_VAL;
     
     //for showing preview buttons when creating or editgin and intervention point
     $('[data-modal="intervention-edit"], [data-modal="intervention-new"]').on('show.bs.modal', function (e) {
@@ -263,8 +261,6 @@ $(document).ready(function(){
         //find the intervention name for the window that's open
         var $interventionName = $currentModal.find('.intervention-name');
 
-        $INTERVENTION_NAME_VAL = $interventionName.val();
-
         //disable the create button if IP name is empty
         //this is mostly for new IP
         if ( !$.trim( $interventionName.val() ).length ){
@@ -286,21 +282,6 @@ $(document).ready(function(){
         });
 
     });
-
-    //TODO: if the user closes the window the form needs to be resotered to it's values
-    //pre-editing
-    /*$('[data-modal="intervention-edit"]').on('hidden.bs.modal', function (e) {
-
-        //e.currentTarget = references the modal window that's open 
-        var $currentModal = $(e.currentTarget);
-        //find the intervention name for the window that's open
-        var $interventionName = $currentModal.find('.intervention-name');
-
-        $currentModal.find('button').removeClass('disabled');
-        $interventionName.removeClass('has-error');
-        $interventionName.val($INTERVENTION_NAME_VAL);
-
-    });*/
     
 
     $('[data-toggle="tooltip"]').tooltip();
