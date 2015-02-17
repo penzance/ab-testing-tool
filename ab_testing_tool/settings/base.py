@@ -164,10 +164,10 @@ if ENV_SETTINGS.get('redis_cache_host'):
         },
     }
 
-if ENV_SETTINGS.get('enable_redis_sessions'):
+if ENV_SETTINGS.get('redis_sessions_host'):
     SESSION_ENGINE = 'redis_sessions.session'
-    SESSION_REDIS_HOST = ENV_SETTINGS.get('session_redis_host', 'localhost')
-    SESSION_REDIS_PORT = ENV_SETTINGS.get('session_redis_port', 6379)
+    SESSION_REDIS_HOST = ENV_SETTINGS.get('redis_sessions_host', 'localhost')
+    SESSION_REDIS_PORT = ENV_SETTINGS.get('redis_sessions_port', 6379)
 
 # Django defaults to False (as of 1.7)
 SESSION_COOKIE_SECURE = ENV_SETTINGS.get('use_secure_cookies', False)

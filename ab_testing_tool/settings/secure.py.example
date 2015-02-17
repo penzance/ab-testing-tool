@@ -11,9 +11,8 @@ SECURE_SETTINGS = {
     #  'log_root': /path/to/log/file,
     #  'database': {},  # Dictionary of db settings for non-sqlite dbs
     #  'redis_cache_host': None,  # Location of redis cache host
-    #  'enable_redis_sessions': False,
-    #  'session_redis_host': 'localhost',  # redis cache must be enabled
-    #  'session_redis_port': 6379,  # redis cache must be enabled
+    #  'redis_sessions_host': 'localhost', 
+    #  'redis_sessions_port': 6379,
     #  'use_secure_cookies': False,  # Should enable when running over SSL
     #  'log_level': 'DEBUG',  # Default log level for loggers and handlers
     #  'enable_test_logging': False,  # Whether to log when running unit tests
