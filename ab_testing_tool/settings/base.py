@@ -36,10 +36,7 @@ path.append(SITE_ROOT)
 ### End path stuff
 
 # THESE ADDRESSES WILL RECEIVE EMAIL ABOUT CERTAIN ERRORS!
-ADMINS = (
-    ('Jaime Bermudez', 'jaime.bermudez@gmail.com'),
-    ('Jaime Bermudez', 'bermudezjd@hotmail.com'),
-)
+ADMINS = ()
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = ENV_SETTINGS.get('django_secret_key', 'changeme')
