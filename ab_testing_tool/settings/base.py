@@ -192,18 +192,37 @@ LOGGING = {
             'format': '%(levelname)s %(module)s %(message)s'
         }
     },
+    # Borrowing some default filters for app loggers
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        },
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+    },
     'handlers': {
+        'console': {
+            'level': _DEFAULT_LOG_LEVEL,
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+            'filters': ['require_debug_true'],
+        },
+        # In case we turn on mail for any of the below loggers
+        'mail_admins': {
+            'level': 'ERROR',
+            'class': 'django.utils.log.AdminEmailHandler',
+            'filters': ['require_debug_false'],
+        },
+        # For testing purposes and fallback for mail filter
+        'null': {
+            'class': 'logging.NullHandler',
+        },
         'logfile': {
+            'level': _DEFAULT_LOG_LEVEL,
             'class': 'logging.handlers.WatchedFileHandler',
             'filename': join(ENV_SETTINGS.get('log_root', ''), 'ab_testing_tool.log'),
             'formatter': 'verbose',
-            'level': _DEFAULT_LOG_LEVEL,
-        },
-        # By default, requires DEBUG to be set to True
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'simple',
-            'level': _DEFAULT_LOG_LEVEL,
         },
     },
     'loggers': {
@@ -212,7 +231,7 @@ LOGGING = {
             'level': _DEFAULT_LOG_LEVEL,
         },
         'ab_tool': {
-            'handlers': ['console', 'logfile'],
+            'handlers': ['console', 'logfile', 'mail_admins'],
             'level': _DEFAULT_LOG_LEVEL,
         },
         'error_middleware': {
