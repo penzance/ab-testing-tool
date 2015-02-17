@@ -38,15 +38,13 @@ when installing lxml, refer to this: http://stackoverflow.com/a/22322645/2812260
   look for 'New Access Token' button under 'Approved Integrations' header)
   and copy this value (token needs to be a string i.e. in quotes)
 
-* Run `cp ab_testing_tool/settings/secure.py.j2 ab_testing_tool/settings/secure.py`
+* Run `cp ab_testing_tool/settings/secure.py.example ab_testing_tool/settings/secure.py`
   from the ab-testing-tool directory
 
 * Edit the new ab_testing_tool/settings/secure.py and fill in values requested there.
   The minimum needed for local setup is as follows:
   Add a line to the dictionary containing the access token from Canvas styled like this:
-  `"course_oauth_token": "asdlkjf234aADKUEJskjdf2l3a6k7sjdf",`.
-  Replace `'{{ secure_settings.lti_key }}': '{{ secure_settings.lti_secret }}'`
-  with `"test": "secret"`.
+  `"canvas_token": "asdlkjf234aADKUEJskjdf2l3a6k7sjdf",`.
 
 * Run `python manage.py syncdb` from the ab-testing-tool directory
 
