@@ -4,9 +4,10 @@ SECURE_SETTINGS = {
     },
     'client_id': 'change-me',
     'client_secret': 'change-me',
-    'canvas_token': 'change-me',
     'django_secret_key': 'change-me',
     'enable_debug': True,  # Enable when running locally
+    'course_oauth_token': 'change-me', # Not needed for production
+    
     # Following settings are used for deployment
     #  'log_root': /path/to/log/file,
     #  'database': {},  # Dictionary of db settings for non-sqlite dbs
