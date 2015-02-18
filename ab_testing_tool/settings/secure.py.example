@@ -1,0 +1,27 @@
+SECURE_SETTINGS = {
+    'lti_oauth_credentials': {
+        'test': 'secret',
+    },
+    'client_id': 'change-me',
+    'client_secret': 'change-me',
+    'django_secret_key': 'change-me',
+    'enable_debug': True,  # Enable when running locally
+    'course_oauth_token': 'change-me', # Not needed for production
+    
+    # Following settings are used for deployment
+    #  'log_root': /path/to/log/file,
+    #  'database': {},  # Dictionary of db settings for non-sqlite dbs
+    #  'redis_cache_host': None,  # Location of redis cache host
+    #  'redis_sessions_host': 'localhost', 
+    #  'redis_sessions_port': 6379,
+    #  'use_secure_cookies': False,  # Should enable when running over SSL
+    #  'log_level': 'DEBUG',  # Default log level for loggers and handlers
+    #  'enable_test_logging': False,  # Whether to log when running unit tests
+    
+    # 'email_host': 'mailhost.harvard.edu',
+    # 'email_host_user': 'change-me',
+    # 'email_host_password': 'change-me',
+    # 'email_use_tls': False,
+    # 'email_port': 25,
+    #'server_email': 'noreply@harvard.edu',
+}

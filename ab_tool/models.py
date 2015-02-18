@@ -70,7 +70,7 @@ class Experiment(CourseObject):
     )
     
     name = models.CharField(max_length=NAME_CHAR_LIMIT)
-    notes = models.CharField(max_length=NOTES_CHAR_LIMIT)
+    notes = models.TextField()
     tracks_finalized = models.BooleanField(default=False)
     assignment_method = models.IntegerField(max_length=1, default=1,
                                             choices=ASSIGNMENT_ENUM_TYPES,)
@@ -196,7 +196,7 @@ class TrackProbabilityWeight(CourseObject):
 class InterventionPoint(CourseObject):
     """ This model stores the configuration of an intervention point"""
     name = models.CharField(max_length=NAME_CHAR_LIMIT)
-    notes = models.CharField(max_length=NOTES_CHAR_LIMIT)
+    notes = models.TextField()
     experiment = models.ForeignKey(Experiment, related_name="intervention_points")
     tracks = models.ManyToManyField(Track, through="InterventionPointUrl")
     
@@ -305,7 +305,7 @@ class CourseNotification(TimestampedModel):
     def notification_sent(self):
         self.update(last_emailed=timezone.now())
     
-    def get_canvas_domain(self):
+    def get_canvas_course_url(self):
         parsed_uri = urlparse(self.canvas_url)
         return '{uri.scheme}://{uri.netloc}/courses/{course_id}'.format(
                 uri=parsed_uri, course_id=self.course_id

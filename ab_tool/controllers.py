@@ -9,7 +9,7 @@ from random import choice
 
 from ab_tool.models import (TrackProbabilityWeight, Experiment, ExperimentStudent)
 from ab_tool.exceptions import (BAD_STAGE_ID, missing_param_error,
-    INPUT_NOT_ALLOWED, NO_TRACKS_FOR_EXPERIMENT, TRACK_WEIGHTS_NOT_SET,
+    NO_TRACKS_FOR_EXPERIMENT, TRACK_WEIGHTS_NOT_SET,
     CSV_UPLOAD_NEEDED, INVALID_URL_PARAM, INCORRECT_WEIGHTING_PARAM,
     MISSING_NAME_PARAM, PARAM_LENGTH_EXCEEDS_LIMIT, NoValidCredentials)
 from ab_tool.constants import (NAME_CHAR_LIMIT, URL_CHAR_LIMIT)
@@ -65,10 +65,12 @@ def validate_name(name):
     return name
 
 
-def validate_weighting(weight):
-    if not 0 <= weight <=100:
+def validate_weighting(weighting):
+    """ Track weights need to be an integer between 1 and 100 """
+    weighting = int(weighting)
+    if not 0 <= weighting <=100:
         raise INCORRECT_WEIGHTING_PARAM
-    return weight
+    return weighting
 
 
 def validate_format_url(url):
@@ -141,7 +143,7 @@ def streamed_csv_response(row_generator, file_title):
 def send_email_notification(course_notification, email):
     if course_notification.can_notify():
         subject, message = email
-        message += "\n\nCourse URL: %s" % course_notification.get_canvas_domain()
+        message += "\n\nCourse URL: %s" % course_notification.get_canvas_course_url()
         send_mail(subject, message, settings.SERVER_EMAIL,
                   course_notification.get_emails(), fail_silently=False)
         course_notification.notification_sent()

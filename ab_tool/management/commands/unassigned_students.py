@@ -28,11 +28,10 @@ class Command(BaseCommand):
     def handle_experiment(self, experiment):
         course_notification = experiment.get_course_notification()
         # Check whether or not a notification can be sent to avoid extra API calls
-        if not course_notification.can_notify():
-            continue
-        try:
-            students = get_unassigned_students_with_stored_credentials(course_notification, experiment)
-            if students:
-                send_email_notification(course_notification, ASSIGN_STUDENTS_MESSAGE)
-        except NoValidCredentials:
-            send_email_notification(course_notification, NO_CREDENTIALS_MESSAGE)
+        if course_notification.can_notify():
+            try:
+                students = get_unassigned_students_with_stored_credentials(course_notification, experiment)
+                if students:
+                    send_email_notification(course_notification, ASSIGN_STUDENTS_MESSAGE)
+            except NoValidCredentials:
+                send_email_notification(course_notification, NO_CREDENTIALS_MESSAGE)

@@ -37,6 +37,7 @@ TRACK_WEIGHTS_NOT_SET = Renderable403(NO_STUDENT_CONTENT)
 
 INPUT_NOT_ALLOWED = Renderable404("Input does not follow requirements")
 INVALID_FILE_TYPE = Renderable404("File type must be csv, xls, or xlsx")
+
 MISSING_NAME_PARAM = Renderable400("Names are required. Please go back and submit a name for all experiments, tracks, and intervention points.")
 INCORRECT_WEIGHTING_PARAM = Renderable400("Weights (between 0 and 100) are required if you are randomizing with weights. Please go back and submit weights for all tracks.")
 INVALID_URL_PARAM = Renderable400("One of your URL inputs is invalid.")

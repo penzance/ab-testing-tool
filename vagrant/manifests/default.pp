@@ -50,6 +50,11 @@ package {'libaio-dev':
     require => Exec['apt-get-update']
 }
 
+package {'libpq-dev':
+    ensure => installed,
+    require => Exec['apt-get-update']
+}
+
 package {'git':
     ensure => latest,
     require => Exec['apt-get-update'],

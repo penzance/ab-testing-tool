@@ -9,7 +9,7 @@ AS_TAB_TAG = 'open_as_tab_for_track_'
 
 NAME_CHAR_LIMIT = 256
 URL_CHAR_LIMIT = 2048
-NOTES_CHAR_LIMIT = 1024
+NOTES_CHAR_LIMIT = 8192
 
 ASSIGN_STUDENTS_MESSAGE = ("Missing Student Track Assignments",
 """ New learners have joined your course.
