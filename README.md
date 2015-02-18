@@ -38,15 +38,14 @@ when installing lxml, refer to this: http://stackoverflow.com/a/22322645/2812260
   look for 'New Access Token' button under 'Approved Integrations' header)
   and copy this value (token needs to be a string i.e. in quotes)
 
-* Run `cp ab_testing_tool/settings/secure.py.j2 ab_testing_tool/settings/secure.py`
+* Run `cp ab_testing_tool/settings/secure.py.example ab_testing_tool/settings/secure.py`
   from the ab-testing-tool directory
 
 * Edit the new ab_testing_tool/settings/secure.py and fill in values requested there.
   The minimum needed for local setup is as follows:
-  Add a line to the dictionary containing the access token from Canvas styled like this:
+  Modify the line referring to the `course_oauth_token`,
+  adding the access token from Canvas like this:
   `"course_oauth_token": "asdlkjf234aADKUEJskjdf2l3a6k7sjdf",`.
-  Replace `'{{ secure_settings.lti_key }}': '{{ secure_settings.lti_secret }}'`
-  with `"test": "secret"`.
 
 * Run `python manage.py syncdb` from the ab-testing-tool directory
 
@@ -110,3 +109,5 @@ All commands here should be run from the ab-testing-tool directory
 * If you get an import error, update requirements with 
   `sudo pip install -r ab_testing_tool/requirements/local.txt`
   (don't use sudo if using cygwin or virtualenv).
+
+* If a library has changed versions and secure.py needs updating, the library update can be done via `[sudo] pip install -r ab_testing_tool/requirements/base.txt --upgrade`
