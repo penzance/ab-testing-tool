@@ -1,32 +1,9 @@
 from .base import *
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# NOTE: when running tests DEBUG mode is enabled regardless of setting it explicitly to False
 
-TEMPLATE_DEBUG = True
-
-ALLOWED_HOSTS = []
-
-STATIC_ROOT = normpath(join(SITE_ROOT, 'http_static'))
-
-LOGGING = {
-    'version': 1,
-    'handlers': {
-        'null': {
-            'level': 'DEBUG',
-            'class': 'logging.NullHandler',
-        },
-    },
-    'loggers': {
-        'ab_tool': {
-            'handlers':['null'],
-            'propagate': True,
-            'level':'DEBUG',
-        },
-        'error_middleware': {
-            'handlers':['null'],
-            'propagate': True,
-            'level':'DEBUG',
-        },
-    }
-}
+# To disable logging during test runs, we add a null handler and
+# set each logger's handler to it.
+if not ENV_SETTINGS.get('enable_test_logging'):
+    for logger in LOGGING['loggers']:
+        LOGGING['loggers'][logger]['handlers'] = ['null']
