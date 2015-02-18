@@ -4,7 +4,7 @@ from ab_tool.exceptions import (UNAUTHORIZED_ACCESS,
     EXPERIMENT_TRACKS_ALREADY_FINALIZED, DATABASE_ERROR)
 import json
 from django.core.urlresolvers import reverse
-from ab_tool.constants import NAME_CHAR_LIMIT, URL_CHAR_LIMIT, NOTES_CHAR_LIMIT
+from ab_tool.constants import NAME_CHAR_LIMIT, URL_CHAR_LIMIT
 
 
 class TimestampedModel(models.Model):
@@ -57,7 +57,7 @@ class Experiment(CourseObject):
     )
     
     name = models.CharField(max_length=NAME_CHAR_LIMIT)
-    notes = models.CharField(max_length=NOTES_CHAR_LIMIT)
+    notes = models.TextField()
     tracks_finalized = models.BooleanField(default=False)
     assignment_method = models.IntegerField(max_length=1, default=1,
                                             choices=ASSIGNMENT_ENUM_TYPES,)
@@ -142,7 +142,7 @@ class TrackProbabilityWeight(CourseObject):
 class InterventionPoint(CourseObject):
     """ This model stores the configuration of an intervention point"""
     name = models.CharField(max_length=NAME_CHAR_LIMIT)
-    notes = models.CharField(max_length=NOTES_CHAR_LIMIT)
+    notes = models.TextField()
     experiment = models.ForeignKey(Experiment, related_name="intervention_points")
     tracks = models.ManyToManyField(Track, through="InterventionPointUrl")
     

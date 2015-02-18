@@ -9,3 +9,4 @@ dist
 secure.py
 .coverage
 env/
+*.log

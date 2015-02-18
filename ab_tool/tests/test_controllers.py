@@ -1,11 +1,11 @@
 from mock import MagicMock
 
 from ab_tool.controllers import (intervention_point_url,
-    validate_format_url, post_param, format_weighting,
-    assign_track_and_create_student, validate_name, validate_weighting)
+    validate_format_url, post_param, assign_track_and_create_student,
+    validate_name, validate_weighting)
 from ab_tool.tests.common import (SessionTestCase, TEST_STUDENT_ID)
-from ab_tool.exceptions import (BAD_STAGE_ID, INPUT_NOT_ALLOWED,
-    CSV_UPLOAD_NEEDED, NO_TRACKS_FOR_EXPERIMENT, TRACK_WEIGHTS_NOT_SET,
+from ab_tool.exceptions import (BAD_STAGE_ID, CSV_UPLOAD_NEEDED,
+    NO_TRACKS_FOR_EXPERIMENT, TRACK_WEIGHTS_NOT_SET,
     INVALID_URL_PARAM, MISSING_NAME_PARAM, PARAM_LENGTH_EXCEEDS_LIMIT,
     INCORRECT_WEIGHTING_PARAM)
 from ab_tool.models import Experiment, ExperimentStudent
@@ -50,14 +50,6 @@ class TestControllers(SessionTestCase):
         data = {"experiment": experiment, "student_id":TEST_STUDENT_ID,
                 "lis_person_sourcedid": TEST_STUDENT_ID}
         self.assertRaisesSpecific(CSV_UPLOAD_NEEDED, assign_track_and_create_student, **data)
-    
-    def test_format_weighting(self):
-        self.assertTrue(1 == format_weighting("1"))
-        self.assertTrue(100 == format_weighting("100"))
-    
-    def test_format_weighting_raises_error(self):
-        self.assertRaisesSpecific(INPUT_NOT_ALLOWED, format_weighting, "-1")
-        self.assertRaisesSpecific(INPUT_NOT_ALLOWED, format_weighting, "1001")
     
     def test_intervention_point_url_contains_intervention_point_id(self):
         """ Tests that intervention_point_url contains the string of the intervention_point_id """
