@@ -455,6 +455,19 @@ textarea.form-control {
   float: left;
 }
 /**** error experiment form (end) ***/
+.previewURL {
+  position: relative;
+}
+.previewURL a {
+  position: absolute;
+  top: 3em;
+  right: 3.8%;
+  display: block;
+  background: #fff;
+  padding: 0.25em 1%;
+  border-radius: 5px;
+  font-size: 0.85em;
+}
 .panel {
   display: inline-block;
   border-width: 0;
@@ -991,29 +1004,61 @@ body.blocked {
   box-shadow: 0 0 8px #111;
   z-index: 10000;
 }
+/*#expSummary{
+	width: 80%;
+	margin: 0 auto;
+	display: block;
+	border:0;
+	& dt{
+		width: 30%;
+		text-align: right;
+		display: inline-block;
+		margin: 0;
+		letter-spacing: 0.035em;
+		float: left;
+		font-family: @font-family-sans-serif;
+		font-size: 1.2em;
+	}
+	& dd{
+		width: 55%;
+		text-align: left;
+		display: inline-block;
+		margin-left: 1%;
+		clear: both;
+		padding: 0 0 1em 0;
+	}
+}*/
 #expSummary {
-  width: 80%;
-  margin: 0 auto;
-  display: block;
   border: 0;
 }
-#expSummary dt {
-  width: 30%;
-  text-align: right;
+#expSummary dl {
+  display: inline-block;
+}
+#expSummary dt, #expSummary dd {
   display: inline-block;
   margin: 0;
-  letter-spacing: 0.035em;
+  width: 40%;
+}
+#expSummary dt {
   float: left;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  text-align: right;
   font-size: 1.2em;
+  line-height: 1.25em;
+  letter-spacing: 0.025em;
+  color: #191919;
 }
 #expSummary dd {
-  width: 55%;
+  float: left;
   text-align: left;
-  display: inline-block;
   margin-left: 1%;
+  font-size: 1em;
+  line-height: 1.75em;
+}
+#expSummary div {
   clear: both;
-  padding: 0 0 1em 0;
+  margin-bottom: 1em;
+  display: inline-block;
+  width: 100%;
 }
 /***********************************************************************************
 					modal (END)
