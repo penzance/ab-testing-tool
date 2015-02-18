@@ -1,6 +1,8 @@
 import csv
+from django.conf import settings
 from django.http.response import StreamingHttpResponse
 from django.core.urlresolvers import reverse
+from django.core.mail import send_mail
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
 from random import choice
@@ -136,3 +138,12 @@ def streamed_csv_response(row_generator, file_title):
     response = StreamingHttpResponse(csv_file_generator, content_type="text/csv")
     response['Content-Disposition'] = ("attachment; filename=%s" % file_title)
     return response
+
+
+def send_email_notification(course_notification, email):
+    if course_notification.can_notify():
+        subject, message = email
+        message += "\n\nCourse URL: %s" % course_notification.get_canvas_course_url()
+        send_mail(subject, message, settings.SERVER_EMAIL,
+                  course_notification.get_emails(), fail_silently=False)
+        course_notification.notification_sent()

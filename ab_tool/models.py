@@ -1,3 +1,4 @@
+from urlparse import urlparse
 from datetime import timedelta
 from django.db import models, IntegrityError
 from django.conf import settings
@@ -83,7 +84,11 @@ class Experiment(CourseObject):
                                   assignment_method=Experiment.CSV_UPLOAD)
     
     def get_course_notification(self):
-        return CourseNotification.objects.get_or_create(course_id=self.course_id)[0]
+        """ The CourseNotification object should exist, at the point at which
+            an experiment has been created under the same course, so this method
+            will raise an exception if the CourseNotification object doesn't
+            exist yet."""
+        return CourseNotification.objects.get(course_id=self.course_id)
     
     def assert_not_finalized(self):
         if self.tracks_finalized:
@@ -299,6 +304,12 @@ class CourseNotification(TimestampedModel):
     
     def notification_sent(self):
         self.update(last_emailed=timezone.now())
+    
+    def get_canvas_course_url(self):
+        parsed_uri = urlparse(self.canvas_url)
+        return '{uri.scheme}://{uri.netloc}/courses/{course_id}'.format(
+                uri=parsed_uri, course_id=self.course_id
+        )
 
 
 class CourseCredential(TimestampedModel):
