@@ -76,7 +76,9 @@ def parse_uploaded_file(experiment, unassigned_students, input_spreadsheet, file
         # Slice off row 1 to skip headers
         csvreader = csv.reader(input_spreadsheet.split("\n")[1:])
         for row_number, row in enumerate(csvreader):
-            parse_row(row, row_number, experiment, track_names,
+            # Row number is off by 2 because we trimmed the headers and
+            # CSV files are 1-indexed while enumerate is 0-indexed
+            parse_row(row, row_number + 2, experiment, track_names,
                       unassigned_students, students, errors)
     elif filename.endswith('.xlsx') or filename.endswith('.xls'):
         book = xlrd.open_workbook(file_contents=input_spreadsheet)
@@ -97,6 +99,9 @@ def parse_row(row, row_number, experiment, tracks, unassigned_students, students
         If an error is encountered in parsing the row, a string representing the
         error is appended to the list `errors`.  If there are no errors,
         an entry (sis_id -> track_name) should be added to the `students` dict """
+    # Skip empty rows
+    if not row:
+        return
     if len(row) < 4 or row[3] == "" or row[3] is None:
         errors.append("Row %s: missing track name" % (row_number))
     elif row[3] not in tracks:
