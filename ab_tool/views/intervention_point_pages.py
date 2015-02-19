@@ -102,13 +102,13 @@ def submit_create_intervention_point(request, experiment_id):
 @lti_role_required(ADMINS)
 def modules_page_view_intervention_point(request, intervention_point_id):
     context = intervention_point_context(request, intervention_point_id)
-    return render_to_response("ab_tool/viewInterventionPointFromCanvas.html", context)
+    return render_to_response("ab_tool/view_intervention_point_from_canvas.html", context)
 
 
 @lti_role_required(ADMINS)
 def modules_page_edit_intervention_point(request, intervention_point_id):
     context = intervention_point_context(request, intervention_point_id)
-    return render_to_response("ab_tool/editInterventionPointFromCanvas.html", context)
+    return render_to_response("ab_tool/edit_intervention_point_from_canvas.html", context)
 
 
 def intervention_point_context(request, intervention_point_id):

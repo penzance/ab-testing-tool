@@ -16,7 +16,7 @@ from ab_tool.controllers import (get_missing_track_weights,
 @lti_role_required(ADMINS)
 def create_experiment(request):
     context = {"create": True, "started": False}
-    return render_to_response("ab_tool/editExperiment.html", context)
+    return render_to_response("ab_tool/edit_experiment.html", context)
 
 
 @lti_role_required(ADMINS)
@@ -70,7 +70,7 @@ def edit_experiment(request, experiment_id):
                "experiment_has_installed_intervention": has_installed_intervention,
                "create": False,
                "started": experiment.tracks_finalized}
-    return render_to_response("ab_tool/editExperiment.html", context)
+    return render_to_response("ab_tool/edit_experiment.html", context)
 
 
 @lti_role_required(ADMINS)
