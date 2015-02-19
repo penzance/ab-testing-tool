@@ -57,14 +57,15 @@ var controller = function($scope, $window, $http) {
          */
         //set a resuable len
         var len = $scope.experiment.tracks.length;
-
-        if ($scope.experiment.uniformRandom) {
+        
+        if ($scope.experiment.uniformRandom || $scope.experiment.csvUpload) {
             // If uniformRandom is true, the actual track weights are ignored.
+            // If csvUpload is true, there are no track weights.
             return true;
         }
         
         for (var i = 0, sum = 0; i < len; i++) {
-
+            
             var weighting = $scope.experiment.tracks[i].weighting;
             if (weighting) {
                 sum += parseInt(weighting);
@@ -90,7 +91,7 @@ var controller = function($scope, $window, $http) {
         /**
          * If the form validates, display the confirmation modal to the user
          */
-
+        
         if ($scope.experiment.name == ''){
             $scope.nameError = true;
             return false;
