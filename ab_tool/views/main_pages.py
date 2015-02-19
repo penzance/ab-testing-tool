@@ -33,7 +33,7 @@ def render_control_panel(request):
         "experiments": experiments,
         "deletable_experiment_ids": canvas_modules.get_deletable_experiment_ids(),
     }
-    return render_to_response("ab_tool/experimentsDashboard.html", context)
+    return render_to_response("ab_tool/experiments_dashboard.html", context)
 
 
 def tool_config(request):

@@ -78,8 +78,8 @@ class Experiment(CourseObject):
     
     def to_json(self):
         """ Converts the experiment and its associated tracks to json,
-            in the form expected by the editExperiment.html template and
-            by experiment.js """
+            in the form expected by the edit_experiment.html template and
+            by edit_experiment.js """
         experiment_dict = {
             "id": self.id,
             "name": self.name,
