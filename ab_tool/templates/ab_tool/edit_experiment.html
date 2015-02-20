@@ -14,12 +14,12 @@
         <div>
             {% if create %}
                 <h1>
-                    <a href="{% url 'ab_testing_tool_index' %}">A/B Testing</a> <span class="lti-breadcrumb"><i class="fa fa-chevron-right"></i></span> 
+                    <a href="{% url 'ab_testing_tool_index' %}">A/B Testing</a> <span class="lti-breadcrumb"><i class="fa fa-chevron-right"></i></span>
                     <span>Create Experiment</span>
                 </h1>
             {% else %}
                 <h1>
-                    <a href="{% url 'ab_testing_tool_index' %}">A/B Testing</a> 
+                    <a href="{% url 'ab_testing_tool_index' %}">A/B Testing</a>
                     <span class="lti-breadcrumb"><i class="fa fa-chevron-right"></i></span>
                     <span>Editing {{experiment.name}}</span>
                 </h1>
@@ -35,11 +35,11 @@
                     <label for="experimentName"
                             ng-class="nameError ? 'text-error' : ''">Name:</label>
                             <i class="fa fa-asterisk"></i>
-                    <input type="text" 
-                            class="block form-control" 
-                            name="experimentName" 
-                            id="experimentName" 
-                            ng-model="experiment.name" 
+                    <input type="text"
+                            class="block form-control"
+                            name="experimentName"
+                            id="experimentName"
+                            ng-model="experiment.name"
                             placeholder="Enter experiment name"
                             ng-class="nameError ? 'has-error' : ''">
                 </div>
@@ -82,7 +82,7 @@
                                         data-track="value" data-trackindex="1"
                                         maxlength="2" size="2"
                                         ng-pattern="/^\d+$/" ng-model="track.weighting"
-                                        {%if started %}disabled="disabled"{% endif %} 
+                                        {%if started %}disabled="disabled"{% endif %}
                                         class="input-trackWeight input-group-right float-left"
                                         ng-class="weightingError ? 'has-error' : ''"><span> % </span>
                                 </div>
@@ -121,7 +121,7 @@
                                         <span> % </span>
                             </div>
                             <input type="text" name="newTrackName" id="newTrackName" placeholder="Enter track name" class="input-newTrackName form-control float-left" ng-model="newTrackName">
-                            <a href="#" ng-click="addTrack()" class="btn btn-submit" id="addTrack"><i class="fa fa-plus"></i>Add Track</a>    
+                            <a href="#" ng-click="addTrack()" class="btn btn-submit" id="addTrack"><i class="fa fa-plus"></i>Add Track</a>
                         </li>
                         {% endif %}
                     </ul>
@@ -145,12 +145,12 @@
                     </div>
                     <div ng-if="!weightingError">
                         <p>
-                            Manage the tracks in this experiment and the probability that a learner will be 
-                            sorted into each track. Tracks may have explicit weightings (weighted random) or 
+                            Manage the tracks in this experiment and the probability that a learner will be
+                            sorted into each track. Tracks may have explicit weightings (weighted random) or
                             be weighted equally (uniform random).
                         </p>
                         <p>
-                            <em>Note: As these are probabilities, the actual proportion of students in each 
+                            <em>Note: As these are probabilities, the actual proportion of students in each
                             track may differ from the probabilities specified.</em>
                         </p>
                     </div>
@@ -258,6 +258,6 @@
 </script>
 
 <script src="{% static 'ab_tool/js/angular-1.2.27.min.js' %}"></script>
-<script src="{% static 'ab_tool/js/experiment.js' %}"></script>
+<script src="{% static 'ab_tool/js/edit_experiment.js' %}"></script>
 
 {% endblock %}

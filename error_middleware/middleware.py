@@ -30,7 +30,7 @@ class ErrorMiddleware(object):
     
     In order to customize the formatting of this page, simply define a template
     called 'renderable_error.html'; if this template exists, the middleware
-    passes the error message do it under template varialbe 'message'.
+    passes the error message do it under template variable 'message'.
     """
     
     def process_exception(self, request, exception):

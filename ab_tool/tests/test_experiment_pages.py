@@ -13,13 +13,13 @@ class TestExperimentPages(SessionTestCase):
     """ Tests related to Experiment and Experiment pages and methods """
     
     def test_create_experiment_view(self):
-        """ Tests editExperiment template renders for url 'create_experiment' """
+        """ Tests edit_experiment template renders for url 'create_experiment' """
         response = self.client.get(reverse("ab_testing_tool_create_experiment"))
         self.assertOkay(response)
-        self.assertTemplateUsed(response, "ab_tool/editExperiment.html")
+        self.assertTemplateUsed(response, "ab_tool/edit_experiment.html")
     
     def test_create_experiment_view_unauthorized(self):
-        """ Tests editExperiment template does not render for url 'create_experiment'
+        """ Tests edit_experiment template does not render for url 'create_experiment'
             when unauthorized """
         self.set_roles([])
         response = self.client.get(reverse("ab_testing_tool_create_experiment"), follow=True)
@@ -27,21 +27,21 @@ class TestExperimentPages(SessionTestCase):
         self.assertTemplateUsed(response, "ab_tool/not_authorized.html")
     
     def test_edit_experiment_view(self):
-        """ Tests editExperiment template renders when authenticated """
+        """ Tests edit_experiment template renders when authenticated """
         experiment = self.create_test_experiment()
         response = self.client.get(reverse("ab_testing_tool_edit_experiment", args=(experiment.id,)))
-        self.assertTemplateUsed(response, "ab_tool/editExperiment.html")
+        self.assertTemplateUsed(response, "ab_tool/edit_experiment.html")
     
     def test_edit_experiment_view_started_experiment(self):
-        """ Tests editExperiment template renders when experiment has started """
+        """ Tests edit_experiment template renders when experiment has started """
         experiment = self.create_test_experiment()
         experiment.tracks_finalized = True
         experiment.save()
         response = self.client.get(reverse("ab_testing_tool_edit_experiment", args=(experiment.id,)))
-        self.assertTemplateUsed(response, "ab_tool/editExperiment.html")
+        self.assertTemplateUsed(response, "ab_tool/edit_experiment.html")
     
     def test_edit_experiment_view_with_tracks_weights(self):
-        """ Tests editExperiment template renders properly with track weights """
+        """ Tests edit_experiment template renders properly with track weights """
         experiment = self.create_test_experiment()
         experiment.assignment_method = Experiment.WEIGHTED_PROBABILITY_RANDOM
         track1 = self.create_test_track(name="track1", experiment=experiment)
@@ -49,22 +49,22 @@ class TestExperimentPages(SessionTestCase):
         self.create_test_track_weight(experiment=experiment, track=track1)
         self.create_test_track_weight(experiment=experiment, track=track2)
         response = self.client.get(reverse("ab_testing_tool_edit_experiment", args=(experiment.id,)))
-        self.assertTemplateUsed(response, "ab_tool/editExperiment.html")
+        self.assertTemplateUsed(response, "ab_tool/edit_experiment.html")
     
     def test_edit_experiment_view_unauthorized(self):
-        """ Tests editExperiment template doesn't render when unauthorized """
+        """ Tests edit_experiment template doesn't render when unauthorized """
         self.set_roles([])
         experiment = self.create_test_experiment(course_id=TEST_OTHER_COURSE_ID)
         response = self.client.get(reverse("ab_testing_tool_edit_experiment", args=(experiment.id,)),
                                    follow=True)
-        self.assertTemplateNotUsed(response, "ab_tool/editExperiment.html")
+        self.assertTemplateNotUsed(response, "ab_tool/edit_experiment.html")
         self.assertTemplateUsed(response, "ab_tool/not_authorized.html")
     
     def test_edit_experiment_view_nonexistent(self):
         """Tests edit_experiment when experiment does not exist"""
         e_id = NONEXISTENT_EXPERIMENT_ID
         response = self.client.get(reverse("ab_testing_tool_edit_experiment", args=(e_id,)))
-        self.assertTemplateNotUsed(response, "ab_tool/editExperiment.html")
+        self.assertTemplateNotUsed(response, "ab_tool/edit_experiment.html")
         self.assertEquals(response.status_code, 404)
     
     def test_edit_experiment_view_wrong_course(self):

@@ -356,7 +356,7 @@ class TestInterventionPointPages(SessionTestCase):
         response = self.client.get(reverse("ab_testing_tool_modules_page_edit_intervention_point",
                                            args=(intervention_point.id,)))
         self.assertOkay(response)
-        self.assertTemplateUsed(response, "ab_tool/editInterventionPointFromCanvas.html")
+        self.assertTemplateUsed(response, "ab_tool/edit_intervention_point_from_canvas.html")
     
     def test_modules_page_view_intervention_point(self):
         """ Tests that submit_edit_intervention_point does not change DB count
@@ -371,7 +371,7 @@ class TestInterventionPointPages(SessionTestCase):
         response = self.client.post(reverse("ab_testing_tool_modules_page_view_intervention_point",
                                             args=(intervention_point_id,)), follow=True)
         self.assertOkay(response)
-        self.assertTemplateUsed(response, "ab_tool/viewInterventionPointFromCanvas.html")
+        self.assertTemplateUsed(response, "ab_tool/view_intervention_point_from_canvas.html")
     
     def test_submit_edit_intervention_point_from_modules(self):
         """ Tests that test_submit_edit_intervention_point_from_modules does not change DB count
