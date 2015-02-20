@@ -275,23 +275,19 @@
             </div>
             <form method="post" action="{% url 'ab_testing_tool_upload_track_assignments' experiment.id %}" enctype="multipart/form-data">
                 <div class="modal-body">
-                    <p>Download one of the following files and fill it in with track
-                        assignments for each student, then upload it here.
-                        The CSV file is intended for use in scripts, while the XLSX
-                        file is easier to fill in by hand.</p>
-                    CSV: <a href="{% url 'ab_testing_tool_track_selection_csv' experiment.id %}">track_selection.csv</a>
-                    <br>
+                    <p>Upload a spreadsheet to assign students to tracks. Download the following file of all
+                    students not assigned to a track, fill it in with track assignments for each student, and
+                    upload it below. You can also upload the list of student track assignments
+                    from a different experiment in this course or a CSV file.</p>
                     XLSX: <a href="{% url 'ab_testing_tool_track_selection_xlsx' experiment.id %}">track_selection.xlsx</a>
                     <br><br>
-                    <p class="text-warning">Warning: track assignments are final.
-                        A student cannot be changed to a different track once an assignment
-                        has been made.</p>
+                    <p class="text-warning">Warning: Track assignments are final. A student
+                    cannot be changed to a different track once an assignment has been made.</p>
                     {% if not experiment.tracks_finalized %}
-                    <p class="text-warning">Note: Uploading students will start this experiment.
-                        Starting an experiment cannot be undone.
-                        Once started, the experiment assignment method and number of
-                        tracks cannot be changed. Students that join later will need
-                        to be assigned tracks.</p>
+                    <p class="text-warning">Warning: You have not started the experiment yet.
+                        Uploading students will start this experiment. Starting an experiment cannot be undone.
+                        Once started, the experiment assignment method and number of tracks cannot be changed.
+                        <b>Students that join later will need to be assigned tracks</b>.</p>
                     {% endif %}
                     <label>Completed track assignment spreadsheet:
                         <input type="file" name="track_assignments">
