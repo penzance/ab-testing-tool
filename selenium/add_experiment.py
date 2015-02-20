@@ -1,22 +1,19 @@
 # Add experiment to the A/B Testing Tool in a course
 
 import pdb
-
-from settings import USERS, USERNAME, PASSWORD, canvas_environment, canvas_base_url, tool_server, timestamp
+import unittest
+import time
 from selenium import webdriver
-
-pin_login_url = "https://www.pin1.harvard.edu/cas/login?service=https%3A%2F%2F" + canvas_environment + "%2Flogin%2Fcas"
-
-
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.ui import Select
-from selenium.common.exceptions import NoSuchElementException
-import unittest, time, re
-
+from selenium.common.exceptions import (NoSuchElementException,
+    NoAlertPresentException)
+from settings import (USERNAME, PASSWORD, CANVAS_ENVIRONMENT, CANVAS_BASE_URL,
+    TIMESTAMP)
 
 # to run on Jenkins
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+
+PIN_LOGIN_URL = "https://www.pin1.harvard.edu/cas/login?service=https%3A%2F%2F" + CANVAS_ENVIRONMENT + "%2Flogin%2Fcas"
+
 
 class add_experiment(unittest.TestCase):
     # setUp to run locally
@@ -24,7 +21,7 @@ class add_experiment(unittest.TestCase):
     def setUp(self):
         self.driver = webdriver.Firefox()
         self.driver.implicitly_wait(10)
-        self.base_url = canvas_base_url
+        self.base_url = CANVAS_BASE_URL
         self.verificationErrors = []
         self.accept_next_alert = True
     """
@@ -35,13 +32,13 @@ class add_experiment(unittest.TestCase):
            command_executor='http://127.0.0.1:5555/wd/hub',
            desired_capabilities=DesiredCapabilities.FIREFOX)
         self.driver.implicitly_wait(10)
-        self.base_url = canvas_base_url
+        self.base_url = CANVAS_BASE_URL
 
     def test_course_login(self):
         driver = self.driver
             
         # log in to PIN
-        driver.get(pin_login_url)
+        driver.get(PIN_LOGIN_URL)
 
         #pdb.set_trace()
         time.sleep(10)
@@ -56,7 +53,6 @@ class add_experiment(unittest.TestCase):
         driver.find_element_by_id("password").send_keys(PASSWORD)
         driver.find_element_by_name("_eventId_submit").click()
 
-
         # go to the Selenium test course
         driver.get(self.base_url)
 
@@ -66,7 +62,7 @@ class add_experiment(unittest.TestCase):
         driver.find_element_by_link_text("A/B Testing Tool").click()
         driver.switch_to_frame("tool_content")
         driver.find_element_by_link_text("New Experiment").click()
-        driver.find_element_by_name("experimentName").send_keys("%s Selenium Add Uniform Experiment" %timestamp)
+        driver.find_element_by_name("experimentName").send_keys("%s Selenium Add Uniform Experiment" %TIMESTAMP)
         if not driver.find_element_by_name("uniformRandom").is_selected():
             driver.find_element_by_name("uniformRandom").click()
         driver.find_element_by_name("experimentNotes").send_keys("Selenium test for add_experiment. Select Uniform Random with 2 tracks.")
@@ -77,26 +73,21 @@ class add_experiment(unittest.TestCase):
         # need to be able to find element by link_text to work
         #driver.find_element_by_id("add_intervention_point_button").click()
         #driver.find_element_by_name("name").clear()
-        #driver.find_element_by_name("name").send_keys("%s Selenium Add Intervention Point" %timestamp)
+        #driver.find_element_by_name("name").send_keys("%s Selenium Add Intervention Point" %TIMESTAMP)
         #driver.find_element_by_link_text("Create").click()
-
-
-
 
         # Log out of PIN
         driver.get("http://login.icommons.harvard.edu/pinproxy/logout")
-
-
-
-
+    
+    
     def is_element_present(self, how, what):
         try: self.driver.find_element(by=how, value=what)
-        except NoSuchElementException, e: return False
+        except NoSuchElementException: return False
         return True
     
     def is_alert_present(self):
         try: self.driver.switch_to_alert()
-        except NoAlertPresentException, e: return False
+        except NoAlertPresentException: return False
         return True
     
     def close_alert_and_get_its_text(self):
