@@ -115,7 +115,7 @@ var controller = function($scope, $window, $http) {
           }).
           error(function(data, status, headers, config) {
               $scope.submitting = false;
-              $window.alert("An error occured submitting this form")
+              $window.alert("An error occurred in submission. Note that all names for experiments in this course must be unique, and that you can't submit an unlimited amount of notes.")
           });
     }
     
@@ -131,7 +131,7 @@ var controller = function($scope, $window, $http) {
         } else {
             // Confirm if the track already exists in the database
             var message = ("Are you sure you want to delete track \"" + track["name"] +
-                "\"?  This will also delete any URLs associrated with that track.");
+                "\"?  This will also delete any URLs associated with that track.");
             if ($window.confirm(message)) {
                 // Delete track on backend
                 $http.post(track["deleteURL"]).
@@ -139,7 +139,7 @@ var controller = function($scope, $window, $http) {
                     $scope._removeTrackFromInterface(track)
                 }).
                 error(function(data, status, headers, config) {
-                    $window.alert("An error occured deleting a track")
+                    $window.alert("An error occurred while deleting a track. Try again.")
                 });
             }
         }
@@ -149,7 +149,7 @@ var controller = function($scope, $window, $http) {
         /**
          * Removes the track from the list of tracks on the experiment,
          * causing it to be removed from the interface.
-         * 
+         *
          * Note: this function checks for a matching track by identity;
          * consequently you must pass the track itself, not just a copy of it
          * or an object with the same attributes. (i.e. you must pass by reference)
