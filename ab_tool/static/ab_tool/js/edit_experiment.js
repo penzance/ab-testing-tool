@@ -149,7 +149,7 @@ var controller = function($scope, $window, $http) {
         /**
          * Removes the track from the list of tracks on the experiment,
          * causing it to be removed from the interface.
-         * 
+         *
          * Note: this function checks for a matching track by identity;
          * consequently you must pass the track itself, not just a copy of it
          * or an object with the same attributes. (i.e. you must pass by reference)
