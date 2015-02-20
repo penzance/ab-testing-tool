@@ -59,7 +59,7 @@
                     <legend class="sr-only">Name of intervention point</legend>
                     <div class="form-group">
                         <label for="interventionName">Name:</label> <i class="fa fa-asterisk"></i>
-                        <input type="text" name="name" id="interventionName" class="form-control intervention-name" 
+                        <input type="text" name="name" id="interventionName" class="form-control intervention-name"
                                 placeholder="Enter Intervention Name">
                     </div>
                     <div class="form-group-description">
@@ -142,7 +142,7 @@
                     <div class="form-group">
                         <label for="intervention_{{intervention_point.id}}">Name:</label>
                         <input type="text" name="name" id="intervention_{{intervention_point.id}}"
-                            class="form-control intervention-name" value="{{intervention_point.name}}" 
+                            class="form-control intervention-name" value="{{intervention_point.name}}"
                             placeholder="Enter Intervention Name">
                         <!--a href="#"><i class="fa fa-question-circle"></i></a-->
                     </div>
@@ -277,12 +277,14 @@
                 <div class="modal-body">
                     <p>Download one of the following files and fill it in with track
                         assignments for each student, then upload it here.
-                        The CSV file is intened for use in scripts, while the XLSX
+                        The CSV file is intended for use in scripts, while the XLSX
                         file is easier to fill in by hand.</p>
-                    <a href="{% url 'ab_testing_tool_track_selection_csv' experiment.id %}">track_selection.csv</a>&nbsp&nbsp&nbsp&nbsp
-                    <a href="{% url 'ab_testing_tool_track_selection_xlsx' experiment.id %}">track_selection.xlsx</a>
+                    CSV: <a href="{% url 'ab_testing_tool_track_selection_csv' experiment.id %}">track_selection.csv</a>
+                    <br>
+                    XLSX: <a href="{% url 'ab_testing_tool_track_selection_xlsx' experiment.id %}">track_selection.xlsx</a>
+                    <br><br>
                     <p class="text-warning">Warning: track assignments are final.
-                        A student cannot be changed to a different track once an assingment
+                        A student cannot be changed to a different track once an assignment
                         has been made.</p>
                     {% if not experiment.tracks_finalized %}
                     <p class="text-warning">Note: Uploading students will start this experiment.
