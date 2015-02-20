@@ -1,4 +1,3 @@
-
 {% extends "ab_tool/base_lti.html" %}
 {% load static %}
 
@@ -206,11 +205,11 @@
                 <div ng-repeat="track in experiment.tracks">
                     <dt class="list-item-title" ng-cloak>Track "{{track.name}}"</dt>
                     <!-- Hide weighting if csvUpload is set -->
-                    <div ng-cloak ng-if="!experiment.csvUpload">
-                        <!-- Show different weighting if uniformRandom is set -->
-                        <dd ng-cloak ng-if="!experiment.uniformRandom">{{track.weighting}}%</dd>
-                        <dd ng-cloak ng-if="experiment.uniformRandom">{{uniformPercent()}}%</dd>
-                    </div>
+                    <!-- Show different weighting if uniformRandom is set -->
+                    <dd ng-cloak ng-if="!experiment.uniformRandom && !experiment.csvUpload">
+                        {{track.weighting}}%</dd>
+                    <dd ng-cloak ng-if="experiment.uniformRandom && !experiment.csvUpload">
+                        {{uniformPercent()}}%</dd>
                 </div>
             <!-- End Angular loop over tracks -->
             <div><dt class="list-item-title">Notes</dt><dd>{{experiment.notes}}</dd></div>
