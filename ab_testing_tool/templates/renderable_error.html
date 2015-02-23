@@ -1,12 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    {% load staticfiles %}
-    <meta charset="utf-8" />
-    <title>A/B Testing Tool</title>
-    <link rel="stylesheet" href="{% static 'ab_tool/css/bootstrap.min.css' %}" type="text/css"/>
-</head>
-<body>
-    <h2>Error: {{ message }}</h2>
-</body>
-</html>
+{% extends "ab_tool/base_lti.html" %}
+{% load static %}
+
+{% block content %}
+
+<header>
+    <div>
+        <h1>A/B Testing Dashboard</h1>
+    </div>
+</header>
+<main>
+
+<h2>Error: {{ message }}</h2>
+
+{% endblock %}
