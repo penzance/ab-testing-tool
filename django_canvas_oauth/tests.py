@@ -76,14 +76,6 @@ class TestMiddleware(TestCase):
         redirect_url = response._headers['location'][1]
         self.assertIn(AUTHORIZE_URL_PATTERN % self.TEST_DOMAIN, redirect_url)
     
-#     def test_oauth_callback_bad_params(self):
-#         """ Tests that oauth_callback errors on an error param or no params """
-#         self.assertRaises(BadOAuthReturnError, oauth_callback, self.request())
-#         self.assertRaises(BadOAuthReturnError, oauth_callback,
-#                            self.request(get_params={"error": "some_error"}))
-#         self.assertRaises(BadOAuthReturnError, oauth_callback,
-#                            self.request(get_params={"error": "x", "code": "y"}))
-    
     @patch("error_middleware.middleware.loader.render_to_string")
     def test_oauth_callback_fails_with_template(self, mock_renderer):
         response = oauth_callback(self.request())
@@ -96,7 +88,7 @@ class TestMiddleware(TestCase):
         mock_renderer.assert_called_with(OAUTH_ERROR_TEMPLATE, {"message":
                                 "test_error"})
         self.assertEqual(response.status_code, 403)
-
+    
     @patch("error_middleware.middleware.loader.render_to_string",
            side_effect=TemplateDoesNotExist)
     def test_oauth_callback_fails_without_error_template(self, mock_renderer):
