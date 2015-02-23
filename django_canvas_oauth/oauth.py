@@ -7,6 +7,9 @@ from rauth import OAuth2Service
 from django_canvas_oauth.models import OAuthToken
 from django_canvas_oauth.exceptions import (NewTokenNeeded, BadLTIConfigError,
     BadOAuthReturnError)
+from django.template.base import TemplateDoesNotExist
+from django.template import loader
+from django.http.response import HttpResponse
 
 
 BASE_URL_PATTERN = "https://%s/"
@@ -41,6 +44,10 @@ def begin_oauth(request):
     return redirect(service.get_authorize_url(response_type="code",
                                               redirect_uri=redirect_uri))
 
+OAUTH_ERROR_TEMPLATE = "oauth_error.html"
+if hasattr(settings, "OAUTH_ERROR_TEMPLATE"):
+    OAUTH_ERROR_TEMPLATE = settings.OAUTH_ERROR_TEMPLATE
+
 
 def oauth_callback(request):
     """ Receives the callback from canvas and saves the token to the database.
@@ -48,10 +55,19 @@ def oauth_callback(request):
         procedure. """
     error = request.GET.get("error", None)
     if error:
-        raise BadOAuthReturnError("%s" % error)
+        try:
+            template = loader.render_to_string(OAUTH_ERROR_TEMPLATE, {"message": error})
+        except TemplateDoesNotExist:
+            return HttpResponse("Error: %s" % error, status=403)
+        return HttpResponse(template, status=403)
     code = request.GET.get("code", None)
     if not code:
-        raise BadOAuthReturnError("No code param in oauth_middleware response")
+        message = "No code param in oauth_middleware response"
+        try:
+            template = loader.render_to_string(OAUTH_ERROR_TEMPLATE, {"message": message})
+        except TemplateDoesNotExist:
+            return HttpResponse("Error: %s" % message, status=403)
+        return HttpResponse(template, status=403)
     service = get_oauth_service(request)
     token = service.get_access_token(decoder=json.loads, params={"code": code})
     o_auth_token, created = OAuthToken.objects.get_or_create(
