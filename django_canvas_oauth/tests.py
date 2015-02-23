@@ -5,10 +5,10 @@ from mock import MagicMock, patch
 
 from django_canvas_oauth.models import OAuthToken
 from django_canvas_oauth.middleware import OAuthMiddleware
-from django_canvas_oauth.exceptions import NewTokenNeeded, BadLTIConfigError,\
-    BadOAuthReturnError
-from django_canvas_oauth.oauth import get_token, begin_oauth, get_oauth_service,\
-    AUTHORIZE_URL_PATTERN, oauth_callback
+from django_canvas_oauth.exceptions import (NewTokenNeeded, BadLTIConfigError)
+from django_canvas_oauth.oauth import (get_token, begin_oauth, get_oauth_service,
+    AUTHORIZE_URL_PATTERN, oauth_callback, OAUTH_ERROR_TEMPLATE)
+from django.template.base import TemplateDoesNotExist
 
 class TestMiddleware(TestCase):
     TEST_DOMAIN = "example.com"
@@ -48,7 +48,7 @@ class TestMiddleware(TestCase):
         request.user = User()
         self.assertRaises(NewTokenNeeded, get_token, request)
     
-    def test_get_token_succuess(self):
+    def test_get_token_success(self):
         """ Tests that get_token returns a user's token if it exists """
         request = self.request()
         request.user.oauthtoken = OAuthToken(token="test_token")
@@ -76,13 +76,33 @@ class TestMiddleware(TestCase):
         redirect_url = response._headers['location'][1]
         self.assertIn(AUTHORIZE_URL_PATTERN % self.TEST_DOMAIN, redirect_url)
     
-    def test_oauth_callback_bad_params(self):
-        """ Tests that oauth_callback errors on an error param or no params """
-        self.assertRaises(BadOAuthReturnError, oauth_callback, self.request())
-        self.assertRaises(BadOAuthReturnError, oauth_callback,
-                           self.request(get_params={"error": "some_error"}))
-        self.assertRaises(BadOAuthReturnError, oauth_callback,
-                           self.request(get_params={"error": "x", "code": "y"}))
+#     def test_oauth_callback_bad_params(self):
+#         """ Tests that oauth_callback errors on an error param or no params """
+#         self.assertRaises(BadOAuthReturnError, oauth_callback, self.request())
+#         self.assertRaises(BadOAuthReturnError, oauth_callback,
+#                            self.request(get_params={"error": "some_error"}))
+#         self.assertRaises(BadOAuthReturnError, oauth_callback,
+#                            self.request(get_params={"error": "x", "code": "y"}))
+    
+    @patch("error_middleware.middleware.loader.render_to_string")
+    def test_oauth_callback_fails_with_template(self, mock_renderer):
+        response = oauth_callback(self.request())
+        mock_renderer.assert_called_with(OAUTH_ERROR_TEMPLATE, {"message":
+                                "No code param in oauth_middleware response"})
+        self.assertEqual(response.status_code, 403)
+    @patch("error_middleware.middleware.loader.render_to_string")
+    def test_oauth_callback_fails_with_template_and_error(self, mock_renderer):
+        response = oauth_callback(self.request(get_params={"error": "test_error"}))
+        mock_renderer.assert_called_with(OAUTH_ERROR_TEMPLATE, {"message":
+                                "test_error"})
+        self.assertEqual(response.status_code, 403)
+
+    @patch("error_middleware.middleware.loader.render_to_string",
+           side_effect=TemplateDoesNotExist)
+    def test_oauth_callback_fails_without_error_template(self, mock_renderer):
+        response = oauth_callback(self.request())
+        self.assertContains(response, "No code param in oauth_middleware response",
+                            status_code=403, html=False)
     
     @patch("django_canvas_oauth.oauth.get_oauth_service")
     def test_oauth_callback_success(self, mock_get_oauth_service):

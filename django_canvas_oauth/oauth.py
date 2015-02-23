@@ -5,8 +5,7 @@ from django.shortcuts import redirect
 from rauth import OAuth2Service
 
 from django_canvas_oauth.models import OAuthToken
-from django_canvas_oauth.exceptions import (NewTokenNeeded, BadLTIConfigError,
-    BadOAuthReturnError)
+from django_canvas_oauth.exceptions import (NewTokenNeeded, BadLTIConfigError)
 from django.template.base import TemplateDoesNotExist
 from django.template import loader
 from django.http.response import HttpResponse
