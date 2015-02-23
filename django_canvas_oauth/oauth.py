@@ -16,6 +16,10 @@ BASE_URL_PATTERN = "https://%s/"
 AUTHORIZE_URL_PATTERN = "https://%s/login/oauth2/auth"
 ACCESS_TOKEN_URL_PATTERN = "https://%s/login/oauth2/token"
 
+OAUTH_ERROR_TEMPLATE = "oauth_error.html"
+if hasattr(settings, "OAUTH_ERROR_TEMPLATE"):
+    OAUTH_ERROR_TEMPLATE = settings.OAUTH_ERROR_TEMPLATE
+
 
 def get_token(request):
     """ Retrieves a token for the user if one exists already.
@@ -44,10 +48,6 @@ def begin_oauth(request):
     return redirect(service.get_authorize_url(response_type="code",
                                               redirect_uri=redirect_uri))
 
-OAUTH_ERROR_TEMPLATE = "oauth_error.html"
-if hasattr(settings, "OAUTH_ERROR_TEMPLATE"):
-    OAUTH_ERROR_TEMPLATE = settings.OAUTH_ERROR_TEMPLATE
-
 
 def oauth_callback(request):
     """ Receives the callback from canvas and saves the token to the database.
@@ -55,19 +55,10 @@ def oauth_callback(request):
         procedure. """
     error = request.GET.get("error", None)
     if error:
-        try:
-            template = loader.render_to_string(OAUTH_ERROR_TEMPLATE, {"message": error})
-        except TemplateDoesNotExist:
-            return HttpResponse("Error: %s" % error, status=403)
-        return HttpResponse(template, status=403)
+        return render_oauth_error(error)
     code = request.GET.get("code", None)
     if not code:
-        message = "No code param in oauth_middleware response"
-        try:
-            template = loader.render_to_string(OAUTH_ERROR_TEMPLATE, {"message": message})
-        except TemplateDoesNotExist:
-            return HttpResponse("Error: %s" % message, status=403)
-        return HttpResponse(template, status=403)
+        return render_oauth_error("No code param in oauth_middleware response")
     service = get_oauth_service(request)
     token = service.get_access_token(decoder=json.loads, params={"code": code})
     o_auth_token, created = OAuthToken.objects.get_or_create(
@@ -100,3 +91,15 @@ def get_lti_param(request, key):
     if key not in request.session["LTI_LAUNCH"]:
         raise BadLTIConfigError("Missing LTI parameter in session")
     return request.session["LTI_LAUNCH"][key]
+
+
+def render_oauth_error(error_message):
+    """ If there is an error in the oauth callback, attempts to render it in a
+        template that can be styled; otherwise, if OAUTH_ERROR_TEMPLATE not defined,
+        this will return a HttpResponse with status 403 """
+    try:
+        template = loader.render_to_string(OAUTH_ERROR_TEMPLATE, {"message": error_message})
+    except TemplateDoesNotExist:
+        return HttpResponse("Error: %s" % error_message, status=403)
+    return HttpResponse(template, status=403)
+

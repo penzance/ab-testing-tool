@@ -146,6 +146,11 @@ TEMPLATE_DIRS = (
     os.path.join(BASE_DIR, 'templates'),
 )
 
+# renderable_error.html is the default template specified in error_middleware and can be changed if desired
+RENDERABLE_ERROR_TEMPLATE = "renderable_error.html"
+# oauth_error.html is the default template specified in django_canvas_oauth and can be changed if desired
+OAUTH_ERROR_TEMPLATE = "oauth_error.html"
+
 CANVAS_OAUTH_CLIENT_ID = ENV_SETTINGS.get('client_id')
 CANVAS_OAUTH_CLIENT_SECRET = ENV_SETTINGS.get('client_secret')
 
