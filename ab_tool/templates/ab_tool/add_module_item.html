@@ -20,11 +20,11 @@
                 <div class="form-group-inline">
                     <label for="intervention_point_dd"> To install a new Intervention Point, select one from list of uninstalled intervention points below:</label>
                     <div class="custom-dropdown">
-                        <select id="intervention_point_dd" name="intervention_point_dd">
+                        <select id="intervention_point_id" name="intervention_point_id">
                         {% for intervention_point in intervention_points %}
                             <option value="{{intervention_point.id}}">Experiment "{{intervention_point.experiment.name}}" -- Intervention Point "{{intervention_point.name}}"</option>
                         {%endfor %}
-                        </select>    
+                        </select>
                     </div>
                     
                     <button class="btn btn-submit-primary">Add From List</button>
