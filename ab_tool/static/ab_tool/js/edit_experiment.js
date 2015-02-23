@@ -115,7 +115,7 @@ var controller = function($scope, $window, $http) {
           }).
           error(function(data, status, headers, config) {
               $scope.submitting = false;
-              $window.alert("An error occurred in submission. Note that all names for experiments in this course must be unique, and that you can't submit an unlimited amount of notes.")
+              $window.alert("An error occurred in submission. Note that all names for experiments in this course must be unique, and notes must be less than 8000 characters.")
           });
     }
     
@@ -139,7 +139,7 @@ var controller = function($scope, $window, $http) {
                     $scope._removeTrackFromInterface(track)
                 }).
                 error(function(data, status, headers, config) {
-                    $window.alert("An error occurred while deleting a track. Try again.")
+                    $window.alert("An error occurred while deleting a track. Please try again.")
                 });
             }
         }
