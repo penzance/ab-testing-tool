@@ -44,6 +44,7 @@ INVALID_URL_PARAM = Renderable400("One of your URL inputs is invalid.")
 
 PARAM_LENGTH_EXCEEDS_LIMIT = Renderable400("There are length limitations. At least one of your inputs is too long.")
 
+COPIES_EXCEEDS_LIMIT = Renderable400("There exists too many copies of the experiment you are trying to copy. Please delete some before copying.")
 
 def DATABASE_ERROR(error_message):
     return Renderable400("%s" % error_message)
