@@ -8,7 +8,7 @@ from ab_tool.constants import ADMINS
 from ab_tool.models import (Track, Experiment, ExperimentStudent)
 from ab_tool.canvas import get_lti_param, CanvasModules, get_unassigned_students
 from ab_tool.exceptions import (NO_TRACKS_FOR_EXPERIMENT,
-    INTERVENTION_POINTS_ARE_INSTALLED, FILE_TOO_LARGE)
+    INTERVENTION_POINTS_ARE_INSTALLED, FILE_TOO_LARGE, COPIES_EXCEEDS_LIMIT)
 from django.http.response import HttpResponse
 from ab_tool.controllers import (get_missing_track_weights,
     get_incomplete_intervention_points, validate_weighting, validate_name)
@@ -148,11 +148,15 @@ def submit_edit_experiment(request, experiment_id):
 @lti_role_required(ADMINS)
 def copy_experiment(request, experiment_id):
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
-    new_name = "%s_copy" % experiment.name
-    num_experiments = Experiment.objects.filter(
-            course_id=course_id, name__startswith=new_name).count()
-    new_name = "%s%s" % (new_name, num_experiments + 1)
+    experiment = Experiment.get_or_404_check_course(experiment_id, course_id).na
+    experiments_with_prefix = set([e.name for e in Experiment.objects.filter(
+            course_id=course_id, name__startswith=experiment.name)])
+    for i in range(1,1000):
+        new_name = "%s_copy%s" % (experiment.name, i)
+        if new_name not in experiments_with_prefix:
+            break
+    else:
+        raise COPIES_EXCEEDS_LIMIT
     experiment.copy(new_name)
     return redirect(reverse("ab_testing_tool_index"))
 
