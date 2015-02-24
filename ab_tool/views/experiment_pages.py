@@ -148,7 +148,7 @@ def submit_edit_experiment(request, experiment_id):
 @lti_role_required(ADMINS)
 def copy_experiment(request, experiment_id):
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    experiment = Experiment.get_or_404_check_course(experiment_id, course_id).na
+    experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
     experiments_with_prefix = set([e.name for e in Experiment.objects.filter(
             course_id=course_id, name__startswith=experiment.name)])
     for i in range(1,1000):
