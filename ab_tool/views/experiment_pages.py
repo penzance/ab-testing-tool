@@ -154,11 +154,9 @@ def copy_experiment(request, experiment_id):
     for i in range(1,1000):
         new_name = "%s_copy%s" % (experiment.name, i)
         if new_name not in experiments_with_prefix:
-            break
-    else:
-        raise COPIES_EXCEEDS_LIMIT
-    experiment.copy(new_name)
-    return redirect(reverse("ab_testing_tool_index"))
+            experiment.copy(new_name)
+            return redirect(reverse("ab_testing_tool_index"))
+    raise COPIES_EXCEEDS_LIMIT
 
 
 @lti_role_required(ADMINS)
