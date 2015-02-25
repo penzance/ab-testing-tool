@@ -87,7 +87,7 @@ class CanvasModules(object):
         return installed_intervention_point_urls
 
 
-def experiments_with_unnasigned_students(request, course_id):
+def experiments_with_unassigned_students(request, course_id):
     return [experiment.id for experiment in
             Experiment.objects.filter(assignment_method=Experiment.CSV_UPLOAD,
                                       course_id=course_id)
