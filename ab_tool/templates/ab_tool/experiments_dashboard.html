@@ -52,7 +52,7 @@
                     <div class="panel-heading">
                         <h3 class="panel-title panel-title-experiment">Experiment "{{experiment.name}}"</h3>
 
-                        {% if experiment.get_incomplete_intervention_point_names %}
+                        {% if experiment.get_incomplete_intervention_point_names and not experiment.tracks_finalized %}
                             <a href="#incomplete_intervention_points_modal{{experiment.id}}" data-toggle="modal" class="btn btn-icon btn-experiment-start"><i class="fa fa-play-circle"></i>Start Experiment
                         {% elif not experiment.tracks_finalized %}
                             <a href="#finalize_modal{{experiment.id}}" data-toggle="modal" class="btn btn-icon btn-experiment-start"><i class="fa fa-play-circle"></i>Start Experiment
