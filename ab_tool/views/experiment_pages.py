@@ -7,7 +7,7 @@ from ab_tool.constants import ADMINS
 from ab_tool.models import Track, Experiment
 from ab_tool.canvas import get_lti_param, CanvasModules
 from ab_tool.exceptions import (NO_TRACKS_FOR_EXPERIMENT,
-    INTERVENTION_POINTS_ARE_INSTALLED, FILE_TOO_LARGE, COPIES_EXCEEDS_LIMIT)
+    INTERVENTION_POINTS_ARE_INSTALLED)
 from django.http.response import HttpResponse, Http404
 from ab_tool.controllers import (get_missing_track_weights,
     get_incomplete_intervention_points, validate_weighting, validate_name)
