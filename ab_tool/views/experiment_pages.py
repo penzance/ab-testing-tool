@@ -75,6 +75,8 @@ def edit_experiment(request, experiment_id):
 
 @lti_role_required(ADMINS)
 def delete_track(request, track_id):
+    """ If Http404 is raised, delete_track redirects regardless. This is by
+        design, as multiple users may be deleting concurrently in the same course """
     course_id = get_lti_param(request, "custom_canvas_course_id")
     try:
         track = Track.get_or_404_check_course(track_id, course_id)
@@ -137,6 +139,8 @@ def submit_edit_experiment(request, experiment_id):
 
 @lti_role_required(ADMINS)
 def delete_experiment(request, experiment_id):
+    """ If Http404 is raised, delete_experiment redirects regardless. This is by
+        design, as multiple users may be deleting concurrently in the same course """
     course_id = get_lti_param(request, "custom_canvas_course_id")
     try:
         experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
