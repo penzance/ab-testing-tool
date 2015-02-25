@@ -12,6 +12,7 @@ from ab_tool.controllers import (validate_format_url, post_param, assign_track_a
 from ab_tool.exceptions import (DELETING_INSTALLED_STAGE,
     EXPERIMENT_TRACKS_NOT_FINALIZED, NO_URL_FOR_TRACK)
 from ab_tool.analytics import log_intervention_point_interaction
+from django.http.response import Http404
 
 
 def deploy_intervention_point(request, intervention_point_id):
@@ -179,10 +180,13 @@ def delete_intervention_point(request, intervention_point_id):
     """ Note: Installed intervention_points are not allowed to be deleted
         Note: attached InterventionPointUrls are deleted via cascading delete """
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    intervention_point = InterventionPoint.get_or_404_check_course(
-            intervention_point_id, course_id)
-    canvas_modules = CanvasModules(request)
-    if canvas_modules.intervention_point_is_installed(intervention_point):
-        raise DELETING_INSTALLED_STAGE
-    intervention_point.delete()
+    try:
+        intervention_point = InterventionPoint.get_or_404_check_course(
+                intervention_point_id, course_id)
+        canvas_modules = CanvasModules(request)
+        if canvas_modules.intervention_point_is_installed(intervention_point):
+            raise DELETING_INSTALLED_STAGE
+        intervention_point.delete()
+    except Http404:
+        pass
     return redirect(reverse("ab_testing_tool_index"))
