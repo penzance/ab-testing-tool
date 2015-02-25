@@ -8,7 +8,6 @@
 
 {% block content %}
 
-
 <header>
     <div>
         <h1>A/B Testing Dashboard</h1>
@@ -52,10 +51,10 @@
                 <div class="panel-wrapper">
                     <div class="panel-heading">
                         <h3 class="panel-title panel-title-experiment">Experiment "{{experiment.name}}"</h3>
-                        
+
                         {% if experiment.id in experiments_with_unassigned_students and experiment.tracks_finalized %}
-                            <a href="#upload_students_modal{{experiment.id}}" class="btn btn-icon btn-track-upload" data-toggle="modal">Assign Tracks (Urgent!)
-                        {% elif experiment.get_incomplete_intervention_point_names %}
+                            <a href="#upload_students_modal{{experiment.id}}" class="btn btn-icon btn-track-upload" data-toggle="modal">Assign Tracks For New Students
+                        {% elif experiment.get_incomplete_intervention_point_names and not experiment.tracks_finalized %}
                             <a href="#incomplete_intervention_points_modal{{experiment.id}}" data-toggle="modal" class="btn btn-icon btn-experiment-start"><i class="fa fa-play-circle"></i>Start Experiment
                         {% elif experiment.id in experiments_with_unassigned_students %}
                             <a href="#upload_students_modal{{experiment.id}}" class="btn btn-icon btn-experiment-start" data-toggle="modal"><i class="fa fa-play-circle"></i>Start Experiment
@@ -114,7 +113,7 @@
                                         <a href="{% url 'ab_testing_tool_delete_intervention_point' intervention_point.id %}"
                                             data-toggle="tooltip" data-placement="top"
                                             title="Delete Intervention Point '{{intervention_point.name}}'"
-                                            class="btn btn-icon-only ip-btn-delete">
+                                            class="btn btn-icon-only ip-btn-delete submitter">
                                             <i class="fa fa-trash"></i><span>Delete</span>
                                         </a>
                                     {% else %}
@@ -168,12 +167,16 @@
                             </li>
                             {% if experiment.tracks_finalized %}
                                 <li>
-                                    <a id="download_students_button" href="{% url 'ab_testing_tool_download_data' experiment.id %}" class="btn btn-icon btn-ip-options">
+                                    <a id="download_students_button"
+                                       href="{% url 'ab_testing_tool_download_data' experiment.id %}"
+                                       class="btn btn-icon btn-ip-options submitter">
                                         <i class="fa fa-download"></i>Download Students
                                     </a>
                                 </li>
                                 <li>
-                                    <a id="download_intervention_point_interactions_button" href="{% url 'ab_testing_tool_download_intervention_point_interactions' experiment.id %}" class="btn btn-icon btn-ip-options">
+                                    <a id="download_intervention_point_interactions_button"
+                                       href="{% url 'ab_testing_tool_download_intervention_point_interactions' experiment.id %}"
+                                       class="btn btn-icon btn-ip-options submitter">
                                         <i class="fa fa-download"></i>Download Interactions
                                     </a>
                                 </li>
@@ -201,12 +204,14 @@
             </div>
         {% endfor %}
     </div>
+</div>
 </main>
 
 
 {% include "ab_tool/modals.html" %}
 
 {% endblock %}
+
 
 {% block javascript %}
 {{ block.super }}
