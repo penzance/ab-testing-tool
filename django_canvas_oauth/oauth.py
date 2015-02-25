@@ -43,30 +43,38 @@ def begin_oauth(request):
         user came from so they can be redirected back there at the end.
         https://canvas.instructure.com/doc/api/file.oauth.html """
     request.session["oauth_return_uri"] = request.get_full_path()
-    try:
-        # If we detect that the user generated an OAuth token in the past 30
-        # seconds, the user is almost certainly caught in the OAuth login loop.
-        # This is most likely caused by the fact that the python_canvas_sdk
-        # returns multiple kinds of 401 errors, including
-        # 401: {u'errors': [{u'message': u'Invalid access token.'}]
-        # for which we want to generate a new token, but also
-        # 401: {u'status': u'unauthorized', u'errors':
-        #       [{u'message': u'user not authorized to perform that action'}]}
-        # which means the user deosn't have sufficient permissions in the course.
-        token_updated = request.user.oauthtoken.updated_on
-        if timezone.now() - token_updated < timedelta(seconds=30):
-            return render_oauth_error(
-                    "It appears you don't have sufficient canvas permissions " +
-                    "to use this external tool for this course.  " +
-                    "Please contact your canvas administrator."
-            )
-    except OAuthToken.DoesNotExist:
-        pass
+    if check_for_redirect_loop(request):
+        return render_oauth_error(
+            "It appears you don't have sufficient canvas permissions to use this " +
+            "external tool for this course.  Please contact your canvas administrator."
+        )
     service = get_oauth_service(request)
     redirect_uri = request.build_absolute_uri(reverse("django_canvas_oauth:oauth_page"))
     #TODO: Implement with param `state` for security. See cited documentation.
     return redirect(service.get_authorize_url(response_type="code",
                                               redirect_uri=redirect_uri))
+
+
+def check_for_redirect_loop(request):
+    """
+    If we detect that the user generated an OAuth token in the past 30
+    seconds, the user is almost certainly caught in the OAuth login loop.
+    This is most likely caused by the fact that the python_canvas_sdk
+    returns multiple kinds of 401 errors, including
+    401: {u'errors': [{u'message': u'Invalid access token.'}]
+    for which we want to generate a new token, but also
+    401: {u'status': u'unauthorized', u'errors':
+          [{u'message': u'user not authorized to perform that action'}]}
+    which means the user deosn't have sufficient permissions in the course.
+    """
+    try:
+        token_updated = request.user.oauthtoken.updated_on
+        if timezone.now() - token_updated < timedelta(seconds=30):
+            return True
+    except OAuthToken.DoesNotExist:
+        pass
+    return False
+
 
 
 def oauth_callback(request):
