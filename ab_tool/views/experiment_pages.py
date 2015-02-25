@@ -105,7 +105,6 @@ def submit_edit_experiment(request, experiment_id):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
     experiment_dict = json.loads(request.body)
-    
     # Unpack data from experiment_dict and update experiment
     name = validate_name(experiment_dict["name"])
     notes = experiment_dict["notes"]
@@ -124,7 +123,7 @@ def submit_edit_experiment(request, experiment_id):
     new_tracks = [i for i in experiment_dict["tracks"] if i["id"] is None]
     if csv_upload:
         assignment_method = Experiment.CSV_UPLOAD
-    if uniform_random:
+    elif uniform_random:
         assignment_method = Experiment.UNIFORM_RANDOM
     else:
         assignment_method = Experiment.WEIGHTED_PROBABILITY_RANDOM
