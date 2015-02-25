@@ -22,7 +22,7 @@
                     <div class="custom-dropdown">
                         <select id="intervention_point_id" name="intervention_point_id">
                         {% for intervention_point in intervention_points %}
-                            <option value="{{intervention_point.id}}">Experiment "{{intervention_point.experiment.name}}" -- Intervention Point "{{intervention_point.name}}"</option>
+                            <option value="{{intervention_point.id}}">Intervention Point "{{intervention_point.name}}" -- Experiment "{{intervention_point.experiment.name}}"</option>
                         {%endfor %}
                         </select>
                     </div>
