@@ -8,7 +8,6 @@
 
 {% block content %}
 
-
 <header>
     <div>
         <h1>A/B Testing Dashboard</h1>
@@ -108,7 +107,7 @@
                                         <a href="{% url 'ab_testing_tool_delete_intervention_point' intervention_point.id %}"
                                             data-toggle="tooltip" data-placement="top"
                                             title="Delete Intervention Point '{{intervention_point.name}}'"
-                                            class="btn btn-icon-only ip-btn-delete">
+                                            class="btn btn-icon-only ip-btn-delete submitter">
                                             <i class="fa fa-trash"></i><span>Delete</span>
                                         </a>
                                     {% else %}
@@ -157,12 +156,16 @@
                             </li>
                             {% if experiment.tracks_finalized %}
                                 <li>
-                                    <a id="download_students_button" href="{% url 'ab_testing_tool_download_data' experiment.id %}" class="btn btn-icon btn-ip-options">
+                                    <a id="download_students_button"
+                                       href="{% url 'ab_testing_tool_download_data' experiment.id %}"
+                                       class="btn btn-icon btn-ip-options submitter">
                                         <i class="fa fa-download"></i>Download Students
                                     </a>
                                 </li>
                                 <li>
-                                    <a id="download_intervention_point_interactions_button" href="{% url 'ab_testing_tool_download_intervention_point_interactions' experiment.id %}" class="btn btn-icon btn-ip-options">
+                                    <a id="download_intervention_point_interactions_button"
+                                       href="{% url 'ab_testing_tool_download_intervention_point_interactions' experiment.id %}"
+                                       class="btn btn-icon btn-ip-options submitter">
                                         <i class="fa fa-download"></i>Download Interactions
                                     </a>
                                 </li>
@@ -190,12 +193,14 @@
             </div>
         {% endfor %}
     </div>
+</div>
 </main>
 
 
 {% include "ab_tool/modals.html" %}
 
 {% endblock %}
+
 
 {% block javascript %}
 {{ block.super }}
