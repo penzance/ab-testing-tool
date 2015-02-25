@@ -52,13 +52,12 @@ def begin_oauth(request):
         # for which we want to generate a new token, but also
         # 401: {u'status': u'unauthorized', u'errors':
         #       [{u'message': u'user not authorized to perform that action'}]}
-        # for which the user deosn't have sufficient permission to use the
-        # A/B testing tool for the course.
+        # which means the user deosn't have sufficient permissions in the course.
         token_updated = request.user.oauthtoken.updated_on
         if timezone.now() - token_updated < timedelta(seconds=30):
             return render_oauth_error(
                     "It appears you don't have sufficient canvas permissions " +
-                    "to use the A/B Testing Tool for this course.  " +
+                    "to use this external tool for this course.  " +
                     "Please contact your canvas administrator."
             )
     except OAuthToken.DoesNotExist:
