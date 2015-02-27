@@ -1,7 +1,7 @@
 $(document).ready(function(){
 
     //double click-submission protection
-    $(".submitter").click(function (event) {
+    $('.submitter, form a, form [type="submit"], form button').click(function (event) {
         if ($(this).hasClass("disabled")) {
             event.preventDefault();
         }
