@@ -35,9 +35,10 @@ INVALID_URL_PARAM = Renderable400("One of your URL inputs is invalid.")
 
 PARAM_LENGTH_EXCEEDS_LIMIT = Renderable400("There are length limitations. At least one of your inputs is too long.")
 
+UNIQUE_NAME_ERROR = Renderable400("Another intervention point with this name was found in the database. Names must be unique. Ensure you are using a different name and please try again.")
 
 def DATABASE_ERROR(error_message):
-    return Renderable400("%s" % error_message)
+    return Renderable400("A database rule was violated, namely %s." % error_message)
 
 CSV_ERROR = Renderable500("There was a problem preparing the CSV file for download")
 

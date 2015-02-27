@@ -10,7 +10,7 @@ from ab_tool.canvas import get_lti_param, CanvasModules
 from ab_tool.controllers import (validate_format_url, post_param, assign_track_and_create_student,
     validate_name)
 from ab_tool.exceptions import (DELETING_INSTALLED_STAGE,
-    EXPERIMENT_TRACKS_NOT_FINALIZED, NO_URL_FOR_TRACK)
+    EXPERIMENT_TRACKS_NOT_FINALIZED, NO_URL_FOR_TRACK, UNIQUE_NAME_ERROR)
 from ab_tool.analytics import log_intervention_point_interaction
 from django.http.response import Http404
 
@@ -86,6 +86,9 @@ def submit_create_intervention_point(request, experiment_id):
     intervention_pointurls = [(k,validate_format_url(v)) for (k,v) in request.POST.iteritems()
                               if STAGE_URL_TAG in k and v]
     experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
+    if InterventionPoint.objects.filter(name=name,
+        course_id=course_id, experiment=experiment).count > 0:
+        raise UNIQUE_NAME_ERROR
     intervention_point = InterventionPoint.objects.create(
             name=name, notes=notes, course_id=course_id, experiment=experiment)
     for (k,v) in intervention_pointurls:
