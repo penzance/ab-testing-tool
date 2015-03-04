@@ -164,7 +164,7 @@ def edit_intervention_point_common(request, intervention_point_id):
         raise UNIQUE_NAME_ERROR
     intervention_point.update(name=name, notes=notes)
     # Validates URLs using backend rules before any InterventionPointUrl object creation
-    intervention_pointurls = [(k,validate_format_url(v.strip())) for (k,v) in request.POST.iteritems() if STAGE_URL_TAG in k and v]
+    intervention_pointurls = [(k,validate_format_url(v)) for (k,v) in request.POST.iteritems() if STAGE_URL_TAG in k and v]
     for (k,v) in intervention_pointurls:
         _, track_id = k.split(STAGE_URL_TAG)
         # This is a search for the joint unique index of InterventionPointUrl, so it
