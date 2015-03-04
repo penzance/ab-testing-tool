@@ -72,6 +72,7 @@ def validate_weighting(weighting):
 def validate_format_url(url):
     validator = URLValidator()
     """ Adds "http://" to the beginning of a url if it isn't there """
+    url = url.strip()
     if not url.startswith("http://") and not url.startswith("https://"):
         url = "http://%s" % url
     try:
