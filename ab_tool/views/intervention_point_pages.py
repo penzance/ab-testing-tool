@@ -87,7 +87,7 @@ def submit_create_intervention_point(request, experiment_id):
                               if STAGE_URL_TAG in k and v]
     experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
     if InterventionPoint.objects.filter(name=name,
-        course_id=course_id, experiment=experiment).count > 0:
+        course_id=course_id, experiment=experiment).count() > 0:
         raise UNIQUE_NAME_ERROR
     intervention_point = InterventionPoint.objects.create(
             name=name, notes=notes, course_id=course_id, experiment=experiment)
@@ -160,7 +160,7 @@ def edit_intervention_point_common(request, intervention_point_id):
     name = validate_name(post_param(request, "name"))
     notes = post_param(request, "notes")
     if InterventionPoint.objects.filter(name=name,
-        course_id=course_id, experiment=intervention_point.experiment).count > 0:
+        course_id=course_id, experiment=intervention_point.experiment).count() > 0:
         raise UNIQUE_NAME_ERROR
     intervention_point.update(name=name, notes=notes)
     # Validates URLs using backend rules before any InterventionPointUrl object creation
