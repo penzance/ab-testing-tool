@@ -65,7 +65,7 @@ class TestCourseLogin(unittest.TestCase):
 
         # Add A/B Testing Tool to the course
         driver.find_element_by_xpath("//div[@id='external_tools']/h2/button[3]").click()
-        driver.find_element_by_id("external_tool_name").send_keys("Selenium A/B Testing Tool")
+        driver.find_element_by_id("external_tool_name").send_keys("Selenium A/B Test Testing Tool")
         driver.find_element_by_id("external_tool_consumer_key").send_keys("test")
         driver.find_element_by_id("external_tool_shared_secret").send_keys("secret")
         Select(driver.find_element_by_id("external_tool_config_type")).select_by_value("by_url")

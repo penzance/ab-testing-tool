@@ -62,7 +62,7 @@ class add_experiment(unittest.TestCase):
         driver.find_element_by_link_text("A/B Testing Tool").click()
         driver.switch_to_frame("tool_content")
         driver.find_element_by_link_text("New Experiment").click()
-        driver.find_element_by_name("experimentName").send_keys("%s Selenium Add Uniform Experiment" %TIMESTAMP)
+        driver.find_element_by_name("experimentName").send_keys("%s Test Add Uniform Experiment" %TIMESTAMP)
         if not driver.find_element_by_name("uniformRandom").is_selected():
             driver.find_element_by_name("uniformRandom").click()
         driver.find_element_by_name("experimentNotes").send_keys("Selenium test for add_experiment. Select Uniform Random with 2 tracks.")
