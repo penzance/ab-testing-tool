@@ -11,7 +11,7 @@ from ab_tool.exceptions import (BAD_STAGE_ID, missing_param_error,
 from ab_tool.constants import (NAME_CHAR_LIMIT, URL_CHAR_LIMIT)
 
 
-def assign_track_and_create_student(experiment, student_id, lis_person_sourcedid):
+def assign_track_and_create_student(experiment, student_id, student_name):
     """ Method looks up assignment_mode to select track and creates student in selected track.
         Method returns student object """
     if experiment.assignment_method == Experiment.CSV_UPLOAD:
@@ -37,7 +37,7 @@ def assign_track_and_create_student(experiment, student_id, lis_person_sourcedid
     # Create student with chosen track
     student = ExperimentStudent.objects.create(
             student_id=student_id, course_id=experiment.course_id,
-            track=chosen_track, lis_person_sourcedid=lis_person_sourcedid,
+            track=chosen_track, student_name=student_name,
             experiment=experiment
     )
     return student

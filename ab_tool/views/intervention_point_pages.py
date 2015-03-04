@@ -53,8 +53,8 @@ def deploy_intervention_point(request, intervention_point_id):
         # select a track before creating the student. This avoids a race condition of
         # a student existing but not having a track assigned (e.g. if the update to
         # a student database object fails)
-        lis_person_sourcedid = get_lti_param(request, "lis_person_sourcedid")
-        student = assign_track_and_create_student(experiment, student_id, lis_person_sourcedid)
+        student_name = get_lti_param(request, "lis_person_name_full")
+        student = assign_track_and_create_student(experiment, student_id, student_name)
     
     # Retrieve the url for the student's track at the current intervention point
     # Return an error page if there is no url configured.
@@ -157,12 +157,13 @@ def edit_intervention_point_common(request, intervention_point_id):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     intervention_point = InterventionPoint.get_or_404_check_course(
             intervention_point_id, course_id)
-    name = validate_name(post_param(request, "name"))
+    new_name = validate_name(post_param(request, "name"))
     notes = post_param(request, "notes")
-    if InterventionPoint.objects.filter(name=name,
+    # Checks to see if there exits another intervention point with the same name
+    if new_name != intervention_point.name and InterventionPoint.objects.filter(name=new_name,
         course_id=course_id, experiment=intervention_point.experiment).count() > 0:
         raise UNIQUE_NAME_ERROR
-    intervention_point.update(name=name, notes=notes)
+    intervention_point.update(name=new_name, notes=notes)
     # Validates URLs using backend rules before any InterventionPointUrl object creation
     intervention_pointurls = [(k,validate_format_url(v)) for (k,v) in request.POST.iteritems() if STAGE_URL_TAG in k and v]
     for (k,v) in intervention_pointurls:
