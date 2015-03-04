@@ -19,6 +19,7 @@ TEST_COURSE_ID = "12345"
 TEST_OTHER_COURSE_ID = "5555555"
 TEST_DOMAIN = "example.com"
 TEST_STUDENT_ID = "70707707"
+TEST_STUDENT_NAME = "Test Student"
 
 NONEXISTENT_STAGE_ID = 12345678987654321 #111111111^2
 NONEXISTENT_TRACK_ID = 31415926535897932 #pi
@@ -52,7 +53,7 @@ class SessionTestCase(TestCase):
         lti_launch["custom_canvas_api_domain"] = TEST_DOMAIN
         lti_launch["launch_presentation_return_url"] = TEST_DOMAIN
         lti_launch["custom_canvas_user_login_id"] = TEST_STUDENT_ID
-        lti_launch["lis_person_sourcedid"] = TEST_STUDENT_ID
+        lti_launch["lis_person_name_full"] = TEST_STUDENT_NAME
         lti_launch["context_title"] = "Course title"
         session = self.client.session
         session["LTI_LAUNCH"] = lti_launch

@@ -193,7 +193,7 @@ class ExperimentStudent(CourseObject):
         ExperimentStudent objects, and will have a separate object for each
         experiment they are in. """
     student_id = models.CharField(max_length=128, db_index=True)
-    lis_person_sourcedid = models.CharField(max_length=128, db_index=True, null=True)
+    student_name = models.CharField(max_length=256, db_index=True, null=True)
     experiment = models.ForeignKey(Experiment, related_name="students")
     track = models.ForeignKey(Track)
     

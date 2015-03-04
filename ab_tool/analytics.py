@@ -32,12 +32,12 @@ def get_student_list_csv(experiment, file_title):
     def csv_file_generator():
         writer = csv.writer(Echo())
         # Write headers to CSV file
-        headers = ["Student ID", "LIS Person Sourcedid", "Experiment", "Assigned Track",
-                   "Timestamp Last Updated"]
+        headers = ["Student Name", "Student ID", "Experiment", "Assigned Track",
+                   "Timestamp Last Updated (UTC)"]
         yield writer.writerow(headers)
         # Write data to CSV file
         for s in ExperimentStudent.objects.filter(experiment=experiment):
-            row = [s.student_id, s.lis_person_sourcedid, s.experiment.name,
+            row = [s.student_name, s.student_id, s.experiment.name,
                    s.track.name, s.updated_on]
             yield writer.writerow(row)
     response = StreamingHttpResponse(csv_file_generator(), content_type="text/csv")
@@ -49,12 +49,12 @@ def get_intervention_point_interactions_csv(experiment, file_title):
     def csv_file_generator():
         writer = csv.writer(Echo())
         # Write headers to CSV file
-        headers = ["Student ID", "LIS Person Sourcedid", "Experiment", "Assigned Track",
-                   "Intervention Point", "Intervention Point URL", "Timestamp Encountered"]
+        headers = ["Student Name", "Student ID", "Experiment", "Assigned Track",
+                   "Intervention Point", "Intervention Point URL", "Timestamp Encountered (UTC)"]
         yield writer.writerow(headers)
         # Write data to CSV file
         for i in InterventionPointInteraction.objects.filter(experiment=experiment):
-            row = [i.student.student_id, i.student.lis_person_sourcedid,
+            row = [i.student.student_name, i.student.student_id,
                    i.experiment.name, i.track.name,
                    i.intervention_point.name, i.url, i.created_on]
             yield writer.writerow(row)

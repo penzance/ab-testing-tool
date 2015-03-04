@@ -10,3 +10,4 @@ secure.py
 .coverage
 env/
 *.log
+.idea/
