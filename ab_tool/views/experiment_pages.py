@@ -9,7 +9,8 @@ from ab_tool.models import (Track, Experiment, ExperimentStudent)
 from ab_tool.canvas import get_lti_param, CanvasModules, get_unassigned_students
 from ab_tool.exceptions import (NO_TRACKS_FOR_EXPERIMENT,
     INTERVENTION_POINTS_ARE_INSTALLED, FILE_TOO_LARGE, COPIES_EXCEEDS_LIMIT)
-from django.http.response import HttpResponse
+from django.http.response import HttpResponse, Http404
+
 from ab_tool.controllers import (get_missing_track_weights,
     get_incomplete_intervention_points, validate_weighting, validate_name)
 from ab_tool.spreadsheets import (get_track_selection_xlsx, get_track_selection_csv,
@@ -83,11 +84,15 @@ def edit_experiment(request, experiment_id):
 
 @lti_role_required(ADMINS)
 def delete_track(request, track_id):
+    """ If Http404 is raised, delete_track redirects regardless. This is by
+        design, as multiple users may be deleting concurrently in the same course """
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    track = Track.get_or_404_check_course(track_id, course_id)
-    track.delete()
+    try:
+        track = Track.get_or_404_check_course(track_id, course_id)
+        track.delete()
+    except Http404:
+        pass
     return HttpResponse("success")
-
 
 @lti_role_required(ADMINS)
 def submit_edit_experiment(request, experiment_id):
@@ -160,13 +165,18 @@ def copy_experiment(request, experiment_id):
 
 @lti_role_required(ADMINS)
 def delete_experiment(request, experiment_id):
+    """ If Http404 is raised, delete_experiment redirects regardless. This is by
+        design, as multiple users may be deleting concurrently in the same course """
     course_id = get_lti_param(request, "custom_canvas_course_id")
-    experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
-    experiment.assert_not_finalized()
-    canvas_modules = CanvasModules(request)
-    if canvas_modules.experiment_has_installed_intervention(experiment):
-        raise INTERVENTION_POINTS_ARE_INSTALLED
-    experiment.delete()
+    try:
+        experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
+        experiment.assert_not_finalized()
+        canvas_modules = CanvasModules(request)
+        if canvas_modules.experiment_has_installed_intervention(experiment):
+            raise INTERVENTION_POINTS_ARE_INSTALLED
+        experiment.delete()
+    except Http404:
+        pass
     return redirect(reverse("ab_testing_tool_index"))
 
 

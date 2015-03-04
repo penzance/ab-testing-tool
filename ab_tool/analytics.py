@@ -9,3 +9,4 @@ def log_intervention_point_interaction(course_id, student, intervention_point,
             track=track,
             url=intervention_point_url.url
     )
+

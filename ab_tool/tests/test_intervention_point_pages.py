@@ -313,15 +313,17 @@ class TestInterventionPointPages(SessionTestCase):
         self.assertNotEqual(first_num_intervention_points, second_num_intervention_points)
     
     def test_delete_intervention_point_nonexistent(self):
-        """ Tests that delete_intervention_point method raises error for
-            non-existent InterventionPoint """
+        """ Tests that delete_intervention_point method successfully redirects
+            despite non-existent InterventionPoint. This is by design, as the Http404
+            is caught since multiple users may be editing the A/B dashboard on
+            in the same course """
         first_num_intervention_points = InterventionPoint.objects.count()
         self.create_test_intervention_point()
         intervention_point_id = NONEXISTENT_STAGE_ID
         response = self.client.get(reverse("ab_testing_tool_delete_intervention_point",
                                            args=(intervention_point_id,)), follow=True)
         second_num_intervention_points = InterventionPoint.objects.count()
-        self.assertEqual(response.status_code, 404)
+        self.assertOkay(response)
         self.assertNotEqual(first_num_intervention_points, second_num_intervention_points)
     
     def test_delete_intervention_point_wrong_course(self):

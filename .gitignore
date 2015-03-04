@@ -11,3 +11,5 @@ secure.py
 env/
 *.log
 .settings
+.idea/
+
