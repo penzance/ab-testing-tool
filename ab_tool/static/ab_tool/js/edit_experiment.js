@@ -115,7 +115,7 @@ var controller = function($scope, $window, $http) {
           }).
           error(function(data, status, headers, config) {
               $scope.submitting = false;
-              $window.alert("An error occurred in submission. Note that all names for experiments in this course must be unique, and notes must be less than 8000 characters.")
+              $window.alert("Sorry, an error occurred when submitting the form. Please make sure that the experiment name is unique and under 250 characters and that notes are less than 8000 characters.")
           });
     }
     
@@ -258,10 +258,10 @@ var controller = function($scope, $window, $http) {
                 continue;
             }
             if (otherTrack.name == track.newName) {
-                alert("Invalid Name: There is another track with that name");
+                alert("Sorry, there is already another track with that name. Each track in an experiment must have a unique name.");
                 return false;
             } else if (otherTrack.databaseName == track.newName) {
-                alert("Invalid Name: There was already another track with that name");
+                alert("Sorry, there is already another track with that name. Each track in an experiment must have a unique name.");
                 return false;
             }
         }

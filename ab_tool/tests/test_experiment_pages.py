@@ -341,14 +341,17 @@ class TestExperimentPages(SessionTestCase):
         self.assertEqual(first_num_experiments, second_num_experiments)
     
     def test_delete_experiment_nonexistent(self):
-        """ Tests that delete_experiment method raises error for non-existent Experiment """
+        """ Tests that delete_experiment method raises successfully redirects
+            despite non-existent Experiment. This is by design, as the Http404
+            is caught since multiple users may be editing the A/B dashboard on
+            in the same course """
         self.create_test_experiment()
         t_id = NONEXISTENT_TRACK_ID
         first_num_experiments = Experiment.objects.count()
         response = self.client.get(reverse("ab_testing_tool_delete_experiment", args=(t_id,)), follow=True)
         second_num_experiments = Experiment.objects.count()
         self.assertEqual(first_num_experiments, second_num_experiments)
-        self.assertEquals(response.status_code, 404)
+        self.assertOkay(response)
     
     def test_delete_experiment_wrong_course(self):
         """ Tests that delete_experiment method raises error for existent Experiment but for

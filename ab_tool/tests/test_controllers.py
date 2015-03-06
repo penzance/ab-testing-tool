@@ -3,7 +3,7 @@ from mock import MagicMock
 from ab_tool.controllers import (intervention_point_url,
     validate_format_url, post_param, assign_track_and_create_student,
     validate_name, validate_weighting)
-from ab_tool.tests.common import (SessionTestCase, TEST_STUDENT_ID)
+from ab_tool.tests.common import (SessionTestCase, TEST_STUDENT_ID, TEST_STUDENT_NAME)
 from ab_tool.exceptions import (BAD_STAGE_ID, CSV_UPLOAD_NEEDED,
     NO_TRACKS_FOR_EXPERIMENT, TRACK_WEIGHTS_NOT_SET,
     INVALID_URL_PARAM, MISSING_NAME_PARAM, PARAM_LENGTH_EXCEEDS_LIMIT,
@@ -36,19 +36,19 @@ class TestControllers(SessionTestCase):
         experiment = self.create_test_experiment(assignment_method=Experiment.WEIGHTED_PROBABILITY_RANDOM)
         self.create_test_track(experiment=experiment)
         data = {"experiment": experiment, "student_id":TEST_STUDENT_ID,
-                "lis_person_sourcedid": TEST_STUDENT_ID}
+                "student_name": TEST_STUDENT_NAME}
         self.assertRaisesSpecific(TRACK_WEIGHTS_NOT_SET, assign_track_and_create_student, **data)
     
     def test_assign_track_and_create_student_raises_error_for_no_tracks(self):
         experiment = self.create_test_experiment()
         data = {"experiment": experiment, "student_id":TEST_STUDENT_ID,
-                "lis_person_sourcedid": TEST_STUDENT_ID}
+                "student_name": TEST_STUDENT_NAME}
         self.assertRaisesSpecific(NO_TRACKS_FOR_EXPERIMENT, assign_track_and_create_student, **data)
     
     def test_assign_track_and_create_student_raises_error_for_no_csv(self):
         experiment = self.create_test_experiment(assignment_method=Experiment.CSV_UPLOAD)
         data = {"experiment": experiment, "student_id":TEST_STUDENT_ID,
-                "lis_person_sourcedid": TEST_STUDENT_ID}
+                "student_name": TEST_STUDENT_NAME}
         self.assertRaisesSpecific(CSV_UPLOAD_NEEDED, assign_track_and_create_student, **data)
     
     def test_intervention_point_url_contains_intervention_point_id(self):

@@ -1,7 +1,7 @@
 $(document).ready(function(){
 
     //double click-submission protection
-    $(".submitter").click(function (event) {
+    $('.submitter, form a, form [type="submit"], form button').click(function (event) {
         if ($(this).hasClass("disabled")) {
             event.preventDefault();
         }
@@ -9,7 +9,7 @@ $(document).ready(function(){
     });
 
     function is_valid_url(url) {
-        return /^(http(s)?:\/\/)?(www\.)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/.test(url);
+        return /^(http(s)?:\/\/)?(www\.)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/i.test(url);
     }
 
     $('.addIntervention').modal('show');
