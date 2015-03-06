@@ -346,7 +346,7 @@ class TestExperimentPages(SessionTestCase):
             is caught since multiple users may be editing the A/B dashboard on
             in the same course """
         self.create_test_experiment()
-        t_id = NONEXISTENT_TRACK_ID
+        t_id = NONEXISTENT_EXPERIMENT_ID
         first_num_experiments = Experiment.objects.count()
         response = self.client.get(reverse("ab_testing_tool_delete_experiment", args=(t_id,)), follow=True)
         second_num_experiments = Experiment.objects.count()
@@ -428,6 +428,15 @@ class TestExperimentPages(SessionTestCase):
         track = self.create_test_track(experiment=experiment)
         self.assertEqual(experiment.tracks.count(), 1)
         response = self.client.get(reverse("ab_testing_tool_delete_track", args=(track.id,)),
+                                   follow=True)
+        self.assertEqual(experiment.tracks.count(), 0)
+        self.assertOkay(response)
+    
+    def test_delete_nonexistent_track(self):
+        """ Tests that delete_track method succeeds, by design, when deleting a nonexistent track"""
+        experiment = self.create_test_experiment()
+        self.assertEqual(experiment.tracks.count(), 0)
+        response = self.client.get(reverse("ab_testing_tool_delete_track", args=(NONEXISTENT_TRACK_ID,)),
                                    follow=True)
         self.assertEqual(experiment.tracks.count(), 0)
         self.assertOkay(response)

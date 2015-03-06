@@ -9,7 +9,7 @@ from ab_tool.tests.common import (SessionTestCase, TEST_COURSE_ID,
     TEST_STUDENT_ID)
 from ab_tool.exceptions import (NO_URL_FOR_TRACK,  UNAUTHORIZED_ACCESS,
     EXPERIMENT_TRACKS_NOT_FINALIZED, NO_TRACKS_FOR_EXPERIMENT,
-    DELETING_INSTALLED_STAGE)
+    DELETING_INSTALLED_STAGE, UNIQUE_NAME_ERROR)
 
 
 class TestInterventionPointPages(SessionTestCase):
@@ -150,6 +150,18 @@ class TestInterventionPointPages(SessionTestCase):
         self.assertOkay(response)
         self.assertEqual(num_intervention_points + 1, InterventionPoint.objects.count())
     
+    def test_submit_create_intervention_point_with_same_name_raises_exception(self):
+        """ Tests that create_intervention_point with same name as existing intervention
+            point raises exception"""
+        intervention_point = self.create_test_intervention_point(name="SAME_NAME")
+        num_intervention_points = InterventionPoint.objects.count()
+        data = {"name": intervention_point.name, "notes": "hi"}
+        experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
+        url = reverse("ab_testing_tool_submit_create_intervention_point", args=(experiment.id,))
+        response = self.client.post(url, data, follow=True)
+        self.assertError(response, UNIQUE_NAME_ERROR)
+        self.assertEqual(num_intervention_points, InterventionPoint.objects.count())
+    
     def test_submit_create_intervention_point_with_intervention_pointurls(self):
         """ Tests that create_intervention_point creates an InterventionPoint
             object and InterventionPointUrl objects verified by DB count """
@@ -209,6 +221,18 @@ class TestInterventionPointPages(SessionTestCase):
         self.assertEqual(num_intervention_points, InterventionPoint.objects.count())
         intervention_point = InterventionPoint.objects.get(id=intervention_point_id)
         self.assertEqual(intervention_point.name, "new_name")
+    
+    def test_submit_edit_intervention_point_with_same_name_raises_exception(self):
+        """ Tests that submit_edit_intervention_point submission with same
+            name as existing intervention point raises exception"""
+        intervention_point1 = self.create_test_intervention_point(name="SAME_NAME")
+        intervention_point2 = self.create_test_intervention_point(name="old_name")
+        num_intervention_points = InterventionPoint.objects.count()
+        data = {"name": intervention_point1.name, "notes": ""}
+        response = self.client.post(reverse("ab_testing_tool_submit_edit_intervention_point",
+                args=(intervention_point2.id,)), data, follow=True)
+        self.assertError(response, UNIQUE_NAME_ERROR)
+        self.assertEqual(num_intervention_points, InterventionPoint.objects.count())
     
     def test_submit_edit_intervention_point_with_intervention_point_urls(self):
         """ Tests that submit_edit_intervention_point does not change DB count
