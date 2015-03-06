@@ -157,12 +157,13 @@ def edit_intervention_point_common(request, intervention_point_id):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     intervention_point = InterventionPoint.get_or_404_check_course(
             intervention_point_id, course_id)
-    name = validate_name(post_param(request, "name"))
+    new_name = validate_name(post_param(request, "name"))
     notes = post_param(request, "notes")
-    if InterventionPoint.objects.filter(name=name,
+    # Checks to see if there exits another intervention point with the same name
+    if new_name != intervention_point.name and InterventionPoint.objects.filter(name=new_name,
         course_id=course_id, experiment=intervention_point.experiment).count() > 0:
         raise UNIQUE_NAME_ERROR
-    intervention_point.update(name=name, notes=notes)
+    intervention_point.update(name=new_name, notes=notes)
     # Validates URLs using backend rules before any InterventionPointUrl object creation
     intervention_pointurls = [(k,validate_format_url(v)) for (k,v) in request.POST.iteritems() if STAGE_URL_TAG in k and v]
     for (k,v) in intervention_pointurls:

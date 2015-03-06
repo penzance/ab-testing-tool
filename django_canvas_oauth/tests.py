@@ -9,6 +9,10 @@ from django_canvas_oauth.exceptions import (NewTokenNeeded, BadLTIConfigError)
 from django_canvas_oauth.oauth import (get_token, begin_oauth, get_oauth_service,
     AUTHORIZE_URL_PATTERN, oauth_callback, OAUTH_ERROR_TEMPLATE)
 from django.template.base import TemplateDoesNotExist
+from django.utils import timezone
+from datetime import datetime
+
+TEST_TIME = timezone.make_aware(datetime(2000, 1, 1), timezone.utc)
 
 class TestMiddleware(TestCase):
     TEST_DOMAIN = "example.com"
@@ -21,6 +25,7 @@ class TestMiddleware(TestCase):
             session["LTI_LAUNCH"] = lti_launch
         request.session = session
         request.GET = get_params
+        request.user.oauthtoken.updated_on = TEST_TIME
         return request
     
     @patch("django_canvas_oauth.middleware.begin_oauth")
@@ -71,19 +76,36 @@ class TestMiddleware(TestCase):
     
     def test_begin_oauth_redirect(self):
         """ Tests that begin_oauth redirects to the authorize url """
-        self.client
         response = begin_oauth(self.request())
         redirect_url = response._headers['location'][1]
         self.assertIn(AUTHORIZE_URL_PATTERN % self.TEST_DOMAIN, redirect_url)
     
+    @patch("django.utils.timezone.now", return_value=TEST_TIME)
+    @patch("error_middleware.middleware.loader.render_to_string")
+    def test_oauth_loop_detection(self, mock_renderer, _mock):
+        """ Tests that there is an error page for a redirect loop (if it is being
+            called to generate a token just after it generated one) """
+        response = begin_oauth(self.request())
+        mock_renderer.assert_called_with(
+                OAUTH_ERROR_TEMPLATE,
+                {"message":
+                    "It appears you don't have sufficient canvas permissions " +
+                    "to use this external tool for this course.  " +
+                    "Please contact your canvas administrator."}
+        )
+        self.assertEqual(response.status_code, 403)
+    
     @patch("error_middleware.middleware.loader.render_to_string")
     def test_oauth_callback_fails_with_template(self, mock_renderer):
+        """ Tests that an error page is displayed if there is no code param """
         response = oauth_callback(self.request())
         mock_renderer.assert_called_with(OAUTH_ERROR_TEMPLATE, {"message":
                                 "No code param in oauth_middleware response"})
         self.assertEqual(response.status_code, 403)
+    
     @patch("error_middleware.middleware.loader.render_to_string")
     def test_oauth_callback_fails_with_template_and_error(self, mock_renderer):
+        """ Tests that an error page is displayed if the oauth_callback gets an error """
         response = oauth_callback(self.request(get_params={"error": "test_error"}))
         mock_renderer.assert_called_with(OAUTH_ERROR_TEMPLATE, {"message":
                                 "test_error"})
@@ -92,6 +114,7 @@ class TestMiddleware(TestCase):
     @patch("error_middleware.middleware.loader.render_to_string",
            side_effect=TemplateDoesNotExist)
     def test_oauth_callback_fails_without_error_template(self, mock_renderer):
+        """ Tests that an error page is displayed even if there is no error template """
         response = oauth_callback(self.request())
         self.assertContains(response, "No code param in oauth_middleware response",
                             status_code=403, html=False)

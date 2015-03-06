@@ -63,7 +63,7 @@
                                 placeholder="Enter Intervention Name">
                     </div>
                     <div class="form-group-description">
-                        <p>A descriptive name for this track. This will help you blah blah blah</p>
+                        <p>Please enter a name for this intervention point.</p>
                     </div>
                 </fieldset>
 
@@ -75,11 +75,11 @@
                         <a href="#" class="preview-link">preview</a>
                         <input type="url" name="intervention_point_url_{{track.id}}"
                             id="intervention_point_url_{{track.id}}" class="form-control intervention-url"
-                            value="">
+                            value="" placeholder="Enter URL">
                         <!--a href="#"><i class="fa fa-question-circle"></i></a-->
                     </div>
                     <div class="form-group-description">
-                        <p>A descriptive name for this track. This will help you blah blah blah</p>
+                        <p>Please enter a URL for this track to view in this intervention point.</p>
                     </div>
 
                     <div class="form-group-inline-right">
@@ -87,15 +87,15 @@
                         <div class="custom-dropdown">
                             <select name="is_canvas_page_for_track_{{track.id}}"
                                 id="is_canvas_page_for_track_{{track.id}}">
-                                <option value="canvasPage">Canvas URL -- Learners in this track are redirected to this Canvas page.</option>
-                                <option value="externalPage">External URL in Canvas -- Learners in this track view this page within Canvas.</option>
-                                <option value="newTab">In new tab -- Learners in this track open this page in a new tab.</option>
+                                <option value="canvasPage">Canvas URL -- Students in this track are redirected to this Canvas page.</option>
+                                <option value="externalPage">External URL in Canvas -- Students in this track view this page within Canvas.</option>
+                                <option value="newTab">In new tab -- Students in this track open this page in a new tab.</option>
                             </select>
                         </div>
                         <!--a href="#"><i class="fa fa-question-circle"></i></a-->
                     </div>
                     <div class="form-group-description">
-                        <p>A descriptive name for this track. This will help you blah blah blah</p>
+                        <p>Please choose how you would like the web page to be displayed for students.</p>
                     </div>
                 </fieldset>
                 {% endfor %}
@@ -161,7 +161,7 @@
                         <a href="#" class="preview-link">preview</a>
                         <input type="url" name="intervention_point_url_{{track_url.track.id}}"
                             id="intervention_point_url_{{track_url.track.id}}" class="form-control intervention-url"
-                            value="{{track_url.url}}">
+                            value="{{track_url.url}}" placeholder="Enter URL">
                         <!--a href="#"><i class="fa fa-question-circle"></i></a-->
                     </div>
                     <div class="form-group-description">
@@ -175,15 +175,15 @@
                                 id="is_canvas_page_for_track_{{track_url.track.id}}">
                                 <option {% if not track_url.open_as_tab and track_url.is_canvas_page %}selected="selected"{% endif %}
                                     value="canvasPage">
-                                    Canvas URL -- Learners in this track are redirected to this Canvas page.
+                                    Canvas URL -- Students in this track are redirected to this Canvas page.
                                 </option>
                                 <option {% if not track_url.open_as_tab and not track_url.is_canvas_page %}selected="selected"{% endif %}
                                     value="externalPage">
-                                    External URL in Canvas -- Learners in this track view this page within Canvas.
+                                    External URL in Canvas -- Students in this track view this page within Canvas.
                                 </option>
                                 <option {% if track_url.open_as_tab %}selected="selected"{% endif %}
                                     value="newTab">
-                                    In new tab -- Learners in this track open this page in a new tab.
+                                    In new tab -- Students in this track open this page in a new tab.
                                 </option>
                             </select>
                         </div>
