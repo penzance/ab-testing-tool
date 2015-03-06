@@ -231,7 +231,7 @@ def upload_track_assignments(request, experiment_id):
         # lis_person_sourcedid is not returned by SDK, so we set it to None
         ExperimentStudent.objects.create(
             student_id=student_id, course_id=experiment.course_id,
-            track=track, lis_person_sourcedid=None,
+            track=track, student_name=unassigned_students[student_id],
             experiment=experiment
         )
     if not experiment.tracks_finalized:

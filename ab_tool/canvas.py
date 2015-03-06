@@ -134,8 +134,8 @@ def get_unassigned_students_with_context(request_context, experiment):
     except CanvasAPIError as exception:
         handle_canvas_error(exception)
     existing_student_ids = set(s.student_id for s in experiment.students.all())
-    return [i["sis_user_id"] for i in enrollments
-            if i["sis_user_id"] not in existing_student_ids]
+    return {i["sis_user_id"] : i["name"] for i in enrollments
+            if i["sis_user_id"] not in existing_student_ids}
 
 
 def list_module_items(request_context, course_id, module_id):

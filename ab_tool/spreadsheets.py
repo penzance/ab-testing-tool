@@ -36,12 +36,12 @@ def get_track_selection_xlsx(request, experiment, file_title="test.xlsx"):
     workbook = xlsxwriter.Workbook(output, {"in_memory": True})
     worksheet = workbook.add_worksheet()
     worksheet.set_column(0, 3, 20)
-    headers = ["Student ID", "LIS Person Sourcedid", "Experiment", "Assigned Track"]
+    headers = ["Student Name", "Student ID", "Experiment", "Assigned Track"]
     worksheet.write_row(0, 0, headers)
     students = get_unassigned_students(request, experiment)
     # Row offsets of +1 below are to account for header
-    for i, student in enumerate(students):
-        row = [student, "", experiment.name, ""]
+    for i, student_id in enumerate(students):
+        row = [students[student_id], student_id, experiment.name, ""]
         worksheet.write_row(i + 1, 0, row)
     # Add drop-down with track names as the only valid options for the missing column
     track_names = [t.name for t in experiment.tracks.all()]
@@ -57,10 +57,10 @@ def get_track_selection_xlsx(request, experiment, file_title="test.xlsx"):
 
 def get_track_selection_csv(request, experiment, file_title="test.xlsx"):
     def row_generator():
-        yield ["Student ID", "LIS Person Sourcedid", "Experiment", "Assigned Track"]
+        yield ["Student Name", "Student ID", "Experiment", "Assigned Track"]
         # Write data to CSV file
-        for student in get_unassigned_students(request, experiment):
-            yield [student, "", experiment.name, ""]
+        for student_id, student_name in get_unassigned_students(request, experiment).items():
+            yield [student_name, student_id, experiment.name, ""]
     return streamed_csv_response(row_generator(), file_title)
 
 
@@ -108,7 +108,7 @@ def parse_row(row, row_number, experiment, tracks, unassigned_students, students
         errors.append("Row %s: invalid track name '%s'" % (row_number, row[3]))
     elif row[2] != experiment.name:
         errors.append("Row %s: wrong experiment name '%s'" % (row_number, row[2]))
-    elif row[0] not in unassigned_students:
+    elif row[1] not in unassigned_students:
         errors.append("Row %s: student '%s' not available for assignment" % (row_number, row[0]))
     else:
-        students[row[0]] = tracks[row[3]]
+        students[row[1]] = tracks[row[3]]
