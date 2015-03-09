@@ -1,13 +1,13 @@
 from django.core.urlresolvers import reverse
 from ab_tool.tests.common import (SessionTestCase, TEST_DOMAIN,
-    NONEXISTENT_STAGE_ID)
+    NONEXISTENT_INTERVENTION_POINT_ID)
 from ab_tool.models import InterventionPoint, InterventionPointUrl
 from django.utils.http import urlencode
 from ab_tool.controllers import intervention_point_url
 from mock import patch
 from ab_tool.exceptions import (MISSING_RETURN_TYPES_PARAM,
     MISSING_RETURN_URL, missing_param_error)
-from ab_tool.constants import STAGE_URL_TAG
+from ab_tool.constants import INTERVENTION_POINT_URL_TAG
 
 class TestSelectionPages(SessionTestCase):
     """ Tests related to selection pages and methods """
@@ -62,7 +62,7 @@ class TestSelectionPages(SessionTestCase):
         """ Tests that submit_selection returns a redirect url with the
             described parameters """
         content_return_url = "http://test_content_return_url.com"
-        data = {"intervention_point_id": NONEXISTENT_STAGE_ID, "content_return_url": content_return_url}
+        data = {"intervention_point_id": NONEXISTENT_INTERVENTION_POINT_ID, "content_return_url": content_return_url}
         response = self.client.post(reverse("ab_testing_tool_submit_selection"), data)
         self.assertEquals(response.status_code, 404)
    
@@ -114,8 +114,8 @@ class TestSelectionPages(SessionTestCase):
 #         track1 = self.create_test_track(name="track1")
 #         track2 = self.create_test_track(name="track2")
 #         content_return_url = "http://test_content_return_url.com"
-#         data = {"name": intervention_point_name, STAGE_URL_TAG + "1": "http://example.com/page",
-#                 STAGE_URL_TAG + "2": "http://example.com/otherpage", "notes": "hi",
+#         data = {"name": intervention_point_name, INTERVENTION_POINT_URL_TAG + "1": "http://example.com/page",
+#                 INTERVENTION_POINT_URL_TAG + "2": "http://example.com/otherpage", "notes": "hi",
 #                 "content_return_url": content_return_url}
 #         self.client.post(reverse("ab_testing_tool_submit_selection_new_intervention_point"), data)
 #         self.assertEqual(num_intervention_points + 1, InterventionPoint.objects.count())

@@ -2,15 +2,16 @@ from django.shortcuts import render_to_response, redirect
 from django.core.urlresolvers import reverse
 from django_auth_lti.decorators import lti_role_required
 
-from ab_tool.constants import (ADMINS, STAGE_URL_TAG,
+from ab_tool.constants import (ADMINS, INTERVENTION_POINT_URL_TAG,
     DEPLOY_OPTION_TAG)
 from ab_tool.models import (InterventionPoint, Track, InterventionPointUrl,
      ExperimentStudent, Experiment)
 from ab_tool.canvas import get_lti_param, CanvasModules
 from ab_tool.controllers import (validate_format_url, post_param, assign_track_and_create_student,
     validate_name)
-from ab_tool.exceptions import (DELETING_INSTALLED_STAGE,
-    EXPERIMENT_TRACKS_NOT_FINALIZED, NO_URL_FOR_TRACK, UNIQUE_NAME_ERROR)
+from ab_tool.exceptions import (DELETING_INSTALLED_INTERVENTION_POINT,
+    EXPERIMENT_TRACKS_NOT_FINALIZED, NO_URL_FOR_TRACK, UNIQUE_NAME_ERROR,
+    EXPERIMENT_TRACKS_ALREADY_FINALIZED, DELETING_INTERVENTION_POINT_AFTER_FINALIZED)
 from ab_tool.analytics import log_intervention_point_interaction
 from django.http.response import Http404
 
@@ -84,7 +85,7 @@ def submit_create_intervention_point(request, experiment_id):
     notes = post_param(request, "notes")
     # validate_format_url validates URLs using backend rules before InterventionPointUrl object creation
     intervention_pointurls = [(k,validate_format_url(v)) for (k,v) in request.POST.iteritems()
-                              if STAGE_URL_TAG in k and v]
+                              if INTERVENTION_POINT_URL_TAG in k and v]
     experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
     if InterventionPoint.objects.filter(name=name,
         course_id=course_id, experiment=experiment).count() > 0:
@@ -92,7 +93,7 @@ def submit_create_intervention_point(request, experiment_id):
     intervention_point = InterventionPoint.objects.create(
             name=name, notes=notes, course_id=course_id, experiment=experiment)
     for (k,v) in intervention_pointurls:
-        _, track_id = k.split(STAGE_URL_TAG)
+        _, track_id = k.split(INTERVENTION_POINT_URL_TAG)
         deploy_option = post_param(request, DEPLOY_OPTION_TAG + track_id)
         is_canvas_page = bool(deploy_option == "canvasPage")
         open_as_tab = bool(deploy_option == "newTab")
@@ -165,9 +166,9 @@ def edit_intervention_point_common(request, intervention_point_id):
         raise UNIQUE_NAME_ERROR
     intervention_point.update(name=new_name, notes=notes)
     # Validates URLs using backend rules before any InterventionPointUrl object creation
-    intervention_pointurls = [(k,validate_format_url(v)) for (k,v) in request.POST.iteritems() if STAGE_URL_TAG in k and v]
+    intervention_pointurls = [(k,validate_format_url(v)) for (k,v) in request.POST.iteritems() if INTERVENTION_POINT_URL_TAG in k and v]
     for (k,v) in intervention_pointurls:
-        _, track_id = k.split(STAGE_URL_TAG)
+        _, track_id = k.split(INTERVENTION_POINT_URL_TAG)
         # This is a search for the joint unique index of InterventionPointUrl, so it
         # should not ever return multiple objects
         deploy_option = post_param(request, DEPLOY_OPTION_TAG + track_id)
@@ -187,13 +188,17 @@ def delete_intervention_point(request, intervention_point_id):
     """ Note: Installed intervention_points are not allowed to be deleted
         Note: attached InterventionPointUrls are deleted via cascading delete """
     course_id = get_lti_param(request, "custom_canvas_course_id")
+
     try:
         intervention_point = InterventionPoint.get_or_404_check_course(
                 intervention_point_id, course_id)
+        if intervention_point.experiment.tracks_finalized:
+            raise DELETING_INTERVENTION_POINT_AFTER_FINALIZED
         canvas_modules = CanvasModules(request)
         if canvas_modules.intervention_point_is_installed(intervention_point):
-            raise DELETING_INSTALLED_STAGE
+            raise DELETING_INSTALLED_INTERVENTION_POINT
         intervention_point.delete()
     except Http404:
         pass
+
     return redirect(reverse("ab_testing_tool_index"))
