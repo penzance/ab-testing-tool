@@ -6,7 +6,7 @@ from ab_tool.models import (Track, InterventionPointUrl, InterventionPoint,
     Experiment)
 from ab_tool.controllers import (intervention_point_url, post_param,
     validate_name)
-from ab_tool.constants import STAGE_URL_TAG, ADMINS
+from ab_tool.constants import INTERVENTION_POINT_URL_TAG, ADMINS
 from ab_tool.canvas import get_lti_param, CanvasModules
 from ab_tool.exceptions import (MISSING_RETURN_TYPES_PARAM,
     MISSING_RETURN_URL)
@@ -57,9 +57,9 @@ def submit_selection_new_intervention_point(request):
     experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
     intervention_point = InterventionPoint.objects.create(
             name=name, notes=notes, course_id=course_id, experiment=experiment)
-    intervention_pointurls = [(k,v) for (k,v) in request.POST.iteritems() if STAGE_URL_TAG in k and v]
+    intervention_pointurls = [(k,v) for (k,v) in request.POST.iteritems() if INTERVENTION_POINT_URL_TAG in k and v]
     for (k,v) in intervention_pointurls:
-        _, track_id = k.split(STAGE_URL_TAG)
+        _, track_id = k.split(INTERVENTION_POINT_URL_TAG)
         InterventionPointUrl.objects.create(url=v, intervention_point_id=intervention_point.id, track_id=track_id)
     page_url = intervention_point_url(request, intervention_point.id)
     page_name = intervention_point.name

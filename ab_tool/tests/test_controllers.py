@@ -4,7 +4,7 @@ from ab_tool.controllers import (intervention_point_url,
     validate_format_url, post_param, assign_track_and_create_student,
     validate_name, validate_weighting)
 from ab_tool.tests.common import (SessionTestCase, TEST_STUDENT_ID, TEST_STUDENT_NAME)
-from ab_tool.exceptions import (BAD_STAGE_ID, CSV_UPLOAD_NEEDED,
+from ab_tool.exceptions import (BAD_INTERVENTION_POINT_ID, CSV_UPLOAD_NEEDED,
     NO_TRACKS_FOR_EXPERIMENT, TRACK_WEIGHTS_NOT_SET,
     INVALID_URL_PARAM, MISSING_NAME_PARAM, PARAM_LENGTH_EXCEEDS_LIMIT,
     INCORRECT_WEIGHTING_PARAM)
@@ -71,8 +71,8 @@ class TestControllers(SessionTestCase):
     
     def test_intervention_point_url_errors(self):
         """ Tests that intervention_point_url errors when passed a non-numeral intervention_point_id """
-        self.assertRaisesSpecific(BAD_STAGE_ID, intervention_point_url, self.request, None)
-        self.assertRaisesSpecific(BAD_STAGE_ID, intervention_point_url, self.request, "str")
+        self.assertRaisesSpecific(BAD_INTERVENTION_POINT_ID, intervention_point_url, self.request, None)
+        self.assertRaisesSpecific(BAD_INTERVENTION_POINT_ID, intervention_point_url, self.request, "str")
     
     def test_validate_format_url_passthrough(self):
         """ Tests that validate_format_url doesn't change a proper http:// url """
