@@ -38,7 +38,7 @@ UNIQUE_NAME_ERROR = Renderable400("Another intervention point with this name was
 CSV_ERROR = Renderable500("There was a problem preparing the CSV file for download.")
 
 def DATABASE_ERROR(error_message):
-    return Renderable400("Sadly, there was a problem loading this page. Please try again. If the problem persists please notify your local academic support staff.")
+    return Renderable400(ADMIN_VISIBLE_ERROR)
 
 def missing_param_error(param_name):
-    return Renderable400("Sadly, there was a problem loading this page. Please try again. If the problem persists please notify your local academic support staff.")
+    return Renderable400(ADMIN_VISIBLE_ERROR)
