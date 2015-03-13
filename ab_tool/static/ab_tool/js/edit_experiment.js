@@ -260,10 +260,7 @@ var controller = function($scope, $window, $http) {
             if (otherTrack == track) {
                 continue;
             }
-            if (otherTrack.name == track.newName) {
-                alert("Sorry, there is already another track with that name. Each track in an experiment must have a unique name.");
-                return false;
-            } else if (otherTrack.databaseName == track.newName) {
+            if (otherTrack.name == track.newName || otherTrack.databaseName == track.newName ) {
                 alert("Sorry, there is already another track with that name. Each track in an experiment must have a unique name.");
                 return false;
             }

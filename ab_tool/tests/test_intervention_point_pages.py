@@ -1,15 +1,15 @@
 from django.core.urlresolvers import reverse
 from mock import patch
 
-from ab_tool.constants import STAGE_URL_TAG, DEPLOY_OPTION_TAG
+from ab_tool.constants import INTERVENTION_POINT_URL_TAG, DEPLOY_OPTION_TAG
 from ab_tool.models import (InterventionPoint, InterventionPointUrl,
     ExperimentStudent, Experiment)
 from ab_tool.tests.common import (SessionTestCase, TEST_COURSE_ID,
-    TEST_OTHER_COURSE_ID, NONEXISTENT_STAGE_ID, APIReturn, LIST_MODULES,
+    TEST_OTHER_COURSE_ID, NONEXISTENT_INTERVENTION_POINT_ID, APIReturn, LIST_MODULES,
     TEST_STUDENT_ID)
 from ab_tool.exceptions import (NO_URL_FOR_TRACK,  UNAUTHORIZED_ACCESS,
     EXPERIMENT_TRACKS_NOT_FINALIZED, NO_TRACKS_FOR_EXPERIMENT,
-    DELETING_INSTALLED_STAGE)
+    DELETING_INSTALLED_INTERVENTION_POINT, UNIQUE_NAME_ERROR)
 
 
 class TestInterventionPointPages(SessionTestCase):
@@ -150,6 +150,18 @@ class TestInterventionPointPages(SessionTestCase):
         self.assertOkay(response)
         self.assertEqual(num_intervention_points + 1, InterventionPoint.objects.count())
     
+    def test_submit_create_intervention_point_with_same_name_raises_exception(self):
+        """ Tests that create_intervention_point with same name as existing intervention
+            point raises exception"""
+        intervention_point = self.create_test_intervention_point(name="SAME_NAME")
+        num_intervention_points = InterventionPoint.objects.count()
+        data = {"name": intervention_point.name, "notes": "hi"}
+        experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
+        url = reverse("ab_testing_tool_submit_create_intervention_point", args=(experiment.id,))
+        response = self.client.post(url, data, follow=True)
+        self.assertError(response, UNIQUE_NAME_ERROR)
+        self.assertEqual(num_intervention_points, InterventionPoint.objects.count())
+    
     def test_submit_create_intervention_point_with_intervention_pointurls(self):
         """ Tests that create_intervention_point creates an InterventionPoint
             object and InterventionPointUrl objects verified by DB count """
@@ -159,8 +171,8 @@ class TestInterventionPointPages(SessionTestCase):
         track1 = self.create_test_track(name="t1")
         track2 = self.create_test_track(name="t2")
         data = {"name": intervention_point_name,
-                STAGE_URL_TAG + str(track1.id): "http://example.com/page",
-                STAGE_URL_TAG + str(track2.id): "http://example.com/otherpage",
+                INTERVENTION_POINT_URL_TAG + str(track1.id): "http://example.com/page",
+                INTERVENTION_POINT_URL_TAG + str(track2.id): "http://example.com/otherpage",
                 DEPLOY_OPTION_TAG + str(track1.id): "non_canvas_url",
                 DEPLOY_OPTION_TAG + str(track2.id): "non_canvas_url",
                 "notes": "hi"}
@@ -183,8 +195,8 @@ class TestInterventionPointPages(SessionTestCase):
         num_intervention_points = InterventionPoint.objects.count()
         num_intervention_pointurls = InterventionPointUrl.objects.count()
         data = {"name": "intervention_point",
-                STAGE_URL_TAG + "1": "http://example.com/page",
-                STAGE_URL_TAG + "2": "http://example.com/otherpage",
+                INTERVENTION_POINT_URL_TAG + "1": "http://example.com/page",
+                INTERVENTION_POINT_URL_TAG + "2": "http://example.com/otherpage",
                 "notes": "hi"}
         experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
         url = reverse("ab_testing_tool_submit_create_intervention_point", args=(experiment.id,))
@@ -210,6 +222,18 @@ class TestInterventionPointPages(SessionTestCase):
         intervention_point = InterventionPoint.objects.get(id=intervention_point_id)
         self.assertEqual(intervention_point.name, "new_name")
     
+    def test_submit_edit_intervention_point_with_same_name_raises_exception(self):
+        """ Tests that submit_edit_intervention_point submission with same
+            name as existing intervention point raises exception"""
+        intervention_point1 = self.create_test_intervention_point(name="SAME_NAME")
+        intervention_point2 = self.create_test_intervention_point(name="old_name")
+        num_intervention_points = InterventionPoint.objects.count()
+        data = {"name": intervention_point1.name, "notes": ""}
+        response = self.client.post(reverse("ab_testing_tool_submit_edit_intervention_point",
+                args=(intervention_point2.id,)), data, follow=True)
+        self.assertError(response, UNIQUE_NAME_ERROR)
+        self.assertEqual(num_intervention_points, InterventionPoint.objects.count())
+    
     def test_submit_edit_intervention_point_with_intervention_point_urls(self):
         """ Tests that submit_edit_intervention_point does not change DB count
             but does change InterventionPoint attribute, edits the existing
@@ -223,8 +247,8 @@ class TestInterventionPointPages(SessionTestCase):
         num_intervention_points = InterventionPoint.objects.count()
         num_intervention_pointurls = InterventionPointUrl.objects.count()
         data = {"name": "new_name",
-                STAGE_URL_TAG + str(track1.id): "http://example.com/new_page",
-                STAGE_URL_TAG + str(track2.id): "http://example.com/second_page",
+                INTERVENTION_POINT_URL_TAG + str(track1.id): "http://example.com/new_page",
+                INTERVENTION_POINT_URL_TAG + str(track2.id): "http://example.com/second_page",
                 DEPLOY_OPTION_TAG + str(track1.id): "canvasPage",
                 DEPLOY_OPTION_TAG + str(track2.id): "externalPage",
                 "notes": "hi",
@@ -259,7 +283,7 @@ class TestInterventionPointPages(SessionTestCase):
     def test_submit_edit_intervention_point_nonexistent(self):
         """ Tests that submit_edit_intervention_point method raises error for
             non-existent InterventionPoint """
-        intervention_point_id = NONEXISTENT_STAGE_ID
+        intervention_point_id = NONEXISTENT_INTERVENTION_POINT_ID
         data = {"name": "new_name",
                 "notes": "hi"}
         response = self.client.post(
@@ -319,7 +343,7 @@ class TestInterventionPointPages(SessionTestCase):
             in the same course """
         first_num_intervention_points = InterventionPoint.objects.count()
         self.create_test_intervention_point()
-        intervention_point_id = NONEXISTENT_STAGE_ID
+        intervention_point_id = NONEXISTENT_INTERVENTION_POINT_ID
         response = self.client.get(reverse("ab_testing_tool_delete_intervention_point",
                                            args=(intervention_point_id,)), follow=True)
         second_num_intervention_points = InterventionPoint.objects.count()
@@ -350,7 +374,7 @@ class TestInterventionPointPages(SessionTestCase):
                                                args=(intervention_point.id,)), follow=True)
             second_num_intervention_points = InterventionPoint.objects.count()
             self.assertNotEqual(first_num_intervention_points, second_num_intervention_points)
-            self.assertError(response, DELETING_INSTALLED_STAGE)
+            self.assertError(response, DELETING_INSTALLED_INTERVENTION_POINT)
     
     def test_modules_page_edit_intervention_point(self):
         """ Tests modules_page_edit_intervention_point for admins redirects to editInterventionPointFromCanvas """

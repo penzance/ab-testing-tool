@@ -109,7 +109,7 @@
                         <ul class='intervention-points'>
                             {% for intervention_point in experiment.intervention_points.all %}
                                 <li>
-                                    {% if intervention_point in uninstalled_intervention_points %}
+                                    {% if intervention_point in uninstalled_intervention_points and not experiment.tracks_finalized %}
                                         <a href="{% url 'ab_testing_tool_delete_intervention_point' intervention_point.id %}"
                                             data-toggle="tooltip" data-placement="top"
                                             title="Delete Intervention Point '{{intervention_point.name}}'"

@@ -8,11 +8,11 @@ from django.core.exceptions import ValidationError
 from random import choice
 
 from ab_tool.models import (TrackProbabilityWeight, Experiment, ExperimentStudent)
-from ab_tool.exceptions import (BAD_STAGE_ID, missing_param_error,
+from ab_tool.exceptions import (BAD_INTERVENTION_POINT_ID, missing_param_error,
     NO_TRACKS_FOR_EXPERIMENT, TRACK_WEIGHTS_NOT_SET,
     CSV_UPLOAD_NEEDED, INVALID_URL_PARAM, INCORRECT_WEIGHTING_PARAM,
-    MISSING_NAME_PARAM, PARAM_LENGTH_EXCEEDS_LIMIT, NoValidCredentials)
-from ab_tool.constants import (NAME_CHAR_LIMIT, URL_CHAR_LIMIT)
+    MISSING_NAME_PARAM, PARAM_LENGTH_EXCEEDS_LIMIT, INPUT_NOT_ALLOWED)
+from ab_tool.constants import (NAME_CHAR_LIMIT)
 
 
 def assign_track_and_create_student(experiment, student_id, student_name):
@@ -53,7 +53,7 @@ def intervention_point_url(request, intervention_point_id):
     try:
         intervention_point_id = int(intervention_point_id)
     except (TypeError, ValueError):
-        raise BAD_STAGE_ID
+        raise BAD_INTERVENTION_POINT_ID
     return request.build_absolute_uri(reverse("ab_testing_tool_deploy_intervention_point",
                                               args=(intervention_point_id,)))
 
@@ -80,9 +80,8 @@ def validate_format_url(url):
     if not url.startswith("http://") and not url.startswith("https://"):
         url = "http://%s" % url
     try:
+        #the validator enforces standard URL length requirement
         validator(url)
-        if len(url) > URL_CHAR_LIMIT:
-            raise PARAM_LENGTH_EXCEEDS_LIMIT #the validator may already enforce length requirement
         return url
     except ValidationError:
         raise INVALID_URL_PARAM
