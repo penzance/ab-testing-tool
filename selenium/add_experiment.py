@@ -61,6 +61,9 @@ class add_experiment(unittest.TestCase):
         # Go to the A/B Testing Tool and add an uniform experiment to have 2 tracks
         driver.find_element_by_link_text("A/B Testing Tool").click()
         driver.switch_to_frame("tool_content")
+        current_name = driver.find_element_by_tag_name("h1").text
+        title_name = "A/B Testing Dashboard"
+        self.assertEqual(title_name, current_name)
         driver.find_element_by_link_text("New Experiment").click()
         driver.find_element_by_name("experimentName").send_keys("%s Test Add Uniform Experiment" %TIMESTAMP)
         if not driver.find_element_by_name("uniformRandom").is_selected():
@@ -69,10 +72,6 @@ class add_experiment(unittest.TestCase):
         driver.find_element_by_id("create-confirm").click()
         driver.find_element_by_id("createNow").click()
 
-        driver.switch_to_frame("tool_content")
-        current_name = driver.find_element_by_tag_name("h1").text
-        title_name = "A/B Testing Tool"
-        self.assertEqual(title_name, current_name)
         # Add an intervention point with no URLs
         # need to be able to find element by link_text to work
         #driver.find_element_by_id("add_intervention_point_button").click()
