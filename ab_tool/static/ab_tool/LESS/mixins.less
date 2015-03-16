@@ -1,0 +1,65 @@
+/* 
+.trans (@what: all, @time: 0.2s, @type: ease-in-out) {  
+   -webkit-transition: @arguments;  
+   -moz-transition: @arguments;  
+   -o-transition: @arguments;  
+   -ms-transition: @arguments;  
+   transition: @arguments; 
+}
+
+usage: .trans(@time:1s); or .trans(@type:linear, @what: opacity); */
+
+.toFluidSize(@target, @context, @multiplier:1){
+	@size: ((@target / @context) * @multiplier);
+}
+
+.mixPadding(@t, @r, @b, @l){
+
+	padding: @arguments;
+}
+
+.mixBtn(@bkgColor, @hoverColor, @border, @radius:0, @fontColor, @fontColorHover){
+	border: @border;
+	border-radius: @radius;
+	background-color: @bkgColor;
+	color: @fontColor;
+	&:hover{
+		background-color: @hoverColor;
+		color: @fontColorHover;
+	}
+}
+
+// Single side border-radius
+.border-top-radius(@radius) {
+  border-top-right-radius: @radius;
+   border-top-left-radius: @radius;
+}
+.border-right-radius(@radius) {
+  border-bottom-right-radius: @radius;
+     border-top-right-radius: @radius;
+}
+.border-bottom-radius(@radius) {
+  border-bottom-right-radius: @radius;
+   border-bottom-left-radius: @radius;
+}
+.border-left-radius(@radius) {
+  border-bottom-left-radius: @radius;
+     border-top-left-radius: @radius;
+}
+
+.sr-only{
+	position:absolute;
+	left:-10000px;
+	top:auto;
+	width:1px;
+	height:1px;
+	overflow:hidden;
+}
+
+// Opacity
+.opacity(@opacity) {
+  opacity: @opacity;
+  // IE8 filter
+  @opacity-ie: (@opacity * 100);
+  filter: ~"alpha(opacity=@{opacity-ie})";
+}

@@ -1,0 +1,93 @@
+.btn{
+	display: inline-block;
+	text-align: center;
+	text-decoration: none;
+	&.disabled
+	, &[disabled]
+	, fieldset[disabled] & {
+		cursor: not-allowed;
+		pointer-events: none;
+		.opacity(.65);
+	}
+}
+
+.btn-icon{
+	text-decoration: none;
+
+	& .fa { 
+		.toFluidSize(8em,16em);
+		padding-right: @size; 
+	}
+}
+
+.btn-submit{
+	/*height: 1em;*/
+	padding: 0.45em 2%;
+	border-radius: 5px;
+	background-color: #cecece;
+	border: solid 1px #c3c3c3;
+	margin-left: 0.5em;
+	color: #525252;
+}
+	.btn-submit-primary{
+		.btn-submit;
+		background-color: #3e67a2;
+		color: #fafafa;
+
+		&:hover{
+			background-color: @link-hover-color;
+			color: #fafafa;
+		}
+	}
+	button.btn-submit-primary{
+		height: auto;
+	}
+
+/* link look and feel but with the padding
+and spacing to match a btn-submit */
+.btn-link{
+	.btn-submit;
+	background-color: transparent;
+	border: 0;
+	color: #3e67a2;
+}
+
+.btn-icon-only{
+	padding: @btn-icon-only-padding;
+	border-radius: 8px;
+	& span{
+		.sr-only;
+	}
+}
+
+.btn-dashboard{
+	color: #fafafa;
+	//margin-top: 0.85em;
+	font-size: (20em / 16em);
+	padding: 1.5em 0;
+	text-decoration: none;
+	& i { 
+		display: inline-block;
+		width: 100%;
+	}
+}
+
+	.btn-modules{
+		width: ((128% / 1040%) * 100%);
+		background-color: @font-family-title-color;
+		margin-right: 1.538461538462%;
+		float: left;
+		&:hover{
+			background-color: #67b5dc;
+			color: #fafafa;
+		}
+	}
+	.btn-newExperiment{
+		background-color: @link-color;
+		width: ((192% / 1040%) * 100%);
+		&:hover{
+			background-color: #67b5dc;
+			color: #fafafa;	
+		}
+	}
+
