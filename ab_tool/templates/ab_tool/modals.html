@@ -63,7 +63,7 @@
                                 placeholder="Enter Intervention Name">
                     </div>
                     <div class="form-group-description">
-                        <p>A descriptive name for this track. This will help you blah blah blah</p>
+                        <p>Please enter a name for this intervention point.</p>
                     </div>
                 </fieldset>
 
@@ -75,11 +75,11 @@
                         <a href="#" class="preview-link">preview</a>
                         <input type="url" name="intervention_point_url_{{track.id}}"
                             id="intervention_point_url_{{track.id}}" class="form-control intervention-url"
-                            value="">
+                            value="" placeholder="Enter URL">
                         <!--a href="#"><i class="fa fa-question-circle"></i></a-->
                     </div>
                     <div class="form-group-description">
-                        <p>A descriptive name for this track. This will help you blah blah blah</p>
+                        <p>Please enter a URL for this track to view in this intervention point.</p>
                     </div>
 
                     <div class="form-group-inline-right">
@@ -87,15 +87,15 @@
                         <div class="custom-dropdown">
                             <select name="is_canvas_page_for_track_{{track.id}}"
                                 id="is_canvas_page_for_track_{{track.id}}">
-                                <option value="canvasPage">Canvas URL -- Learners in this track are redirected to this Canvas page.</option>
-                                <option value="externalPage">External URL in Canvas -- Learners in this track view this page within Canvas.</option>
-                                <option value="newTab">In new tab -- Learners in this track open this page in a new tab.</option>
+                                <option value="canvasPage">Canvas URL -- Students in this track are redirected to this Canvas page.</option>
+                                <option value="externalPage">External URL in Canvas -- Students in this track view this page within Canvas.</option>
+                                <option value="newTab">In new tab -- Students in this track open this page in a new tab.</option>
                             </select>
                         </div>
                         <!--a href="#"><i class="fa fa-question-circle"></i></a-->
                     </div>
                     <div class="form-group-description">
-                        <p>A descriptive name for this track. This will help you blah blah blah</p>
+                        <p>Please choose how you would like the web page to be displayed for students.</p>
                     </div>
                 </fieldset>
                 {% endfor %}
@@ -161,7 +161,7 @@
                         <a href="#" class="preview-link">preview</a>
                         <input type="url" name="intervention_point_url_{{track_url.track.id}}"
                             id="intervention_point_url_{{track_url.track.id}}" class="form-control intervention-url"
-                            value="{{track_url.url}}">
+                            value="{{track_url.url}}" placeholder="Enter URL">
                         <!--a href="#"><i class="fa fa-question-circle"></i></a-->
                     </div>
                     <div class="form-group-description">
@@ -175,15 +175,15 @@
                                 id="is_canvas_page_for_track_{{track_url.track.id}}">
                                 <option {% if not track_url.open_as_tab and track_url.is_canvas_page %}selected="selected"{% endif %}
                                     value="canvasPage">
-                                    Canvas URL -- Learners in this track are redirected to this Canvas page.
+                                    Canvas URL -- Students in this track are redirected to this Canvas page.
                                 </option>
                                 <option {% if not track_url.open_as_tab and not track_url.is_canvas_page %}selected="selected"{% endif %}
                                     value="externalPage">
-                                    External URL in Canvas -- Learners in this track view this page within Canvas.
+                                    External URL in Canvas -- Students in this track view this page within Canvas.
                                 </option>
                                 <option {% if track_url.open_as_tab %}selected="selected"{% endif %}
                                     value="newTab">
-                                    In new tab -- Learners in this track open this page in a new tab.
+                                    In new tab -- Students in this track open this page in a new tab.
                                 </option>
                             </select>
                         </div>
@@ -257,6 +257,47 @@
                 <a class="btn btn-lg btn-submit-primary" data-dismiss="modal"> Close </a>
                 <a class="btn btn-lg btn-submit submitter" href="{% url 'ab_testing_tool_finalize_tracks' experiment.id %}"> Yes, Start Experiment </a>
             </div>
+        </div>
+    </div>
+</div>
+<!-- END Modal code for Finalize Tracks confirmation box-->
+{% endfor %}
+
+
+{% for experiment in experiments %}
+<!-- START Modal code for Finalize Tracks confirmation box-->
+<div id="upload_students_modal{{experiment.id}}" class="modal fade" role="dialog" aria-labelledby="upload_students_modal{{experiment.id}}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Upload Track Assignments</h4>
+            </div>
+            <form method="post" action="{% url 'ab_testing_tool_upload_track_assignments' experiment.id %}" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <p>Upload a spreadsheet to assign students to tracks. Download the following file of all
+                    students not assigned to a track, fill it in with track assignments for each student, and
+                    upload it below. You can also upload the list of student track assignments
+                    from a different experiment in this course or a CSV file.</p>
+                    XLSX: <a href="{% url 'ab_testing_tool_track_selection_xlsx' experiment.id %}">track_selection.xlsx</a>
+                    <br><br>
+                    <p class="text-warning">Warning: Track assignments are final. A student
+                    cannot be changed to a different track once an assignment has been made.</p>
+                    {% if not experiment.tracks_finalized %}
+                    <p class="text-warning">Warning: You have not started the experiment yet.
+                        Uploading students will start this experiment. Starting an experiment cannot be undone.
+                        Once started, the experiment assignment method and number of tracks cannot be changed.
+                        <b>Students that join later will need to be assigned tracks</b>.</p>
+                    {% endif %}
+                    <label>Completed track assignment spreadsheet:
+                        <input type="file" name="track_assignments">
+                    </label>
+                </div>
+                <div class="modal-footer">
+                    <a class="btn btn-lg btn-submit-primary" data-dismiss="modal"> Close </a>
+                    <input type="submit" class="btn btn-lg btn-submit" value="Assign Tracks">
+                </div>
+            </form>
         </div>
     </div>
 </div>

@@ -1,10 +1,14 @@
+from urlparse import urlparse
+from datetime import timedelta
 from django.db import models, IntegrityError
+from django.conf import settings
 from django.shortcuts import get_object_or_404
 from ab_tool.exceptions import (UNAUTHORIZED_ACCESS,
     EXPERIMENT_TRACKS_ALREADY_FINALIZED, DATABASE_ERROR)
 import json
 from django.core.urlresolvers import reverse
-from ab_tool.constants import NAME_CHAR_LIMIT, URL_CHAR_LIMIT
+from django.utils import timezone
+from ab_tool.constants import NAME_CHAR_LIMIT, URL_CHAR_LIMIT, NOTES_CHAR_LIMIT
 
 
 class TimestampedModel(models.Model):
@@ -19,6 +23,15 @@ class TimestampedModel(models.Model):
         for k, v in kwargs.iteritems():
             setattr(self, k, v)
         self.save(update_fields=kwargs.keys())
+    
+    def save_as_new_object(self, **kwargs):
+        """ Saves a new object based on the original, applying updates in
+            kwargs.  Note that this operates in-place; do not use this if
+            other memory references to this object exist """
+        for k, v in kwargs.iteritems():
+            setattr(self, k, v)
+        self.pk, self.id = None, None
+        self.save()
     
     # Override for objects.create
     def save(self, *args, **kwargs):
@@ -65,6 +78,18 @@ class Experiment(CourseObject):
     class Meta:
         unique_together = (('course_id', 'name'),)
     
+    @classmethod
+    def get_all_started_csv(cls):
+        return cls.objects.filter(tracks_finalized=True,
+                                  assignment_method=Experiment.CSV_UPLOAD)
+    
+    def get_course_notification(self):
+        """ The CourseNotification object should exist, at the point at which
+            an experiment has been created under the same course, so this method
+            will raise an exception if the CourseNotification object doesn't
+            exist yet."""
+        return CourseNotification.objects.get(course_id=self.course_id)
+    
     def assert_not_finalized(self):
         if self.tracks_finalized:
             raise EXPERIMENT_TRACKS_ALREADY_FINALIZED
@@ -85,6 +110,7 @@ class Experiment(CourseObject):
             "name": self.name,
             "notes": self.notes,
             "uniformRandom": bool(self.assignment_method == self.UNIFORM_RANDOM),
+            "csvUpload": bool(self.assignment_method == self.CSV_UPLOAD),
             "tracks": [{"id": t.id,
                         "weighting": t.get_weighting(),
                         "name": t.name,
@@ -97,6 +123,34 @@ class Experiment(CourseObject):
                        for t in self.tracks.all()],
         }
         return json.dumps(experiment_dict)
+    
+    def copy(self, new_name):
+        tracks = self.tracks.all()
+        intervention_points = self.intervention_points.all()
+        # Copy Experiment
+        self.save_as_new_object(name=new_name, tracks_finalized=False)
+        
+        # Copy Tracks
+        track_id_mapping = {}
+        for track in tracks:
+            original_track_id = track.id
+            track.save_as_new_object(experiment=self)
+            track_id_mapping[original_track_id] = track
+            # Copy TrackProbabilityWeight, if any
+            try:
+                weight = TrackProbabilityWeight.objects.get(track_id=original_track_id)
+                weight.save_as_new_object(track=track)
+            except TrackProbabilityWeight.DoesNotExist:
+                pass
+        
+        # Copy InterventionPoints
+        for intervention_point in intervention_points:
+            orig_ip_id = intervention_point.id
+            intervention_point.save_as_new_object(experiment=self)
+            # Copy InterventionPointUrls, if any
+            for ip_url in InterventionPointUrl.objects.filter(intervention_point_id=orig_ip_id):
+                ip_url.save_as_new_object(track=track_id_mapping[ip_url.track.id],
+                                          intervention_point=intervention_point)
     
     @classmethod
     def get_placeholder_course_experiment(cls, course_id):
@@ -189,9 +243,9 @@ class InterventionPointUrl(TimestampedModel):
 
 class ExperimentStudent(CourseObject):
     """ This model stores which track a student is in for a given experiment
-        within a given course.  A real-world can be represented by multiple
-        ExperimentStudent objects, and will have a separate object for each
-        experiment they are in. """
+        within a given course.  A real-world student can be represented by
+        multiple ExperimentStudent objects, and will have a separate object for
+        each experiment they are in. """
     student_id = models.CharField(max_length=128, db_index=True)
     student_name = models.CharField(max_length=256, db_index=True, null=True)
     experiment = models.ForeignKey(Experiment, related_name="students")
@@ -210,3 +264,59 @@ class InterventionPointInteraction(CourseObject):
     experiment = models.ForeignKey(Experiment, related_name="intervention_point_interactions")
     track = models.ForeignKey(Track)
     url = models.URLField(max_length=URL_CHAR_LIMIT)
+
+
+class CourseNotification(TimestampedModel):
+    course_id = models.CharField(max_length=128, unique=True)
+    last_emailed = models.DateTimeField(null=True)
+    canvas_url = models.URLField(max_length=2048) #Base URL for Canvas SDK
+    
+    @classmethod
+    def store_credential(cls, course_id, canvas_url, email, oauth_token):
+        """ Gets and stores a credential per user of the course. """
+        course = cls.objects.get_or_create(
+                course_id=course_id, defaults={"canvas_url": canvas_url})[0]
+        credential, created = CourseCredential.objects.get_or_create(
+                course=course, email=email, defaults={"token": oauth_token})
+        if not created:
+            credential.update(token=oauth_token)
+    
+    def can_notify(self):
+        """ Returns a boolean as to whether or not a notification can be sent
+            if all of the following are true:
+              * The course was created in the last year
+              * A notification has not already been sent within the
+                minimum amount of time to wait between notifications,
+              * There is at least one started experiment with CSV upload
+                for that course.
+            
+            TODO: change the logic for course expiration to be dynamic """
+        expiration = self.created_on + timedelta(days=settings.COURSE_ACTIVE_DAYS)
+        if timezone.now() > expiration:
+            return False
+        wait_time = timedelta(hours=settings.NOTIFICATION_FREQUENCY_HOURS)
+        if self.last_emailed is not None and timezone.now() < self.last_emailed + wait_time:
+            return False
+        return self.experiments_to_check().count() > 0
+    
+    def get_emails(self):
+        return [credential.email for credential in self.credentials.all()]
+    
+    def notification_sent(self):
+        self.update(last_emailed=timezone.now())
+    
+    def get_canvas_course_url(self):
+        parsed_uri = urlparse(self.canvas_url)
+        return '{uri.scheme}://{uri.netloc}/courses/{course_id}'.format(
+                uri=parsed_uri, course_id=self.course_id
+        )
+
+
+class CourseCredential(TimestampedModel):
+    """ Stores oauth tokens and emails for people in the course """
+    course = models.ForeignKey(CourseNotification, related_name="credentials")
+    email = models.EmailField(max_length=2048)
+    token = models.CharField(max_length=128)
+    
+    class Meta:
+        unique_together = (('course', 'email'),)

@@ -1,18 +1,19 @@
+from canvas_sdk.methods.courses import list_users_in_course_users
 from canvas_sdk.methods import modules
 from canvas_sdk import RequestContext
 from canvas_sdk.exceptions import CanvasAPIError
 from django.conf import settings
 
 from ab_tool.exceptions import (MISSING_LTI_PARAM, MISSING_LTI_LAUNCH,
-    NO_SDK_RESPONSE)
+    NO_SDK_RESPONSE, NoValidCredentials, UNAUTHORIZED_ACCESS)
+from requests.exceptions import RequestException
 from django_canvas_oauth import get_token
 from ab_tool.controllers import intervention_point_url
-from ab_tool.models import InterventionPoint, Experiment
+from ab_tool.models import InterventionPoint, Experiment, CourseNotification
 from django_canvas_oauth.exceptions import NewTokenNeeded
 
 
 class CanvasModules(object):
-    
     def __init__(self, request):
         self.request_context = get_canvas_request_context(request)
         self.course_id = get_lti_param(request, "custom_canvas_course_id")
@@ -86,12 +87,64 @@ class CanvasModules(object):
         return installed_intervention_point_urls
 
 
+def experiments_with_unassigned_students(request, course_id):
+    return [experiment.id for experiment in
+            Experiment.objects.filter(assignment_method=Experiment.CSV_UPLOAD,
+                                      course_id=course_id)
+            if get_unassigned_students(request, experiment)]
+
+
+def get_unassigned_students(request, experiment):
+    """ Gets the list of students that have not been assigned a track.
+        This version of the function is for requests that have come through
+        a web view and consequently have a django request object off of which
+        to make a canvas request context """
+    request_context = get_canvas_request_context(request)
+    return get_unassigned_students_with_context(request_context, experiment)
+
+
+def get_unassigned_students_with_stored_credentials(course_object, experiment):
+    """ Gets the list of students that have not been assigned a track.
+        This version of the function is for requests that have not come through
+        a web view and consequently must make a canvas request context from
+        cached credentials.
+        
+        Note: Raises NoValidCredentials exception if none of the credentials
+        work for the API call.  This exception should be handled by the caller
+        by sending an email request for new credentials """
+    if experiment.course_id != course_object.course_id:
+        raise UNAUTHORIZED_ACCESS
+    for credential in course_object.credentials.all():
+        try:
+            # Creates custom RequestContext with one of the CourseCredentials for the CourseNotification
+            request_context = RequestContext(credential.token, course_object.canvas_url)
+            return get_unassigned_students_with_context(request_context, experiment)
+        except NewTokenNeeded:
+            continue
+    raise NoValidCredentials("There are no valid credentials for course %s" %
+                             course_object.course_id)
+
+
+def get_unassigned_students_with_context(request_context, experiment):
+    """ Returns a list of sis_user_ids because that is the unique
+        identifier the ab_tool users for students """
+    try:
+        enrollments = list_users_in_course_users(
+                request_context, experiment.course_id, None, enrollment_type="student").json()
+    except CanvasAPIError as exception:
+        handle_canvas_error(exception)
+    existing_student_ids = set(s.student_id for s in experiment.students.all())
+    return {i["sis_user_id"] : i["name"] for i in enrollments
+            if i["sis_user_id"] not in existing_student_ids}
+
+
 def list_module_items(request_context, course_id, module_id):
     try:
         return modules.list_module_items(request_context, course_id, module_id,
                                          "content_details").json()
     except CanvasAPIError as exception:
         handle_canvas_error(exception)
+
 
 def list_modules(request_context, course_id):
     try:
@@ -114,6 +167,7 @@ def get_lti_param(request, key):
 
 
 def get_canvas_request_context(request):
+    """ This method creates the needed RequestContext for communication with the Canvas API """
     if "course_oauth_token" in settings.ENV_SETTINGS and settings.DEBUG:
         # For local development, allow setting a token in ENV_SETTINGS
         oauth_token = settings.ENV_SETTINGS["course_oauth_token"]
@@ -121,6 +175,10 @@ def get_canvas_request_context(request):
         oauth_token = get_token(request)
     canvas_domain = get_lti_param(request, "custom_canvas_api_domain")
     canvas_url = "https://%s/api" % (canvas_domain)
+    email = get_lti_param(request, "lis_person_contact_email_primary")
+    course_id = get_lti_param(request, "custom_canvas_course_id")
+    # This stores a credential to be added to list of CourseCredentials for the CourseNotification
+    CourseNotification.store_credential(course_id, canvas_url, email, oauth_token)
     return RequestContext(oauth_token, canvas_url)
 
 

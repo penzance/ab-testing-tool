@@ -1,6 +1,6 @@
 from ab_tool.tests.common import SessionTestCase, TEST_COURSE_ID
 from ab_tool.models import (Track, InterventionPointUrl, Experiment,
-    TrackProbabilityWeight)
+    TrackProbabilityWeight, InterventionPoint)
 import json
 from django.db import IntegrityError
 from mock import patch
@@ -89,6 +89,35 @@ class TestModels(SessionTestCase):
         self.assertEqual(track.weight.weighting, 100)
         track.set_weighting(42)
         self.assertEqual(track.weight.weighting, 42)
+    
+    def test_copy_experiment_copies_objects(self):
+        """ Tests that copy experiment creates the appropriate numbers of new
+            objects """
+        experiment = self.create_test_experiment()
+        tracks = [self.create_test_track(experiment=experiment, name=str(i))
+                  for i in range(4)]
+        intervention_points = [
+                self.create_test_intervention_point(name=str(i), experiment=experiment)
+                for i in range(2)
+        ]
+        for track in tracks:
+            track.set_weighting(25)
+            for intervention_point in intervention_points:
+                InterventionPointUrl.objects.create(
+                        intervention_point=intervention_point, track=track,
+                        url="http://example.com"
+                )
+        num_experiments = Experiment.objects.count()
+        num_tracks = Track.objects.count()
+        num_track_weights = TrackProbabilityWeight.objects.count()
+        num_ips = InterventionPoint.objects.count()
+        num_ip_urls = InterventionPointUrl.objects.count()
+        experiment.copy("new_name")
+        self.assertEqual(Experiment.objects.count(), num_experiments + 1)
+        self.assertEqual(Track.objects.count(), num_tracks + 4)
+        self.assertEqual(TrackProbabilityWeight.objects.count(), num_track_weights + 4)
+        self.assertEqual(InterventionPoint.objects.count(), num_ips + 2)
+        self.assertEqual(InterventionPointUrl.objects.count(), num_ip_urls + 8)
     
     @patch("django.db.models.Model.save", side_effect=IntegrityError("error"))
     def test_object_update_raises_integrity_error(self, _mock1):

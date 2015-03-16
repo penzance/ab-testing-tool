@@ -52,8 +52,12 @@
                     <div class="panel-heading">
                         <h3 class="panel-title panel-title-experiment">Experiment "{{experiment.name}}"</h3>
 
-                        {% if experiment.get_incomplete_intervention_point_names and not experiment.tracks_finalized %}
+                        {% if experiment.id in experiments_with_unassigned_students and experiment.tracks_finalized %}
+                            <a href="#upload_students_modal{{experiment.id}}" class="btn btn-icon btn-track-upload" data-toggle="modal">Assign Tracks For New Students
+                        {% elif experiment.get_incomplete_intervention_point_names and not experiment.tracks_finalized %}
                             <a href="#incomplete_intervention_points_modal{{experiment.id}}" data-toggle="modal" class="btn btn-icon btn-experiment-start"><i class="fa fa-play-circle"></i>Start Experiment
+                        {% elif experiment.id in experiments_with_unassigned_students %}
+                            <a href="#upload_students_modal{{experiment.id}}" class="btn btn-icon btn-experiment-start" data-toggle="modal"><i class="fa fa-play-circle"></i>Start Experiment
                         {% elif not experiment.tracks_finalized %}
                             <a href="#finalize_modal{{experiment.id}}" data-toggle="modal" class="btn btn-icon btn-experiment-start"><i class="fa fa-play-circle"></i>Start Experiment
                         {% else %}
@@ -67,6 +71,8 @@
                                 <dd>Weighted random</dd>
                             {% elif experiment.assignment_method == experiment.UNIFORM_RANDOM %}
                                 <dd>Uniform random</dd>
+                            {% elif experiment.assignment_method == experiment.CSV_UPLOAD %}
+                                <dd>Spreadsheet upload</dd>
                             {% endif %}
                             <dt class="list-item-title">Tracks:</dt>
                             <dd>{{experiment.tracks.count}}</dd>
@@ -103,7 +109,7 @@
                         <ul class='intervention-points'>
                             {% for intervention_point in experiment.intervention_points.all %}
                                 <li>
-                                    {% if intervention_point in uninstalled_intervention_points %}
+                                    {% if intervention_point in uninstalled_intervention_points and not experiment.tracks_finalized %}
                                         <a href="{% url 'ab_testing_tool_delete_intervention_point' intervention_point.id %}"
                                             data-toggle="tooltip" data-placement="top"
                                             title="Delete Intervention Point '{{intervention_point.name}}'"
@@ -153,6 +159,11 @@
                                 <a href="#createIntervention_{{experiment.id}}" id="add_intervention_point_button" data-toggle="modal" class="btn btn-icon btn-ip-options">
                                     <i class="fa fa-plus"></i>Add Intervention Point
                                 </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'ab_testing_tool_copy_experiment' experiment.id %}" class="btn btn-icon btn-ip-options" id="copy_experiment_button">
+                                Copy Experiment </a>
+                            
                             </li>
                             {% if experiment.tracks_finalized %}
                                 <li>

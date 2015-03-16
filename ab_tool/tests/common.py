@@ -19,9 +19,10 @@ TEST_COURSE_ID = "12345"
 TEST_OTHER_COURSE_ID = "5555555"
 TEST_DOMAIN = "example.com"
 TEST_STUDENT_ID = "70707707"
+TEST_EMAIL = "test@example.com"
 TEST_STUDENT_NAME = "Test Student"
 
-NONEXISTENT_STAGE_ID = 12345678987654321 #111111111^2
+NONEXISTENT_INTERVENTION_POINT_ID = 12345678987654321 #111111111^2
 NONEXISTENT_TRACK_ID = 31415926535897932 #pi
 
 NONEXISTENT_EXPERIMENT_ID = 31415926535897932 #pi
@@ -55,6 +56,7 @@ class SessionTestCase(TestCase):
         lti_launch["custom_canvas_user_login_id"] = TEST_STUDENT_ID
         lti_launch["lis_person_name_full"] = TEST_STUDENT_NAME
         lti_launch["context_title"] = "Course title"
+        lti_launch["lis_person_contact_email_primary"] = TEST_EMAIL
         session = self.client.session
         session["LTI_LAUNCH"] = lti_launch
         session.save()
@@ -145,8 +147,10 @@ class SessionTestCase(TestCase):
                 course_id=course_id, weighting=weighting, track=track,
                 experiment=experiment)
     
-    def create_test_intervention_point(self, course_id=TEST_COURSE_ID, name="testip"):
-        experiment = Experiment.get_placeholder_course_experiment(course_id)
+    def create_test_intervention_point(self, course_id=TEST_COURSE_ID, name="testip",
+                                       experiment=None):
+        if not experiment:
+            experiment = Experiment.get_placeholder_course_experiment(course_id)
         return InterventionPoint.objects.create(name=name, course_id=course_id,
                                                 experiment=experiment)
 
