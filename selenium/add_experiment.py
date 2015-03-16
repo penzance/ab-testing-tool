@@ -69,6 +69,9 @@ class add_experiment(unittest.TestCase):
         driver.find_element_by_id("create-confirm").click()
         driver.find_element_by_id("createNow").click()
 
+        current_name = driver.find_element_by_tag_name("h1").text
+        title_name = "A/B Testing Tool"
+        self.self.assertEqual(title_name, current_name)
         # Add an intervention point with no URLs
         # need to be able to find element by link_text to work
         #driver.find_element_by_id("add_intervention_point_button").click()
