@@ -69,6 +69,7 @@ class add_experiment(unittest.TestCase):
         driver.find_element_by_id("create-confirm").click()
         driver.find_element_by_id("createNow").click()
 
+        driver.switch_to_frame("tool_content")
         current_name = driver.find_element_by_tag_name("h1").text
         title_name = "A/B Testing Tool"
         self.assertEqual(title_name, current_name)
