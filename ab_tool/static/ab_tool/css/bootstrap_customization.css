@@ -24,7 +24,7 @@
 	display: none;
 }
 
-.ng-invalid .error-only-numbers{
+.error-only-numbers{
     display: inline-block;
     font-weight: bold;
     color: #a51c30;

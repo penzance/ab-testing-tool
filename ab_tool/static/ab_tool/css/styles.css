@@ -16,6 +16,15 @@ usage: .trans(@time:1s); or .trans(@type:linear, @what: opacity); */
   height: 1px;
   overflow: hidden;
 }
+.show-block {
+  display: block;
+}
+.show-inline {
+  display: inline-block;
+}
+.hide {
+  display: none;
+}
 /*! normalize.css v3.0.0 | MIT License | git.io/normalize */
 html {
   font-family: sans-serif;

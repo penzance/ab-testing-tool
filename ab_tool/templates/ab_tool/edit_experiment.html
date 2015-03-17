@@ -27,7 +27,7 @@
     </header>
     <main>
             
-        <form role="form">
+        <form name="experimentForm" role="form">
             <fieldset>
                 <div class="form-group">
                     <legend class="sr-only">Name of experiment</legend>
@@ -83,12 +83,14 @@
                                         ng-pattern="/^\d+$/" ng-model="track.weighting"
                                         {%if started %}disabled="disabled"{% endif %}
                                         class="input-trackWeight input-group-right float-left"
-                                        ng-class="weightingError ? 'has-error' : ''"><span> % </span>
+                                        ng-class="weightingError ? 'has-error' : ''"
+                                        {% verbatim %}name="{{track.name}}"{% verbatim %}><span> % </span>
                                 </div>
                                 <div ng-if="experiment.uniformRandom" ng-cloak>
                                     <input type="text" disabled="disabled" size="2"
                                         {% verbatim %}ng-cloak value="{{uniformPercent()}}" class="input-group-right float-left"><span> % </span>{% endverbatim %}
                                 </div>
+                                <span class="hide error-only-numbers">This must be a number.</span>
                             </div>
                             
                             {% verbatim %}
@@ -105,7 +107,8 @@
                                     <!--TODO:button>save</button>
                                     <button>cancel</button-->
                                 </label>
-                            {% endverbatim %} <span class="error-only-numbers" ng-cloak>This must be a number.</span>
+                            
+                            {% endverbatim %}
                         </li>
                         <!-- Angular loop over tracks (end) -->
                         {% if not started %}
@@ -254,6 +257,11 @@
     {% endif %}
     
     window.parentPage = "{% url 'ab_testing_tool_index' %}";
+    //error-only-numbers
+    $(document).ready(function(){
+        console.log('hi');
+    });
+
 </script>
 
 <script src="{% static 'ab_tool/js/angular-1.2.27.min.js' %}"></script>
