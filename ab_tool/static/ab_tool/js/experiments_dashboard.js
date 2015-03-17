@@ -1,11 +1,16 @@
 $(document).ready(function(){
 
-    //double click-submission protection
-    $('.submitter, form a, form [type="submit"], form button').click(function (event) {
-        if ($(this).hasClass("disabled")) {
+    // multiple-submission protection for create/update button
+    $('.modal-form').submit(function (event) {
+        var $submit_button = $(this).find('.modal-submit');
+        if ($submit_button.hasClass("disabled")) {
             event.preventDefault();
         }
-        $(this).addClass("disabled");
+        else {
+            // disables create/update button, cancel button
+            $submit_button.addClass("disabled");
+            $submit_button.siblings('.modal-cancel').addClass("disabled");
+        }
     });
 
     function is_valid_url(url) {
@@ -14,6 +19,8 @@ $(document).ready(function(){
 
     $('.addIntervention').modal('show');
 
+    // TODO: if we're still using Scott Jehl's, consider updating to http://jqueryui.com/selectmenu/
+    // http://www.filamentgroup.com/lab/jquery-ui-selectmenu-an-aria-accessible-plugin-for-styling-a-html-select.html
     $('select').selectmenu({
         format: function(text){
             var pattern = /([\s\S]+)\-\- ([\s\S]+)/;
@@ -23,6 +30,7 @@ $(document).ready(function(){
     });
     
     //for showing preview buttons when creating or editgin and intervention point
+    // todo: remove .modal-intervention from template if we can use data-modal for everything
     $('[data-modal="intervention-edit"], [data-modal="intervention-new"]').on('show.bs.modal', function (e) {
 
         //go through each track url to show/hide preview link
