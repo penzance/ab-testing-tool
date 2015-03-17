@@ -20,9 +20,7 @@
 
 
 /* FOR ANGULAR validation of track weight*/
-.error-only-numbers{
-	display: none;
-}
+
 
 .error-only-numbers{
     display: inline-block;

@@ -151,7 +151,8 @@ fieldset.fieldset-btn{
 
 /****** show hide helper text based on modal window or 	******
 ******* screen size 									*****/
-.form-group .fa-asterisk{ color: @font-color-error; }
+.form-group .fa-asterisk
+, .form-group-inline-left .fa-asterisk{ color: @font-color-error; }
 
 .form-group .fa-question-circle{
 	/* hide the question icon from forms */
@@ -261,6 +262,9 @@ fieldset.fieldset-btn{
 }
 /**** error experiment form (end) ***/
 
+.input-trackWeight.ng-invalid{
+	.error;
+}
 
 .previewURL{
 	position: relative;

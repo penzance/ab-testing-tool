@@ -394,7 +394,8 @@ fieldset[disabled] .input-group-right + span {
 }
 /****** show hide helper text based on modal window or 	******
 ******* screen size 									*****/
-.form-group .fa-asterisk {
+.form-group .fa-asterisk,
+.form-group-inline-left .fa-asterisk {
   color: #a51c30;
 }
 .form-group .fa-question-circle {
@@ -495,6 +496,11 @@ fieldset[disabled] .input-group-right + span {
   float: left;
 }
 /**** error experiment form (end) ***/
+.input-trackWeight.ng-invalid {
+  border: solid 1px #b03535;
+  box-shadow: 0 0 3px #d45252;
+  color: #a51c30;
+}
 .previewURL {
   position: relative;
 }
