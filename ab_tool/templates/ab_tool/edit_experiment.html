@@ -61,6 +61,7 @@
                     <ul id="expWeights" class="list-withfloats">
                         <!-- Angular loop over tracks (start) -->
                         <li ng-cloak ng-repeat="track in experiment.tracks">
+                            <ng-form name="weightingForm"> <!-- To allow dynamic form validation per element -->
                             
                             {% if not started %}
                                 <a data-track="delete" ng-if="experiment.tracks.length > 2"
@@ -83,7 +84,16 @@
                                         ng-pattern="/^\d+$/" ng-model="track.weighting"
                                         {%if started %}disabled="disabled"{% endif %}
                                         class="input-trackWeight input-group-right float-left"
-                                        ng-class="weightingError ? 'has-error' : ''"><span> % </span>
+                                        ng-class="weightingError ? 'has-error' : ''"
+                                        name="weightingInupt">
+                                        <span> % </span>
+
+
+                                        <!-- Put this somewhere appropriate -->
+                                        <span ng-if="weightingForm.weightingInupt.$invalid">
+                                        Must be a number between 0 and 99</span>
+
+
                                 </div>
                                 <div ng-if="experiment.uniformRandom" ng-cloak>
                                     <input type="text" disabled="disabled" size="2"
@@ -106,7 +116,7 @@
                                     <button>cancel</button-->
                                 </label>
                             {% endverbatim %}
-                        </li>
+                        </ng-form></li>
                         <!-- Angular loop over tracks (end) -->
                         {% if not started %}
                         <li>
