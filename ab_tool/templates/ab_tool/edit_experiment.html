@@ -27,7 +27,7 @@
     </header>
     <main>
             
-        <form role="form">
+        <form name="experimentForm" role="form">
             <fieldset>
                 <div class="form-group">
                     <legend class="sr-only">Name of experiment</legend>
@@ -61,51 +61,56 @@
                     <ul id="expWeights" class="list-withfloats">
                         <!-- Angular loop over tracks (start) -->
                         <li ng-cloak ng-repeat="track in experiment.tracks">
-                            
-                            {% if not started %}
-                                <a data-track="delete" ng-if="experiment.tracks.length > 2"
-                                    ng-cloak ng-click="deleteTrack(track)" class="btn btn-icon-only ip-btn-delete">
-                                    <i class="fa fa-trash"></i><span>Delete</span>
-                                </a>
-                                <!-- show disabled delete icons for UI consistency -->
-                                <a ng-if="experiment.tracks.length < 3"
-                                    ng-cloak class="btn btn-icon-only ip-btn-delete disabled">
-                                    <i class="fa fa-trash"></i><span>Delete</span>
-                                </a>
-                            {% endif %}
-                            <!-- Hide weighting if csvUpload is set -->
-                            <div ng-if="!experiment.csvUpload">
-                                <!-- Show different weighting if uniformRandom is set -->
-                                <div ng-if="!experiment.uniformRandom" ng-cloak>
-                                    <input type="" min="0" max="100" step="1"
-                                        data-track="value" data-trackindex="1"
-                                        maxlength="2" size="2"
-                                        ng-pattern="/^\d+$/" ng-model="track.weighting"
-                                        {%if started %}disabled="disabled"{% endif %}
-                                        class="input-trackWeight input-group-right float-left"
-                                        ng-class="weightingError ? 'has-error' : ''"><span> % </span>
+                            <!--to allow dynamic form validation per element -->
+                            <ng-form name="weightingForm">
+
+                                {% if not started %}
+                                    <a data-track="delete" ng-if="experiment.tracks.length > 2"
+                                        ng-cloak ng-click="deleteTrack(track)" class="btn btn-icon-only ip-btn-delete">
+                                        <i class="fa fa-trash"></i><span>Delete</span>
+                                    </a>
+                                    <!-- show disabled delete icons for UI consistency -->
+                                    <a ng-if="experiment.tracks.length < 3"
+                                        ng-cloak class="btn btn-icon-only ip-btn-delete disabled">
+                                        <i class="fa fa-trash"></i><span>Delete</span>
+                                    </a>
+                                {% endif %}
+                                <!-- Hide weighting if csvUpload is set -->
+                                <div ng-if="!experiment.csvUpload">
+                                    <!-- Show different weighting if uniformRandom is set -->
+                                    <div ng-if="!experiment.uniformRandom" ng-cloak>
+                                        <input type="" min="0" max="100" step="1"
+                                            data-track="value" data-trackindex="1"
+                                            maxlength="2" size="2"
+                                            ng-pattern="/^\d+$/" ng-model="track.weighting"
+                                            {%if started %}disabled="disabled"{% endif %}
+                                            class="input-trackWeight input-group-right float-left"
+                                            ng-class="weightingError ? 'has-error' : ''"
+                                            name="weightingInput"><span> % </span>
+                                    </div>
+                                    <div ng-if="experiment.uniformRandom" ng-cloak>
+                                        <input type="text" disabled="disabled" size="2"
+                                            {% verbatim %}ng-cloak value="{{uniformPercent()}}" class="input-group-right float-left"><span> % </span>{% endverbatim %}
+                                    </div>
+                                    
                                 </div>
-                                <div ng-if="experiment.uniformRandom" ng-cloak>
-                                    <input type="text" disabled="disabled" size="2"
-                                        {% verbatim %}ng-cloak value="{{uniformPercent()}}" class="input-group-right float-left"><span> % </span>{% endverbatim %}
-                                </div>
-                            </div>
-                            
-                            {% verbatim %}
-                                <a href="#" class="btn btn-link" data-track="name"
-                                    title="Edit {{track.name}}" ng-cloak
-                                    ng-click="editTrackName(track)" ng-if="!track.editing">
-                                    Track "{{track.name}}"
-                                </a>
-                                <label ng-if="track.editing">Track
-                                    <input data-track="name" title="Edit track name"
-                                        ng-cloak ng-model="track.newName"
-                                        ng-keypress="trackNameKeypress($event, track)"
-                                        ng-blur="trackNameChanged(track)">
-                                    <!--TODO:button>save</button>
-                                    <button>cancel</button-->
-                                </label>
-                            {% endverbatim %}
+                                
+                                {% verbatim %}
+                                    <a href="#" class="btn btn-link" data-track="name"
+                                        title="Edit {{track.name}}" ng-cloak
+                                        ng-click="editTrackName(track)" ng-if="!track.editing">
+                                        Track "{{track.name}}"
+                                    </a>
+                                    <label ng-if="track.editing">Track
+                                        <input data-track="name" title="Edit track name"
+                                            ng-cloak ng-model="track.newName"
+                                            ng-keypress="trackNameKeypress($event, track)"
+                                            ng-blur="trackNameChanged(track)">
+                                    </label>
+                                    <span ng-if="weightingForm.weightingInput.$invalid" class="error-only-numbers">This must be a number between 0 and 99.</span>
+                                {% endverbatim %}
+
+                            </ng-form>
                         </li>
                         <!-- Angular loop over tracks (end) -->
                         {% if not started %}
@@ -254,6 +259,7 @@
     {% endif %}
     
     window.parentPage = "{% url 'ab_testing_tool_index' %}";
+
 </script>
 
 <script src="{% static 'ab_tool/js/angular-1.2.27.min.js' %}"></script>
