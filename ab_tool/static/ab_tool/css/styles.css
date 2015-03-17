@@ -1086,30 +1086,6 @@ body.blocked {
   box-shadow: 0 0 8px #111;
   z-index: 10000;
 }
-/*#expSummary{
-	width: 80%;
-	margin: 0 auto;
-	display: block;
-	border:0;
-	& dt{
-		width: 30%;
-		text-align: right;
-		display: inline-block;
-		margin: 0;
-		letter-spacing: 0.035em;
-		float: left;
-		font-family: @font-family-sans-serif;
-		font-size: 1.2em;
-	}
-	& dd{
-		width: 55%;
-		text-align: left;
-		display: inline-block;
-		margin-left: 1%;
-		clear: both;
-		padding: 0 0 1em 0;
-	}
-}*/
 #expSummary {
   border: 0;
 }

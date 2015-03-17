@@ -106,8 +106,6 @@
                                             ng-cloak ng-model="track.newName"
                                             ng-keypress="trackNameKeypress($event, track)"
                                             ng-blur="trackNameChanged(track)">
-                                        <!--TODO:button>save</button>
-                                        <button>cancel</button-->
                                     </label>
                                     <span ng-if="weightingForm.weightingInput.$invalid" class="error-only-numbers">This must be a number between 0 and 99.</span>
                                 {% endverbatim %}
@@ -261,10 +259,6 @@
     {% endif %}
     
     window.parentPage = "{% url 'ab_testing_tool_index' %}";
-    //error-only-numbers
-    $(document).ready(function(){
-        console.log('hi');
-    });
 
 </script>
 
