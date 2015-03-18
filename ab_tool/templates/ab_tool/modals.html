@@ -72,6 +72,7 @@
                     <legend class="sr-only">Tracks for experiment</legend>
                     <div class="form-group-inline-left previewURL">
                         <label for="intervention_point_url_{{track.id}}">Track "{{track.name}}":</label>
+                        <i class="fa fa-asterisk"></i>
                         <a href="#" class="preview-link">preview</a>
                         <input type="url" name="intervention_point_url_{{track.id}}"
                             id="intervention_point_url_{{track.id}}" class="form-control intervention-url"
@@ -141,6 +142,7 @@
 
                     <div class="form-group">
                         <label for="intervention_{{intervention_point.id}}">Name:</label>
+                        <i class="fa fa-asterisk"></i>
                         <input type="text" name="name" id="intervention_{{intervention_point.id}}"
                             class="form-control intervention-name" value="{{intervention_point.name}}"
                             placeholder="Enter Intervention Name">
@@ -158,6 +160,7 @@
 
                     <div class="form-group-inline-left previewURL">
                         <label for="intervention_point_url_{{track_url.track.id}}">Track "{{track_url.track.name}}":</label>
+                        <i class="fa fa-asterisk"></i>
                         <a href="#" class="preview-link">preview</a>
                         <input type="url" name="intervention_point_url_{{track_url.track.id}}"
                             id="intervention_point_url_{{track_url.track.id}}" class="form-control intervention-url"
