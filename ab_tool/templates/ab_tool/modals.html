@@ -45,7 +45,7 @@
 
 <!-- START Modal code for create intervention-->
 {% for experiment in experiments %}
-<div class="modal fade modal-intervention" data-modal="intervention-new" id="createIntervention_{{experiment.id}}" tabindex="-1" role="dialog" aria-labelledby="addIntervention" aria-hidden="true">
+<div class="modal fade" data-modal="intervention-new" id="createIntervention_{{experiment.id}}" tabindex="-1" role="dialog" aria-labelledby="addIntervention" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
         <div class="modal-header">
@@ -59,7 +59,7 @@
                     <legend class="sr-only">Name of intervention point</legend>
                     <div class="form-group">
                         <label for="interventionName">Name:</label> <i class="fa fa-asterisk"></i>
-                        <input type="text" name="name" id="interventionName" class="form-control intervention-name"
+                        <input type="text" name="name" id="interventionName" class="form-control intervention-name empty"
                                 placeholder="Enter Intervention Name">
                     </div>
                     <div class="form-group-description">
@@ -74,7 +74,7 @@
                         <label for="intervention_point_url_{{track.id}}">Track "{{track.name}}":</label>
                         <a href="#" class="preview-link" target="_blank">preview</a>
                         <input type="text" name="intervention_point_url_{{track.id}}"
-                            id="intervention_point_url_{{track.id}}" class="form-control intervention-url"
+                            id="intervention_point_url_{{track.id}}" class="form-control intervention-url empty"
                             value="" placeholder="Enter URL">
                         <!--a href="#"><i class="fa fa-question-circle"></i></a-->
                     </div>
@@ -126,7 +126,7 @@
 
 <!-- START Modal code for edit intervention-->
 {% for intervention_point in intervention_points %}
-<div class="modal fade modal-intervention" data-modal="intervention-edit" id="editIntervention_{{intervention_point.id}}"
+<div class="modal fade" data-modal="intervention-edit" id="editIntervention_{{intervention_point.id}}"
     tabindex="-1" role="dialog" aria-labelledby="editIntervention_{{intervention_point.id}}"
     aria-hidden="true">
   <div class="modal-dialog">
