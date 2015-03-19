@@ -1,15 +1,15 @@
+from django.test import RequestFactory
 
 from ab_tool.spreadsheets import (get_student_list_csv, get_intervention_point_interactions_csv,
                                   get_track_selection_xlsx, get_track_selection_csv,
                                   parse_uploaded_file, parse_row)
+
 from ab_tool.models import (InterventionPointUrl, ExperimentStudent, Experiment,
                             InterventionPointInteraction)
-
 from ab_tool.tests.common import (SessionTestCase, TEST_COURSE_ID, TEST_STUDENT_ID)
-
-from django.test import RequestFactory
-from mock import patch, MagicMock, ANY, Mock
+from mock import patch, Mock
 from error_middleware.exceptions import Renderable404
+
 
 '''
 Setup some test data
@@ -23,7 +23,7 @@ TEST_STUDENT_DICT = {'10123478': 'StudentA',
                      '20123278': 'StudentB',
                      '34512278': 'StudentC',
                      '40212478': 'StudentD',
-                     }
+}
 TEST_CONTENT_TYPE = [('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'),
                      ('Content-Disposition', 'attachment; filename=test.xlsx')]
 
@@ -33,23 +33,22 @@ TEST_TRACK_SELECTION_RESPONSE = ['Student Name,Student ID,Experiment,Assigned Tr
                                  'StudentA,10123478,Experiment 1,\r\n',
                                  'StudentC,34512278,Experiment 1,\r\n']
 
-TEST_ROW = [TEST_STUDENT_DICT['20123278'],'20123278','Experiment 1', 'track1']
+TEST_ROW = [TEST_STUDENT_DICT['20123278'], '20123278', 'Experiment 1', 'track1']
 
 TEST_ROW_NUMBER = 1
 
+
 class TestSpreadsheets(SessionTestCase):
-
     def setUp(self):
-
         self.request = RequestFactory().get('/fake-path')
         self.request.user = Mock(name='user_mock')
-        self.request.session = { 'oauth_return_uri': TEST_DOMAIN,
-                                 'LTI_LAUNCH': {
-                                     'custom_canvas_api_domain': TEST_DOMAIN,
-                                     'lis_person_contact_email_primary': TEST_STUDENT_EMAIL,
-                                     'custom_canvas_course_id': TEST_COURSE_ID,
-                                     },
-                                }
+        self.request.session = {'oauth_return_uri': TEST_DOMAIN,
+                                'LTI_LAUNCH': {
+                                    'custom_canvas_api_domain': TEST_DOMAIN,
+                                    'lis_person_contact_email_primary': TEST_STUDENT_EMAIL,
+                                    'custom_canvas_course_id': TEST_COURSE_ID,
+                                },
+        }
 
         self.experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
         self.experiment.update(tracks_finalized=True)
@@ -92,7 +91,7 @@ class TestSpreadsheets(SessionTestCase):
         streaming_list = list(response.streaming_content)
         self.assertTrue(TEST_STUDENT_ID in streaming_list[1])
         self.assertTrue('Experiment 1' in streaming_list[1])
-        self.assertTrue('track1'in streaming_list[1])
+        self.assertTrue('track1' in streaming_list[1])
 
     def test_get_intervention_point_interactions_csv(self):
         """
@@ -131,7 +130,7 @@ class TestSpreadsheets(SessionTestCase):
         Test that parse_uploaded_xlsx_file calls the xlrd.open_workbook method with the
         appropriate data for files of type xlsx
         """
-        result = parse_uploaded_file(self.experiment, TEST_STUDENT_DICT, TEST_TRACK_SELECTION_RESPONSE, TEST_XLSX_FILE_NAME)
+        parse_uploaded_file(self.experiment, TEST_STUDENT_DICT, TEST_TRACK_SELECTION_RESPONSE, TEST_XLSX_FILE_NAME)
         mock_open_workbook.assert_called_with(file_contents=TEST_TRACK_SELECTION_RESPONSE)
 
     @patch('ab_tool.spreadsheets.xlrd.open_workbook')
@@ -140,7 +139,7 @@ class TestSpreadsheets(SessionTestCase):
         Test that parse_uploaded_xlsx_file calls the xlrd.open_workbook method with the
         appropriate data for files of type xls
         """
-        result = parse_uploaded_file(self.experiment, TEST_STUDENT_DICT, TEST_TRACK_SELECTION_RESPONSE, TEST_XLS_FILE_NAME)
+        parse_uploaded_file(self.experiment, TEST_STUDENT_DICT, TEST_TRACK_SELECTION_RESPONSE, TEST_XLS_FILE_NAME)
         mock_open_workbook.assert_called_with(file_contents=TEST_TRACK_SELECTION_RESPONSE)
 
     @patch('ab_tool.spreadsheets.csv.reader')
@@ -153,9 +152,9 @@ class TestSpreadsheets(SessionTestCase):
         new_row = ','.join(TEST_ROW)
         mock_csv_reader.return_value = [new_row]
         tracks = {track.name: track for track in self.experiment.tracks.all()}
-        result = parse_uploaded_file(self.experiment, TEST_STUDENT_DICT,
-                                     TEST_TRACK_SELECTION_RESPONSE[1],
-                                     TEST_CSV_FILE_NAME)
+        parse_uploaded_file(self.experiment, TEST_STUDENT_DICT,
+                            TEST_TRACK_SELECTION_RESPONSE[1],
+                            TEST_CSV_FILE_NAME)
         data = TEST_TRACK_SELECTION_RESPONSE[1].split('\n')[1:]
         mock_csv_reader.assert_called_with(data)
         mock_parse_row.assert_called_with(new_row, 2,
@@ -170,7 +169,6 @@ class TestSpreadsheets(SessionTestCase):
         """
         self.assertRaises(Renderable404, parse_uploaded_file, self.experiment,
                           TEST_STUDENT_DICT, TEST_TRACK_SELECTION_RESPONSE, "test.xslx")
-
 
     def test_parse_row(self):
         """
@@ -229,7 +227,7 @@ class TestSpreadsheets(SessionTestCase):
         students = {}
         errors = []
         tracks = {track.name: track for track in self.experiment.tracks.all()}
-        # missing row
+        # for this case we set row to None
         row = None
         result = parse_row(row, TEST_ROW_NUMBER, self.experiment, tracks,
                            TEST_STUDENT_DICT, students, errors)
@@ -243,7 +241,7 @@ class TestSpreadsheets(SessionTestCase):
         students = {}
         errors = []
         tracks = {track.name: track for track in self.experiment.tracks.all()}
-        # row with student who is able to be assigned
+        # row with student who is not available to be assigned
         row = ['StudentE', '50123278', 'Experiment 1', 'track2']
         parse_row(row, TEST_ROW_NUMBER, self.experiment, tracks, TEST_STUDENT_DICT, students, errors)
         self.assertEqual(errors, ["Row 1: student 'StudentE' not available for assignment"])
