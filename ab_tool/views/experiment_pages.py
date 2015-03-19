@@ -38,19 +38,20 @@ def submit_create_experiment(request):
     """
     course_id = get_lti_param(request, "custom_canvas_course_id")
     experiment_dict = json.loads(request.body)
-    
+
     # Unpack data from experiment_dict and update experiment
     name = validate_name(experiment_dict["name"])
     notes = experiment_dict["notes"]
     uniform_random = bool(experiment_dict["uniformRandom"])
     tracks = experiment_dict["tracks"]
+    csv_upload = bool(experiment_dict["csvUpload"])
+
     # Validates using backend rules before any object creation
     for track_dict in tracks:
         validate_name(track_dict["name"])
-        if not uniform_random:
+        if not uniform_random and not csv_upload:
             validate_weighting(track_dict["weighting"])
-    
-    csv_upload = experiment_dict["csvUpload"]
+
     if csv_upload:
         assignment_method = Experiment.CSV_UPLOAD
     elif uniform_random:
