@@ -88,7 +88,23 @@ class TestExperimentPages(SessionTestCase):
             content_type="application/json", data=json.dumps(experiment)
         )
         self.assertEquals(num_experiments + 1, Experiment.objects.count(), response)
-    
+
+    def test_submit_create_experiment_csv_upload(self):
+        """ Tests that create_experiment creates a Experiment object verified by
+            DB count when csvUpload is True and no track weights are specified"""
+        Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
+        num_experiments = Experiment.objects.count()
+        experiment = {
+                "name": "experiment", "notes": "hi", "uniformRandom": False,
+                "csvUpload": True,
+                "tracks": [{"id": None, "name": "A"}]
+        }
+        response = self.client.post(
+            reverse("ab_testing_tool_submit_create_experiment"), follow=True,
+            content_type="application/json", data=json.dumps(experiment)
+        )
+        self.assertEquals(num_experiments + 1, Experiment.objects.count(), response)
+
     def test_submit_create_experiment_with_weights_as_assignment_method(self):
         """ Tests that create_experiment creates a Experiment object verified by
             DB count when uniformRandom is false and the tracks have weightings """
