@@ -2,11 +2,11 @@ from canvas_sdk.methods.courses import list_users_in_course_users
 from canvas_sdk.methods import modules
 from canvas_sdk import RequestContext
 from canvas_sdk.exceptions import CanvasAPIError
+from canvas_sdk.utils import get_all_list_data
 from django.conf import settings
 
 from ab_tool.exceptions import (MISSING_LTI_PARAM, MISSING_LTI_LAUNCH,
     NO_SDK_RESPONSE, NoValidCredentials, UNAUTHORIZED_ACCESS)
-from requests.exceptions import RequestException
 from django_canvas_oauth import get_token
 from ab_tool.controllers import intervention_point_url
 from ab_tool.models import InterventionPoint, Experiment, CourseNotification
@@ -129,8 +129,11 @@ def get_unassigned_students_with_context(request_context, experiment):
     """ Returns a list of sis_user_ids because that is the unique
         identifier the ab_tool users for students """
     try:
-        enrollments = list_users_in_course_users(
-                request_context, experiment.course_id, None, enrollment_type="student").json()
+        """
+        Part of TLT-949 add get_all_list_data call to get the full list of students in the course
+        """
+        enrollments = get_all_list_data(request_context, list_users_in_course_users, experiment.course_id, None, enrollment_type="student")
+
     except CanvasAPIError as exception:
         handle_canvas_error(exception)
     existing_student_ids = set(s.student_id for s in experiment.students.all())
