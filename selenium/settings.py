@@ -1,7 +1,7 @@
 import time
 
 USERNAME = "test22@mcelroy.org";
-USERNAME = "test2@mcelroy.org";
+STUDENT= "test2@mcelroy.org";
 PASSWORD = "pwd1pwd1";
 
 USERS = {
