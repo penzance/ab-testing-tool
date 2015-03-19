@@ -1,3 +1,5 @@
+{% load util_tags %}
+
 <!-- START Modal code for Modules Installations modal (to see where intervention points are installed-->
 <div id="modules_installations" class="modal fade" role="dialog" aria-labelledby="modules_installations" aria-hidden="true">
     <div class="modal-dialog">
@@ -181,22 +183,15 @@
                         <label for="is_canvas_page_for_track_{{track_url.track.id}}">Open</label>
                         <div class="custom-dropdown">
                             <select name="is_canvas_page_for_track_{{track_url.track.id}}"
-                                data-initial-index="
-                                  {% if not track_url.open_as_tab and track_url.is_canvas_page %}0{% endif %}
-                                  {% if not track_url.open_as_tab and not track_url.is_canvas_page %}1{% endif %}
-                                  {% if track_url.open_as_tab %}2{% endif %}
-                                "
+                                data-initial-index="{{ track_url.id|lookup_in:ip_display_mappings }}"
                                 id="is_canvas_page_for_track_{{track_url.track.id}}">
-                                <option {% if not track_url.open_as_tab and track_url.is_canvas_page %}selected="selected"{% endif %}
-                                    value="canvasPage">
+                                <option value="canvasPage">
                                     Canvas URL -- Students in this track are redirected to this Canvas page.
                                 </option>
-                                <option {% if not track_url.open_as_tab and not track_url.is_canvas_page %}selected="selected"{% endif %}
-                                    value="externalPage">
+                                <option value="externalPage">
                                     External URL in Canvas -- Students in this track view this page within Canvas.
                                 </option>
-                                <option {% if track_url.open_as_tab %}selected="selected"{% endif %}
-                                    value="newTab">
+                                <option value="newTab">
                                     In new tab -- Students in this track open this page in a new tab.
                                 </option>
                             </select>

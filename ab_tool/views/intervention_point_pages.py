@@ -202,3 +202,19 @@ def delete_intervention_point(request, intervention_point_id):
         pass
 
     return redirect(reverse("ab_testing_tool_index"))
+
+
+def get_ip_open_where_display_index(track_url_obj):
+    """
+    Maps logical combinations of track_url object properties to a user interface display object choice.
+    Meant to be used for UI select menu.
+    :param track_url_obj: a track URL object as returned by InterventionPoint.track_urls()
+    :return an index mapping to a specific select option for an html dropdown selectmenu list
+    """
+
+    if not track_url_obj.open_as_tab and track_url_obj.is_canvas_page:
+        return 0  # <option value="canvasPage">
+    if not track_url_obj.open_as_tab and not track_url_obj.is_canvas_page:
+        return 1  # <option value="externalPage">
+    if track_url_obj.open_as_tab:
+        return 2  # <option value="newTab">
