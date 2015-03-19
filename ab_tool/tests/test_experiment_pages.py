@@ -72,6 +72,20 @@ class TestExperimentPages(SessionTestCase):
         experiment = self.create_test_experiment(course_id=TEST_OTHER_COURSE_ID)
         response = self.client.get(reverse("ab_testing_tool_edit_experiment", args=(experiment.id,)))
         self.assertError(response, UNAUTHORIZED_ACCESS)
+
+    def test_edit_experiment_view_last_modified_updated(self):
+        """ Tests edit_experiment to confirm that the last updated timestamp changes """
+        experiment = self.create_test_experiment()
+        experiment.name += " (updated)"
+        response = self.client.post(reverse("ab_testing_tool_submit_edit_experiment",
+                                            args=(experiment.id,)),
+                                    content_type="application/json",
+                                    data=experiment.to_json())
+        self.assertEquals(response.content, "success")
+        updated_experiment = Experiment.objects.get(id=experiment.id)
+        self.assertLess(experiment.updated_on, updated_experiment.updated_on,
+                        response)
+
     
     def test_submit_create_experiment(self):
         """ Tests that create_experiment creates a Experiment object verified by
@@ -88,7 +102,23 @@ class TestExperimentPages(SessionTestCase):
             content_type="application/json", data=json.dumps(experiment)
         )
         self.assertEquals(num_experiments + 1, Experiment.objects.count(), response)
-    
+
+    def test_submit_create_experiment_csv_upload(self):
+        """ Tests that create_experiment creates a Experiment object verified by
+            DB count when csvUpload is True and no track weights are specified"""
+        Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
+        num_experiments = Experiment.objects.count()
+        experiment = {
+                "name": "experiment", "notes": "hi", "uniformRandom": False,
+                "csvUpload": True,
+                "tracks": [{"id": None, "name": "A"}]
+        }
+        response = self.client.post(
+            reverse("ab_testing_tool_submit_create_experiment"), follow=True,
+            content_type="application/json", data=json.dumps(experiment)
+        )
+        self.assertEquals(num_experiments + 1, Experiment.objects.count(), response)
+
     def test_submit_create_experiment_with_weights_as_assignment_method(self):
         """ Tests that create_experiment creates a Experiment object verified by
             DB count when uniformRandom is false and the tracks have weightings """
