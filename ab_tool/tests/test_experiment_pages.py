@@ -72,6 +72,20 @@ class TestExperimentPages(SessionTestCase):
         experiment = self.create_test_experiment(course_id=TEST_OTHER_COURSE_ID)
         response = self.client.get(reverse("ab_testing_tool_edit_experiment", args=(experiment.id,)))
         self.assertError(response, UNAUTHORIZED_ACCESS)
+
+    def test_edit_experiment_view_last_modified_updated(self):
+        """ Tests edit_experiment to confirm that the last updated timestamp changes """
+        experiment = self.create_test_experiment()
+        experiment.name += " (updated)"
+        response = self.client.post(reverse("ab_testing_tool_submit_edit_experiment",
+                                            args=(experiment.id,)),
+                                    content_type="application/json",
+                                    data=experiment.to_json())
+        self.assertEquals(response.content, "success")
+        updated_experiment = Experiment.objects.get(id=experiment.id)
+        self.assertLess(experiment.updated_on, updated_experiment.updated_on,
+                        response)
+
     
     def test_submit_create_experiment(self):
         """ Tests that create_experiment creates a Experiment object verified by
