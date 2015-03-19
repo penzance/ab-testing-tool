@@ -49,6 +49,8 @@ def submit_create_experiment(request):
     # Validates using backend rules before any object creation
     for track_dict in tracks:
         validate_name(track_dict["name"])
+        # added check for csv upload. if we are uploading a csv file
+        # we don't want track weights
         if not uniform_random and not csv_upload:
             validate_weighting(track_dict["weighting"])
 
