@@ -1,0 +1,28 @@
+@infoBlock-border-color: #ededed;
+
+.infoBlock{
+	width: 90%;
+	display: inline-block;
+	margin: 0 0 1em @panel-wrapper-margin-RL;
+	width: @panel-wrapper-width - 10%;
+	padding: 1.5em 5%;
+
+	&-empty{
+		background: #f7f7f7;
+		color: #636363;
+	}
+}
+
+body.lti-tool .infoBlock{
+	width: 95.572916666668%; 
+	padding: 2em 2.083333333333%; /*(16 / 768) * 100*/
+	margin: 0;
+	border: solid 1px #ededed; /*border with in percent 0.130208333333 */
+
+	&-empty{
+		font-size: 35/16em;
+		font-family: @font-family-sans-serif;
+		color: #c2c2c2;
+		text-align: center;
+	}
+}

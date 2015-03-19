@@ -72,6 +72,7 @@
                     <legend class="sr-only">Tracks for experiment</legend>
                     <div class="form-group-inline-left previewURL">
                         <label for="intervention_point_url_{{track.id}}">Track "{{track.name}}":</label>
+                        <i class="fa fa-asterisk"></i>
                         <a href="#" class="preview-link" target="_blank">preview</a>
                         <input type="text" name="intervention_point_url_{{track.id}}"
                             id="intervention_point_url_{{track.id}}" class="form-control intervention-url empty"
@@ -144,6 +145,7 @@
 
                     <div class="form-group">
                         <label for="intervention_{{intervention_point.id}}">Name:</label>
+                        <i class="fa fa-asterisk"></i>
                         <input type="text" name="name" id="intervention_{{intervention_point.id}}"
                             class="form-control intervention-name"
                             data-initial-value="{{intervention_point.name}}" value="{{intervention_point.name}}"
@@ -163,6 +165,7 @@
 
                     <div class="form-group-inline-left previewURL">
                         <label for="intervention_point_url_{{track_url.track.id}}">Track "{{track_url.track.name}}":</label>
+                        <i class="fa fa-asterisk"></i>
                         <a href="#" class="preview-link" target="_blank">preview</a>
                         <input type="text" name="intervention_point_url_{{track_url.track.id}}"
                             id="intervention_point_url_{{track_url.track.id}}" class="form-control intervention-url"
@@ -212,7 +215,7 @@
 
                     <div class="form-group">
                         <label for="interventionPointNotes">Notes</label>
-                        <textarea name="notes" id="interventonPointNotes" class="form-control"
+                        <textarea name="notes" id="interventionPointNotes" class="form-control"
                                   data-initial-value="{{intervention_point.notes}}">
                             {{ intervention_point.notes }}
                         </textarea>

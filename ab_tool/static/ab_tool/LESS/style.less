@@ -1,0 +1,354 @@
+@import "variables.less";
+@import "mixins.less";
+
+// Reset
+@import "normalize.less";
+
+@import "layout.less";
+
+@import "form.less";
+
+@import "panels.less";
+
+@import "lists.less";
+
+@import "buttons.less";
+
+@import "labels.less";
+
+@import "infoBlock.less";
+
+@import "type.less";
+//@import "modals.less";
+
+body{
+	font-size: @font-size-body;
+	line-height: @line-height-body;
+	color: @font-color-body;
+}
+
+h1, h2, h3, h4{	
+	font-weight: normal;
+	margin: 0.5em 0;
+}
+
+h1{ font-size: @h1; }
+
+h2{ font-size: @h2; }
+
+a{
+	color: @link-color;
+	&:hover{
+		color: @link-hover-color;
+		text-decoration: none;
+	}
+}
+
+/***********************************************************************************
+					EXP DASHBOARD (START )
+/**********************************************************************************/
+.dashboard{
+	display: inline-block;
+	width: 100%;
+	margin: 0 0 1em @panel-wrapper-margin-RL;
+	width: @panel-wrapper-width;
+}
+	.dashboard-totals{
+		width: ((@dashboard-totals-width / @context-content-desktop) * 100%);
+		display: inline-block;
+		float: left;
+		background: #f7f7f7;
+		margin-right: 1.4925373134328357%;
+	}
+
+
+.btn-experiment-start{
+		//(@bkgColor, @hoverColor, @border, @radius:0, @fontColor, @fontColorHover)
+	.mixBtn(#67b5dc, #525252, 0px,0, #f7f7f7, #f7f7f7);
+	float:right;
+	width: 23%;
+	padding: 0.5em 0;
+	font-size: @font-size-btn;
+	text-transform: uppercase;
+	&.disabled{
+		background-color: #959595;
+		color: #f7f7f7 !important;
+	}
+}
+
+.btn-ip-options{
+	.mixBtn(#eaeaea, #525252, 0px,24px, #525252, #eaeaea);
+	width: 70%;
+	.toFluidSize(11em, 16em);
+	padding: @size 15%;
+	margin-bottom: @size;
+	text-align: left;
+	font-size: @font-size-btn;
+}
+
+	.btn-no-ip{
+		.mixBtn(#eaeaea, #525252, 0px,24px, #525252, #eaeaea);
+		width: 20%;
+		padding: 0.6875em 3%;
+		margin: 0.75em auto;
+		text-align: center;
+		display: block;
+	}
+
+.panel-experiment{
+	width: 100%;
+	margin-bottom: 2em;
+}
+
+	.panel-wrapper{
+		margin: 0 @panel-wrapper-margin-RL;
+		width: @panel-wrapper-width;
+		background-color: #f7f7f7;
+		position: relative;
+	}
+
+	.panel-body{
+		.toFluidSize(752%, 1072%, 100%);
+		width: @size;
+		float: left;
+		margin-bottom: 1em;
+	}
+
+	.panel-footer{
+		margin-left: (@panel-left-right-padding / 2);
+		width: 22%;
+		float: left;
+	}
+
+.intervention-points{
+	margin: 0 2%;
+	& li{
+		.toFluidSize(10em, 16em);
+		padding: @size 0;
+		display: inline-block;
+		width: 100%;
+		border-bottom: solid 1px #e8e9e7;
+	}
+
+	& li:last-child{
+		border: 0;
+	}
+
+	& li .date{
+		font-family: "Georgia", serif;
+		font-size: (14em / 16em);
+		color: #505151;
+		font-style: italic;
+	}
+}
+
+	.ip-status{
+		width: 11%;
+	}
+
+	.missing-url{
+		font-size:1.2em;
+		float:right;
+		display:inline-block;
+		text-align:center;
+		.text-warning;
+		& span{
+			font-size:0.65em !important;
+			display:block;
+		}
+	}
+
+	.ip-installed{
+		.missing-url;
+		.text-success;
+	}
+
+.ip-btn-delete{
+	color: @font-color-error;
+	float: left;
+	margin-right: 1%;
+	&:hover{
+		background-color: @font-color-error;
+		color: #f7f7f7;
+	}
+}
+
+
+.exp-edit{
+	position: absolute;
+	top: 29px;
+	left: -14px;
+	width: 2em;
+}
+	.exp-edit a:hover{
+		background-color: @link-color;
+		color: #f7f7f7;
+	}
+
+.exp-delete{
+	//width: 29px;
+	position: absolute;
+	right: -14px;
+	top: 29px;
+	width: 2em;
+}
+
+	.exp-delete a:hover{
+		background-color: @font-color-error;
+		color: #f7f7f7;
+	}
+
+.exp-btn-global{
+	border-radius: 0;
+	background-color: #525252;
+	color: #f7f7f7;
+	width: 1em;
+}
+
+.arrow-left {
+	width: 0; 
+	height: 0; 
+	border-top: 9px solid transparent;
+	border-bottom: 0px solid transparent; 
+	border-right:14px solid #141414; 
+}
+
+.arrow-right {
+	width: 0; 
+	height: 0;
+	float: right;
+	border-top: 9px solid transparent;
+	border-bottom: 0px solid transparent;
+	border-left: 14px solid #141414;
+}
+
+/********* Modules popup (START) ***********/
+.module-name{
+	background: #f7f7f7;
+	margin: 0;
+	padding: 0.55em 0.55em 0 0.55em;
+	border-width: 1px 1px 0px 1px;
+	border-color: #ececeb;
+	border-style: solid;
+}
+
+.list-modules{
+	background: #f7f7f7;
+	padding: 1.5em;
+	border-width: 0 1px 1px 1px;
+	border-color: #ececeb;
+	border-style: solid;
+
+	& li{
+		padding: 0.75em 1.5em;
+		border-bottom: solid 1px #ececeb;
+		border-left: solid 1px #ececeb;
+		border-right: solid 1px #ececeb;
+		background: #fcfefd;
+
+		&:first-child{
+			border-top: solid 1px #ececeb;
+		}
+	}
+}
+
+
+/********* Modules popup (END) ***********/
+
+/***********************************************************************************
+					EXP DASHBOARD (END)
+/**********************************************************************************/
+
+/***********************************************************************************
+					NEW EXPERIMENT FORM (START)
+/**********************************************************************************/
+.input-newWeight{
+	margin-left: 2.25em;
+}
+
+.input-newTrackName{
+	width: 20%;
+	margin-left: 1em; 
+
+	/*margin for when uniform random is selected*/
+	&-uniformrandom{
+		width: 20%;
+		margin-left: 5.25%;
+	}
+}
+
+.btn.disabled {
+	color: #9e9d9d;
+}
+/***********************************************************************************
+					NEW EXPERIMENT FORM (END)
+/**********************************************************************************/
+/***********************************************************************************
+					modal (start)
+/**********************************************************************************/
+.modal-screen{
+	background: #717174;
+	position: absolute;
+	width: 100%;
+	overflow: hidden;
+	height: 100%;
+	top: 0;
+	left: 0;
+	opacity: .9;
+	z-index: 9999;
+}
+	.modal-screen iframe{
+		height: 100%;
+		width: 100%;
+		position: absolute;
+		top: 0;
+		left: 0;
+		padding: 0;
+		margin: 0;
+		opacity: 0;
+	}
+	/* this class gets added with js when the popup is open to hide
+	scrollbars, so that the user is not able to scroll the dialog out of view */
+	body.blocked{
+		overflow: hidden;
+	}
+
+#dialog{
+	background: #fff;
+	position: absolute;
+	width: 250px;
+	top: 20%;
+	left: 50%;
+	margin-left: -125px;
+	-o-box-shadow: 0 0 8px #111;
+	-moz-box-shadow: 0 0 8px #111;
+	-webkit-box-shadow: 0 0 8px #111;
+	box-shadow: 0 0 8px #111;
+	z-index: 10000;
+}
+
+#expSummary{
+	border: 0;
+	& dl{display: inline-block;}
+	& dt,dd{display:inline-block; margin: 0; width: 40%}
+	& dt{
+		float: left;
+		text-align: right;
+		font-size: 1.2em;
+		line-height: 1.25em;
+		letter-spacing: 0.025em;
+		color: #191919;
+	}
+	& dd{
+		float: left;
+		text-align: left;
+		margin-left: 1%;
+		font-size: 1em;
+		line-height: 1.75em;
+	}
+	& div {clear:both;margin-bottom:1em;display:inline-block; width: 100%;}
+}
+/***********************************************************************************
+					modal (END)
+/**********************************************************************************/
+

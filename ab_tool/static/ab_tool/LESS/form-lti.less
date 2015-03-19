@@ -1,0 +1,243 @@
+@form-label-color: #333333;
+@form-label-size: 1em;
+@form-label-font-family: "HelveticaNeue-Bold", "Helvetica Neue", Helvetica, Arial, sans-serif;
+@error-font-color: #a51c30;
+
+
+.block { display: block; }
+
+.text-error { color: @error-font-color; }
+
+.error{
+	border: solid 1px #b03535;
+	box-shadow: 0 0 3px #d45252;
+	.text-error;
+}
+
+label{
+	color: @form-label-color;
+	font-size: @form-label-size;
+	font-family: @form-label-font-family;
+	display: inline-block;
+}
+
+fieldset{
+	width: 100%;
+	margin: 0;
+	padding: 1em 0;
+	border-width: 0px 0px 1px 0px;
+}
+	.fieldset-noborder{ border: 0; }
+
+fieldset.fieldset-btn{
+	border: 0;
+	text-align: right;
+}
+// Common form controls
+//
+// Shared size and type resets for form controls. Apply `.form-control` to any
+// of the following form controls:
+//
+// select
+// textarea
+// input[type="text"]
+// input[type="password"]
+// input[type="datetime"]
+// input[type="datetime-local"]
+// input[type="date"]
+// input[type="month"]
+// input[type="time"]
+// input[type="week"]
+// input[type="number"]
+// input[type="email"]
+// input[type="url"]
+// input[type="search"]
+// input[type="tel"]
+// input[type="color"]
+.form-control {
+  display: block;
+  height: 1em;//@input-height-base; // Make inputs at least the height of their button counterpart (base line-height + padding + border)
+  padding: 0.55em 1%; //@padding-base-vertical @padding-base-horizontal;
+  font-size: 1em; //@font-size-base;
+  line-height: 1em;//@line-height-base;
+  color: #000; //@input-color;
+  vertical-align: middle;
+  background-color: #ffffff; //@input-bg;
+  background-image: none; // Reset unusual Firefox-on-Android default style; see https://github.com/necolas/normalize.css/issues/214
+  border: solid 1px #d2d2d2; //@input-border;
+  border-radius: 5px; //@input-border-radius;
+  box-shadow: none;
+  //.box-shadow(inset 0 1px 1px rgba(0,0,0,.075));
+  //.transition(~"border-color ease-in-out .15s, box-shadow ease-in-out .15s");
+
+  // Customize the `:focus` state to imitate native WebKit styles.
+  //.form-control-focus();
+
+  // Placeholder
+  //
+  // Placeholder text gets special styles because when browsers invalidate entire
+  // lines if it doesn't understand a selector/
+  //.placeholder();
+
+  // Disabled and read-only inputs
+  // Note: HTML5 says that controls under a fieldset > legend:first-child won't
+  // be disabled if the fieldset is disabled. Due to implementation difficulty,
+  // we don't honor that edge case; we style them as disabled anyway.
+	&[disabled],
+	&[readonly],
+	fieldset[disabled] & {
+		cursor: not-allowed;
+		background-color: gray;//@input-bg-disabled;
+	}
+
+	&:focus{
+		
+	}
+
+	&.has-error{ .error; }
+}
+
+// Reset height for `textarea`s
+ textarea.form-control {
+	height: auto;
+}
+
+.input-group-right{
+	.form-control;
+	width: ((38% / 1072%) * 100%);
+	border-right: 0;
+	border-bottom-right-radius: 0;
+	border-top-right-radius: 0;
+	text-align: center;
+
+	& + span{
+		.form-control;
+		width: ((28% / 1072%) * 100%);
+		display: inline-block;
+		border-bottom-left-radius: 0;
+		border-top-left-radius: 0;
+		text-align: center;
+		float: left;
+	}
+
+	&.has-error{
+		.error;
+		border-right: 0;
+	}
+
+	&.has-error + span{
+		.error;
+		border-left: 0;
+	}
+}
+
+
+
+.form-group{
+	width: 60%;
+	.float-left;
+	margin-right: 2%;
+}
+
+.form-group-inline *{
+	display: inline-block;
+}
+
+	.form-group-description{
+		width: 38%;
+		.float-left;
+		font-family: @font-family-serif;
+		font-size: 0.875em;
+
+	}
+
+/****** show hide helper text based on modal window or 	******
+******* screen size 									*****/
+.form-group .fa-asterisk{ color: @font-color-error; }
+
+.form-group .fa-question-circle{
+	/* hide the question icon from forms */
+	display: none;
+}
+
+.modal .fa-question-circle{
+	/* show the questioin icon for help on all modal windows */
+	display: inline-block;
+}
+
+.modal .form-group{
+	width: 100%;
+}
+
+.modal .form-control{
+	display: inline-block;
+	width: 95%;
+}
+
+.modal .form-group-inline-left{
+	width: 70.833333333333%;
+	.float-left;
+	margin-right: 2%;
+}
+
+.form-horizontal .form-group-inline-left{
+	.modal .form-group-inline-left;
+}
+
+	.form-group-inline-left .form-control{
+		width: 94%;
+	}
+
+.modal .form-group-inline-right{
+	width: 26.916667%;
+	.float-left;
+
+	& > div{
+		position: relative;
+		display: inline-block;
+		width: 90%;
+	}
+
+	& .fa-question-circle{
+		margin-top: 0.55em;
+		float: right;
+	}
+
+}
+
+.form-horizontal .form-group-inline-right{
+	.modal .form-group-inline-right;
+}
+
+.custom-dropdown{
+	position: relative;
+	display: inline-block;
+	width: 90%;
+}
+
+.modal .form-group-description{
+	display: none;
+}
+
+@media (max-width: 768px) {
+	.form-group{
+		width: 99%;
+		margin-right: 0;
+	}
+
+	.form-group-description{
+	display: none;
+	}
+
+	.form-control{
+		display: inline-block;
+		width: 95%;
+	}
+
+	.form-group .fa-question-circle{
+		/* hide the question icon from forms */
+		display: inline-block;
+	}
+
+}
+
