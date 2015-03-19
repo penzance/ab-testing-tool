@@ -34,6 +34,10 @@ $(document).ready(function(){
         $form.find('.form-control').val('');
         // .empty ensures that form cannot be submitted even though .has-error is not showing user validation feedback
         $form.find('.intervention-url, .intervention-name').removeClass('has-error').addClass('empty');
+        // reset each selectmenu to the first item in the menu
+        $form.find('select').each(function () {
+            $($(this).siblings('ul').find('a')[0]).trigger('select');
+        });
         enable_submit_if_no_errors($form);
     }
 
@@ -48,7 +52,6 @@ $(document).ready(function(){
             validate_ip_name_input_element($(this));
         });
         $form.find('select').each(function () {
-            console.log('select input capture in modal show is firing');
             $($(this).siblings('ul').find('a')[parseInt($(this).data("initial-index"))]).trigger('select');
         });
         enable_submit_if_no_errors($form);
