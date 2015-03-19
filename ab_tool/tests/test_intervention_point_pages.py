@@ -1,6 +1,7 @@
 from django.core.urlresolvers import reverse
-from mock import patch
+from mock import patch, Mock
 
+from ab_tool.views.intervention_point_pages import get_ip_open_where_display_index
 from ab_tool.constants import INTERVENTION_POINT_URL_TAG, DEPLOY_OPTION_TAG
 from ab_tool.models import (InterventionPoint, InterventionPointUrl,
     ExperimentStudent, Experiment)
@@ -414,3 +415,11 @@ class TestInterventionPointPages(SessionTestCase):
         self.assertEqual(num_intervention_points, InterventionPoint.objects.count())
         intervention_point = InterventionPoint.objects.get(id=intervention_point_id)
         self.assertEqual(intervention_point.name, "new_name")
+
+    def test_get_ip_open_where_display_index(self):
+        """
+        Smoke test to see that get_ip_open_where_display_index() returns a selectmenu index for a track_url
+        """
+        mock_track_url = Mock(open_as_tab=False, is_canvas_page=True)
+        result = get_ip_open_where_display_index(mock_track_url)
+        self.assertEqual(result, 0)

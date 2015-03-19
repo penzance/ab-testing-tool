@@ -1,3 +1,5 @@
+{% load util_tags %}
+
 <!-- START Modal code for Modules Installations modal (to see where intervention points are installed-->
 <div id="modules_installations" class="modal fade" role="dialog" aria-labelledby="modules_installations" aria-hidden="true">
     <div class="modal-dialog">
@@ -45,21 +47,21 @@
 
 <!-- START Modal code for create intervention-->
 {% for experiment in experiments %}
-<div class="modal fade"  data-modal="intervention-new" id="createIntervention_{{experiment.id}}" tabindex="-1" role="dialog" aria-labelledby="addIntervention" aria-hidden="true">
+<div class="modal fade" data-modal="intervention-new" id="createIntervention_{{experiment.id}}" tabindex="-1" role="dialog" aria-labelledby="addIntervention" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
             <h4 class="modal-title" id="">New Intervention Point</h4>
         </div>
-        <form class="form-horizontal" role="form" method="post" name="intervention_point_creation_form"
+        <form class="form-horizontal modal-form" role="form" method="post" name="intervention_point_creation_form"
             action="{% url 'ab_testing_tool_submit_create_intervention_point' experiment.id %}">
             <div class="modal-body">
                 <fieldset>
                     <legend class="sr-only">Name of intervention point</legend>
                     <div class="form-group">
                         <label for="interventionName">Name:</label> <i class="fa fa-asterisk"></i>
-                        <input type="text" name="name" id="interventionName" class="form-control intervention-name"
+                        <input type="text" name="name" id="interventionName" class="form-control intervention-name empty"
                                 placeholder="Enter Intervention Point Name">
                     </div>
                     <div class="form-group-description">
@@ -73,9 +75,9 @@
                     <div class="form-group-inline-left previewURL">
                         <label for="intervention_point_url_{{track.id}}">Track "{{track.name}}":</label>
                         <i class="fa fa-asterisk"></i>
-                        <a href="#" class="preview-link">preview</a>
-                        <input type="url" name="intervention_point_url_{{track.id}}"
-                            id="intervention_point_url_{{track.id}}" class="form-control intervention-url"
+                        <a href="#" class="preview-link" target="_blank">preview</a>
+                        <input type="text" name="intervention_point_url_{{track.id}}"
+                            id="intervention_point_url_{{track.id}}" class="form-control intervention-url empty"
                             value="" placeholder="Enter URL">
                         <!--a href="#"><i class="fa fa-question-circle"></i></a-->
                     </div>
@@ -112,9 +114,12 @@
                 </fieldset>
             </div>
             <div class="modal-footer">
-                <a href="#" class="btn btn-link" data-dismiss="modal">Cancel</a>
+                <a class="btn btn-link modal-cancel" href="#" data-dismiss="modal">Cancel</a>
                 <!--input type="submit" class="btn btn-submit-primary" value="Save"-->
-                <button type="submit" class="btn btn-submit-primary intervention-create submitter">Create</button>
+                <button type="submit"
+                        class="btn btn-submit-primary intervention-create modal-submit disabled">
+                    Create
+                </button>
             </div>
         </form>
     </div>
@@ -133,7 +138,7 @@
             <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
             <h4 class="modal-title" id="myModalLabel">Edit Intervention Point</h4>
         </div>
-        <form method="post" class="form-horizontal" name="intervention_point_form"
+        <form method="post" class="form-horizontal modal-form" name="intervention_point_form"
             action="{% url 'ab_testing_tool_submit_edit_intervention_point' intervention_point.id %}">
             <div class="modal-body">
 
@@ -144,10 +149,12 @@
                         <label for="intervention_{{intervention_point.id}}">Name:</label>
                         <i class="fa fa-asterisk"></i>
                         <input type="text" name="name" id="intervention_{{intervention_point.id}}"
-                            class="form-control intervention-name" value="{{intervention_point.name}}"
+                            class="form-control intervention-name"
+                            data-initial-value="{{intervention_point.name}}" value="{{intervention_point.name}}"
                             placeholder="Enter Intervention Point Name">
                         <!--a href="#"><i class="fa fa-question-circle"></i></a-->
                     </div>
+                    {# todo: Do all these form-group-descriptions need to be changed? #}
                     <div class="form-group-description">
                         <p>A descriptive name for this track. This will help you blah blah blah</p>
                     </div>
@@ -161,9 +168,10 @@
                     <div class="form-group-inline-left previewURL">
                         <label for="intervention_point_url_{{track_url.track.id}}">Track "{{track_url.track.name}}":</label>
                         <i class="fa fa-asterisk"></i>
-                        <a href="#" class="preview-link">preview</a>
-                        <input type="url" name="intervention_point_url_{{track_url.track.id}}"
+                        <a href="#" class="preview-link" target="_blank">preview</a>
+                        <input type="text" name="intervention_point_url_{{track_url.track.id}}"
                             id="intervention_point_url_{{track_url.track.id}}" class="form-control intervention-url"
+                            data-initial-value="{{track_url.url}}"
                             value="{{track_url.url}}" placeholder="Enter URL">
                         <!--a href="#"><i class="fa fa-question-circle"></i></a-->
                     </div>
@@ -175,17 +183,15 @@
                         <label for="is_canvas_page_for_track_{{track_url.track.id}}">Open</label>
                         <div class="custom-dropdown">
                             <select name="is_canvas_page_for_track_{{track_url.track.id}}"
+                                data-initial-index="{{ track_url.id|lookup_in:ip_display_mappings }}"
                                 id="is_canvas_page_for_track_{{track_url.track.id}}">
-                                <option {% if not track_url.open_as_tab and track_url.is_canvas_page %}selected="selected"{% endif %}
-                                    value="canvasPage">
+                                <option value="canvasPage">
                                     Canvas URL -- Students in this track are redirected to this Canvas page.
                                 </option>
-                                <option {% if not track_url.open_as_tab and not track_url.is_canvas_page %}selected="selected"{% endif %}
-                                    value="externalPage">
+                                <option value="externalPage">
                                     External URL in Canvas -- Students in this track view this page within Canvas.
                                 </option>
-                                <option {% if track_url.open_as_tab %}selected="selected"{% endif %}
-                                    value="newTab">
+                                <option value="newTab">
                                     In new tab -- Students in this track open this page in a new tab.
                                 </option>
                             </select>
@@ -204,14 +210,17 @@
 
                     <div class="form-group">
                         <label for="interventionPointNotes">Notes</label>
-                        <textarea name="notes" id="interventonPointNotes" class="form-control">{{ intervention_point.notes }}</textarea>
+                        <textarea name="notes" id="interventionPointNotes" class="form-control intervention-notes"
+                                  data-initial-value="{{intervention_point.notes}}">
+                            {{ intervention_point.notes }}
+                        </textarea>
                     </div>
 
                 </fieldset>
             </div>
             <div class="modal-footer">
-                <a href="#" class="btn btn-link" data-dismiss="modal">Cancel</a>
-                <button type="submit" class="btn btn-submit-primary intervention-update submitter">Update</button>
+                <a href="#" class="btn btn-link modal-cancel" data-dismiss="modal">Cancel</a>
+                <button type="submit" class="btn btn-submit-primary intervention-update modal-submit">Update</button>
             </div>
         </form>
     </div>
