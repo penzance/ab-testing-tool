@@ -20,9 +20,11 @@ class TimestampedModel(models.Model):
     
     def update(self, **kwargs):
         """ Helper method to update objects """
+        update_fields = {'updated_on'}
         for k, v in kwargs.iteritems():
             setattr(self, k, v)
-        self.save(update_fields=kwargs.keys())
+            update_fields.add(k)
+        self.save(update_fields=update_fields)
     
     def save_as_new_object(self, **kwargs):
         """ Saves a new object based on the original, applying updates in
