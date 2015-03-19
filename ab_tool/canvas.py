@@ -7,7 +7,6 @@ from django.conf import settings
 
 from ab_tool.exceptions import (MISSING_LTI_PARAM, MISSING_LTI_LAUNCH,
     NO_SDK_RESPONSE, NoValidCredentials, UNAUTHORIZED_ACCESS)
-from requests.exceptions import RequestException
 from django_canvas_oauth import get_token
 from ab_tool.controllers import intervention_point_url
 from ab_tool.models import InterventionPoint, Experiment, CourseNotification

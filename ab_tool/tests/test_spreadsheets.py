@@ -42,12 +42,13 @@ class TestSpreadsheets(SessionTestCase):
     def setUp(self):
         self.request = RequestFactory().get('/fake-path')
         self.request.user = Mock(name='user_mock')
-        self.request.session = {'oauth_return_uri': TEST_DOMAIN,
-                                'LTI_LAUNCH': {
-                                    'custom_canvas_api_domain': TEST_DOMAIN,
-                                    'lis_person_contact_email_primary': TEST_STUDENT_EMAIL,
-                                    'custom_canvas_course_id': TEST_COURSE_ID,
-                                },
+        self.request.session = {
+            'oauth_return_uri': TEST_DOMAIN,
+            'LTI_LAUNCH': {
+                'custom_canvas_api_domain': TEST_DOMAIN,
+                'lis_person_contact_email_primary': TEST_STUDENT_EMAIL,
+                'custom_canvas_course_id': TEST_COURSE_ID,
+            },
         }
 
         self.experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
