@@ -20,8 +20,12 @@
 
 
 /* FOR ANGULAR validation of track weight*/
-.ng-invalid {
-    background: red;
+
+
+.error-only-numbers{
+    display: inline-block;
+    font-weight: bold;
+    color: #a51c30;
 }
 
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {

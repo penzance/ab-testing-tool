@@ -72,6 +72,20 @@ class TestExperimentPages(SessionTestCase):
         experiment = self.create_test_experiment(course_id=TEST_OTHER_COURSE_ID)
         response = self.client.get(reverse("ab_testing_tool_edit_experiment", args=(experiment.id,)))
         self.assertError(response, UNAUTHORIZED_ACCESS)
+
+    def test_edit_experiment_view_last_modified_updated(self):
+        """ Tests edit_experiment to confirm that the last updated timestamp changes """
+        experiment = self.create_test_experiment()
+        experiment.name += " (updated)"
+        response = self.client.post(reverse("ab_testing_tool_submit_edit_experiment",
+                                            args=(experiment.id,)),
+                                    content_type="application/json",
+                                    data=experiment.to_json())
+        self.assertEquals(response.content, "success")
+        updated_experiment = Experiment.objects.get(id=experiment.id)
+        self.assertLess(experiment.updated_on, updated_experiment.updated_on,
+                        response)
+
     
     def test_submit_create_experiment(self):
         """ Tests that create_experiment creates a Experiment object verified by
@@ -80,6 +94,7 @@ class TestExperimentPages(SessionTestCase):
         num_experiments = Experiment.objects.count()
         experiment = {
                 "name": "experiment", "notes": "hi", "uniformRandom": True,
+                "csvUpload": False,
                 "tracks": [{"id": None, "weighting": None, "name": "A"}]
         }
         response = self.client.post(
@@ -87,7 +102,23 @@ class TestExperimentPages(SessionTestCase):
             content_type="application/json", data=json.dumps(experiment)
         )
         self.assertEquals(num_experiments + 1, Experiment.objects.count(), response)
-    
+
+    def test_submit_create_experiment_csv_upload(self):
+        """ Tests that create_experiment creates a Experiment object verified by
+            DB count when csvUpload is True and no track weights are specified"""
+        Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
+        num_experiments = Experiment.objects.count()
+        experiment = {
+                "name": "experiment", "notes": "hi", "uniformRandom": False,
+                "csvUpload": True,
+                "tracks": [{"id": None, "name": "A"}]
+        }
+        response = self.client.post(
+            reverse("ab_testing_tool_submit_create_experiment"), follow=True,
+            content_type="application/json", data=json.dumps(experiment)
+        )
+        self.assertEquals(num_experiments + 1, Experiment.objects.count(), response)
+
     def test_submit_create_experiment_with_weights_as_assignment_method(self):
         """ Tests that create_experiment creates a Experiment object verified by
             DB count when uniformRandom is false and the tracks have weightings """
@@ -95,6 +126,7 @@ class TestExperimentPages(SessionTestCase):
         num_experiments = Experiment.objects.count()
         experiment = {
                 "name": "experiment", "notes": "hi", "uniformRandom": False,
+                "csvUpload": False,
                 "tracks": [{"id": None, "weighting": 100, "name": "A"}]
         }
         response = self.client.post(
@@ -124,6 +156,7 @@ class TestExperimentPages(SessionTestCase):
         num_experiments = Experiment.objects.count()
         experiment = {
                 "name": "new_name", "notes": "hi", "uniformRandom": True,
+                "csvUpload": False,
                 "tracks": [{"id": None, "weighting": None, "name": "A"}]
         }
         response = self.client.post(
@@ -144,6 +177,7 @@ class TestExperimentPages(SessionTestCase):
         no_track_weights = experiment.track_probabilites.count()
         experiment = {
                 "name": "new_name", "notes": "hi", "uniformRandom": False,
+                "csvUpload": False,
                 "tracks": [{"id": None, "weighting": 20, "name": "A"},
                            {"id": None, "weighting": 80, "name": "B"}]
         }
@@ -167,6 +201,7 @@ class TestExperimentPages(SessionTestCase):
         no_tracks = experiment.tracks.count()
         experiment = {
                 "name": "new_name", "notes": "hi", "uniformRandom": True,
+                "csvUpload": False,
                 "tracks": [{"id": None, "weighting": None, "name": "A"},
                            {"id": None, "weighting": None, "name": "B"},
                            {"id": None, "weighting": None, "name": "C"}]
@@ -248,6 +283,7 @@ class TestExperimentPages(SessionTestCase):
         no_tracks = experiment.tracks.count()
         experiment = {
                 "name": "new_name", "notes": "hi", "uniformRandom": True,
+                "csvUpload": False,
                 "tracks": [{"id": None, "weighting": None, "name": "A"},
                            {"id": None, "weighting": None, "name": "B"},
                            {"id": None, "weighting": None, "name": "C"}]
@@ -274,6 +310,7 @@ class TestExperimentPages(SessionTestCase):
         track_count = experiment.tracks.count()
         experiment_json = {
                 "name": "new_name", "notes": "hi", "uniformRandom": False,
+                "csvUpload": False,
                 "tracks": [{"id": track1.id, "weighting": 30, "name": "C"},
                            {"id": track2.id, "weighting": 70, "name": "D"}]
         }
@@ -346,7 +383,7 @@ class TestExperimentPages(SessionTestCase):
             is caught since multiple users may be editing the A/B dashboard on
             in the same course """
         self.create_test_experiment()
-        t_id = NONEXISTENT_TRACK_ID
+        t_id = NONEXISTENT_EXPERIMENT_ID
         first_num_experiments = Experiment.objects.count()
         response = self.client.get(reverse("ab_testing_tool_delete_experiment", args=(t_id,)), follow=True)
         second_num_experiments = Experiment.objects.count()
@@ -422,12 +459,51 @@ class TestExperimentPages(SessionTestCase):
                                    follow=True)
         self.assertFalse(experiment.tracks_finalized)
     
+    def test_copy_experiment(self):
+        """ Tests that copy_experiment creates a new experiment """
+        experiment = self.create_test_experiment()
+        num_experiments = Experiment.objects.count()
+        url = reverse("ab_testing_tool_copy_experiment", args=(experiment.id,))
+        response = self.client.get(url, follow=True)
+        self.assertOkay(response)
+        self.assertEqual(Experiment.objects.count(), num_experiments + 1)
+    
+    def test_copy_experiment_unauthorized(self):
+        """ Tests that copy_experiment fails when unauthorized """
+        self.set_roles([])
+        experiment = self.create_test_experiment()
+        url = reverse("ab_testing_tool_copy_experiment", args=(experiment.id,))
+        response = self.client.get(url, follow=True)
+        self.assertTemplateUsed(response, "ab_tool/not_authorized.html")
+    
+    def test_copy_experiment_inavlid_id(self):
+        """ Tests that copy_experiment fails with bad experiment_id """
+        url = reverse("ab_testing_tool_copy_experiment", args=(12345,))
+        response = self.client.get(url, follow=True)
+        self.assertEquals(response.status_code, 404)
+    
+    def test_copy_experiment_wrong_course(self):
+        """ Tests that copy_experiment fails if experiment is different coruse """
+        experiment = self.create_test_experiment(course_id=TEST_OTHER_COURSE_ID)
+        url = reverse("ab_testing_tool_copy_experiment", args=(experiment.id,))
+        response = self.client.get(url, follow=True)
+        self.assertError(response, UNAUTHORIZED_ACCESS)
+    
     def test_delete_track(self):
         """ Tests that delete_track method properly deletes a track of an experiment when authorized"""
         experiment = self.create_test_experiment()
         track = self.create_test_track(experiment=experiment)
         self.assertEqual(experiment.tracks.count(), 1)
         response = self.client.get(reverse("ab_testing_tool_delete_track", args=(track.id,)),
+                                   follow=True)
+        self.assertEqual(experiment.tracks.count(), 0)
+        self.assertOkay(response)
+    
+    def test_delete_nonexistent_track(self):
+        """ Tests that delete_track method succeeds, by design, when deleting a nonexistent track"""
+        experiment = self.create_test_experiment()
+        self.assertEqual(experiment.tracks.count(), 0)
+        response = self.client.get(reverse("ab_testing_tool_delete_track", args=(NONEXISTENT_TRACK_ID,)),
                                    follow=True)
         self.assertEqual(experiment.tracks.count(), 0)
         self.assertOkay(response)

@@ -12,7 +12,8 @@ from ab_tool.views.intervention_point_pages import (submit_create_intervention_p
     submit_edit_intervention_point_from_modules)
 from ab_tool.views.experiment_pages import (create_experiment, submit_create_experiment,
     edit_experiment, submit_edit_experiment, delete_experiment, finalize_tracks,
-    delete_track)
+    copy_experiment, delete_track, track_selection_xlsx, track_selection_csv,
+    upload_track_assignments)
 
 urlpatterns = patterns('',
     url(r'^$', render_control_panel, name='ab_testing_tool_index'),
@@ -41,4 +42,8 @@ urlpatterns = patterns('',
     url(r'^delete_experiment/(?P<experiment_id>\d+)$', delete_experiment, name='ab_testing_tool_delete_experiment'),
     url(r'^delete_track/(?P<track_id>\d+)$', delete_track, name='ab_testing_tool_delete_track'),
     url(r'^finalize_tracks/(?P<experiment_id>\d+)$', finalize_tracks, name='ab_testing_tool_finalize_tracks'),
+    url(r'^copy_experiment/(?P<experiment_id>\d+)$', copy_experiment, name='ab_testing_tool_copy_experiment'),
+    url(r'^track_selection_xlsx/(?P<experiment_id>\d+)$', track_selection_xlsx, name='ab_testing_tool_track_selection_xlsx'),
+    url(r'^track_selection_csv/(?P<experiment_id>\d+)$', track_selection_csv, name='ab_testing_tool_track_selection_csv'),
+    url(r'^upload_track_assignments/(?P<experiment_id>\d+)$', upload_track_assignments, name='ab_testing_tool_upload_track_assignments'),
 )

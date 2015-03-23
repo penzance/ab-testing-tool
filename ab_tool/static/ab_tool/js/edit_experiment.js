@@ -14,15 +14,16 @@ var controller = function($scope, $window, $http) {
     
     $scope.nameError = null;
     $scope.weightingError = null;
-
+    
     $scope.addTrack = function() {
         /**
          * Add a new track based on the inputs in the new track form
          * (the fields in the new track form are bound to the variables
          * $scope.newTrackName and $scope.newTrackWeighting)
          */
-        // Don't include value from hidden weight field if uniformRandom is true
-        if ($scope.experiment.uniformRandom) {
+        // Don't include value from hidden weight field if uniformRandom or
+        // csvUplaod is true
+        if ($scope.experiment.uniformRandom || $scope.experiment.csvUpload) {
             $scope.newTrackWeighting = null;
         }
         var newTrack = {id: null, name: $scope.newTrackName, editing: false,
@@ -56,14 +57,15 @@ var controller = function($scope, $window, $http) {
          */
         //set a resuable len
         var len = $scope.experiment.tracks.length;
-
-        if ($scope.experiment.uniformRandom) {
+        
+        if ($scope.experiment.uniformRandom || $scope.experiment.csvUpload) {
             // If uniformRandom is true, the actual track weights are ignored.
+            // If csvUpload is true, there are no track weights.
             return true;
         }
         
         for (var i = 0, sum = 0; i < len; i++) {
-
+            
             var weighting = $scope.experiment.tracks[i].weighting;
             if (weighting) {
                 sum += parseInt(weighting);
@@ -89,7 +91,7 @@ var controller = function($scope, $window, $http) {
         /**
          * If the form validates, display the confirmation modal to the user
          */
-
+        
         if ($scope.experiment.name == ''){
             $scope.nameError = true;
             return false;
@@ -176,6 +178,7 @@ var controller = function($scope, $window, $http) {
         var curr = $scope.experiment;
         if (orig.name != curr.name) { return true; }
         if (orig.notes != curr.notes) { return true; }
+        if (orig.csvUpload != curr.csvUpload) { return true; }
         if (orig.uniformRandom != curr.uniformRandom) { return true; }
         var origNumTracks = orig.tracks.length;
         var currNumTracks = curr.tracks.length;
@@ -257,10 +260,7 @@ var controller = function($scope, $window, $http) {
             if (otherTrack == track) {
                 continue;
             }
-            if (otherTrack.name == track.newName) {
-                alert("Sorry, there is already another track with that name. Each track in an experiment must have a unique name.");
-                return false;
-            } else if (otherTrack.databaseName == track.newName) {
+            if (otherTrack.name == track.newName || otherTrack.databaseName == track.newName ) {
                 alert("Sorry, there is already another track with that name. Each track in an experiment must have a unique name.");
                 return false;
             }
