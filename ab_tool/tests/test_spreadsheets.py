@@ -33,6 +33,12 @@ TEST_TRACK_SELECTION_RESPONSE = ['Student Name,Student ID,Experiment,Assigned Tr
                                  'StudentA,10123478,Experiment 1,\r\n',
                                  'StudentC,34512278,Experiment 1,\r\n']
 
+TEST_TRACK_SELECTION_UPLOAD = ['Student Name,Student ID,Experiment,Assigned Track\r\n',
+                                 'StudentD,40212478,Experiment 1,track1\r\n',
+                                 'StudentB,20123278,Experiment 1,track1\r\n',
+                                 'StudentA,10123478,Experiment 1,track1\r\n',
+                                 'StudentC,34512278,Experiment 1,track1\r\n']
+
 TEST_ROW = [TEST_STUDENT_DICT['20123278'], '20123278', 'Experiment 1', 'track1']
 
 TEST_ROW_NUMBER = 1
@@ -143,22 +149,17 @@ class TestSpreadsheets(SessionTestCase):
         parse_uploaded_file(self.experiment, TEST_STUDENT_DICT, TEST_TRACK_SELECTION_RESPONSE, TEST_XLS_FILE_NAME)
         mock_open_workbook.assert_called_with(file_contents=TEST_TRACK_SELECTION_RESPONSE)
 
-    @patch('ab_tool.spreadsheets.csv.reader')
     @patch('ab_tool.spreadsheets.parse_row')
-    def test_parse_uploaded_csv_file(self, mock_parse_row, mock_csv_reader):
+    def test_parse_uploaded_csv_file(self, mock_parse_row):
         """
         Test that parse_uploaded_csv_file calls the csv.reader method with the
         appropriate data for files of type csv
         """
-        new_row = ','.join(TEST_ROW)
-        mock_csv_reader.return_value = [new_row]
         tracks = {track.name: track for track in self.experiment.tracks.all()}
         parse_uploaded_file(self.experiment, TEST_STUDENT_DICT,
-                            TEST_TRACK_SELECTION_RESPONSE[1],
+                            ''.join(TEST_TRACK_SELECTION_UPLOAD[0:3]),
                             TEST_CSV_FILE_NAME)
-        data = TEST_TRACK_SELECTION_RESPONSE[1].split('\n')[1:]
-        mock_csv_reader.assert_called_with(data)
-        mock_parse_row.assert_called_with(new_row, 2,
+        mock_parse_row.assert_called_with(TEST_ROW, TEST_ROW_NUMBER + 2,
                                           self.experiment, tracks,
                                           TEST_STUDENT_DICT, {}, [])
 
