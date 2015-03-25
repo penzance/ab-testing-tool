@@ -12,7 +12,8 @@ if not ENV_SETTINGS.get('enable_test_logging'):
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(os.path.dirname(__file__), 'test.db'),
-        'TEST_NAME': os.path.join(os.path.dirname(__file__), 'test.db'),
+        'TEST': {
+            'NAME': os.path.join(BASE_DIR, 'test.sqlite3'),
+        }
     },
 }
