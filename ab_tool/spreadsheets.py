@@ -4,7 +4,7 @@ import StringIO
 import xlrd
 from django.http.response import HttpResponse
 
-from ab_tool.models import (ExperimentStudent, InterventionPointInteraction)
+from ab_tool.models import ExperimentStudent, InterventionPointInteraction
 from ab_tool.controllers import streamed_csv_response
 from ab_tool.canvas import get_unassigned_students
 from ab_tool.exceptions import INVALID_FILE_TYPE
@@ -73,9 +73,9 @@ def parse_uploaded_file(experiment, unassigned_students, input_spreadsheet, file
     errors = []
     track_names = {track.name: track for track in experiment.tracks.all()}
     if filename.endswith('.csv'):
-        # Slice off row 1 to skip headers
-        csvreader = csv.reader(input_spreadsheet.split("\n")[1:])
-        for row_number, row in enumerate(csvreader):
+        reader = csv.reader(input_spreadsheet.splitlines())
+        reader.next()  # Skip the header
+        for row_number, row in enumerate(reader):
             # Row number is off by 2 because we trimmed the headers and
             # CSV files are 1-indexed while enumerate is 0-indexed
             parse_row(row, row_number + 2, experiment, track_names,
