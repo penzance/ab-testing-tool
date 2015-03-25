@@ -16,7 +16,7 @@ for file in $(git diff-index --name-only --diff-filter=ACM HEAD -- | grep '\.js$
     fi
 done
 
-python manage.py test --settings=icommons_lti_tools.settings.test_settings
+python manage.py test --settings=ab_testing_tool.settings.test_settings
 
 if [[ `git symbolic-ref HEAD` == "refs/heads/master" ]]
 then
