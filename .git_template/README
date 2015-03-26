@@ -3,4 +3,4 @@ To install the git hooks in this directory for this repository only, create symb
 Example:
 
 cd ~/tlt/ab_testing_tool
-ln -s ~/tlt/ab_testing_tool/.git_template/hooks/pre-commit ~/tlt/ab_testing_tool/.git/pre-commit
+ln -s ~/tlt/ab_testing_tool/.git_template/hooks/pre-commit ~/tlt/ab_testing_tool/.git/hooks/pre-commit
