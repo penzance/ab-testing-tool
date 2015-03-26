@@ -7,3 +7,13 @@ from .base import *
 if not ENV_SETTINGS.get('enable_test_logging'):
     for logger in LOGGING['loggers']:
         LOGGING['loggers'][logger]['handlers'] = ['null']
+
+# make tests faster
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'TEST': {
+            'NAME': os.path.join(BASE_DIR, 'test.sqlite3'),
+        }
+    },
+}
