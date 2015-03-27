@@ -6,3 +6,4 @@
 # below are requirements specific to the local environment
 django-debug-toolbar
 django-sslserver==0.14
+pep8
