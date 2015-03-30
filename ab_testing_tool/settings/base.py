@@ -69,9 +69,9 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    # Disabling these removes the need for @xframe_options_exempt, @csrf_exempt on views
-    # TODO: determine if this is a better way to go about this
-    # 'django.middleware.csrf.CsrfViewMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    # Disabling this removes the need for @xframe_options_exempt on views
+    # TODO: determine if there is a better way to prevent clickjacking within an iframe context
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_auth_lti.middleware.LTIAuthMiddleware',
     'error_middleware.middleware.ErrorMiddleware',

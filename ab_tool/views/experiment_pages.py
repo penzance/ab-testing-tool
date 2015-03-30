@@ -1,5 +1,5 @@
 import json
-from django.shortcuts import render_to_response, redirect
+from django.shortcuts import render_to_response, redirect, render
 from django_auth_lti.decorators import lti_role_required
 from django.core.urlresolvers import reverse
 from django.conf import settings
@@ -20,7 +20,7 @@ from ab_tool.spreadsheets import (get_track_selection_xlsx, get_track_selection_
 @lti_role_required(ADMINS)
 def create_experiment(request):
     context = {"create": True, "started": False}
-    return render_to_response("ab_tool/edit_experiment.html", context)
+    return render(request, "ab_tool/edit_experiment.html", context)
 
 
 @lti_role_required(ADMINS)
@@ -82,7 +82,7 @@ def edit_experiment(request, experiment_id):
                "experiment_has_installed_intervention": has_installed_intervention,
                "create": False,
                "started": experiment.tracks_finalized}
-    return render_to_response("ab_tool/edit_experiment.html", context)
+    return render(request, "ab_tool/edit_experiment.html", context)
 
 
 @lti_role_required(ADMINS)
