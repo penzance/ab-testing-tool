@@ -186,6 +186,7 @@ def edit_intervention_point_common(request, intervention_point_id):
                                     is_canvas_page=is_canvas_page, open_as_tab=open_as_tab)
 
 
+# TODO: CSRF protection e.g. implement as POST
 @lti_role_required(ADMINS)
 def delete_intervention_point(request, intervention_point_id):
     """ Note: Installed intervention_points are not allowed to be deleted
