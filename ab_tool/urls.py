@@ -3,8 +3,7 @@ from django.conf.urls import patterns, url
 from ab_tool.views.main_pages import (render_control_panel, not_authorized,
     tool_config, download_track_assignments, download_intervention_point_interactions)
 
-from ab_tool.views.selection_pages import (resource_selection, submit_selection,
-    submit_selection_new_intervention_point)
+from ab_tool.views.selection_pages import (resource_selection, submit_selection)
 from ab_tool.views.intervention_point_pages import (submit_create_intervention_point,
     delete_intervention_point, deploy_intervention_point,
     submit_edit_intervention_point, modules_page_edit_intervention_point,
@@ -25,7 +24,8 @@ urlpatterns = patterns('',
     
     url(r'^resource_selection$', resource_selection, name="ab_testing_tool_resource_selection"),
     url(r'^submit_selection$', submit_selection, name="ab_testing_tool_submit_selection"),
-    url(r'^submit_selection_new_intervention_point$', submit_selection_new_intervention_point, name="ab_testing_tool_submit_selection_new_intervention_point"),
+    # TODO: re-enable submit_selection_new_intervention_point() once it is available through the UI
+    # url(r'^submit_selection_new_intervention_point$', submit_selection_new_intervention_point, name="ab_testing_tool_submit_selection_new_intervention_point"),
     
     url(r'^submit_create_intervention_point/(?P<experiment_id>\d+)$', submit_create_intervention_point, name='ab_testing_tool_submit_create_intervention_point'),
     url(r'^modules_page_view_intervention_point/(?P<intervention_point_id>\d+)$', modules_page_view_intervention_point, name='ab_testing_tool_modules_page_view_intervention_point'),

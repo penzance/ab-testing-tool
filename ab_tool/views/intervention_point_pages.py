@@ -1,5 +1,6 @@
-from django.shortcuts import render_to_response, redirect
+from django.shortcuts import render_to_response, redirect, render
 from django.core.urlresolvers import reverse
+from django.views.decorators.csrf import csrf_exempt
 from django_auth_lti.decorators import lti_role_required
 
 from ab_tool.constants import (ADMINS, INTERVENTION_POINT_URL_TAG,
@@ -16,6 +17,7 @@ from ab_tool.analytics import log_intervention_point_interaction
 from django.http.response import Http404
 
 
+@csrf_exempt
 def deploy_intervention_point(request, intervention_point_id):
     """
     Delivers randomly one of the urls in intervention_point if user is not an admin,
@@ -113,7 +115,7 @@ def modules_page_view_intervention_point(request, intervention_point_id):
 @lti_role_required(ADMINS)
 def modules_page_edit_intervention_point(request, intervention_point_id):
     context = intervention_point_context(request, intervention_point_id)
-    return render_to_response("ab_tool/edit_intervention_point_from_canvas.html", context)
+    return render(request, "ab_tool/edit_intervention_point_from_canvas.html", context)
 
 
 def intervention_point_context(request, intervention_point_id):
@@ -141,6 +143,7 @@ def intervention_point_context(request, intervention_point_id):
     return context
 
 
+@csrf_exempt
 @lti_role_required(ADMINS)
 def submit_edit_intervention_point(request, intervention_point_id):
     edit_intervention_point_common(request, intervention_point_id)
@@ -183,6 +186,7 @@ def edit_intervention_point_common(request, intervention_point_id):
                                     is_canvas_page=is_canvas_page, open_as_tab=open_as_tab)
 
 
+# TODO: CSRF protection e.g. implement as POST
 @lti_role_required(ADMINS)
 def delete_intervention_point(request, intervention_point_id):
     """ Note: Installed intervention_points are not allowed to be deleted

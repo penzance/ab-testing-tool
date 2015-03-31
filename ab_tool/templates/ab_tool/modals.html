@@ -56,6 +56,7 @@
         </div>
         <form class="form-horizontal modal-form" role="form" method="post" name="intervention_point_creation_form"
             action="{% url 'ab_testing_tool_submit_create_intervention_point' experiment.id %}">
+            {% csrf_token %}
             <div class="modal-body">
                 <fieldset>
                     <legend class="sr-only">Name of intervention point</legend>
@@ -140,6 +141,7 @@
         </div>
         <form method="post" class="form-horizontal modal-form" name="intervention_point_form"
             action="{% url 'ab_testing_tool_submit_edit_intervention_point' intervention_point.id %}">
+            {% csrf_token %}
             <div class="modal-body">
 
                 <fieldset>
@@ -286,6 +288,7 @@
                 <h4 class="modal-title">Upload Track Assignments</h4>
             </div>
             <form method="post" action="{% url 'ab_testing_tool_upload_track_assignments' experiment.id %}" enctype="multipart/form-data">
+                {% csrf_token %}
                 <div class="modal-body">
                     <p>Upload a spreadsheet to assign students to tracks. Download the following file of all
                     students not assigned to a track, fill it in with track assignments for each student, and

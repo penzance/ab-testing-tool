@@ -1,7 +1,7 @@
 from django.core.urlresolvers import reverse
 from django.http.response import HttpResponse
-from django.shortcuts import render_to_response, redirect
-#from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
 from django_auth_lti.decorators import lti_role_required
 from django.template.defaultfilters import slugify
 from django.template import loader
@@ -20,6 +20,7 @@ def not_authorized(request):
     return HttpResponse(loader.render_to_string("ab_tool/not_authorized.html"), status=401)
 
 
+@csrf_exempt
 @lti_role_required(ADMINS)
 def render_control_panel(request):
     canvas_modules = CanvasModules(request)
@@ -39,7 +40,7 @@ def render_control_panel(request):
         "experiments_with_unassigned_students": experiments_with_unassigned_students(request, course_id),
         "deletable_experiment_ids": canvas_modules.get_deletable_experiment_ids(),
     }
-    return render_to_response("ab_tool/experiments_dashboard.html", context)
+    return render(request, "ab_tool/experiments_dashboard.html", context)
 
 
 def tool_config(request):

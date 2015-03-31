@@ -14,7 +14,7 @@
     <main>
             <form role="form" method="post" class="form-horizontal" name="intervention_point_form"
             action="{% url 'ab_testing_tool_submit_edit_intervention_point_from_modules' intervention_point.id %}">
-            
+                {% csrf_token %}
                 <fieldset>
                     <legend class="sr-only">Name of experiment</legend>
                     

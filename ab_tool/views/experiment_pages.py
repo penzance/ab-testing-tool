@@ -1,5 +1,5 @@
 import json
-from django.shortcuts import render_to_response, redirect
+from django.shortcuts import render_to_response, redirect, render
 from django_auth_lti.decorators import lti_role_required
 from django.core.urlresolvers import reverse
 from django.conf import settings
@@ -20,7 +20,7 @@ from ab_tool.spreadsheets import (get_track_selection_xlsx, get_track_selection_
 @lti_role_required(ADMINS)
 def create_experiment(request):
     context = {"create": True, "started": False}
-    return render_to_response("ab_tool/edit_experiment.html", context)
+    return render(request, "ab_tool/edit_experiment.html", context)
 
 
 @lti_role_required(ADMINS)
@@ -82,9 +82,10 @@ def edit_experiment(request, experiment_id):
                "experiment_has_installed_intervention": has_installed_intervention,
                "create": False,
                "started": experiment.tracks_finalized}
-    return render_to_response("ab_tool/edit_experiment.html", context)
+    return render(request, "ab_tool/edit_experiment.html", context)
 
 
+# TODO: CSRF protection e.g. implement as POST
 @lti_role_required(ADMINS)
 def delete_track(request, track_id):
     """ If Http404 is raised, delete_track redirects regardless. This is by
@@ -152,6 +153,7 @@ def submit_edit_experiment(request, experiment_id):
     return HttpResponse("success")
 
 
+# TODO: CSRF protection e.g. implement as POST
 @lti_role_required(ADMINS)
 def copy_experiment(request, experiment_id):
     course_id = get_lti_param(request, "custom_canvas_course_id")
@@ -166,6 +168,7 @@ def copy_experiment(request, experiment_id):
     raise COPIES_EXCEEDS_LIMIT
 
 
+# TODO: CSRF protection e.g. implement as POST
 @lti_role_required(ADMINS)
 def delete_experiment(request, experiment_id):
     """ If Http404 is raised, delete_experiment redirects regardless. This is by
@@ -183,6 +186,7 @@ def delete_experiment(request, experiment_id):
     return redirect(reverse("ab_testing_tool_index"))
 
 
+# TODO: CSRF protection e.g. implement as POST
 @lti_role_required(ADMINS)
 def finalize_tracks(request, experiment_id):
     course_id = get_lti_param(request, "custom_canvas_course_id")
