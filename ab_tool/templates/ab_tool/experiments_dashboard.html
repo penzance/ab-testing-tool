@@ -110,18 +110,12 @@
                             {% for intervention_point in experiment.intervention_points.all %}
                                 <li>
                                     {% if intervention_point in uninstalled_intervention_points and not experiment.tracks_finalized %}
-                                        <form method="post" id="delete_ip_form_{{intervention_point.id}}"
-                                              action="{% url 'ab_testing_tool_delete_intervention_point' intervention_point.id %}"
-                                              enctype="multipart/form-data">
-                                            {% csrf_token %}
-                                            <a id="delete_ip_button_{{intervention_point.id}}"
-                                               class="btn btn-icon-only ip-btn-delete submitter"
-                                               onclick="this.parentNode.submit(); return false;"
-                                               data-toggle="tooltip" data-placement="top"
-                                               title="Delete Intervention Point '{{intervention_point.name}}'">
-                                                <i class="fa fa-trash"></i><span>Delete</span>
-                                            </a>
-                                        </form>
+                                        <a href="{% url 'ab_testing_tool_delete_intervention_point' intervention_point.id %}"
+                                            data-toggle="tooltip" data-placement="top"
+                                            title="Delete Intervention Point '{{intervention_point.name}}'"
+                                            class="btn btn-icon-only ip-btn-delete submitter">
+                                            <i class="fa fa-trash"></i><span>Delete</span>
+                                        </a>
                                     {% else %}
                                         <a href="#" class="btn btn-icon-only ip-btn-delete disabled">
                                             <i class="fa fa-trash"></i><span>Delete</span>
@@ -167,16 +161,9 @@
                                 </a>
                             </li>
                             <li>
-                                <form method="post" id="copy_experiment_form_{{experiment.id}}"
-                                      action="{% url 'ab_testing_tool_copy_experiment' experiment.id %}"
-                                      enctype="multipart/form-data">
-                                    {% csrf_token %}
-                                    <a id="copy_experiment_button_{{experiment.id}}"
-                                       class="btn btn-icon btn-ip-options"
-                                       onclick="this.parentNode.submit(); return false;">
-                                        Copy Experiment
-                                    </a>
-                                </form>
+                                <a href="{% url 'ab_testing_tool_copy_experiment' experiment.id %}" class="btn btn-icon btn-ip-options" id="copy_experiment_button">
+                                Copy Experiment </a>
+                            
                             </li>
                             {% if experiment.tracks_finalized %}
                                 <li>
