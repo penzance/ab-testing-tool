@@ -110,6 +110,7 @@
                             {% for intervention_point in experiment.intervention_points.all %}
                                 <li>
                                     {% if intervention_point in uninstalled_intervention_points and not experiment.tracks_finalized %}
+                                        {# TODO: This can be an AJAX POST with intervention_point.id in the params #}
                                         <form method="post" id="delete_ip_form_{{intervention_point.id}}"
                                               action="{% url 'ab_testing_tool_delete_intervention_point' intervention_point.id %}"
                                               enctype="multipart/form-data">
@@ -167,6 +168,7 @@
                                 </a>
                             </li>
                             <li>
+                                {# TODO: This can be an AJAX POST with intervention_point.id in the params #}
                                 <form method="post" id="copy_experiment_form_{{experiment.id}}"
                                       action="{% url 'ab_testing_tool_copy_experiment' experiment.id %}"
                                       enctype="multipart/form-data">
