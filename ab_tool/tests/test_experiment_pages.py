@@ -423,8 +423,8 @@ class TestExperimentPages(SessionTestCase):
         experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
         self.assertFalse(experiment.tracks_finalized)
         self.create_test_track()
-        response = self.client.get(reverse("ab_testing_tool_finalize_tracks", args=(experiment.id,)),
-                                   follow=True)
+        response = self.client.post(reverse("ab_testing_tool_finalize_tracks", args=(experiment.id,)),
+                                    follow=True)
         self.assertOkay(response)
         experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
         self.assertTrue(experiment.tracks_finalized)
@@ -438,16 +438,16 @@ class TestExperimentPages(SessionTestCase):
         intervention_point = self.create_test_intervention_point()
         InterventionPointUrl.objects.create(intervention_point=intervention_point,
                                             track=track1, url="example.com")
-        self.client.get(reverse("ab_testing_tool_finalize_tracks", args=(experiment.id,)),
-                        follow=True)
+        response = self.client.post(reverse("ab_testing_tool_finalize_tracks", args=(experiment.id,)), follow=True)
+        self.assertOkay(response)
         experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
         self.assertFalse(experiment.tracks_finalized)
     
     def test_finalize_tracks_no_tracks(self):
         """ Tests that finalize fails if there are no tracks for an experiment """
         experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
-        response = self.client.get(reverse("ab_testing_tool_finalize_tracks", args=(experiment.id,)),
-                                   follow=True)
+        response = self.client.post(reverse("ab_testing_tool_finalize_tracks", args=(experiment.id,)),
+                                    follow=True)
         self.assertError(response, NO_TRACKS_FOR_EXPERIMENT)
     
     def test_finalize_tracks_missing_track_weights(self):
@@ -455,8 +455,8 @@ class TestExperimentPages(SessionTestCase):
             probability experiment """
         experiment = self.create_test_experiment(assignment_method=Experiment.WEIGHTED_PROBABILITY_RANDOM)
         self.create_test_track(name="track1", experiment=experiment)
-        self.client.get(reverse("ab_testing_tool_finalize_tracks", args=(experiment.id,)),
-                                   follow=True)
+        response = self.client.post(reverse("ab_testing_tool_finalize_tracks", args=(experiment.id,)), follow=True)
+        self.assertOkay(response)
         self.assertFalse(experiment.tracks_finalized)
     
     def test_copy_experiment(self):
@@ -494,8 +494,8 @@ class TestExperimentPages(SessionTestCase):
         experiment = self.create_test_experiment()
         track = self.create_test_track(experiment=experiment)
         self.assertEqual(experiment.tracks.count(), 1)
-        response = self.client.get(reverse("ab_testing_tool_delete_track", args=(track.id,)),
-                                   follow=True)
+        response = self.client.post(reverse("ab_testing_tool_delete_track", args=(track.id,)),
+                                    follow=True)
         self.assertEqual(experiment.tracks.count(), 0)
         self.assertOkay(response)
     
@@ -503,7 +503,7 @@ class TestExperimentPages(SessionTestCase):
         """ Tests that delete_track method succeeds, by design, when deleting a nonexistent track"""
         experiment = self.create_test_experiment()
         self.assertEqual(experiment.tracks.count(), 0)
-        response = self.client.get(reverse("ab_testing_tool_delete_track", args=(NONEXISTENT_TRACK_ID,)),
-                                   follow=True)
+        response = self.client.post(reverse("ab_testing_tool_delete_track", args=(NONEXISTENT_TRACK_ID,)),
+                                    follow=True)
         self.assertEqual(experiment.tracks.count(), 0)
         self.assertOkay(response)

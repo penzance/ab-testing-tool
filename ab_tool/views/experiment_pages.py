@@ -86,7 +86,7 @@ def edit_experiment(request, experiment_id):
     return render(request, "ab_tool/edit_experiment.html", context)
 
 
-# TODO: CSRF protection e.g. implement as POST
+@require_POST
 @lti_role_required(ADMINS)
 def delete_track(request, track_id):
     """ If Http404 is raised, delete_track redirects regardless. This is by
@@ -98,6 +98,7 @@ def delete_track(request, track_id):
     except Http404:
         pass
     return HttpResponse("success")
+
 
 @lti_role_required(ADMINS)
 def submit_edit_experiment(request, experiment_id):
@@ -187,7 +188,7 @@ def delete_experiment(request, experiment_id):
     return redirect(reverse("ab_testing_tool_index"))
 
 
-# TODO: CSRF protection e.g. implement as POST
+@require_POST
 @lti_role_required(ADMINS)
 def finalize_tracks(request, experiment_id):
     course_id = get_lti_param(request, "custom_canvas_course_id")
