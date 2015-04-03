@@ -320,8 +320,8 @@ class TestInterventionPointPages(SessionTestCase):
         first_num_intervention_points = InterventionPoint.objects.count()
         intervention_point = self.create_test_intervention_point()
         self.assertEqual(first_num_intervention_points + 1, InterventionPoint.objects.count())
-        response = self.client.get(reverse("ab_testing_tool_delete_intervention_point",
-                                           args=(intervention_point.id,)), follow=True)
+        response = self.client.post(reverse("ab_testing_tool_delete_intervention_point",
+                                            args=(intervention_point.id,)), follow=True)
         second_num_intervention_points = InterventionPoint.objects.count()
         self.assertOkay(response)
         self.assertEqual(first_num_intervention_points, second_num_intervention_points)
@@ -331,8 +331,8 @@ class TestInterventionPointPages(SessionTestCase):
         self.set_roles([])
         first_num_intervention_points = InterventionPoint.objects.count()
         intervention_point = self.create_test_intervention_point()
-        response = self.client.get(reverse("ab_testing_tool_delete_intervention_point",
-                                           args=(intervention_point.id,)), follow=True)
+        response = self.client.post(reverse("ab_testing_tool_delete_intervention_point",
+                                            args=(intervention_point.id,)), follow=True)
         second_num_intervention_points = InterventionPoint.objects.count()
         self.assertTemplateUsed(response, "ab_tool/not_authorized.html")
         self.assertNotEqual(first_num_intervention_points, second_num_intervention_points)
@@ -345,8 +345,8 @@ class TestInterventionPointPages(SessionTestCase):
         first_num_intervention_points = InterventionPoint.objects.count()
         self.create_test_intervention_point()
         intervention_point_id = NONEXISTENT_INTERVENTION_POINT_ID
-        response = self.client.get(reverse("ab_testing_tool_delete_intervention_point",
-                                           args=(intervention_point_id,)), follow=True)
+        response = self.client.post(reverse("ab_testing_tool_delete_intervention_point",
+                                            args=(intervention_point_id,)), follow=True)
         second_num_intervention_points = InterventionPoint.objects.count()
         self.assertOkay(response)
         self.assertNotEqual(first_num_intervention_points, second_num_intervention_points)
@@ -356,8 +356,8 @@ class TestInterventionPointPages(SessionTestCase):
             InterventionPoint but for wrong course """
         first_num_intervention_points = InterventionPoint.objects.count()
         intervention_point = self.create_test_intervention_point(course_id=TEST_OTHER_COURSE_ID)
-        response = self.client.get(reverse("ab_testing_tool_delete_intervention_point",
-                                           args=(intervention_point.id,)), follow=True)
+        response = self.client.post(reverse("ab_testing_tool_delete_intervention_point",
+                                            args=(intervention_point.id,)), follow=True)
         second_num_intervention_points = InterventionPoint.objects.count()
         self.assertError(response, UNAUTHORIZED_ACCESS)
         self.assertNotEqual(first_num_intervention_points, second_num_intervention_points)
@@ -371,8 +371,8 @@ class TestInterventionPointPages(SessionTestCase):
         ret_val = [True]
         with patch("ab_tool.canvas.CanvasModules.intervention_point_is_installed",
                    return_value=ret_val):
-            response = self.client.get(reverse("ab_testing_tool_delete_intervention_point",
-                                               args=(intervention_point.id,)), follow=True)
+            response = self.client.post(reverse("ab_testing_tool_delete_intervention_point",
+                                                args=(intervention_point.id,)), follow=True)
             second_num_intervention_points = InterventionPoint.objects.count()
             self.assertNotEqual(first_num_intervention_points, second_num_intervention_points)
             self.assertError(response, DELETING_INSTALLED_INTERVENTION_POINT)

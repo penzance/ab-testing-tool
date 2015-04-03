@@ -334,8 +334,18 @@
                 <p class="text-warning">Are you sure you want to delete experiment "{{experiment.name}}"?  This will also delete all intervention points for this experiment.</p>
             </div>
             <div class="modal-footer">
-                <a class="btn btn-lg btn-submit-primary" data-dismiss="modal"> Close </a>
-                <a class="btn btn-lg btn-link submitter"  href="{% url 'ab_testing_tool_delete_experiment' experiment.id %}"> Yes, Delete Experiment </a>
+                {# TODO: This can be an AJAX POST with intervention_point.id in the params #}
+                <form method="post" id="delete_experiment_form_{{experiment.id}}"
+                      action="{% url 'ab_testing_tool_delete_experiment' experiment.id %}"
+                      enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <a class="btn btn-lg btn-submit-primary" data-dismiss="modal"> Close </a>
+                    <a id="delete_experiment_button_{{experiment.id}}"
+                       class="btn btn-lg btn-link submitter"
+                       onclick="this.parentNode.submit(); return false;">
+                        Yes, Delete Experiment
+                    </a>
+                </form>
             </div>
         </div>
     </div>
