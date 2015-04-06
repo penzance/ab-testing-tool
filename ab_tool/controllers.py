@@ -47,7 +47,7 @@ def assign_track_and_create_student(experiment, student_id, student_name):
     return student
 
 
-def intervention_point_url(request, intervention_point_id):
+def intervention_point_url(request, resource_link_id, intervention_point_id):
     """ Builds a URL to deploy the intervention_point with the database id
         intervention_point_id """
     try:
@@ -55,7 +55,7 @@ def intervention_point_url(request, intervention_point_id):
     except (TypeError, ValueError):
         raise BAD_INTERVENTION_POINT_ID
     return request.build_absolute_uri(reverse("ab_testing_tool_deploy_intervention_point",
-                                              args=(intervention_point_id,)))
+                                              args=(resource_link_id, intervention_point_id,)))
 
 def validate_name(name):
     if not name:

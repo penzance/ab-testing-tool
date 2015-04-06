@@ -55,7 +55,7 @@
             <h4 class="modal-title" id="">New Intervention Point</h4>
         </div>
         <form class="form-horizontal modal-form" role="form" method="post" name="intervention_point_creation_form"
-            action="{% url 'ab_testing_tool_submit_create_intervention_point' experiment.id %}">
+            action="{% url 'ab_testing_tool_submit_create_intervention_point' resource_link_id experiment.id %}">
             {% csrf_token %}
             <div class="modal-body">
                 <fieldset>
@@ -140,7 +140,7 @@
             <h4 class="modal-title" id="myModalLabel">Edit Intervention Point</h4>
         </div>
         <form method="post" class="form-horizontal modal-form" name="intervention_point_form"
-            action="{% url 'ab_testing_tool_submit_edit_intervention_point' intervention_point.id %}">
+            action="{% url 'ab_testing_tool_submit_edit_intervention_point' resource_link_id intervention_point.id %}">
             {% csrf_token %}
             <div class="modal-body">
 
@@ -269,7 +269,7 @@
             </div>
             <div class="modal-footer">
                 <a class="btn btn-lg btn-submit-primary" data-dismiss="modal"> Close </a>
-                <a class="btn btn-lg btn-submit submitter" href="{% url 'ab_testing_tool_finalize_tracks' experiment.id %}"> Yes, Start Experiment </a>
+                <a class="btn btn-lg btn-submit submitter" href="{% url 'ab_testing_tool_finalize_tracks' resource_link_id experiment.id %}"> Yes, Start Experiment </a>
             </div>
         </div>
     </div>
@@ -287,14 +287,14 @@
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h4 class="modal-title">Upload Track Assignments</h4>
             </div>
-            <form method="post" action="{% url 'ab_testing_tool_upload_track_assignments' experiment.id %}" enctype="multipart/form-data">
+            <form method="post" action="{% url 'ab_testing_tool_upload_track_assignments' resource_link_id experiment.id %}" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div class="modal-body">
                     <p>Upload a spreadsheet to assign students to tracks. Download the following file of all
                     students not assigned to a track, fill it in with track assignments for each student, and
                     upload it below. You can also upload the list of student track assignments
                     from a different experiment in this course.</p>
-                    XLSX: <a href="{% url 'ab_testing_tool_track_selection_xlsx' experiment.id %}">track_selection.xlsx</a>
+                    XLSX: <a href="{% url 'ab_testing_tool_track_selection_xlsx' resource_link_id experiment.id %}">track_selection.xlsx</a>
                     <br><br>
                     <p class="text-warning">Warning: Track assignments are final. A student
                     cannot be changed to a different track once an assignment has been made.</p>
@@ -335,7 +335,7 @@
             </div>
             <div class="modal-footer">
                 <a class="btn btn-lg btn-submit-primary" data-dismiss="modal"> Close </a>
-                <a class="btn btn-lg btn-link submitter"  href="{% url 'ab_testing_tool_delete_experiment' experiment.id %}"> Yes, Delete Experiment </a>
+                <a class="btn btn-lg btn-link submitter"  href="{% url 'ab_testing_tool_delete_experiment' resource_link_id experiment.id %}"> Yes, Delete Experiment </a>
             </div>
         </div>
     </div>

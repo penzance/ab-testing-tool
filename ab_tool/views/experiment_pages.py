@@ -18,13 +18,13 @@ from ab_tool.spreadsheets import (get_track_selection_xlsx, get_track_selection_
 
 
 @lti_role_required(ADMINS)
-def create_experiment(request):
-    context = {"create": True, "started": False}
+def create_experiment(request, resource_link_id):
+    context = {"create": True, "started": False, "resource_link_id": resource_link_id}
     return render(request, "ab_tool/edit_experiment.html", context)
 
 
 @lti_role_required(ADMINS)
-def submit_create_experiment(request):
+def submit_create_experiment(request, resource_link_id):
     """ Expects a post parameter 'experiment' to be json of the form:
             {"name": name(str),
              "notes": notes(str),
@@ -74,11 +74,13 @@ def submit_create_experiment(request):
 
 
 @lti_role_required(ADMINS)
-def edit_experiment(request, experiment_id):
+def edit_experiment(request, resource_link_id, experiment_id):
+    print("resource_link_id="+resource_link_id)
     course_id = get_lti_param(request, "custom_canvas_course_id")
     experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
-    has_installed_intervention = CanvasModules(request).experiment_has_installed_intervention(experiment)
-    context = {"experiment": experiment,
+    has_installed_intervention = CanvasModules(request).experiment_has_installed_intervention(resource_link_id, experiment)
+    context = {"resource_link_id": resource_link_id,
+               "experiment": experiment,
                "experiment_has_installed_intervention": has_installed_intervention,
                "create": False,
                "started": experiment.tracks_finalized}
@@ -99,7 +101,7 @@ def delete_track(request, track_id):
     return HttpResponse("success")
 
 @lti_role_required(ADMINS)
-def submit_edit_experiment(request, experiment_id):
+def submit_edit_experiment(request, resource_link_id, experiment_id):
     """ Expects a post parameter 'experiment' to be json of the form:
             {"name": name(str),
              "notes": notes(str),
@@ -155,7 +157,7 @@ def submit_edit_experiment(request, experiment_id):
 
 # TODO: CSRF protection e.g. implement as POST
 @lti_role_required(ADMINS)
-def copy_experiment(request, experiment_id):
+def copy_experiment(request, resource_link_id, experiment_id):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
     experiments_with_prefix = set([e.name for e in Experiment.objects.filter(
@@ -170,7 +172,7 @@ def copy_experiment(request, experiment_id):
 
 # TODO: CSRF protection e.g. implement as POST
 @lti_role_required(ADMINS)
-def delete_experiment(request, experiment_id):
+def delete_experiment(request, resource_link_id, experiment_id):
     """ If Http404 is raised, delete_experiment redirects regardless. This is by
         design, as multiple users may be deleting concurrently in the same course """
     course_id = get_lti_param(request, "custom_canvas_course_id")
@@ -178,7 +180,7 @@ def delete_experiment(request, experiment_id):
         experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
         experiment.assert_not_finalized()
         canvas_modules = CanvasModules(request)
-        if canvas_modules.experiment_has_installed_intervention(experiment):
+        if canvas_modules.experiment_has_installed_intervention(resource_link_id, experiment):
             raise INTERVENTION_POINTS_ARE_INSTALLED
         experiment.delete()
     except Http404:
@@ -188,7 +190,7 @@ def delete_experiment(request, experiment_id):
 
 # TODO: CSRF protection e.g. implement as POST
 @lti_role_required(ADMINS)
-def finalize_tracks(request, experiment_id):
+def finalize_tracks(request, resource_link_id, experiment_id):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
     if not experiment.tracks.count():
@@ -208,19 +210,19 @@ def finalize_tracks(request, experiment_id):
 
 
 @lti_role_required(ADMINS)
-def track_selection_xlsx(request, experiment_id):
+def track_selection_xlsx(request, resource_link_id, experiment_id):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
-    return get_track_selection_xlsx(request, experiment, "track_selection.xlsx")
+    return get_track_selection_xlsx(request, resource_link_id, experiment, "track_selection.xlsx")
 
 @lti_role_required(ADMINS)
-def track_selection_csv(request, experiment_id):
+def track_selection_csv(request, resource_link_id, experiment_id):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
-    return get_track_selection_csv(request, experiment, "track_selection.csv")
+    return get_track_selection_csv(request, resource_link_id, experiment, "track_selection.csv")
 
 @lti_role_required(ADMINS)
-def upload_track_assignments(request, experiment_id):
+def upload_track_assignments(request, resource_link_id, experiment_id):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
     uploaded_file = request.FILES["track_assignments"]

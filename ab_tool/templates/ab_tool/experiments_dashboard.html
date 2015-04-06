@@ -37,7 +37,7 @@
             <i class="fa fa-search"></i>
             Modules
         </a>
-        <a href="{% url 'ab_testing_tool_create_experiment' %}" class="btn btn-dashboard btn-newExperiment">
+        <a href="{% url 'ab_testing_tool_create_experiment' resource_link_id %}" class="btn btn-dashboard btn-newExperiment">
             <i class="fa fa-plus"></i>
             New Experiment
         </a>
@@ -45,7 +45,7 @@
 
     <div id="experiment_panel" class="row row-lti col-md-8">
 
-        <!--h2><a href="{% url 'ab_testing_tool_create_experiment' %}">Add an Experiment</a></h2-->
+        <!--h2><a href="{% url 'ab_testing_tool_create_experiment' resource_link_id %}">Add an Experiment</a></h2-->
         {% for experiment in experiments %}
             <div class="panel panel-experiment"><!-- exp (start) -->
                 <div class="panel-wrapper">
@@ -85,7 +85,7 @@
                     </div>
                     <div class="exp-edit" data-toggle="tooltip" data-placement="right" title="Edit experiment">
                         <div class="arrow-left"></div>
-                        <a href="{% url 'ab_testing_tool_edit_experiment' experiment.id %}" id="experiment_{{experiment.id}}" class="btn btn-icon-only exp-btn-global">
+                        <a href="{% url 'ab_testing_tool_edit_experiment' resource_link_id experiment.id %}" id="experiment_{{experiment.id}}" class="btn btn-icon-only exp-btn-global">
                             <i class="fa fa-pencil"></i><span>Edit</span>
                         </a>
                     </div>
@@ -110,7 +110,7 @@
                             {% for intervention_point in experiment.intervention_points.all %}
                                 <li>
                                     {% if intervention_point in uninstalled_intervention_points and not experiment.tracks_finalized %}
-                                        <a href="{% url 'ab_testing_tool_delete_intervention_point' intervention_point.id %}"
+                                        <a href="{% url 'ab_testing_tool_delete_intervention_point' resource_link_id intervention_point.id %}"
                                             data-toggle="tooltip" data-placement="top"
                                             title="Delete Intervention Point '{{intervention_point.name}}'"
                                             class="btn btn-icon-only ip-btn-delete submitter">
@@ -161,33 +161,33 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="{% url 'ab_testing_tool_copy_experiment' experiment.id %}" class="btn btn-icon btn-ip-options" id="copy_experiment_button">
+                                <a href="{% url 'ab_testing_tool_copy_experiment' resource_link_id experiment.id %}" class="btn btn-icon btn-ip-options" id="copy_experiment_button">
                                 Copy Experiment </a>
                             
                             </li>
                             {% if experiment.tracks_finalized %}
                                 <li>
                                     <a id="download_students_button"
-                                       href="{% url 'ab_testing_tool_download_data' experiment.id %}"
+                                       href="{% url 'ab_testing_tool_download_data' resource_link_id experiment.id %}"
                                        class="btn btn-icon btn-ip-options submitter">
                                         <i class="fa fa-download"></i>Download Students
                                     </a>
                                 </li>
                                 <li>
                                     <a id="download_intervention_point_interactions_button"
-                                       href="{% url 'ab_testing_tool_download_intervention_point_interactions' experiment.id %}"
+                                       href="{% url 'ab_testing_tool_download_intervention_point_interactions' resource_link_id experiment.id %}"
                                        class="btn btn-icon btn-ip-options submitter">
                                         <i class="fa fa-download"></i>Download Interactions
                                     </a>
                                 </li>
                             {% else %}
                                 <li>
-                                    <a href="{% url 'ab_testing_tool_download_data' experiment.id %}" class="btn btn-icon btn-ip-options disabled">
+                                    <a href="{% url 'ab_testing_tool_download_data' resource_link_id experiment.id %}" class="btn btn-icon btn-ip-options disabled">
                                         <i class="fa fa-download"></i>Download Students
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="{% url 'ab_testing_tool_download_intervention_point_interactions' experiment.id %}f" class="btn btn-icon btn-ip-options disabled">
+                                    <a href="{% url 'ab_testing_tool_download_intervention_point_interactions' resource_link_id experiment.id %}f" class="btn btn-icon btn-ip-options disabled">
                                         <i class="fa fa-download"></i>Download Interactions
                                     </a>
                                 </li>

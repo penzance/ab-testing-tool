@@ -18,6 +18,7 @@ from ab_tool.exceptions import (MISSING_RETURN_TYPES_PARAM,
 def resource_selection(request):
     """ docs: https://canvas.instructure.com/doc/api/file.link_selection_tools.html """
     course_id = get_lti_param(request, "custom_canvas_course_id")
+    resource_link_id = get_lti_param(request, "resource_link_id")
     canvas_modules = CanvasModules(request)
     ext_content_return_types = request.POST.getlist('ext_content_return_types')
     if ext_content_return_types != ['lti_launch_url']:
@@ -27,7 +28,7 @@ def resource_selection(request):
         raise MISSING_RETURN_URL
     all_experiments = Experiment.objects.filter(course_id=course_id)
     context = {"content_return_url": content_return_url,
-               "intervention_points": canvas_modules.get_uninstalled_intervention_points(),
+               "intervention_points": canvas_modules.get_uninstalled_intervention_points(resource_link_id),
                "tracks": Track.objects.filter(course_id=course_id),
                "experiments": all_experiments,
                }
@@ -38,9 +39,10 @@ def resource_selection(request):
 def submit_selection(request):
     intervention_point_id = post_param(request, "intervention_point_id")
     course_id = get_lti_param(request, "custom_canvas_course_id")
+    resource_link_id = get_lti_param(request, "resource_link_id")
     intervention_point = InterventionPoint.get_or_404_check_course(
             intervention_point_id, course_id)
-    page_url = intervention_point_url(request, intervention_point_id)
+    page_url = intervention_point_url(request, resource_link_id, intervention_point_id)
     page_name = intervention_point.name
     content_return_url = post_param(request, "content_return_url")
     params = {"return_type": "lti_launch_url",

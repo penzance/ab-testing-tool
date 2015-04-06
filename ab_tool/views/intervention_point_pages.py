@@ -18,7 +18,7 @@ from django.http.response import Http404
 
 
 @csrf_exempt
-def deploy_intervention_point(request, intervention_point_id):
+def deploy_intervention_point(request, resource_link_id, intervention_point_id):
     """
     Delivers randomly one of the urls in intervention_point if user is not an admin,
     or edit_intervention_point panel if admin.
@@ -34,7 +34,7 @@ def deploy_intervention_point(request, intervention_point_id):
     # If user is an admin, let them edit the intervention_point
     if set(ADMINS) & set(user_roles):
         return redirect(reverse("ab_testing_tool_modules_page_view_intervention_point",
-                                args=(intervention_point_id,)))
+                                args=(resource_link_id, intervention_point_id,)))
     
     intervention_point = InterventionPoint.get_or_404_check_course(
             intervention_point_id, course_id)
@@ -79,7 +79,7 @@ def deploy_intervention_point(request, intervention_point_id):
 
 
 @lti_role_required(ADMINS)
-def submit_create_intervention_point(request, experiment_id):
+def submit_create_intervention_point(request, resource_link_id, experiment_id):
     """ Note: request will always be POST because Canvas fetches pages within iframe by POST
         TODO: use Django forms library to save instead of getting individual POST params """
     course_id = get_lti_param(request, "custom_canvas_course_id")
@@ -107,18 +107,18 @@ def submit_create_intervention_point(request, experiment_id):
 
 
 @lti_role_required(ADMINS)
-def modules_page_view_intervention_point(request, intervention_point_id):
-    context = intervention_point_context(request, intervention_point_id)
+def modules_page_view_intervention_point(request, resource_link_id, intervention_point_id):
+    context = intervention_point_context(request, resource_link_id, intervention_point_id)
     return render_to_response("ab_tool/view_intervention_point_from_canvas.html", context)
 
 
 @lti_role_required(ADMINS)
-def modules_page_edit_intervention_point(request, intervention_point_id):
-    context = intervention_point_context(request, intervention_point_id)
+def modules_page_edit_intervention_point(request, resource_link_id, intervention_point_id):
+    context = intervention_point_context(request, resource_link_id, intervention_point_id)
     return render(request, "ab_tool/edit_intervention_point_from_canvas.html", context)
 
 
-def intervention_point_context(request, intervention_point_id):
+def intervention_point_context(request, resource_link_id, intervention_point_id):
     """ Common core shared between edit_intervention_point and modules_page_edit_intervention_point """
     course_id = get_lti_param(request, "custom_canvas_course_id")
     canvas_modules = CanvasModules(request)
@@ -135,9 +135,10 @@ def intervention_point_context(request, intervention_point_id):
             track_urls.append((track, intervention_point_url))
         except InterventionPointUrl.DoesNotExist:
             track_urls.append((track, None))
-    context = {"intervention_point": intervention_point,
+    context = {"resource_link_id": resource_link_id,
+               "intervention_point": intervention_point,
                "tracks": track_urls,
-               "is_installed": canvas_modules.intervention_point_is_installed(intervention_point),
+               "is_installed": canvas_modules.intervention_point_is_installed(resource_link_id, intervention_point),
                #TODO: "installed_module": installed_module,
                }
     return context
@@ -145,17 +146,17 @@ def intervention_point_context(request, intervention_point_id):
 
 @csrf_exempt
 @lti_role_required(ADMINS)
-def submit_edit_intervention_point(request, intervention_point_id):
-    edit_intervention_point_common(request, intervention_point_id)
+def submit_edit_intervention_point(request, resource_link_id, intervention_point_id):
+    edit_intervention_point_common(request, resource_link_id, intervention_point_id)
     return redirect(reverse("ab_testing_tool_index"))
 
 @lti_role_required(ADMINS)
-def submit_edit_intervention_point_from_modules(request, intervention_point_id):
-    edit_intervention_point_common(request, intervention_point_id)
+def submit_edit_intervention_point_from_modules(request, resource_link_id, intervention_point_id):
+    edit_intervention_point_common(request, resource_link_id, intervention_point_id)
     return redirect(reverse("ab_testing_tool_modules_page_view_intervention_point",
-                            args=(intervention_point_id,)))
+                            args=(resource_link_id, intervention_point_id,)))
 
-def edit_intervention_point_common(request, intervention_point_id):
+def edit_intervention_point_common(request, resource_link_id, intervention_point_id):
     """ Note: Only allowed if admin has privileges on the particular course.
         TODO: consider using Django forms to save rather of getting individual POST params """
     course_id = get_lti_param(request, "custom_canvas_course_id")
@@ -188,7 +189,7 @@ def edit_intervention_point_common(request, intervention_point_id):
 
 # TODO: CSRF protection e.g. implement as POST
 @lti_role_required(ADMINS)
-def delete_intervention_point(request, intervention_point_id):
+def delete_intervention_point(request, resource_link_id, intervention_point_id):
     """ Note: Installed intervention_points are not allowed to be deleted
         Note: attached InterventionPointUrls are deleted via cascading delete """
     course_id = get_lti_param(request, "custom_canvas_course_id")
@@ -199,7 +200,7 @@ def delete_intervention_point(request, intervention_point_id):
         if intervention_point.experiment.tracks_finalized:
             raise DELETING_INTERVENTION_POINT_AFTER_FINALIZED
         canvas_modules = CanvasModules(request)
-        if canvas_modules.intervention_point_is_installed(intervention_point):
+        if canvas_modules.intervention_point_is_installed(resource_link_id, intervention_point):
             raise DELETING_INSTALLED_INTERVENTION_POINT
         intervention_point.delete()
     except Http404:

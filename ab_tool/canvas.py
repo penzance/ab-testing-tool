@@ -25,41 +25,41 @@ class CanvasModules(object):
             module["module_items"] = list_module_items(
                     self.request_context, self.course_id, module["id"])
     
-    def get_uninstalled_intervention_points(self):
+    def get_uninstalled_intervention_points(self, resource_link_id):
         """ Returns the list of InterventionPoint objects that have been created for the
             current course but not installed in any of that course's modules """
         installed_intervention_point_urls = self._get_installed_intervention_point_urls()
         intervention_points = [intervention_point for intervention_point in
                                InterventionPoint.objects.filter(course_id=self.course_id)
-                               if intervention_point_url(self.request, intervention_point.id)
+                               if intervention_point_url(self.request, resource_link_id, intervention_point.id)
                                not in installed_intervention_point_urls]
         return intervention_points
     
-    def get_deletable_experiment_ids(self):
+    def get_deletable_experiment_ids(self, resource_link_id):
         """ Returns list of experiment ids for experiments that can be deleted
             (they have tracks_finalzed == False and no installed intervention
             points """
         return [e.id for e in Experiment.objects.filter(course_id=self.course_id)
                 if not e.tracks_finalized
-                and not self.experiment_has_installed_intervention(e)]
+                and not self.experiment_has_installed_intervention(resource_link_id,e)]
     
-    def intervention_point_is_installed(self, intervention_point):
-        return (intervention_point_url(self.request, intervention_point.id) in
+    def intervention_point_is_installed(self, resource_link_id, intervention_point):
+        return (intervention_point_url(self.request, resource_link_id, intervention_point.id) in
                 self._get_installed_intervention_point_urls())
     
-    def experiment_has_installed_intervention(self, experiment):
+    def experiment_has_installed_intervention(self, resource_link_id, experiment):
         """ Checks to see if a experiment has any intervention points installed.
             For Python2.6+, the built-in isdisjoint provides the fastest return"""
-        return not set([intervention_point_url(self.request, ip.id) for ip in
+        return not set([intervention_point_url(self.request, resource_link_id, ip.id) for ip in
                experiment.intervention_points.all()]).isdisjoint(set(self._get_installed_intervention_point_urls()))
     
-    def get_modules_with_items(self):
+    def get_modules_with_items(self, resource_link_id):
         """ Returns a list of all modules with the items of that module added to the
             module under the extra attribute "module_items" (this is a list).
             Each item in those lists has the added attribute "is_intervention_point",
             which is a boolean describing whether or not the item is a intervention_point
             of the ab_testing_tool """
-        intervention_point_urls = self._all_intervention_point_urls()
+        intervention_point_urls = self._all_intervention_point_urls(resource_link_id)
         for module in self.modules:
             for item in module["module_items"]:
                 is_intervention_point = (item["type"] == "ExternalTool" and "external_url" in item
@@ -70,10 +70,10 @@ class CanvasModules(object):
                     item["experiment_name"] = intervention_point_urls[item["external_url"]].experiment.name
         return self.modules
     
-    def _all_intervention_point_urls(self):
+    def _all_intervention_point_urls(self, resource_link_id):
         """ Returns a dict of deploy urls to intervention points of all intervention_points
             in the database for that course"""
-        return {intervention_point_url(self.request, intervention_point.id): intervention_point
+        return {intervention_point_url(self.request, resource_link_id, intervention_point.id): intervention_point
                 for intervention_point in InterventionPoint.objects.filter(course_id=self.course_id)}
     
     def _get_installed_intervention_point_urls(self):

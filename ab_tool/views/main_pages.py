@@ -23,6 +23,8 @@ def not_authorized(request):
 @csrf_exempt
 @lti_role_required(ADMINS)
 def render_control_panel(request):
+    # retrieve the resource_link_id from lti_launch
+    resource_link_id = get_lti_param(request, "resource_link_id")
     canvas_modules = CanvasModules(request)
     course_id = get_lti_param(request, "custom_canvas_course_id")
     intervention_points = InterventionPoint.objects.filter(course_id=course_id)
@@ -31,14 +33,15 @@ def render_control_panel(request):
     experiments = Experiment.objects.filter(course_id=course_id)
     
     context = {
-        "modules": canvas_modules.get_modules_with_items(),
+        "resource_link_id": resource_link_id,
+        "modules": canvas_modules.get_modules_with_items(resource_link_id),
         "intervention_points": intervention_points,
         "ip_display_mappings": ip_display_mappings,
-        "uninstalled_intervention_points": canvas_modules.get_uninstalled_intervention_points(),
+        "uninstalled_intervention_points": canvas_modules.get_uninstalled_intervention_points(resource_link_id),
         "canvas_url": get_lti_param(request, "launch_presentation_return_url"),
         "experiments": experiments,
         "experiments_with_unassigned_students": experiments_with_unassigned_students(request, course_id),
-        "deletable_experiment_ids": canvas_modules.get_deletable_experiment_ids(),
+        "deletable_experiment_ids": canvas_modules.get_deletable_experiment_ids(resource_link_id),
     }
     return render(request, "ab_tool/experiments_dashboard.html", context)
 

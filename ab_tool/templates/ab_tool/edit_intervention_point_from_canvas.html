@@ -13,7 +13,7 @@
 
     <main>
             <form role="form" method="post" class="form-horizontal" name="intervention_point_form"
-            action="{% url 'ab_testing_tool_submit_edit_intervention_point_from_modules' intervention_point.id %}">
+            action="{% url 'ab_testing_tool_submit_edit_intervention_point_from_modules' resource_link_id intervention_point.id %}">
                 {% csrf_token %}
                 <fieldset>
                     <legend class="sr-only">Name of experiment</legend>
@@ -74,7 +74,7 @@
                     </div>
                 </fieldset>
 
-                <a id="update-cancel" class="btn btn-link" href="{% url 'ab_testing_tool_modules_page_view_intervention_point' intervention_point.id %}">Cancel</a>
+                <a id="update-cancel" class="btn btn-link" href="{% url 'ab_testing_tool_modules_page_view_intervention_point' resource_link_id intervention_point.id %}">Cancel</a>
                 <button type="submit" class="btn btn-submit-primary" value="Save">Update</button>
 
             </form>
