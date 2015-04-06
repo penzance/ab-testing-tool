@@ -268,8 +268,15 @@
                 <p class="text-warning">Starting an experiment cannot be undone. Once started, the experiment assignment method and number of tracks cannot be changed. Students will be assigned to tracks when they first visit an intervention point in this experiment.</p>
             </div>
             <div class="modal-footer">
-                <a class="btn btn-lg btn-submit-primary" data-dismiss="modal"> Close </a>
-                <a class="btn btn-lg btn-submit submitter" href="{% url 'ab_testing_tool_finalize_tracks' resource_link_id experiment.id %}"> Yes, Start Experiment </a>
+                {# TODO: This can be an AJAX POST with intervention_point.id in the params #}
+                <form method="post" id="finalize_tracks_confirmation_form_{{experiment.id}}"
+                      action="{% url 'ab_testing_tool_finalize_tracks' resource_link_id experiment.id %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <a class="btn btn-lg btn-submit-primary" data-dismiss="modal"> Close </a>
+                    <a class="btn btn-lg btn-submit submitter" onclick="this.parentNode.submit(); return false;">
+                        Yes, Start Experiment
+                    </a>
+                </form>
             </div>
         </div>
     </div>
@@ -334,8 +341,18 @@
                 <p class="text-warning">Are you sure you want to delete experiment "{{experiment.name}}"?  This will also delete all intervention points for this experiment.</p>
             </div>
             <div class="modal-footer">
-                <a class="btn btn-lg btn-submit-primary" data-dismiss="modal"> Close </a>
-                <a class="btn btn-lg btn-link submitter"  href="{% url 'ab_testing_tool_delete_experiment' resource_link_id experiment.id %}"> Yes, Delete Experiment </a>
+                {# TODO: This can be an AJAX POST with intervention_point.id in the params #}
+                <form method="post" id="delete_experiment_form_{{experiment.id}}"
+                      action="{% url 'ab_testing_tool_delete_experiment' resource_link_id experiment.id %}"
+                      enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <a class="btn btn-lg btn-submit-primary" data-dismiss="modal"> Close </a>
+                    <a id="delete_experiment_button_{{experiment.id}}"
+                       class="btn btn-lg btn-link submitter"
+                       onclick="this.parentNode.submit(); return false;">
+                        Yes, Delete Experiment
+                    </a>
+                </form>
             </div>
         </div>
     </div>

@@ -1,6 +1,7 @@
 from django.shortcuts import render_to_response, redirect, render
 from django.core.urlresolvers import reverse
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 from django_auth_lti.decorators import lti_role_required
 
 from ab_tool.constants import (ADMINS, INTERVENTION_POINT_URL_TAG,
@@ -187,7 +188,7 @@ def edit_intervention_point_common(request, resource_link_id, intervention_point
                                     is_canvas_page=is_canvas_page, open_as_tab=open_as_tab)
 
 
-# TODO: CSRF protection e.g. implement as POST
+@require_POST
 @lti_role_required(ADMINS)
 def delete_intervention_point(request, resource_link_id, intervention_point_id):
     """ Note: Installed intervention_points are not allowed to be deleted
