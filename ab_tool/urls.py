@@ -37,7 +37,7 @@ urlpatterns = patterns('',
     url(r'^delete_intervention_point/(?P<resource_link_id>\w+)/(?P<intervention_point_id>\d+)$', delete_intervention_point, name='ab_testing_tool_delete_intervention_point'),
     
     url(r'^create_experiment/(?P<resource_link_id>\w+)$', create_experiment, name='ab_testing_tool_create_experiment'),
-    url(r'^submit_create_experiment(?P<resource_link_id>\w+)$', submit_create_experiment, name='ab_testing_tool_submit_create_experiment'),
+    url(r'^submit_create_experiment/(?P<resource_link_id>\w+)$', submit_create_experiment, name='ab_testing_tool_submit_create_experiment'),
     url(r'^edit_experiment/(?P<resource_link_id>\w+)/(?P<experiment_id>\d+)$', edit_experiment, name='ab_testing_tool_edit_experiment'),
     url(r'^submit_edit_experiment/(?P<resource_link_id>\w+)/(?P<experiment_id>\d+)$', submit_edit_experiment, name='ab_testing_tool_submit_edit_experiment'),
     url(r'^delete_experiment/(?P<resource_link_id>\w+)/(?P<experiment_id>\d+)$', delete_experiment, name='ab_testing_tool_delete_experiment'),
