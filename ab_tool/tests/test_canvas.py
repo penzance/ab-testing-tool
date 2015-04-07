@@ -93,7 +93,7 @@ class TestCanvas(SessionTestCase):
     def test_get_uninstalled_intervention_points(self):
         """ Tests method get_uninstalled_intervention_points runs and returns no intervention_points when
             database empty """
-        intervention_points = self.get_canvas_modules().get_uninstalled_intervention_points()
+        intervention_points = self.get_canvas_modules().get_uninstalled_intervention_points(self.resource_link_id)
         self.assertEqual(len(intervention_points), 0)
     
     def test_get_uninstalled_intervention_points_with_item(self):
@@ -101,7 +101,7 @@ class TestCanvas(SessionTestCase):
             one item and api returns nothing """
         self.create_test_intervention_point()
         canvas_modules = self.get_canvas_modules(list_modules_return=[{"id": 0}])
-        intervention_points = canvas_modules.get_uninstalled_intervention_points()
+        intervention_points = canvas_modules.get_uninstalled_intervention_points(self.resource_link_id)
         self.assertEqual(len(intervention_points), 1)
     
     def test_get_uninstalled_intervention_points_against_courses(self):
@@ -110,7 +110,7 @@ class TestCanvas(SessionTestCase):
         intervention_point = self.create_test_intervention_point(name="ip1")
         self.create_test_intervention_point(name="ip2", course_id=TEST_OTHER_COURSE_ID)
         canvas_modules = self.get_canvas_modules(list_modules_return=[{"id": 0}])
-        intervention_points = canvas_modules.get_uninstalled_intervention_points()
+        intervention_points = canvas_modules.get_uninstalled_intervention_points(self.resource_link_id)
         self.assertEqual(len(intervention_points), 1)
         self.assertSameIds([intervention_point], intervention_points)
     
@@ -119,9 +119,9 @@ class TestCanvas(SessionTestCase):
             database is also returned by the API, which means it is installed """
         intervention_point = self.create_test_intervention_point()
         mock_item = {"type": "ExternalTool",
-                     "external_url": intervention_point_url(self.request, intervention_point.id)}
+                     "external_url": intervention_point_url(self.request, self.resource_link_id, intervention_point.id)}
         canvas_modules = self.get_canvas_modules(list_modules_return=[{"id": 0}], list_items_return=[mock_item])
-        intervention_points = canvas_modules.get_uninstalled_intervention_points()
+        intervention_points = canvas_modules.get_uninstalled_intervention_points(self.resource_link_id)
         self.assertEqual(len(intervention_points), 0)
     
     def test_get_uninstalled_intervention_points_with_some_installed(self):
@@ -131,40 +131,40 @@ class TestCanvas(SessionTestCase):
         intervention_point = self.create_test_intervention_point(name="ip1")
         self.create_test_intervention_point(name="ip2")
         mock_item = {"type": "ExternalTool",
-                     "external_url": intervention_point_url(self.request, intervention_point.id)}
+                     "external_url": intervention_point_url(self.request, self.resource_link_id, intervention_point.id)}
         canvas_modules = self.get_canvas_modules(list_modules_return=[{"id": 0}], list_items_return=[mock_item])
-        intervention_points = canvas_modules.get_uninstalled_intervention_points()
+        intervention_points = canvas_modules.get_uninstalled_intervention_points(self.resource_link_id)
         self.assertEqual(len(intervention_points), 1)
     
     def test_all_intervention_point_urls_empty(self):
         """ Tests that all_intervention_point_urls returns empty when there are no intervention_points """
-        urls = self.get_canvas_modules()._all_intervention_point_urls()
+        urls = self.get_canvas_modules()._all_intervention_point_urls(self.resource_link_id)
         self.assertEqual(len(urls), 0)
     
     def test_all_intervention_point_urls_one_element(self):
         """ Tests that all_intervention_point_urls returns the url for one intervention_point when
             that is in the database """
         intervention_point = self.create_test_intervention_point()
-        urls = self.get_canvas_modules()._all_intervention_point_urls()
+        urls = self.get_canvas_modules()._all_intervention_point_urls(self.resource_link_id)
         self.assertEqual(len(urls), 1)
-        self.assertEqual({intervention_point_url(self.request, intervention_point.id): intervention_point}, urls)
+        self.assertEqual({intervention_point_url(self.request, self.resource_link_id, intervention_point.id): intervention_point}, urls)
     
     def test_all_intervention_point_urls_multiple_courses(self):
         """ Tests that all_intervention_point_urls only returns the url for the intervention_point
             in the database that matches the course_id """
         intervention_point = self.create_test_intervention_point(name="ip1")
         self.create_test_intervention_point(name="ip2", course_id=TEST_OTHER_COURSE_ID)
-        urls = self.get_canvas_modules()._all_intervention_point_urls()
+        urls = self.get_canvas_modules()._all_intervention_point_urls(self.resource_link_id)
         self.assertEqual(len(urls), 1)
-        self.assertEqual({intervention_point_url(self.request, intervention_point.id): intervention_point}, urls)
+        self.assertEqual({intervention_point_url(self.request, self.resource_link_id, intervention_point.id): intervention_point}, urls)
     
     def test_get_modules_with_items(self):
         """ Tests that get_modules_with_items returns with appropriate values """
         intervention_point = self.create_test_intervention_point(name="test_database_name")
         mock_item = {"type": "ExternalTool",
-                     "external_url": intervention_point_url(self.request, intervention_point.id)}
+                     "external_url": intervention_point_url(self.request, self.resource_link_id, intervention_point.id)}
         canvas_modules = self.get_canvas_modules(list_modules_return=[{"id": 0}], list_items_return=[mock_item])
-        modules = canvas_modules.get_modules_with_items()
+        modules = canvas_modules.get_modules_with_items(self.resource_link_id)
         module_item = modules[0]["module_items"][0]
         self.assertEqual(module_item["is_intervention_point"], True)
         self.assertEqual(module_item["database_name"], "test_database_name")
