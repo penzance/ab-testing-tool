@@ -54,25 +54,25 @@ class TestControllers(SessionTestCase):
     def test_intervention_point_url_contains_intervention_point_id(self):
         """ Tests that intervention_point_url contains the string of the intervention_point_id """
         intervention_point_id = 999888777
-        url = intervention_point_url(self.request, intervention_point_id)
+        url = intervention_point_url(self.request, self.resource_link_id, intervention_point_id)
         self.assertIn(str(intervention_point_id), url)
     
     def test_intervention_point_url_works_with_string_id(self):
         """ Tests that intervention_point_url succeeds when intervention_point_id is a number string """
         intervention_point_id = "999888777"
-        url = intervention_point_url(self.request, intervention_point_id)
+        url = intervention_point_url(self.request, self.resource_link_id, intervention_point_id)
         self.assertIn(intervention_point_id, url)
     
     def test_intervention_point_url_contains_host(self):
         """ Tests that intervention_point_url's output contains the host of the request """
         intervention_point_id = "1"
-        url = intervention_point_url(self.request, intervention_point_id)
+        url = intervention_point_url(self.request, self.resource_link_id, intervention_point_id)
         self.assertIn(self.request.get_host(), url)
     
     def test_intervention_point_url_errors(self):
         """ Tests that intervention_point_url errors when passed a non-numeral intervention_point_id """
-        self.assertRaisesSpecific(BAD_INTERVENTION_POINT_ID, intervention_point_url, self.request, None)
-        self.assertRaisesSpecific(BAD_INTERVENTION_POINT_ID, intervention_point_url, self.request, "str")
+        self.assertRaisesSpecific(BAD_INTERVENTION_POINT_ID, intervention_point_url, self.request, self.resource_link_id,None)
+        self.assertRaisesSpecific(BAD_INTERVENTION_POINT_ID, intervention_point_url, self.request, self.resource_link_id,"str")
     
     def test_validate_format_url_passthrough(self):
         """ Tests that validate_format_url doesn't change a proper http:// url """

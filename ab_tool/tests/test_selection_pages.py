@@ -76,7 +76,7 @@ class TestSelectionPages(SessionTestCase):
         response = self.client.post(reverse("ab_testing_tool_submit_selection"), data)
         self.request.is_secure.return_value = False
         params = {"return_type": "lti_launch_url",
-                   "url": intervention_point_url(self.request, intervention_point.id),
+                   "url": intervention_point_url(self.request, self.resource_link_id, intervention_point.id),
                    "text": intervention_point.name,
                   }
         for k, v in params.items():

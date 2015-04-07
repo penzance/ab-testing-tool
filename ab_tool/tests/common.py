@@ -21,7 +21,7 @@ TEST_DOMAIN = "example.com"
 TEST_STUDENT_ID = "70707707"
 TEST_EMAIL = "test@example.com"
 TEST_STUDENT_NAME = "Test Student"
-TEST_RESOURC_LINK_ID = "1234556879abcdef"
+TEST_RESOURCE_LINK_ID = "1234556879abcdef"
 
 NONEXISTENT_INTERVENTION_POINT_ID = 12345678987654321 #111111111^2
 NONEXISTENT_TRACK_ID = 31415926535897932 #pi
@@ -58,13 +58,14 @@ class SessionTestCase(TestCase):
         lti_launch["lis_person_name_full"] = TEST_STUDENT_NAME
         lti_launch["context_title"] = "Course title"
         lti_launch["lis_person_contact_email_primary"] = TEST_EMAIL
+        lti_launch["resource_link_id"] = TEST_RESOURCE_LINK_ID
         session = self.client.session
         session["LTI_LAUNCH"] = lti_launch
         session.save()
         
         self.request = RequestMock()
         self.request.session = session
-        self.resource_link_id = TEST_RESOURC_LINK_ID
+        self.resource_link_id = TEST_RESOURCE_LINK_ID
         
         # Patches api functions for all tests; can be overridden by re-patching
         # the particular api call for a particular test
