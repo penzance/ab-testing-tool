@@ -19,9 +19,9 @@ class TestInterventionPointPages(SessionTestCase):
         """ Tests deploy intervention_point for admins redirects to edit intervention_point """
         intervention_point = self.create_test_intervention_point()
         response = self.client.get(reverse("ab_testing_tool_deploy_intervention_point",
-                                           args=(intervention_point.id,)))
+                                           args=(self.resource_link_id, intervention_point.id,)))
         self.assertRedirects(response, reverse("ab_testing_tool_modules_page_view_intervention_point",
-                                               args=(intervention_point.id,)))
+                                               args=(self.resource_link_id, intervention_point.id,)))
     
     def test_deploy_intervention_point_student_not_finalized(self):
         """ Tests deploy intervention_point for student errors if tracks not finalized
@@ -29,7 +29,7 @@ class TestInterventionPointPages(SessionTestCase):
         self.set_roles([])
         intervention_point = self.create_test_intervention_point()
         response = self.client.get(reverse("ab_testing_tool_deploy_intervention_point",
-                                           args=(intervention_point.id,)))
+                                           args=(self.resource_link_id, intervention_point.id,)))
         self.assertError(response, EXPERIMENT_TRACKS_NOT_FINALIZED)
     
     def test_deploy_intervention_point_no_tracks_error(self):
@@ -38,7 +38,7 @@ class TestInterventionPointPages(SessionTestCase):
         Experiment.get_placeholder_course_experiment(TEST_COURSE_ID).update(tracks_finalized=True)
         intervention_point = self.create_test_intervention_point()
         response = self.client.get(reverse("ab_testing_tool_deploy_intervention_point",
-                                           args=(intervention_point.id,)))
+                                           args=(self.resource_link_id, intervention_point.id,)))
         self.assertError(response, NO_TRACKS_FOR_EXPERIMENT)
     
     def test_deploy_intervention_point_student_created(self):
@@ -53,7 +53,7 @@ class TestInterventionPointPages(SessionTestCase):
         self.assertEqual(students.count(), 0)
         InterventionPointUrl.objects.create(intervention_point=intervention_point, track=track,
                                 url="http://www.example.com")
-        self.client.get(reverse("ab_testing_tool_deploy_intervention_point", args=(intervention_point.id,)))
+        self.client.get(reverse("ab_testing_tool_deploy_intervention_point", args=(self.resource_link_id, intervention_point.id,)))
         student = ExperimentStudent.objects.get(course_id=TEST_COURSE_ID,
                                             student_id=TEST_STUDENT_ID)
         self.assertEqual(student.track.name, "track1")
@@ -74,7 +74,7 @@ class TestInterventionPointPages(SessionTestCase):
         InterventionPointUrl.objects.create(intervention_point=intervention_point2, track=track2,
                                             url="http://www.incorrect-domain.com")
         response = self.client.get(reverse("ab_testing_tool_deploy_intervention_point",
-                                           args=(intervention_point.id,)))
+                                           args=(self.resource_link_id, intervention_point.id,)))
         # Can't use assertRedirects because it is an external domain
         self.assertEqual(response._headers['location'],
                          ("Location", "http://www.example.com"))
@@ -93,7 +93,7 @@ class TestInterventionPointPages(SessionTestCase):
         InterventionPointUrl.objects.create(intervention_point=intervention_point,
                                             track=track, url="")
         response = self.client.get(reverse("ab_testing_tool_deploy_intervention_point",
-                                           args=(intervention_point.id,)))
+                                           args=(self.resource_link_id, intervention_point.id,)))
         self.assertError(response, NO_URL_FOR_TRACK)
     
     def test_deploy_intervention_point_with_no_interventionpointurl_created(self):
@@ -107,7 +107,7 @@ class TestInterventionPointPages(SessionTestCase):
         ExperimentStudent.objects.create(course_id=TEST_COURSE_ID, experiment=experiment,
                                          student_id=TEST_STUDENT_ID, track=track)
         response = self.client.get(reverse("ab_testing_tool_deploy_intervention_point",
-                                           args=(intervention_point.id,)))
+                                           args=(self.resource_link_id, intervention_point.id,)))
         self.assertError(response, NO_URL_FOR_TRACK)
     
     def test_deploy_intervention_point_with_url_as_new_tab(self):
@@ -122,7 +122,7 @@ class TestInterventionPointPages(SessionTestCase):
         InterventionPointUrl.objects.create(intervention_point=intervention_point,
                                             track=track, url="www.google.com", open_as_tab=True)
         response = self.client.get(reverse("ab_testing_tool_deploy_intervention_point",
-                                           args=(intervention_point.id,)), follow=True)
+                                           args=(self.resource_link_id, intervention_point.id,)), follow=True)
         self.assertTemplateUsed(response, "ab_tool/new_tab_redirect.html")
     
     def test_deploy_intervention_point_with_url_as_canvas_page(self):
@@ -137,7 +137,7 @@ class TestInterventionPointPages(SessionTestCase):
         InterventionPointUrl.objects.create(intervention_point=intervention_point,
                                             track=track, url="www.google.com", is_canvas_page=True)
         response = self.client.get(reverse("ab_testing_tool_deploy_intervention_point",
-                                           args=(intervention_point.id,)), follow=True)
+                                           args=(self.resource_link_id, intervention_point.id,)), follow=True)
         self.assertTemplateUsed(response, "ab_tool/window_redirect.html")
     
     def test_submit_create_intervention_point(self):
@@ -146,7 +146,7 @@ class TestInterventionPointPages(SessionTestCase):
         num_intervention_points = InterventionPoint.objects.count()
         data = {"name": "intervention_point", "notes": "hi"}
         experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
-        url = reverse("ab_testing_tool_submit_create_intervention_point", args=(experiment.id,))
+        url = reverse("ab_testing_tool_submit_create_intervention_point", args=(self.resource_link_id, experiment.id,))
         response = self.client.post(url, data, follow=True)
         self.assertOkay(response)
         self.assertEqual(num_intervention_points + 1, InterventionPoint.objects.count())
@@ -158,7 +158,7 @@ class TestInterventionPointPages(SessionTestCase):
         num_intervention_points = InterventionPoint.objects.count()
         data = {"name": intervention_point.name, "notes": "hi"}
         experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
-        url = reverse("ab_testing_tool_submit_create_intervention_point", args=(experiment.id,))
+        url = reverse("ab_testing_tool_submit_create_intervention_point", args=(self.resource_link_id, experiment.id,))
         response = self.client.post(url, data, follow=True)
         self.assertError(response, UNIQUE_NAME_ERROR)
         self.assertEqual(num_intervention_points, InterventionPoint.objects.count())
@@ -178,7 +178,7 @@ class TestInterventionPointPages(SessionTestCase):
                 DEPLOY_OPTION_TAG + str(track2.id): "non_canvas_url",
                 "notes": "hi"}
         experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
-        url = reverse("ab_testing_tool_submit_create_intervention_point", args=(experiment.id,))
+        url = reverse("ab_testing_tool_submit_create_intervention_point", args=(self.resource_link_id, experiment.id,))
         response = self.client.post(url, data, follow=True)
         self.assertOkay(response)
         self.assertEqual(num_intervention_points + 1, InterventionPoint.objects.count())
@@ -200,7 +200,7 @@ class TestInterventionPointPages(SessionTestCase):
                 INTERVENTION_POINT_URL_TAG + "2": "http://example.com/otherpage",
                 "notes": "hi"}
         experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
-        url = reverse("ab_testing_tool_submit_create_intervention_point", args=(experiment.id,))
+        url = reverse("ab_testing_tool_submit_create_intervention_point", args=(self.resource_link_id, experiment.id,))
         response = self.client.post(url, data, follow=True)
         self.assertEqual(response.status_code, 401)
         self.assertEqual(num_intervention_points, InterventionPoint.objects.count())
@@ -216,7 +216,7 @@ class TestInterventionPointPages(SessionTestCase):
         data = {"name": "new_name",
                 "notes": ""}
         response = self.client.post(
-                reverse("ab_testing_tool_submit_edit_intervention_point", args=(intervention_point_id,)),
+                reverse("ab_testing_tool_submit_edit_intervention_point", args=(self.resource_link_id, intervention_point_id,)),
                 data, follow=True)
         self.assertOkay(response)
         self.assertEqual(num_intervention_points, InterventionPoint.objects.count())
@@ -231,7 +231,7 @@ class TestInterventionPointPages(SessionTestCase):
         num_intervention_points = InterventionPoint.objects.count()
         data = {"name": intervention_point1.name, "notes": ""}
         response = self.client.post(reverse("ab_testing_tool_submit_edit_intervention_point",
-                args=(intervention_point2.id,)), data, follow=True)
+                args=(self.resource_link_id, intervention_point2.id,)), data, follow=True)
         self.assertError(response, UNIQUE_NAME_ERROR)
         self.assertEqual(num_intervention_points, InterventionPoint.objects.count())
     
@@ -255,7 +255,7 @@ class TestInterventionPointPages(SessionTestCase):
                 "notes": "hi",
                 "id": intervention_point_id}
         response = self.client.post(reverse("ab_testing_tool_submit_edit_intervention_point",
-                                            args=(intervention_point_id,)), data, follow=True)
+                                            args=(self.resource_link_id, intervention_point_id,)), data, follow=True)
         self.assertOkay(response)
         self.assertEqual(num_intervention_points, InterventionPoint.objects.count())
         intervention_point = InterventionPoint.objects.get(id=intervention_point_id)
@@ -276,7 +276,7 @@ class TestInterventionPointPages(SessionTestCase):
         data = {"name": "new_name",
                 "notes": "new notes"}
         response = self.client.post(
-                reverse("ab_testing_tool_submit_edit_intervention_point", args=(intervention_point.id,)),
+                reverse("ab_testing_tool_submit_edit_intervention_point", args=(self.resource_link_id, intervention_point.id,)),
                 data, follow=True)
         self.assertEqual(num_intervention_points, InterventionPoint.objects.count())
         self.assertTemplateUsed(response, "ab_tool/not_authorized.html")
@@ -288,7 +288,7 @@ class TestInterventionPointPages(SessionTestCase):
         data = {"name": "new_name",
                 "notes": "hi"}
         response = self.client.post(
-                reverse("ab_testing_tool_submit_edit_intervention_point", args=(intervention_point_id,)),
+                reverse("ab_testing_tool_submit_edit_intervention_point", args=(self.resource_link_id, intervention_point_id,)),
                 data, follow=True)
         self.assertEqual(response.status_code, 404)
     
@@ -300,7 +300,7 @@ class TestInterventionPointPages(SessionTestCase):
         data = {"name": "new_name",
                 "notes": "hi"}
         response = self.client.post(
-                reverse("ab_testing_tool_submit_edit_intervention_point", args=(intervention_point.id,)),
+                reverse("ab_testing_tool_submit_edit_intervention_point", args=(self.resource_link_id, intervention_point.id,)),
                 data, follow=True)
         self.assertError(response, UNAUTHORIZED_ACCESS)
     
@@ -311,7 +311,7 @@ class TestInterventionPointPages(SessionTestCase):
         InterventionPointUrl.objects.create(intervention_point=intervention_point,
                                             url="http://www.example.com", track=track)
         response = self.client.get(reverse("ab_testing_tool_deploy_intervention_point",
-                                           args=(intervention_point.id,)), follow=True)
+                                           args=(self.resource_link_id, intervention_point.id,)), follow=True)
         self.assertOkay(response)
     
     def test_delete_intervention_point(self):
@@ -321,7 +321,7 @@ class TestInterventionPointPages(SessionTestCase):
         intervention_point = self.create_test_intervention_point()
         self.assertEqual(first_num_intervention_points + 1, InterventionPoint.objects.count())
         response = self.client.post(reverse("ab_testing_tool_delete_intervention_point",
-                                            args=(intervention_point.id,)), follow=True)
+                                            args=(self.resource_link_id, intervention_point.id,)), follow=True)
         second_num_intervention_points = InterventionPoint.objects.count()
         self.assertOkay(response)
         self.assertEqual(first_num_intervention_points, second_num_intervention_points)
@@ -332,7 +332,7 @@ class TestInterventionPointPages(SessionTestCase):
         first_num_intervention_points = InterventionPoint.objects.count()
         intervention_point = self.create_test_intervention_point()
         response = self.client.post(reverse("ab_testing_tool_delete_intervention_point",
-                                            args=(intervention_point.id,)), follow=True)
+                                            args=(self.resource_link_id, intervention_point.id,)), follow=True)
         second_num_intervention_points = InterventionPoint.objects.count()
         self.assertTemplateUsed(response, "ab_tool/not_authorized.html")
         self.assertNotEqual(first_num_intervention_points, second_num_intervention_points)
@@ -346,7 +346,7 @@ class TestInterventionPointPages(SessionTestCase):
         self.create_test_intervention_point()
         intervention_point_id = NONEXISTENT_INTERVENTION_POINT_ID
         response = self.client.post(reverse("ab_testing_tool_delete_intervention_point",
-                                            args=(intervention_point_id,)), follow=True)
+                                            args=(self.resource_link_id, intervention_point_id,)), follow=True)
         second_num_intervention_points = InterventionPoint.objects.count()
         self.assertOkay(response)
         self.assertNotEqual(first_num_intervention_points, second_num_intervention_points)
@@ -357,7 +357,7 @@ class TestInterventionPointPages(SessionTestCase):
         first_num_intervention_points = InterventionPoint.objects.count()
         intervention_point = self.create_test_intervention_point(course_id=TEST_OTHER_COURSE_ID)
         response = self.client.post(reverse("ab_testing_tool_delete_intervention_point",
-                                            args=(intervention_point.id,)), follow=True)
+                                            args=(self.resource_link_id, intervention_point.id,)), follow=True)
         second_num_intervention_points = InterventionPoint.objects.count()
         self.assertError(response, UNAUTHORIZED_ACCESS)
         self.assertNotEqual(first_num_intervention_points, second_num_intervention_points)
@@ -372,7 +372,7 @@ class TestInterventionPointPages(SessionTestCase):
         with patch("ab_tool.canvas.CanvasModules.intervention_point_is_installed",
                    return_value=ret_val):
             response = self.client.post(reverse("ab_testing_tool_delete_intervention_point",
-                                                args=(intervention_point.id,)), follow=True)
+                                                args=(self.resource_link_id, intervention_point.id,)), follow=True)
             second_num_intervention_points = InterventionPoint.objects.count()
             self.assertNotEqual(first_num_intervention_points, second_num_intervention_points)
             self.assertError(response, DELETING_INSTALLED_INTERVENTION_POINT)
@@ -381,7 +381,7 @@ class TestInterventionPointPages(SessionTestCase):
         """ Tests modules_page_edit_intervention_point for admins redirects to editInterventionPointFromCanvas """
         intervention_point = self.create_test_intervention_point()
         response = self.client.get(reverse("ab_testing_tool_modules_page_edit_intervention_point",
-                                           args=(intervention_point.id,)))
+                                           args=(self.resource_link_id, intervention_point.id,)))
         self.assertOkay(response)
         self.assertTemplateUsed(response, "ab_tool/edit_intervention_point_from_canvas.html")
     
@@ -396,7 +396,7 @@ class TestInterventionPointPages(SessionTestCase):
         InterventionPointUrl.objects.create(
                 intervention_point=intervention_point, url="http://www.example.com", track=track1)
         response = self.client.post(reverse("ab_testing_tool_modules_page_view_intervention_point",
-                                            args=(intervention_point_id,)), follow=True)
+                                            args=(self.resource_link_id, intervention_point_id,)), follow=True)
         self.assertOkay(response)
         self.assertTemplateUsed(response, "ab_tool/view_intervention_point_from_canvas.html")
     
@@ -410,7 +410,7 @@ class TestInterventionPointPages(SessionTestCase):
                 "notes": ""}
         response = self.client.post(
                 reverse("ab_testing_tool_submit_edit_intervention_point_from_modules",
-                        args=(intervention_point_id,)), data, follow=True)
+                        args=(self.resource_link_id, intervention_point_id,)), data, follow=True)
         self.assertOkay(response)
         self.assertEqual(num_intervention_points, InterventionPoint.objects.count())
         intervention_point = InterventionPoint.objects.get(id=intervention_point_id)
