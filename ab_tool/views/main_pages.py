@@ -78,7 +78,7 @@ def tool_config(request):
 
 
 @lti_role_required(ADMINS)
-def download_track_assignments(request, experiment_id):
+def download_track_assignments(request, resource_link_id, experiment_id):
     #TODO: change this to streaming
     course_id = get_lti_param(request, "custom_canvas_course_id")
     course_title = get_lti_param(request, "context_title")
@@ -89,7 +89,7 @@ def download_track_assignments(request, experiment_id):
 
 
 @lti_role_required(ADMINS)
-def download_intervention_point_interactions(request, experiment_id):
+def download_intervention_point_interactions(request, resource_link_id, experiment_id):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     course_title = get_lti_param(request, "context_title")
     experiment = Experiment.get_or_404_check_course(experiment_id, course_id)

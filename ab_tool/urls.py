@@ -18,8 +18,8 @@ urlpatterns = patterns('',
     url(r'^$', render_control_panel, name='ab_testing_tool_index'),
     url(r'^not_authorized$', not_authorized, name='ab_testing_tool_not_authorized'),
     url(r'^download_track_assignments/(?P<resource_link_id>\w+)/(?P<experiment_id>\d+)$', download_track_assignments, name='ab_testing_tool_download_data'),
-    url(r'^download_intervention_point_interactions/(?P<resource_link_id>\w+)/(?P<experiment_id>\d+)$', download_intervention_point_interactions,
-        name='ab_testing_tool_download_intervention_point_interactions'),
+    url(r'^download_intervention_point_interactions/(?P<resource_link_id>\w+)/(?P<experiment_id>\d+)$',
+        download_intervention_point_interactions, name='ab_testing_tool_download_intervention_point_interactions'),
     url(r'^tool_config$', tool_config, name='ab_testing_tool_tool_config'),
     
     url(r'^resource_selection$', resource_selection, name="ab_testing_tool_resource_selection"),
@@ -41,12 +41,11 @@ urlpatterns = patterns('',
     url(r'^edit_experiment/(?P<resource_link_id>\w+)/(?P<experiment_id>\d+)$', edit_experiment, name='ab_testing_tool_edit_experiment'),
     url(r'^submit_edit_experiment/(?P<resource_link_id>\w+)/(?P<experiment_id>\d+)$', submit_edit_experiment, name='ab_testing_tool_submit_edit_experiment'),
     url(r'^delete_experiment/(?P<resource_link_id>\w+)/(?P<experiment_id>\d+)$', delete_experiment, name='ab_testing_tool_delete_experiment'),
+    # TO_DO : add resource_link_id to delete_track, temporarilynot added to get past some errors in the rendering html
     url(r'^delete_track/(?P<track_id>\d+)$', delete_track, name='ab_testing_tool_delete_track'),
     url(r'^finalize_tracks/(?P<resource_link_id>\w+)/(?P<experiment_id>\d+)$', finalize_tracks, name='ab_testing_tool_finalize_tracks'),
     url(r'^copy_experiment/(?P<resource_link_id>\w+)/(?P<experiment_id>\d+)$', copy_experiment, name='ab_testing_tool_copy_experiment'),
-    #
     url(r'^track_selection_xlsx/(?P<resource_link_id>\w+)/(?P<experiment_id>\d+)$', track_selection_xlsx, name='ab_testing_tool_track_selection_xlsx'),
-    #??
     url(r'^track_selection_csv/(?P<resource_link_id>\w+)/(?P<experiment_id>\d+)$', track_selection_csv, name='ab_testing_tool_track_selection_csv'),
     url(r'^upload_track_assignments/(?P<resource_link_id>\w+)/(?P<experiment_id>\d+)$', upload_track_assignments, name='ab_testing_tool_upload_track_assignments'),
 )

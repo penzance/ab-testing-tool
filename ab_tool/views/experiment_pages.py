@@ -215,13 +215,13 @@ def finalize_tracks(request, resource_link_id, experiment_id):
 def track_selection_xlsx(request, resource_link_id, experiment_id):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
-    return get_track_selection_xlsx(request, resource_link_id, experiment, "track_selection.xlsx")
+    return get_track_selection_xlsx(request, experiment, "track_selection.xlsx")
 
 @lti_role_required(ADMINS)
 def track_selection_csv(request, resource_link_id, experiment_id):
     course_id = get_lti_param(request, "custom_canvas_course_id")
     experiment = Experiment.get_or_404_check_course(experiment_id, course_id)
-    return get_track_selection_csv(request, resource_link_id, experiment, "track_selection.csv")
+    return get_track_selection_csv(request, experiment, "track_selection.csv")
 
 @lti_role_required(ADMINS)
 def upload_track_assignments(request, resource_link_id, experiment_id):

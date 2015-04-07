@@ -29,7 +29,7 @@ class TestMainPages(SessionTestCase):
     def test_control_panel_with_module_and_item(self, _mock1):
         """ Tests control_panel template renders with items returned from Canvas"""
         mock_item = {"type": "ExternalTool",
-                     "external_url": intervention_point_url(self.request, 0)}
+                     "external_url": intervention_point_url(self.request, self.resource_link_id, 0)}
         api_return = APIReturn([mock_item])
         with patch(LIST_ITEMS, return_value=api_return):
             response = self.client.get(reverse("ab_testing_tool_index"), follow=True)
@@ -119,7 +119,7 @@ class TestMainPages(SessionTestCase):
                                          track=track, experiment=experiment)
         ExperimentStudent.objects.create(course_id=TEST_COURSE_ID, student_id=2,
                                          track=track, experiment=experiment)
-        response = self.client.get(reverse("ab_testing_tool_download_data", args=(experiment.id,)))
+        response = self.client.get(reverse("ab_testing_tool_download_data", args=(self.resource_link_id, experiment.id,)))
         self.assertEqual(response._headers["content-type"],
                          ('Content-Type', 'text/csv'))
         num_students = ExperimentStudent.objects.filter(course_id=TEST_COURSE_ID).count()
@@ -134,7 +134,7 @@ class TestMainPages(SessionTestCase):
                                          track=track, experiment=experiment1)
         ExperimentStudent.objects.create(course_id=TEST_OTHER_COURSE_ID, student_id=2,
                                          track=track, experiment=experiment2)
-        response = self.client.get(reverse("ab_testing_tool_download_data", args=(experiment1.id,)))
+        response = self.client.get(reverse("ab_testing_tool_download_data", args=(self.resource_link_id, experiment1.id,)))
         self.assertEqual(response._headers["content-type"],
                          ('Content-Type', 'text/csv'))
         num_students = ExperimentStudent.objects.filter(course_id=TEST_COURSE_ID).count()
@@ -142,7 +142,7 @@ class TestMainPages(SessionTestCase):
     
     def test_download_data_no_students(self):
         experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
-        response = self.client.get(reverse("ab_testing_tool_download_data", args=(experiment.id,)))
+        response = self.client.get(reverse("ab_testing_tool_download_data", args=(self.resource_link_id, experiment.id,)))
         self.assertEqual(response._headers["content-type"],
                          ('Content-Type', 'text/csv'))
         num_students = ExperimentStudent.objects.filter(course_id=TEST_COURSE_ID).count()
@@ -162,7 +162,8 @@ class TestMainPages(SessionTestCase):
         InterventionPointInteraction.objects.create(course_id=TEST_COURSE_ID, student=student,
                     intervention_point=intervention_point, experiment=experiment,
                     track=track, url="http://example.com")
-        response = self.client.get(reverse("ab_testing_tool_download_intervention_point_interactions", args=(experiment.id,)))
+        response = self.client.get(reverse("ab_testing_tool_download_intervention_point_interactions",
+                                           args=(self.resource_link_id, experiment.id,)))
         self.assertEqual(response._headers["content-type"],
                          ('Content-Type', 'text/csv'))
         interactions = InterventionPointInteraction.objects.filter(course_id=TEST_COURSE_ID).count()
@@ -185,7 +186,8 @@ class TestMainPages(SessionTestCase):
         InterventionPointInteraction.objects.create(course_id=TEST_OTHER_COURSE_ID, student=student2,
                     intervention_point=intervention_point2, experiment=experiment2,
                     track=track, url="http://example.com")
-        response = self.client.get(reverse("ab_testing_tool_download_intervention_point_interactions", args=(experiment1.id,)))
+        response = self.client.get(reverse("ab_testing_tool_download_intervention_point_interactions",
+                                           args=(self.resource_link_id, experiment1.id,)))
         self.assertEqual(response._headers["content-type"],
                          ('Content-Type', 'text/csv'))
         interactions = InterventionPointInteraction.objects.filter(course_id=TEST_COURSE_ID).count()
@@ -193,7 +195,8 @@ class TestMainPages(SessionTestCase):
     
     def test_download_intervention_point_interactions_no_students(self):
         experiment = Experiment.get_placeholder_course_experiment(TEST_COURSE_ID)
-        response = self.client.get(reverse("ab_testing_tool_download_intervention_point_interactions", args=(experiment.id,)))
+        response = self.client.get(reverse("ab_testing_tool_download_intervention_point_interactions",
+                                           args=(self.resource_link_id, experiment.id,)))
         self.assertEqual(response._headers["content-type"],
                          ('Content-Type', 'text/csv'))
         interactions = InterventionPointInteraction.objects.filter(course_id=TEST_COURSE_ID).count()
