@@ -52,16 +52,18 @@ class TestModels(SessionTestCase):
     
     def test_experiment_to_json(self):
         """ Tests that the json returned by experiment's to_json method
-            contains expeced properties """
+            contains expected properties """
         experiment = self.create_test_experiment(
                 name="test_experiment", assignment_method=Experiment.UNIFORM_RANDOM)
         self.create_test_track(name="track1", experiment=experiment)
         self.create_test_track(name="track2", experiment=experiment)
-        experiment_dict = json.loads(experiment.to_json())
+        experiment_dict = json.loads(experiment.to_json(self.resource_link_id))
         self.assertEqual(experiment_dict["name"], "test_experiment")
         self.assertEqual(len(experiment_dict["tracks"]), 2)
         self.assertEqual(experiment_dict["uniformRandom"], True)
-    
+        for track in experiment_dict["tracks"]:
+            self.assertIn(self.resource_link_id, track["deleteURL"])
+
     def test_track_get_weighting(self):
         """ Tests that get_weighting returns the weighting of the track """
         track = self.create_test_track()

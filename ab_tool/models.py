@@ -103,7 +103,7 @@ class Experiment(CourseObject):
     def get_incomplete_intervention_point_names(self):
         return [point.name for point in self.intervention_points.all() if point.is_missing_urls()]
     
-    def to_json(self):
+    def to_json(self, resource_link_id):
         """ Converts the experiment and its associated tracks to json,
             in the form expected by the edit_experiment.html template and
             by edit_experiment.js """
@@ -119,9 +119,9 @@ class Experiment(CourseObject):
                         # databaseName stores the track name in the database for collision comparison
                         "databaseName": t.name,
                         # newName and editing are used to hold temporary values for track name editing
-                        "newName" : t.name,
+                        "newName": t.name,
                         "editing": False,
-                        "deleteURL": reverse('ab_testing_tool_delete_track', args=(t.id,))}
+                        "deleteURL": reverse('ab_testing_tool_delete_track', args=(resource_link_id, t.id,))}
                        for t in self.tracks.all()],
         }
         return json.dumps(experiment_dict)

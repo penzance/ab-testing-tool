@@ -81,7 +81,7 @@ class TestExperimentPages(SessionTestCase):
         response = self.client.post(reverse("ab_testing_tool_submit_edit_experiment",
                                             args=(self.resource_link_id, experiment.id,)),
                                     content_type="application/json",
-                                    data=experiment.to_json())
+                                    data=experiment.to_json(self.resource_link_id))
         self.assertEquals(response.content, "success")
         updated_experiment = Experiment.objects.get(id=experiment.id)
         self.assertLess(experiment.updated_on, updated_experiment.updated_on,
@@ -496,7 +496,7 @@ class TestExperimentPages(SessionTestCase):
         experiment = self.create_test_experiment()
         track = self.create_test_track(experiment=experiment)
         self.assertEqual(experiment.tracks.count(), 1)
-        response = self.client.post(reverse("ab_testing_tool_delete_track", args=( track.id,)),
+        response = self.client.post(reverse("ab_testing_tool_delete_track", args=(self.resource_link_id, track.id,)),
                                     follow=True)
         self.assertEqual(experiment.tracks.count(), 0)
         self.assertOkay(response)
@@ -505,7 +505,8 @@ class TestExperimentPages(SessionTestCase):
         """ Tests that delete_track method succeeds, by design, when deleting a nonexistent track"""
         experiment = self.create_test_experiment()
         self.assertEqual(experiment.tracks.count(), 0)
-        response = self.client.post(reverse("ab_testing_tool_delete_track", args=( NONEXISTENT_TRACK_ID,)),
-                                    follow=True)
+        response = self.client.post(
+            reverse("ab_testing_tool_delete_track",  args=(self.resource_link_id,  NONEXISTENT_TRACK_ID,)), follow=True
+        )
         self.assertEqual(experiment.tracks.count(), 0)
         self.assertOkay(response)

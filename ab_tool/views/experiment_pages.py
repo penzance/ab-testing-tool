@@ -82,6 +82,7 @@ def edit_experiment(request, resource_link_id, experiment_id):
     has_installed_intervention = CanvasModules(request).experiment_has_installed_intervention(resource_link_id, experiment)
     context = {"resource_link_id": resource_link_id,
                "experiment": experiment,
+               "experiment_json": experiment.to_json(resource_link_id),
                "experiment_has_installed_intervention": has_installed_intervention,
                "create": False,
                "started": experiment.tracks_finalized}
@@ -90,7 +91,7 @@ def edit_experiment(request, resource_link_id, experiment_id):
 
 @require_POST
 @lti_role_required(ADMINS)
-def delete_track(request, track_id):
+def delete_track(request, resource_link_id, track_id):
     """ If Http404 is raised, delete_track redirects regardless. This is by
         design, as multiple users may be deleting concurrently in the same course """
     course_id = get_lti_param(request, "custom_canvas_course_id")

@@ -251,11 +251,10 @@
         window.modifiedExperiment = JSON.parse(JSON.stringify(window.initialExperiment));
         window.submitURL = "{% url 'ab_testing_tool_submit_create_experiment' resource_link_id%}";
     {% else %}
-        window.initialExperiment = JSON.parse("{{ experiment.to_json  | escapejs}}");
-        window.modifiedExperiment = JSON.parse("{{ experiment.to_json | escapejs}}");
+        window.initialExperiment = JSON.parse("{{ experiment_json | escapejs}}");
+        window.modifiedExperiment = JSON.parse("{{ experiment_json | escapejs}}");
         window.submitURL = "{% url 'ab_testing_tool_submit_edit_experiment' resource_link_id experiment.id %}";
     {% endif %}
-    
     window.parentPage = "{% url 'ab_testing_tool_index' %}";
 
 </script>
