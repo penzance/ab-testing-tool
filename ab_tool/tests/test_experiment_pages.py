@@ -15,7 +15,6 @@ class TestExperimentPages(SessionTestCase):
     def test_create_experiment_view(self):
         """ Tests edit_experiment template renders for url 'create_experiment' """
         response = self.client.get(reverse("ab_testing_tool_create_experiment", args=(self.resource_link_id,)))
-        # response = self.client.get(reverse("ab_testing_tool_create_experiment", args=(self.resource_link_id)),  follow=True)
         self.assertOkay(response)
         self.assertTemplateUsed(response, "ab_tool/edit_experiment.html")
     
@@ -23,7 +22,7 @@ class TestExperimentPages(SessionTestCase):
         """ Tests edit_experiment template does not render for url 'create_experiment'
             when unauthorized """
         self.set_roles([])
-        response = self.client.get(reverse("ab_testing_tool_create_experiment", args=(self.resource_link_id,)))
+        response = self.client.get(reverse("ab_testing_tool_create_experiment", args=(self.resource_link_id,)), follow=True)
         self.assertTemplateNotUsed(response, "ab_tool/create_experiment.html")
         self.assertTemplateUsed(response, "ab_tool/not_authorized.html")
     
