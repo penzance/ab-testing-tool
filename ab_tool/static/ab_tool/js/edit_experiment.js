@@ -286,5 +286,9 @@ var controller = function($scope, $window, $http) {
 /**
  * Angular module configuration
  */
-angular.module('ABToolExperiment', []).
-    controller('experimentController', controller);
+var app = angular.module('ABToolExperiment', []);
+app.controller('experimentController', controller);
+app.config(['$httpProvider', function($httpProvider) {
+    $httpProvider.defaults.xsrfCookieName = 'csrftoken';
+    $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
+}]);

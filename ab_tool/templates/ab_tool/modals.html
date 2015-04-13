@@ -56,6 +56,7 @@
         </div>
         <form class="form-horizontal modal-form" role="form" method="post" name="intervention_point_creation_form"
             action="{% url 'ab_testing_tool_submit_create_intervention_point' experiment.id %}">
+            {% csrf_token %}
             <div class="modal-body">
                 <fieldset>
                     <legend class="sr-only">Name of intervention point</legend>
@@ -140,6 +141,7 @@
         </div>
         <form method="post" class="form-horizontal modal-form" name="intervention_point_form"
             action="{% url 'ab_testing_tool_submit_edit_intervention_point' intervention_point.id %}">
+            {% csrf_token %}
             <div class="modal-body">
 
                 <fieldset>
@@ -266,8 +268,15 @@
                 <p class="text-warning">Starting an experiment cannot be undone. Once started, the experiment assignment method and number of tracks cannot be changed. Students will be assigned to tracks when they first visit an intervention point in this experiment.</p>
             </div>
             <div class="modal-footer">
-                <a class="btn btn-lg btn-submit-primary" data-dismiss="modal"> Close </a>
-                <a class="btn btn-lg btn-submit submitter" href="{% url 'ab_testing_tool_finalize_tracks' experiment.id %}"> Yes, Start Experiment </a>
+                {# TODO: This can be an AJAX POST with intervention_point.id in the params #}
+                <form method="post" id="finalize_tracks_confirmation_form_{{experiment.id}}"
+                      action="{% url 'ab_testing_tool_finalize_tracks' experiment.id %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <a class="btn btn-lg btn-submit-primary" data-dismiss="modal"> Close </a>
+                    <a class="btn btn-lg btn-submit submitter" onclick="this.parentNode.submit(); return false;">
+                        Yes, Start Experiment
+                    </a>
+                </form>
             </div>
         </div>
     </div>
@@ -286,6 +295,7 @@
                 <h4 class="modal-title">Upload Track Assignments</h4>
             </div>
             <form method="post" action="{% url 'ab_testing_tool_upload_track_assignments' experiment.id %}" enctype="multipart/form-data">
+                {% csrf_token %}
                 <div class="modal-body">
                     <p>Upload a spreadsheet to assign students to tracks. Download the following file of all
                     students not assigned to a track, fill it in with track assignments for each student, and
@@ -331,8 +341,18 @@
                 <p class="text-warning">Are you sure you want to delete experiment "{{experiment.name}}"?  This will also delete all intervention points for this experiment.</p>
             </div>
             <div class="modal-footer">
-                <a class="btn btn-lg btn-submit-primary" data-dismiss="modal"> Close </a>
-                <a class="btn btn-lg btn-link submitter"  href="{% url 'ab_testing_tool_delete_experiment' experiment.id %}"> Yes, Delete Experiment </a>
+                {# TODO: This can be an AJAX POST with intervention_point.id in the params #}
+                <form method="post" id="delete_experiment_form_{{experiment.id}}"
+                      action="{% url 'ab_testing_tool_delete_experiment' experiment.id %}"
+                      enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <a class="btn btn-lg btn-submit-primary" data-dismiss="modal"> Close </a>
+                    <a id="delete_experiment_button_{{experiment.id}}"
+                       class="btn btn-lg btn-link submitter"
+                       onclick="this.parentNode.submit(); return false;">
+                        Yes, Delete Experiment
+                    </a>
+                </form>
             </div>
         </div>
     </div>

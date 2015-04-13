@@ -13,7 +13,7 @@
     <main>
         {% if intervention_points %}
         <form class="form-horizontal" method="POST" action="{% url 'ab_testing_tool_submit_selection' %}">
-
+            {% csrf_token %}
             <fieldset  class="fieldset-noborder">
                 <legend class="sr-only">Tracks for experiment</legend>
 
