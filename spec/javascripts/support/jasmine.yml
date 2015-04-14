@@ -12,6 +12,7 @@
 #   - dist/**/*.js
 #
 src_files:
+    - "ab_tool/**/libraries/*.js"
     - "ab_tool/**/*.js"
 
 # stylesheets
@@ -52,7 +53,6 @@ helpers:
 #
 spec_files:
   - "**/*[Ss]pec.js"
-
 
 # src_dir
 #
