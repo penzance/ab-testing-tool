@@ -63,8 +63,7 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['Chrome', 'Firefox', 'PhantomJS', 'Safari'],
-    //browsers: ['PhantomJS'],
+    browsers: ['Chrome', 'Firefox', 'PhantomJS'],
 
 
     // Continuous Integration mode
@@ -72,8 +71,8 @@ module.exports = function(config) {
     singleRun: true,
 
     // NOTE: for jenkins integration, reference http://karma-runner.github.io/0.12/plus/jenkins.html
-    reporters: ['dots', 'junit'],
-    junitReporter: {outputFile: 'test-results.xml'}
+    //reporters: ['dots', 'junit'],
+    //junitReporter: {outputFile: 'test-results.xml'}
 
   });
 };
