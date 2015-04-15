@@ -92,11 +92,11 @@
                     <div class="exp-delete" data-toggle="tooltip" data-placement="left" title="Delete experiment">
                         <div class="arrow-right"></div>
                         {% if experiment.id in deletable_experiment_ids %}
-                            <a href="#delete_modal{{experiment.id}}" data-toggle="modal" class="btn btn-icon-only exp-btn-global">
+                            <a href="#delete_modal{{experiment.id}}"  data-toggle="modal" class="btn btn-icon-only exp-btn-global" data-selenium-experiment-name="delete_{{experiment.name}}">
                                 <i class="fa fa-trash"></i><span>Delete</span>
                             </a>
                         {% else %}
-                           <a href="#" class="btn btn-icon-only exp-btn-global disabled">
+                           <a href="#" class="btn btn-icon-only exp-btn-global disabled" data-selenium-experiment-name="delete_{{experiment.name}}">
                                 <i class="fa fa-trash"></i><span>Delete</span>
                             </a>
                         {% endif %}
