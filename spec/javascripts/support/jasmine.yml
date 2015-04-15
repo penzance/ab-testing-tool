@@ -11,6 +11,7 @@
 #   - lib/source2.js
 #   - dist/**/*.js
 #
+
 src_files:
     - "ab_tool/**/libraries/*.js"
     - "ab_tool/**/*.js"

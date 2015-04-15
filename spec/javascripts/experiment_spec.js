@@ -1,3 +1,38 @@
+describe("Tests for edit_intervention_point", function() {
+
+    describe("Tests for set_preview_href()", function() {
+        //TODO
+        it("tests that true equals true", function() {
+            expect(true).toBe(true);
+        });
+    });
+
+});
+
+describe("Tests for experiments_dashboard", function() {
+
+    describe("Tests for isValidUrl()", function() {
+        it("tests that a valid http url passes validator", function() {
+            expect(isValidUrl("http://www.example.com")).toBe(true);
+        });
+        it("tests that a valid https url passes validator", function() {
+            expect(isValidUrl("https://www.example.com")).toBe(true);
+        });
+        it("tests that an invalid url missing http does not pass validator", function() {
+            expect(isValidUrl("www.example.com")).toBe(false);
+        });
+        it("tests that an invalid url does not pass", function() {
+            expect(isValidUrl("http//www.example.com")).toBe(false);
+        });
+        it("tests that an invalid url does not pass", function() {
+            expect(isValidUrl("http://wwwexasdfasdfsafdasf")).toBe(false);
+        });
+        it("tests that an invalid does not pass", function() {
+            expect(isValidUrl("https:/www.example.com")).toBe(false);
+        });
+    });
+});
+
 describe("Tests for experimentController", function() {
     var $scope, $controller, controller, experiment;
     
@@ -29,18 +64,15 @@ describe("Tests for experimentController", function() {
         });
     });
     
-    
-    describe("Miscelaneous tests", function() {
+    describe("Miscellaneous tests", function() {
         it("name is empty to start", function() {
             expect($scope.experiment.name).toBe("");
         });
         
-        it("test submit", function() {
+        it("test that submitting is true on submit", function() {
             $scope.submit();
             expect($scope.submitting).toBe(true);
         });
     });
-    
-
 });
 
