@@ -18,10 +18,11 @@ SECURE_SETTINGS = {
     #  'log_level': 'DEBUG',  # Default log level for loggers and handlers
     #  'enable_test_logging': False,  # Whether to log when running unit tests
     
-    # 'email_host': 'mailhost.harvard.edu',
+    # 'email_host': 'change-me',
     # 'email_host_user': 'change-me',
     # 'email_host_password': 'change-me',
     # 'email_use_tls': False,
     # 'email_port': 25,
-    #'server_email': 'noreply@harvard.edu',
+    # 'email_server_email': '',
+    # 'email_default_from_email': '',
 }
