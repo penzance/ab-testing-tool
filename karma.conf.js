@@ -22,8 +22,7 @@ module.exports = function(config) {
       'ab_tool/**/libraries/angular-mocks-1.2.27.js',
       'ab_tool/**/libraries/*.js',
       'ab_tool/**/*.js',
-      'spec/*/*.js',
-      'spec/**/*.js',
+      'ab_tool/tests/frontend/**/*.js',
     ],
 
 

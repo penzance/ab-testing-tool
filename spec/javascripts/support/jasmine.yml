@@ -53,7 +53,7 @@ helpers:
 #   - **/*[sS]pec.js
 #
 spec_files:
-  - "**/*[Ss]pec.js"
+  - "**/test_*.js"
 
 # src_dir
 #
@@ -74,5 +74,5 @@ src_dir:
 # EXAMPLE:
 #
 # spec_dir: spec/javascripts
-#
-spec_dir: spec/javascripts
+
+spec_dir: ab_tool/tests/frontend
