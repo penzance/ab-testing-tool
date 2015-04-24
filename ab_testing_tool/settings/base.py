@@ -187,15 +187,22 @@ SESSION_COOKIE_HTTPONLY = True
 COURSE_ACTIVE_DAYS = 365
 NOTIFICATION_FREQUENCY_HOURS = 24
 
-MAX_FILE_UPLOAD_SIZE = 10 * 1024 * 1024 # 10 MB
+MAX_FILE_UPLOAD_SIZE = 10 * 1024 * 1024  # 10 MB
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = ENV_SETTINGS.get('email_host', 'mailhost.harvard.edu')
+EMAIL_HOST = ENV_SETTINGS.get('email_host', 'localhost')
 EMAIL_HOST_USER = ENV_SETTINGS.get('email_host_user', '')
 EMAIL_HOST_PASSWORD = ENV_SETTINGS.get('email_host_password', '')
 EMAIL_USE_TLS = ENV_SETTINGS.get('email_use_tls', False)
 EMAIL_PORT = ENV_SETTINGS.get('email_port', 25)
-SERVER_EMAIL = ENV_SETTINGS.get('server_email', "root@localhost")
+# Email address that error messages come from
+# See Django doc for current default value at:
+# https://docs.djangoproject.com/en/[version]/ref/settings/#std:setting-SERVER_EMAIL
+SERVER_EMAIL = ENV_SETTINGS.get('email_server_email', 'root@localhost')
+# Email address used in send_mail if no from address is specified, see
+# See Django doc for current default value at:
+# https://docs.djangoproject.com/en/[version]/ref/settings/#std:setting-DEFAULT_FROM_EMAIL
+DEFAULT_FROM_EMAIL = ENV_SETTINGS.get('email_default_from_email', 'webmaster@localhost')
 
 _DEFAULT_LOG_LEVEL = ENV_SETTINGS.get('log_level', 'DEBUG')
 
