@@ -127,4 +127,4 @@ dependencies located in `package.json` with command `sudo npm install`,
 and finally
   * if necessary, install a hidden dependency for Phantom.js with `sudo apt-get install libfontconfig` (e.g. on Ubuntu)
 
-You can now run frontend tests with command: `karma start karma.conf.js`
+  You can now run frontend tests with command: `karma start karma.conf.js` (configuration file is `karma.conf.js`)
