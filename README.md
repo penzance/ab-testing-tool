@@ -120,12 +120,11 @@ can be done via `[sudo] pip install -r ab_testing_tool/requirements/base.txt --u
 * Frontend (Javascript) tests are written in Jasmine syntax and ran by Karma as a test runner
 to interact with Phantom.js, a headless webkit, as our browser mock.
 In order to be able to run these tests, you need to:
-
-  1. install Node.js and npm
-  2. install Node
+  * install Node.js and npm
+  * install Node
 dependencies located in `package.json` with command `sudo npm install`,
-  3. install Karma Command Line interface globally with command `sudo npm install -g karma-cli`,
+  * install Karma Command Line interface globally with command `sudo npm install -g karma-cli`,
 and finally
-  4. install a dependency for Phantom.js with `sudo apt-get install libfontconfig`.
+  * if necessary, install a hidden dependency for Phantom.js with `sudo apt-get install libfontconfig` (e.g. on Ubuntu)
 
-  You can now run frontend tests with command: `karma start karma.conf.js`
+You can now run frontend tests with command: `karma start karma.conf.js`
