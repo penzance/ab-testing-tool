@@ -205,6 +205,7 @@ SERVER_EMAIL = ENV_SETTINGS.get('email_server_email', 'root@localhost')
 DEFAULT_FROM_EMAIL = ENV_SETTINGS.get('email_default_from_email', 'webmaster@localhost')
 
 _DEFAULT_LOG_LEVEL = ENV_SETTINGS.get('log_level', 'DEBUG')
+_LOG_ROOT = ENV_SETTINGS.get('log_root', '')
 
 LOGGING = {
     'version': 1,
@@ -246,22 +247,33 @@ LOGGING = {
         'logfile': {
             'level': _DEFAULT_LOG_LEVEL,
             'class': 'logging.handlers.WatchedFileHandler',
-            'filename': join(ENV_SETTINGS.get('log_root', ''), 'ab_testing_tool.log'),
+            'filename': normpath(join(_LOG_ROOT, 'django-ab_testing_tool.log')),
             'formatter': 'verbose',
+        },
+        'jobs-logfile': {
+            'level': _DEFAULT_LOG_LEVEL,
+            'class': 'logging.handlers.WatchedFileHandler',
+            'filename': normpath(join(_LOG_ROOT, 'django-jobs-ab_testing_tool.log')),
+            'formatter': 'verbose'
         },
     },
     'loggers': {
         'django_auth_lti': {
             'handlers': ['console', 'logfile'],
-            'level': _DEFAULT_LOG_LEVEL,
+            'level': 'DEBUG',
         },
         'ab_tool': {
             'handlers': ['console', 'logfile', 'mail_admins'],
-            'level': _DEFAULT_LOG_LEVEL,
+            'level': 'DEBUG',
+        },
+        'ab_tool.management': {
+            'handlers': ['console', 'jobs-logfile', 'mail_admins'],
+            'level': 'DEBUG',
+            'propagate': False,
         },
         'error_middleware': {
             'handlers': ['console', 'logfile'],
-            'level': _DEFAULT_LOG_LEVEL,
+            'level': 'DEBUG',
         }
     },
 }
