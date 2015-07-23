@@ -10,7 +10,6 @@ git+https://github.com/penzance/canvas_python_sdk.git@v0.7b5#egg=canvas-python-s
 redis==2.9.0
 django-redis-cache==0.10.2
 hiredis==0.1.2
-django-redis-sessions==0.4.0
 gunicorn
 xlsxwriter
 xlrd

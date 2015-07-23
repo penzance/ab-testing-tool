@@ -159,20 +159,35 @@ CANVAS_OAUTH_CLIENT_SECRET = ENV_SETTINGS.get('client_secret')
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 if ENV_SETTINGS.get('redis_cache_host'):
-    CACHES = {
-        'default': {
-            'BACKEND': 'redis_cache.RedisCache',
-            'LOCATION': ENV_SETTINGS.get('redis_cache_host'),
-            'OPTIONS': {
-                'PARSER_CLASS': 'redis.connection.HiredisParser'
-            },
-        },
-    }
+     REDIS_HOST = ENV_SETTINGS.get('redis_host', '127.0.0.1')
+     REDIS_PORT = ENV_SETTINGS.get('redis_port', 6379)
+     CACHES = {
+         'default': {
+             'BACKEND': 'redis_cache.RedisCache',
+             'LOCATION': "%s:%s" % (REDIS_HOST, REDIS_PORT),
+             'OPTIONS': {
+                 'PARSER_CLASS': 'redis.connection.HiredisParser'
+             },
+             'KEY_PREFIX': 'ab_testing_tool',  # Provide a unique value for shared cache
+             'TIMEOUT': 60 * 20,  # 20 minutes
+         },
+     }
+
+    # CACHES = {
+    #     'default': {
+    #         'BACKEND': 'redis_cache.RedisCache',
+    #         'LOCATION': ENV_SETTINGS.get('redis_cache_host'),
+    #         'OPTIONS': {
+    #             'PARSER_CLASS': 'redis.connection.HiredisParser'
+    #         },
+    #     },
+    # }
 
 if ENV_SETTINGS.get('redis_sessions_host'):
-    SESSION_ENGINE = 'redis_sessions.session'
-    SESSION_REDIS_HOST = ENV_SETTINGS.get('redis_sessions_host', 'localhost')
-    SESSION_REDIS_PORT = ENV_SETTINGS.get('redis_sessions_port', 6379)
+    SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+    #SESSION_ENGINE = 'redis_sessions.session'
+    #SESSION_REDIS_HOST = ENV_SETTINGS.get('redis_sessions_host', 'localhost')
+    #SESSION_REDIS_PORT = ENV_SETTINGS.get('redis_sessions_port', 6379)
 
 # Django defaults to False (as of 1.7)
 SESSION_COOKIE_SECURE = ENV_SETTINGS.get('use_secure_cookies', False)
