@@ -18,7 +18,7 @@ class BaseSeleniumTestCase(unittest.TestCase):
         """
         # todo: tlt-1263 local/remote should be configurable from outside the code
 
-        local = True
+        local = False
 
         # todo: tlt-1263 remote URL should be configurable from outside the code
         selenium_grid_url = settings.SELENIUM_CONFIG.get('selenium_grid_url', None)
