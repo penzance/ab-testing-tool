@@ -7,3 +7,7 @@
 django-debug-toolbar
 django-sslserver==0.14
 pep8
+xlrd
+selenium
+ddt
+pyvirtualdisplay
