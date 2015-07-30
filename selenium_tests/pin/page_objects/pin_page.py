@@ -8,7 +8,6 @@ import abc
 
 class PinPageLocators(object):
     # List of WebElements found on Pin Page (Locators)
-    # Not all HTML tags are found here, but on a need basis
     LOGIN_TYPE_XID_RADIO_BUTTON = (By.ID, "compositeAuthenticationSourceType3")
     USERNAME = (By.ID, "username")
     PASSWORD = (By.ID, "password")
@@ -65,34 +64,4 @@ class PinLoginPageObject(PinBasePageObject):
         self.set_username(username)
         self.set_password(password)
         self.click_submit()
-
-
-
-# '''--- This class defines methods to login to PIN Authentication--''' 
-# class Login(object):
-
-#     def __init__(self, driver):
-#         self._driver = driver
-#         self._driver.implicitly_wait(30)
-
-
-#     def fill_username(self,driver,username): 
-#             #This method will send input the login field on PIN page
-#             login_id = driver.find_element_by_id("username")
-#             login_id.clear()
-#             login_id.send_keys(username)
-
-#     def fill_password(self,driver, password): 
-#             #This method will send the password on the PIN
-#             login_password = driver.find_element_by_id("password")
-#             login_password.clear()
-#             login_password.send_keys(password)
-
-
-#     def submitlogin(self,driver):  
-#             submit = driver.find_element_by_css_selector("input[name=\"_eventId_submit\"]")
-#             submit.click()
-
-#     def switchframe(self,driver): 
-#             switch_to_tool_frame = driver.switch_to.frame(driver.find_element_by_id("tool_content"))
 
