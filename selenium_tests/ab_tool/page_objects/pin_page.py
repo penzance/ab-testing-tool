@@ -1,5 +1,4 @@
 from selenium_tests.pin.page_objects.pin_page import PinLoginPageObject
-#from selenium_tests.ab_tool.page_objects.index_page import IndexPageObject
 
 class LoginPage(PinLoginPageObject):
 
@@ -10,6 +9,6 @@ class LoginPage(PinLoginPageObject):
         """
         super(LoginPage, self).login(username, password)
         print 'Pin Login page returning Index page for user: %s' % username
-        #return IndexPageObject(self._driver)
+       
 
 

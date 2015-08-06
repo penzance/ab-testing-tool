@@ -1,14 +1,7 @@
-
-
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from selenium.common.exceptions import NoSuchElementException, NoAlertPresentException
-from abc import abstractmethod
+from selenium.common.exceptions import NoSuchElementException
 from selenium_tests.base_page_object import BasePageObject
 
-
-###This is the base class that all page models can inherit from###
+# This is the base class that all page models can inherit from
 
 class ABBasePage(BasePageObject):
  
@@ -19,10 +12,6 @@ class ABBasePage(BasePageObject):
         except NoSuchElementException:
             pass
 
-        
-    #@abstractmethod
-    def _validate_page(self, driver):
-        return
 
     def find_element(self, *loc):
         return self._driver.find_element(*loc)

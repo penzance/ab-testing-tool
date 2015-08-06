@@ -1,15 +1,12 @@
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.ui import Select, WebDriverWait
-from selenium.common.exceptions import NoSuchElementException, TimeoutException, NoAlertPresentException
-import unittest, time, re
+import unittest
+
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.common.exceptions import TimeoutException, NoSuchElementException, ElementNotVisibleException
 from selenium_tests.ab_tool.ab_base_test_case import ABBaseTestCase
 from selenium_tests.ab_tool.page_objects.ab_mainpage import MainPage, Locator1
 from selenium_tests.ab_tool.page_objects.ab_add_experiment_page import AddExperimentPage, Locator2
 
-# These are simple tests to validate that the tool has loaded,
-# as well as validate that an experiment can be added and deleted"""
+# These are simple tests to validate tool loaded, and an experiment can be added and deleted
 
 class test_ab_tool(ABBaseTestCase):
 
@@ -19,40 +16,39 @@ class test_ab_tool(ABBaseTestCase):
         page = MainPage(driver) #instantiate
         element = page.get_title()
         abtext = "A/B Testing Dashboard"
-        print element.text
-        print "Working on verifying that the right page loaded..."
-        driver.save_screenshot('page_after_login.png')
-        self.assertEqual(element.text, abtext, element.text)
+        print "Verifying page title..."
+        self.assertEqual(element.text, abtext, "Error: Wrong page. Expected page title is '{}' but"
+                                               " page title is returning '{}'".format(abtext, element.text))
 
 
     def test_create_new_experiment(self):
         """This test fills out form to create experiment. Asserts that new experiment is created."""
-        #This instantiate the Main Page object and clicks on the new experiment button.
+        #This instantiate the Main Page object and clicks on new experiment button.
         driver = self.driver
         create_experiment = MainPage(driver) #instantiate
         create_experiment.click_to_create_experiment()
+        print "Adding an experiment..."
         fill_form = AddExperimentPage(driver)
-        fill_form.create_name(driver,"MyExperiment")
-        fill_form.add_tracks(driver,"My New Track 101")
-        fill_form.add_notes(driver,"My notes")
-        fill_form.submit_experiment(driver)
-        fill_form.is_checked(driver)
+        fill_form.set_experiment_name("MyExperiment")
+        fill_form.add_tracks("My New Track 101")
+        fill_form.add_notes("My notes")
+        fill_form.is_uniform_random_checked()
+        fill_form.submit_experiment()
         try:
-            WebDriverWait(driver, 10).until(lambda s: s.find_element(*Locator2._experimentname).is_displayed())
+            WebDriverWait(driver, 10).until(lambda s: s.find_element(*Locator1._delete_button).is_displayed())
         except TimeoutException:
             return False
-        self.assertTrue(self, driver.find_element_by_css_selector("[data-selenium-experiment-name='delete_MyExperiment']"))
-
+        self.assertTrue(driver.find_element(*Locator1._delete_button).is_displayed())
 
         
     def test_delete_experiment(self):
         """This deletes the experiment, as part of testing delete functionality and test cleanup"""
         driver = self.driver
         delete_experiment = MainPage(driver) #instantiate
-        print "Deleting experiment..."
-        delete_experiment.delete_experiment()
-        delete_experiment.delete_confirm()
-        driver.save_screenshot('delete_experiment.png')
+        delete_experiment.click_to_begin_delete()
+        print "Deleting an experiment..."
+        self.assertTrue(delete_experiment.verify_experiment_is_deleted(),
+            "Error: Experiment has not been deleted")
 
 
 if __name__ == "__main__":

@@ -1,9 +1,10 @@
 import unittest
 import xlrd
-from selenium import webdriver
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from pyvirtualdisplay import Display
 from django.conf import settings
+
+from selenium import webdriver
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 
 # Enabling stdout logging only for high `-v`

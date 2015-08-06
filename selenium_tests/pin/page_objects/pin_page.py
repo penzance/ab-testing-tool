@@ -8,7 +8,7 @@ import abc
 
 class PinPageLocators(object):
     # List of WebElements found on Pin Page (Locators)
-    LOGIN_TYPE_XID_RADIO_BUTTON = (By.ID, "compositeAuthenticationSourceType3")
+    LOGIN_TYPE_XID_RADIO_BUTTON = (By.CSS_SELECTOR, "input[value=\"XID\"]")
     USERNAME = (By.ID, "username")
     PASSWORD = (By.ID, "password")
     SUBMIT_BUTTON = (By.CSS_SELECTOR, "input[name=\"_eventId_submit\"]")

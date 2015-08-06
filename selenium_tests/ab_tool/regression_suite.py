@@ -18,20 +18,24 @@ from selenium_tests.ab_tool.ab_tests import test_ab_tool
 import HTMLTestRunner
 
 
-dateTimeStamp = time.strftime('%Y%m%d_%H_%M_%S')
-buf = file("TestReport" + "_" + dateTimeStamp + ".html", 'wb')
+date_timestamp = time.strftime('%Y%m%d_%H_%M_%S')
+
+
+buf = file("TestReport" + "_" + date_timestamp + ".html", 'wb')
 runner = HTMLTestRunner.HTMLTestRunner(
     stream=buf,
     title='Test the Report',
     description='Result of tests'
 )
 
-
 ab_tests = unittest.TestLoader().loadTestsFromTestCase(test_ab_tool)
-
 # create a test suite combining search_tests and results_page_tests
+
 smoke_tests = unittest.TestSuite([ab_tests])
 
 # run the suite
 runner.run(smoke_tests)
+# close test report file
+buf.close()
+
 
