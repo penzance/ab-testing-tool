@@ -5,18 +5,15 @@ For more information on this file, see
 https://docs.djangoproject.com/en/1.8/topics/settings
 """
 import os
-from .secure import SECURE_SETTINGS as ENV
+from .secure import SECURE_SETTINGS
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = ENV.get('django_secret_key', 'changeme')
+SECRET_KEY = SECURE_SETTINGS.get('django_secret_key', 'changeme')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = ENV.get('enable_debug', False)
-
-# Current environment
-ENV_NAME = ENV.get('env_name', 'local')
+DEBUG = SECURE_SETTINGS.get('enable_debug', False)
 
 # Application definition
 
@@ -57,7 +54,7 @@ ROOT_URLCONF = 'ab_testing_tool.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.normpath(os.path.join(BASE_DIR, 'templates'))],
+        'DIRS': [os.path.normpath(os.path.join(BASE_DIR, 'ab_testing_tool', 'templates'))],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -79,20 +76,51 @@ WSGI_APPLICATION = 'ab_testing_tool.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': ENV.get('db_default_name', 'lti_emailer'),
-        'USER': ENV.get('db_default_user', 'postgres'),
-        'PASSWORD': ENV.get('db_default_password'),
-        'HOST': ENV.get('db_default_host', '127.0.0.1'),
-        'PORT': ENV.get('db_default_port', 5432),  # Default postgres port
+        'NAME': SECURE_SETTINGS.get('db_default_name', 'lti_emailer'),
+        'USER': SECURE_SETTINGS.get('db_default_user', 'postgres'),
+        'PASSWORD': SECURE_SETTINGS.get('db_default_password'),
+        'HOST': SECURE_SETTINGS.get('db_default_host', '127.0.0.1'),
+        'PORT': SECURE_SETTINGS.get('db_default_port', 5432),  # Default postgres port
     }
 }
 
+# Cache
+# https://docs.djangoproject.com/en/1.8/ref/settings/#std:setting-CACHES
+
+REDIS_HOST = SECURE_SETTINGS.get('redis_host', '127.0.0.1')
+REDIS_PORT = SECURE_SETTINGS.get('redis_port', 6379)
+
+CACHES = {
+    'default': {
+        'BACKEND': 'redis_cache.RedisCache',
+        'LOCATION': "redis://%s:%s/0" % (REDIS_HOST, REDIS_PORT),
+        'OPTIONS': {
+            'PARSER_CLASS': 'redis.connection.HiredisParser'
+        },
+        'KEY_PREFIX': 'ab_testing_tool',  # Provide a unique value for shared cache
+        # See following for default timeout (5 minutes as of 1.7):
+        # https://docs.djangoproject.com/en/1.8/ref/settings/#std:setting-CACHES-TIMEOUT
+        'TIMEOUT': SECURE_SETTINGS.get('default_cache_timeout_secs', 300),
+    },
+}
+
+# Sessions
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+
+SESSION_COOKIE_NAME = 'djsessionid'
+
+# NOTE: This setting only affects the session cookie, not the expiration of the session
+# being stored in the cache.  The session keys will expire according to the value of
+# SESSION_COOKIE_AGE, which defaults to 2 weeks when no value is given.
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
 # Internationalization
-# https://docs.djangoproject.com/en/1.6/topics/i18n/
+# https://docs.djangoproject.com/en/1.8/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'America/New_York'
+TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
@@ -100,101 +128,28 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.6/howto/static-files/
+# https://docs.djangoproject.com/en/1.8/howto/static-files/
 
-STATIC_URL = '/ab-testing/static/'
+STATIC_URL = '/static/'
 
-STATIC_ROOT = normpath(join(SITE_ROOT, 'http_static'))
+STATIC_ROOT = os.path.normpath(os.path.join(BASE_DIR, 'http_static'))
 
-# renderable_error.html is the default template specified in error_middleware and can be changed if desired
-RENDERABLE_ERROR_TEMPLATE = "renderable_error.html"
-# oauth_error.html is the default template specified in django_canvas_oauth and can be changed if desired
-OAUTH_ERROR_TEMPLATE = "oauth_error.html"
+# Logging
 
-CANVAS_OAUTH_CLIENT_ID = ENV_SETTINGS.get('client_id')
-CANVAS_OAUTH_CLIENT_SECRET = ENV_SETTINGS.get('client_secret')
-
-LTI_OAUTH_CREDENTIALS = ENV_SETTINGS.get('lti_oauth_credentials', None)
-
-# This is for https forwarding on server
-# SECURITY WARNING: https://docs.djangoproject.com/en/1.7/ref/settings/#secure-proxy-ssl-header
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
-if ENV_SETTINGS.get('redis_cache_host'):
-     REDIS_HOST = ENV_SETTINGS.get('redis_host', '127.0.0.1')
-     REDIS_PORT = ENV_SETTINGS.get('redis_port', 6379)
-     CACHES = {
-         'default': {
-             'BACKEND': 'redis_cache.RedisCache',
-             'LOCATION': "%s:%s" % (REDIS_HOST, REDIS_PORT),
-             'OPTIONS': {
-                 'PARSER_CLASS': 'redis.connection.HiredisParser'
-             },
-             'KEY_PREFIX': 'ab_testing_tool',  # Provide a unique value for shared cache
-             'TIMEOUT': 60 * 20,  # 20 minutes
-         },
-     }
-
-    # CACHES = {
-    #     'default': {
-    #         'BACKEND': 'redis_cache.RedisCache',
-    #         'LOCATION': ENV_SETTINGS.get('redis_cache_host'),
-    #         'OPTIONS': {
-    #             'PARSER_CLASS': 'redis.connection.HiredisParser'
-    #         },
-    #     },
-    # }
-
-if ENV_SETTINGS.get('redis_sessions_host'):
-    SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
-    #SESSION_ENGINE = 'redis_sessions.session'
-    #SESSION_REDIS_HOST = ENV_SETTINGS.get('redis_sessions_host', 'localhost')
-    #SESSION_REDIS_PORT = ENV_SETTINGS.get('redis_sessions_port', 6379)
-
-# Django defaults to False (as of 1.7)
-SESSION_COOKIE_SECURE = ENV_SETTINGS.get('use_secure_cookies', False)
-
-# session cookie lasts for 7 hours (in seconds)
-SESSION_COOKIE_AGE = 60 * 60 * 7
-
-SESSION_COOKIE_NAME = 'djsessionid'
-
-SESSION_COOKIE_HTTPONLY = True
-
-COURSE_ACTIVE_DAYS = 365
-NOTIFICATION_FREQUENCY_HOURS = 24
-
-MAX_FILE_UPLOAD_SIZE = 10 * 1024 * 1024  # 10 MB
-
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = ENV_SETTINGS.get('email_host', 'localhost')
-EMAIL_HOST_USER = ENV_SETTINGS.get('email_host_user', '')
-EMAIL_HOST_PASSWORD = ENV_SETTINGS.get('email_host_password', '')
-EMAIL_USE_TLS = ENV_SETTINGS.get('email_use_tls', False)
-EMAIL_PORT = ENV_SETTINGS.get('email_port', 25)
-# Email address that error messages come from
-# See Django doc for current default value at:
-# https://docs.djangoproject.com/en/[version]/ref/settings/#std:setting-SERVER_EMAIL
-SERVER_EMAIL = ENV_SETTINGS.get('email_server_email', 'root@localhost')
-# Email address used in send_mail if no from address is specified, see
-# See Django doc for current default value at:
-# https://docs.djangoproject.com/en/[version]/ref/settings/#std:setting-DEFAULT_FROM_EMAIL
-DEFAULT_FROM_EMAIL = ENV_SETTINGS.get('email_default_from_email', 'webmaster@localhost')
-
-_DEFAULT_LOG_LEVEL = ENV_SETTINGS.get('log_level', 'DEBUG')
-_LOG_ROOT = ENV_SETTINGS.get('log_root', '')
+_DEFAULT_LOG_LEVEL = SECURE_SETTINGS.get('log_level', 'DEBUG')
+_LOG_ROOT = SECURE_SETTINGS.get('log_root', '')
 
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,  # Merge this with Django's default logging configuration
     'formatters': {
         'verbose': {
-            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+            'format': '%(levelname)s\t%(asctime)s.%(msecs)03dZ\t%(name)s:%(lineno)s\t%(message)s',
+            'datefmt': '%Y-%m-%dT%H:%M:%S'
         },
         'simple': {
-            'format': '%(levelname)s %(module)s %(message)s'
+            'format': '%(levelname)s\t%(name)s:%(lineno)s\t%(message)s',
         }
     },
     # Borrowing some default filters for app loggers
@@ -208,16 +163,10 @@ LOGGING = {
     },
     'handlers': {
         'console': {
-            'level': _DEFAULT_LOG_LEVEL,
+            'level': 'DEBUG',
             'class': 'logging.StreamHandler',
             'formatter': 'simple',
             'filters': ['require_debug_true'],
-        },
-        # In case we turn on mail for any of the below loggers
-        'mail_admins': {
-            'level': 'ERROR',
-            'class': 'django.utils.log.AdminEmailHandler',
-            'filters': ['require_debug_false'],
         },
         # For testing purposes and fallback for mail filter
         'null': {
@@ -226,28 +175,25 @@ LOGGING = {
         'logfile': {
             'level': _DEFAULT_LOG_LEVEL,
             'class': 'logging.handlers.WatchedFileHandler',
-            'filename': normpath(join(_LOG_ROOT, 'django-ab_testing_tool.log')),
+            'filename': os.path.normpath(os.path.join(_LOG_ROOT, 'django-ab_testing_tool.log')),
             'formatter': 'verbose',
         },
         'jobs-logfile': {
             'level': _DEFAULT_LOG_LEVEL,
             'class': 'logging.handlers.WatchedFileHandler',
-            'filename': normpath(join(_LOG_ROOT, 'django-jobs-ab_testing_tool.log')),
+            'filename': os.path.normpath(os.path.join(_LOG_ROOT, 'django-jobs-ab_testing_tool.log')),
             'formatter': 'verbose'
         },
     },
     'loggers': {
         'django_auth_lti': {
             'handlers': ['console', 'logfile'],
-            'level': 'DEBUG',
         },
         'ab_tool': {
-            'handlers': ['console', 'logfile', 'mail_admins'],
-            'level': 'DEBUG',
+            'handlers': ['console', 'logfile'],
         },
         'ab_tool.management': {
-            'handlers': ['console', 'jobs-logfile', 'mail_admins'],
-            'level': 'DEBUG',
+            'handlers': ['console', 'jobs-logfile'],
             'propagate': False,
         },
         'django.request': {
@@ -257,7 +203,35 @@ LOGGING = {
         },
         'error_middleware': {
             'handlers': ['console', 'logfile'],
-            'level': 'DEBUG',
         }
     },
 }
+
+# Currently deployed environment
+ENV_NAME = SECURE_SETTINGS.get('env_name', 'local')
+
+# Other app specific settings
+
+# renderable_error.html is the default template specified in error_middleware and can be changed if desired
+RENDERABLE_ERROR_TEMPLATE = "renderable_error.html"
+# oauth_error.html is the default template specified in django_canvas_oauth and can be changed if desired
+OAUTH_ERROR_TEMPLATE = "oauth_error.html"
+
+CANVAS_OAUTH_CLIENT_ID = SECURE_SETTINGS.get('client_id')
+CANVAS_OAUTH_CLIENT_SECRET = SECURE_SETTINGS.get('client_secret')
+
+LTI_OAUTH_CREDENTIALS = SECURE_SETTINGS.get('lti_oauth_credentials', None)
+
+COURSE_ACTIVE_DAYS = 365
+NOTIFICATION_FREQUENCY_HOURS = 24
+
+MAX_FILE_UPLOAD_SIZE = 10 * 1024 * 1024  # 10 MB
+
+# Email address that error messages come from
+# See Django doc for current default value at:
+# https://docs.djangoproject.com/en/[version]/ref/settings/#std:setting-SERVER_EMAIL
+SERVER_EMAIL = SECURE_SETTINGS.get('email_server_email', 'root@localhost')
+# Email address used in send_mail if no from address is specified, see
+# See Django doc for current default value at:
+# https://docs.djangoproject.com/en/[version]/ref/settings/#std:setting-DEFAULT_FROM_EMAIL
+DEFAULT_FROM_EMAIL = SECURE_SETTINGS.get('email_default_from_email', 'webmaster@localhost')

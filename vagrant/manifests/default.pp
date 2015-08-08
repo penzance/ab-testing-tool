@@ -30,6 +30,16 @@ package {'libxslt1-dev':
     require => Exec['apt-get-update'],
 }
 
+package {'libxml2':
+    ensure => latest,
+    require => Exec['apt-get-update'],
+}
+
+package {'libxml2-dev':
+    ensure => latest,
+    require => Exec['apt-get-update'],
+}
+
 package {'build-essential':
     ensure => latest,
     require => Exec['apt-get-update'],
@@ -45,14 +55,9 @@ package {'python-pip':
     require => Package['python-dev']
 }
 
-package {'libaio1':
+package {'python-setuptools':
     ensure => installed,
-    require => Exec['apt-get-update']
-}
-
-package {'libaio-dev':
-    ensure => installed,
-    require => Exec['apt-get-update']
+    require => Package['python-dev']
 }
 
 package {'git':
@@ -169,6 +174,12 @@ file {'/etc/profile.d/venvwrapper.sh':
     content => 'source `which virtualenvwrapper.sh`',
     mode => '755',
     require => Package['virtualenvwrapper'],
+}
+
+# Create a symlink from ~/ab_testing_tool to /vagrant as a convenience for the developer
+file {'/home/vagrant/ab_testing_tool':
+    ensure => link,
+    target => '/vagrant',
 }
 
 # Create a virtualenv for <project_name>
