@@ -286,6 +286,11 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': False,
         },
+        'django.request': {
+            'handlers': ['console', 'app_logfile'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
         'error_middleware': {
             'handlers': ['console', 'logfile'],
             'level': 'DEBUG',
