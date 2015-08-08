@@ -10,7 +10,18 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # please see the online documentation at vagrantup.com.
 
   # Every Vagrant virtual environment requires a box to build off of.
-  config.vm.box = "hashicorp/precise64"
+  config.vm.box = "ubuntu/trusty64"
+
+  config.vm.provider "virtualbox" do |v|
+    # Seems to be required for Ubuntu
+    # https://www.virtualbox.org/manual/ch03.html#settings-processor
+    v.customize ["modifyvm", :id, "--pae", "on"]
+    # Recommended for Ubuntu
+    v.cpus = 2
+    # This VM comes without swap memory enabled, so we need to bump up
+    # from 512 in order to accomodate installation of lxml
+    v.memory = 768
+  end
 
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine. In the example below,
