@@ -16,3 +16,10 @@ INTERNAL_IPS = ('127.0.0.1', '10.0.2.2',)
 DEBUG_TOOLBAR_CONFIG = {
     'INTERCEPT_REDIRECTS': False,
 }
+
+SELENIUM_CONFIG = {
+    'selenium_username': SECURE_SETTINGS.get('selenium_user'),
+    'selenium_password': SECURE_SETTINGS.get('selenium_password'),
+    'selenium_grid_url': SECURE_SETTINGS.get('selenium_grid_url'),
+    'base_url': 'https://canvas.icommons.harvard.edu',
+}

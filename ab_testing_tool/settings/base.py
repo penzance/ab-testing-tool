@@ -197,7 +197,7 @@ LOGGING = {
             'propagate': False,
         },
         'django.request': {
-            'handlers': ['console', 'app_logfile'],
+            'handlers': ['console', 'logfile'],
             'level': 'ERROR',
             'propagate': False,
         },

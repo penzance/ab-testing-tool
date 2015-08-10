@@ -9,3 +9,7 @@ django-sslserver==0.14
 pep8
 mock
 jasmine
+xlrd
+selenium
+ddt
+pyvirtualdisplay
