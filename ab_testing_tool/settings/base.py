@@ -76,7 +76,7 @@ WSGI_APPLICATION = 'ab_testing_tool.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': SECURE_SETTINGS.get('db_default_name', 'lti_emailer'),
+        'NAME': SECURE_SETTINGS.get('db_default_name', 'ab_testing_tool'),
         'USER': SECURE_SETTINGS.get('db_default_user', 'postgres'),
         'PASSWORD': SECURE_SETTINGS.get('db_default_password'),
         'HOST': SECURE_SETTINGS.get('db_default_host', '127.0.0.1'),
