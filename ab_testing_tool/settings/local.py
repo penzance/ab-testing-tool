@@ -1,4 +1,5 @@
 from .base import *
+from logging.config import dictConfig
 
 ALLOWED_HOSTS = ['*']
 
@@ -23,3 +24,12 @@ SELENIUM_CONFIG = {
     'selenium_grid_url': SECURE_SETTINGS.get('selenium_grid_url'),
     'base_url': 'https://canvas.icommons.harvard.edu',
 }
+
+# Log to console instead of a file when running locally
+LOGGING['handlers']['default'] = {
+    'level': logging.DEBUG,
+    'class': 'logging.StreamHandler',
+    'formatter': 'simple',
+}
+
+dictConfig(LOGGING)

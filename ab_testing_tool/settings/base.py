@@ -5,6 +5,7 @@ For more information on this file, see
 https://docs.djangoproject.com/en/1.8/topics/settings
 """
 import os
+import logging
 from .secure import SECURE_SETTINGS
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -142,8 +143,12 @@ STATIC_ROOT = os.path.normpath(os.path.join(BASE_DIR, 'http_static'))
 
 # Logging
 
-_DEFAULT_LOG_LEVEL = SECURE_SETTINGS.get('log_level', 'DEBUG')
+_DEFAULT_LOG_LEVEL = SECURE_SETTINGS.get('log_level', logging.DEBUG)
 _LOG_ROOT = SECURE_SETTINGS.get('log_root', '')
+
+# Turn off default Django logging
+# https://docs.djangoproject.com/en/1.8/topics/logging/#disabling-logging-configuration
+LOGGING_CONFIG = None
 
 LOGGING = {
     'version': 1,
@@ -157,57 +162,39 @@ LOGGING = {
             'format': '%(levelname)s\t%(name)s:%(lineno)s\t%(message)s',
         }
     },
-    # Borrowing some default filters for app loggers
-    'filters': {
-        'require_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse',
-        },
-        'require_debug_true': {
-            '()': 'django.utils.log.RequireDebugTrue',
+    'handlers': {
+        'default': {
+            'class': 'logging.handlers.WatchedFileHandler',
+            'level': _DEFAULT_LOG_LEVEL,
+            'formatter': 'verbose',
+            'filename': os.path.join(_LOG_ROOT, 'django-ab_testing_tool.log'),
         },
     },
-    'handlers': {
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-            'formatter': 'simple',
-            'filters': ['require_debug_true'],
-        },
-        # For testing purposes and fallback for mail filter
-        'null': {
-            'class': 'logging.NullHandler',
-        },
-        'logfile': {
-            'level': _DEFAULT_LOG_LEVEL,
-            'class': 'logging.handlers.WatchedFileHandler',
-            'filename': os.path.normpath(os.path.join(_LOG_ROOT, 'django-ab_testing_tool.log')),
-            'formatter': 'verbose',
-        },
-        'jobs-logfile': {
-            'level': _DEFAULT_LOG_LEVEL,
-            'class': 'logging.handlers.WatchedFileHandler',
-            'filename': os.path.normpath(os.path.join(_LOG_ROOT, 'django-jobs-ab_testing_tool.log')),
-            'formatter': 'verbose'
-        },
+    # This is the default logger for any apps or libraries that use the logger
+    # package, but are not represented in the `loggers` dict below.  A level
+    # must be set and handlers defined.  Setting this logger is equivalent to
+    # setting and empty string logger in the loggers dict below, but the separation
+    # here is a bit more explicit.  See link for more details:
+    # https://docs.python.org/2.7/library/logging.config.html#dictionary-schema-details
+    'root': {
+        'level': logging.WARNING,
+        'handlers': ['default'],
     },
     'loggers': {
-        'django_auth_lti': {
-            'handlers': ['console', 'logfile'],
-        },
         'ab_tool': {
-            'handlers': ['console', 'logfile'],
-        },
-        'ab_tool.management': {
-            'handlers': ['console', 'jobs-logfile'],
+            'level': _DEFAULT_LOG_LEVEL,
+            'handlers': ['default'],
             'propagate': False,
         },
-        'django.request': {
-            'handlers': ['console', 'logfile'],
-            'level': 'ERROR',
+        'django_canvas_oauth': {
+            'level': _DEFAULT_LOG_LEVEL,
+            'handlers': ['default'],
             'propagate': False,
         },
         'error_middleware': {
-            'handlers': ['console', 'logfile'],
+            'level': _DEFAULT_LOG_LEVEL,
+            'handlers': ['default'],
+            'propagate': False,
         }
     },
 }
