@@ -169,6 +169,10 @@ LOGGING = {
             'formatter': 'verbose',
             'filename': os.path.join(_LOG_ROOT, 'django-ab_testing_tool.log'),
         },
+        # For testing purposes
+        'null': {
+            'class': 'logging.NullHandler',
+        },
     },
     # This is the default logger for any apps or libraries that use the logger
     # package, but are not represented in the `loggers` dict below.  A level
