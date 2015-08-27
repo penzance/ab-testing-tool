@@ -121,10 +121,15 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
-
-USE_I18N = True
-
-USE_L10N = True
+# A boolean that specifies whether Django's translation system should be enabled. This provides
+# an easy way to turn it off, for performance. If this is set to False, Django will make some
+# optimizations so as not to load the translation machinery.  NOTE: can be loaded when needed
+# in templates
+USE_I18N = False
+# A boolean that specifies if localized formatting of data will be enabled by default or not.
+# If this is set to True, e.g. Django will display numbers and dates using the format of the
+# current locale.  NOTE: can be loaded when needed in templates
+USE_L10N = False
 
 USE_TZ = True
 
