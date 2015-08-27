@@ -93,8 +93,9 @@ class TestControllers(SessionTestCase):
         """ Tests that validate_format_url adds http:// to a url missing it """
         url = "com"
         self.assertRaisesSpecific(INVALID_URL_PARAM, validate_format_url, url)
-        url = "http://" + "a"*2046 + ".com"
-        self.assertRaisesSpecific(INVALID_URL_PARAM, validate_format_url, url)
+        # Below test url is valid in Django 1.8+
+        # url = "http://" + "a"*2046 + ".com"
+        # self.assertRaisesSpecific(INVALID_URL_PARAM, validate_format_url, url)
     
     def test_post_param_success(self):
         """ Test that post_param returns correct value when param is present """
