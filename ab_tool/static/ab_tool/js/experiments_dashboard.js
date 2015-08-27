@@ -1,64 +1,64 @@
+// *** IP MODALS *************************************************************************************************
+
+function validateIPNameInputElement($name) {
+    $name.toggleClass('has-error empty', !($name.val().trim()));
+}
+
+function validateUrlInputElement($url) {
+    // todo: consider using custom HTML5 validation with .willValidate() or .is(':valid') instead
+    var urlValue = $url.val().trim();
+    $url.toggleClass('empty', !urlValue);
+    if ( isValidUrl(urlValue) ){
+        $url.removeClass('has-error');
+        $url.siblings('.preview-link').attr('href', urlValue).show();
+    } else {
+        $url.addClass('has-error');
+        $url.siblings('.preview-link').hide();
+    }
+}
+
+function isValidUrl(url) {
+    //if URL input element is used, this should match the pattern attribute or the custom validation
+    return /^(http(s)?:\/\/)(www\.)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/i.test(url);
+}
+
+function enableSubmitIfNoErrors($form) {
+    var formIsSubmittedPendingResponse = $form.find('.modal-submit').hasClass('submitting');
+    var validationErrorsFound = $form.find('.has-error, .empty').length != 0;
+    $form.find('.modal-submit').toggleClass('disabled', formIsSubmittedPendingResponse || validationErrorsFound);
+}
+
+function resetIPCreateForm($form) {
+    // reset values for non-selectmenu fields
+    $form.find('.form-control').val('');
+    // hide preview links for blank URL fields
+    $form.find('.preview-link').hide();
+    // .empty ensures that form cannot be submitted even though .has-error is not showing user validation feedback
+    $form.find('.intervention-url, .intervention-name').removeClass('has-error').addClass('empty');
+    // reset each selectmenu to the first item in the menu
+    $form.find('select').each(function () {
+        $($(this).siblings('ul').find('a')[0]).trigger('select');
+    });
+    enableSubmitIfNoErrors($form);
+}
+
+function resetIPEditForm($form) {
+    $form.find('.intervention-url, .intervention-name, .intervention-notes').each(function () {
+        $(this).val($(this).data("initial-value"));
+    });
+    $form.find('.intervention-url').each(function(){
+        validateUrlInputElement($(this));
+    });
+    $form.find('.intervention-name').each(function(){
+        validateIPNameInputElement($(this));
+    });
+    $form.find('select').each(function () {
+        $($(this).siblings('ul').find('a')[parseInt($(this).data("initial-index"))]).trigger('select');
+    });
+    enableSubmitIfNoErrors($form);
+}
+
 $(document).ready(function(){
-
-    // *** IP MODALS *************************************************************************************************
-
-    function validateIPNameInputElement($name) {
-        $name.toggleClass('has-error empty', !($name.val().trim()));
-    }
-
-    function validateUrlInputElement($url) {
-        // todo: consider using custom HTML5 validation with .willValidate() or .is(':valid') instead
-        var urlValue = $url.val().trim();
-        $url.toggleClass('empty', !urlValue);
-        if ( isValidUrl(urlValue) ){
-            $url.removeClass('has-error');
-            $url.siblings('.preview-link').attr('href', urlValue).show();
-        } else {
-            $url.addClass('has-error');
-            $url.siblings('.preview-link').hide();
-        }
-    }
-
-    function isValidUrl(url) {
-        //if URL input element is used, this should match the pattern attribute or the custom validation
-        return /^(http(s)?:\/\/)?(www\.)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/i.test(url);
-    }
-
-    function enableSubmitIfNoErrors($form) {
-        var formIsSubmittedPendingResponse = $form.find('.modal-submit').hasClass('submitting');
-        var validationErrorsFound = $form.find('.has-error, .empty').length != 0;
-        $form.find('.modal-submit').toggleClass('disabled', formIsSubmittedPendingResponse || validationErrorsFound);
-    }
-
-    function resetIPCreateForm($form) {
-        // reset values for non-selectmenu fields
-        $form.find('.form-control').val('');
-        // hide preview links for blank URL fields
-        $form.find('.preview-link').hide();
-        // .empty ensures that form cannot be submitted even though .has-error is not showing user validation feedback
-        $form.find('.intervention-url, .intervention-name').removeClass('has-error').addClass('empty');
-        // reset each selectmenu to the first item in the menu
-        $form.find('select').each(function () {
-            $($(this).siblings('ul').find('a')[0]).trigger('select');
-        });
-        enableSubmitIfNoErrors($form);
-    }
-
-    function resetIPEditForm($form) {
-        $form.find('.intervention-url, .intervention-name, .intervention-notes').each(function () {
-            $(this).val($(this).data("initial-value"));
-        });
-        $form.find('.intervention-url').each(function(){
-            validateUrlInputElement($(this));
-        });
-        $form.find('.intervention-name').each(function(){
-            validateIPNameInputElement($(this));
-        });
-        $form.find('select').each(function () {
-            $($(this).siblings('ul').find('a')[parseInt($(this).data("initial-index"))]).trigger('select');
-        });
-        enableSubmitIfNoErrors($form);
-    }
 
     // Initialize elements ****************************************************************************************
 

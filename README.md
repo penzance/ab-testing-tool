@@ -106,8 +106,25 @@ All commands here should be run from the ab-testing-tool directory
 
 * Run the tool via `python manage.py runserver`.
 
-* If you get an import error, update requirements with 
+* If you get an import error, update requirements with
   `sudo pip install -r ab_testing_tool/requirements/local.txt`
   (don't use sudo if using cygwin or virtualenv).
 
-* If a library has changed versions and secure.py needs updating, the library update can be done via `[sudo] pip install -r ab_testing_tool/requirements/base.txt --upgrade`
+* If a library has changed versions and secure.py needs updating, the library update
+can be done via `[sudo] pip install -r ab_testing_tool/requirements/base.txt --upgrade`
+
+## Running Tests:
+
+* Backend (Python) tests can be ran with command: `python manage.py test`
+
+* Frontend (Javascript) tests are written in Jasmine syntax and ran by Karma as a test runner
+to interact with Phantom.js, a headless webkit, as our browser mock.
+In order to be able to run these tests, you need to:
+  * install Node.js and npm
+  * install Node
+dependencies located in `package.json` with command `sudo npm install`,
+  * install Karma Command Line interface globally with command `sudo npm install -g karma-cli`,
+and finally
+  * if necessary, install a hidden dependency for Phantom.js with `sudo apt-get install libfontconfig` (e.g. on Ubuntu)
+
+  You can now run frontend tests with command: `karma start karma.conf.js` (configuration file is `karma.conf.js`)

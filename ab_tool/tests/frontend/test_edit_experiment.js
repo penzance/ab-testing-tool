@@ -29,18 +29,15 @@ describe("Tests for experimentController", function() {
         });
     });
     
-    
-    describe("Miscelaneous tests", function() {
+    describe("Miscellaneous tests", function() {
         it("name is empty to start", function() {
             expect($scope.experiment.name).toBe("");
         });
         
-        it("test submit", function() {
+        it("test that submitting is true on submit", function() {
             $scope.submit();
             expect($scope.submitting).toBe(true);
         });
     });
-    
-
 });
 

@@ -11,7 +11,9 @@
 #   - lib/source2.js
 #   - dist/**/*.js
 #
+
 src_files:
+    - "ab_tool/**/libraries/*.js"
     - "ab_tool/**/*.js"
 
 # stylesheets
@@ -51,8 +53,7 @@ helpers:
 #   - **/*[sS]pec.js
 #
 spec_files:
-  - "**/*[Ss]pec.js"
-
+  - "**/test_*.js"
 
 # src_dir
 #
@@ -73,5 +74,5 @@ src_dir:
 # EXAMPLE:
 #
 # spec_dir: spec/javascripts
-#
-spec_dir: spec/javascripts
+
+spec_dir: ab_tool/tests/frontend
