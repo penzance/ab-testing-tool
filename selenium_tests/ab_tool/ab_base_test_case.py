@@ -18,7 +18,7 @@ class ABBaseTestCase(BaseSeleniumTestCase):
         driver = cls.driver
         cls.USERNAME = settings.SELENIUM_CONFIG.get('selenium_username')
         cls.PASSWORD = settings.SELENIUM_CONFIG.get('selenium_password')
-        cls.BASE_URL = '%s/courses/5992/external_tools/1559' % settings.SELENIUM_CONFIG.get('base_url')
+        cls.BASE_URL = '%s/courses/5992/external_tools/1762' % settings.SELENIUM_CONFIG.get('base_url')
 
         #instantiate, then login to URL with username and password from settings, if running locally.
         base_login = LoginPage(driver) # instantiate
