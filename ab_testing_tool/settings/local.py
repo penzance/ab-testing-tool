@@ -22,7 +22,7 @@ SELENIUM_CONFIG = {
     'selenium_username': SECURE_SETTINGS.get('selenium_user'),
     'selenium_password': SECURE_SETTINGS.get('selenium_password'),
     'selenium_grid_url': SECURE_SETTINGS.get('selenium_grid_url'),
-    'base_url': 'https://canvas.icommons.harvard.edu',
+    'base_url': 'https://canvas.dev.tlt.harvard.edu',
 }
 
 # Log to console instead of a file when running locally
